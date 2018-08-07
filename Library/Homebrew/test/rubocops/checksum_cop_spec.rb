@@ -7,7 +7,7 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
     it "When the checksum is empty" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           stable do
             url "https://github.com/foo-lang/foo-compiler/archive/0.18.0.tar.gz"
             sha256 ""
@@ -26,7 +26,7 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
     it "When the checksum is not 64 characters" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           stable do
             url "https://github.com/foo-lang/foo-compiler/archive/0.18.0.tar.gz"
             sha256 "5cf6e1ae0a645b426c0474cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea0e9ad"
@@ -45,7 +45,7 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
     it "When the checksum has invalid chars" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           stable do
             url "https://github.com/foo-lang/foo-compiler/archive/0.18.0.tar.gz"
             sha256 "5cf6e1ae0a645b426c0k7cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea0e9a"
@@ -70,7 +70,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
     it "When the checksum has upper case characters" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           stable do
             url "https://github.com/foo-lang/foo-compiler/archive/0.18.0.tar.gz"
             sha256 "5cf6e1ae0A645b426c0a7cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea0e9a"
@@ -89,7 +89,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
     it "When auditing stable blocks outside spec blocks" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           resource "foo-outside" do
             url "https://github.com/foo-lang/foo-outside/archive/0.18.0.tar.gz"
             sha256 "A4cc7cd3f7d1605ffa1ac5755cf6e1ae0a645b426b047a6a39a8b2268ddc7ea9"
@@ -113,7 +113,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
     it "When there is uppercase sha256" do
       source = <<~RUBY
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           stable do
             url "https://github.com/foo-lang/foo-compiler/archive/0.18.0.tar.gz"
             sha256 "5cf6e1ae0A645b426c0a7cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea0e9a"
@@ -128,7 +128,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
 
       corrected_source = <<~RUBY
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           stable do
             url "https://github.com/foo-lang/foo-compiler/archive/0.18.0.tar.gz"
             sha256 "5cf6e1ae0a645b426c0a7cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea0e9a"

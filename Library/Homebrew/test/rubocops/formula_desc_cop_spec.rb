@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAudit::DescLength do
       expect_offense(<<~RUBY)
         class Foo < Formula
         ^^^^^^^^^^^^^^^^^^^ Formula should have a desc (Description).
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
         end
       RUBY
     end
@@ -16,7 +16,7 @@ describe RuboCop::Cop::FormulaAudit::DescLength do
     it "reports an offense when desc is an empty string" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc ''
           ^^^^^^^ The desc (description) should not be an empty string.
         end
@@ -26,7 +26,7 @@ describe RuboCop::Cop::FormulaAudit::DescLength do
     it "When desc is too long" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'Bar#{"bar" * 29}'
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Description is too long. "name: desc" should be less than 80 characters. Length is calculated as foo + desc. (currently 95)
         end
@@ -36,7 +36,7 @@ describe RuboCop::Cop::FormulaAudit::DescLength do
     it "When desc is multiline string" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'Bar#{"bar" * 9}'\
             '#{"foo" * 21}'
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Description is too long. "name: desc" should be less than 80 characters. Length is calculated as foo + desc. (currently 98)
@@ -53,7 +53,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     it "When wrong \"command-line\" usage in desc" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'command line'
                 ^ Description should start with a capital letter
                 ^^^^^^^^^^^^ Description should use \"command-line\" instead of \"command line\"
@@ -64,7 +64,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     it "When an article is used in desc" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'An aardvark'
                 ^^^ Description shouldn\'t start with an indefinite article i.e. \"An\"
         end
@@ -74,7 +74,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     it "When an lowercase letter starts a desc" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'bar'
                 ^ Description should start with a capital letter
         end
@@ -84,7 +84,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     it "When formula name is in desc" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'Foo is a foobar'
                 ^^^^ Description shouldn\'t start with the formula name
         end
@@ -94,7 +94,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     it "When the description ends with a full stop" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'Description with a full stop at the end.'
                                                        ^ Description shouldn\'t end with a full stop
         end
@@ -104,7 +104,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     it "When the description starts with a leading space" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc ' Description with a leading space'
                 ^ Description shouldn\'t have a leading space
         end
@@ -114,7 +114,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     it "When the description ends with a trailing space" do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'Description with a trailing space '
                                                  ^ Description shouldn\'t have a trailing space
         end
@@ -124,14 +124,14 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     it "autocorrects all rules" do
       source = <<~RUBY
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc ' an bar: commandline foo '
         end
       RUBY
 
       correct_source = <<~RUBY
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
           desc 'an bar: command-line'
         end
       RUBY

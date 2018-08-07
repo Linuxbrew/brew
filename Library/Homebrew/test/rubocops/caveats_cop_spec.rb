@@ -7,8 +7,8 @@ describe RuboCop::Cop::FormulaAudit::Caveats do
     it "When there is setuid mentioned in caveats" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          homepage "http://example.com/foo"
-          url "http://example.com/foo-1.0.tgz"
+          homepage "https://example.com/foo"
+          url "https://example.com/foo-1.0.tgz"
            def caveats
             "setuid"
              ^^^^^^ Don\'t recommend setuid in the caveats, suggest sudo instead.
