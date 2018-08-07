@@ -583,11 +583,7 @@ class FormulaInstaller
     elsif !deps.empty?
       oh1 "Installing dependencies for #{formula.full_name}: #{deps.map(&:first).map(&Formatter.method(:identifier)).join(", ")}",
         truncate: false
-      deps.each do |dep, options|
-        # Fix for patchelf
-        next if formula.full_name == dep.to_formula.full_name
-        install_dependency(dep, options)
-      end
+      deps.each { |dep, options| install_dependency(dep, options) }
     end
 
     @show_header = true unless deps.empty?
