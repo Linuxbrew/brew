@@ -479,20 +479,9 @@ class FormulaInstaller
   end
 
   def bottle_dependencies(inherited_options)
-    return [] unless OS.linux?
+    return [] if OS.mac?
 
-    # Fix for brew tests, which uses NullLoader.
-    begin
-      Formula["patchelf"]
-    rescue FormulaUnavailableError
-      return []
-    end
-
-    deps = []
-
-    # patchelf is used to set the RPATH and dynamic linker of
-    # executables and shared libraries on Linux.
-    deps << Dependency.new("patchelf")
+    deps = Keg.relocation_formulae.map { |formula| Dependency.new(formula) }
 
     # Installing bottles on Linux require a recent version of glibc and gcc.
     # GCC is required for libgcc_s.so and libstdc++.so. It depends on glibc.
@@ -536,12 +525,7 @@ class FormulaInstaller
     end
 
     if pour_bottle
-      bottle_deps = Keg.relocation_formulae
-                       .map { |formula| Dependency.new(formula) }
-                       .reject do |dep|
-        inherited_options[dep.name] |= inherited_options_for(dep)
-        dep.satisfied? inherited_options[dep.name]
-      end
+      bottle_deps = bottle_dependencies(inherited_options)
       expanded_deps = Dependency.merge_repeats(bottle_deps + expanded_deps) unless bottle_deps.empty?
     end
 
