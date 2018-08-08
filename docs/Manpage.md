@@ -1307,17 +1307,15 @@ Homebrew Documentation: <https://docs.brew.sh>
 
 Homebrew's lead maintainer is Mike McQuaid.
 
-Homebrew's project leadership committee is Mike McQuaid, ilovezfs, JCount, Misty De Meo and Markus Reiter.
+Homebrew's project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter.
 
-Homebrew/homebrew-core's lead maintainer is ilovezfs.
-
-Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, ilovezfs, JCount, Misty De Meo, Gautham Goli, Markus Reiter and William Woodruff.
+Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter and William Woodruff.
 
 Homebrew/brew's Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman.
 
-Homebrew/homebrew-core's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Viktor Szakats, FX Coudert, JCount, Misty De Meo and Tom Schoonjans.
+Homebrew/homebrew-core's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, JCount, Misty De Meo and Tom Schoonjans.
 
-Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross,  and Homebrew's creator: Max Howell.
+Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
 
 ## BUGS
 
