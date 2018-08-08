@@ -9,7 +9,7 @@ module CleanupRefinement
     end
 
     def nested_cache?
-      directory? && ["glide_home", "java_cache", "npm_cache"].include?(basename.to_s)
+      directory? && %w[glide_home java_cache npm_cache gclient_cache].include?(basename.to_s)
     end
 
     def prune?(days)
