@@ -101,7 +101,19 @@ module OS
     end
 
     def sdk_path_if_needed(v = nil)
-      return if !MacOS::Xcode.installed? && MacOS::CLT.separate_header_package?
+      # Prefer Xcode SDK when both Xcode and the CLT are installed.
+      # Expected results:
+      # 1. On Xcode-only systems, return the Xcode SDK.
+      # 2. On Xcode-and-CLT systems where headers are provided by the system, return nil.
+      # 3. On CLT-only systems with no CLT SDK, return nil.
+      # 4. On CLT-only systems with a CLT SDK, where headers are provided by the system, return nil.
+      # 5. On CLT-only systems with a CLT SDK, where headers are not provided by the system, return the CLT SDK.
+
+      # If there's no CLT SDK, return early
+      return if MacOS::CLT.installed? && !MacOS::CLT.provides_sdk?
+      # If the CLT is installed and provides headers, return early
+      return if MacOS::CLT.installed? && !MacOS::CLT.separate_header_package?
+
       sdk_path(v)
     end
 
