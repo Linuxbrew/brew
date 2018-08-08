@@ -2,10 +2,32 @@ require "test/support/fixtures/testball"
 require "cleanup"
 require "fileutils"
 
+using CleanupRefinement
+
+describe CleanupRefinement do
+  describe "::prune?" do
+    alias_matcher :be_pruned, :be_prune
+
+    subject(:path) { HOMEBREW_CACHE/"foo" }
+
+    before do
+      path.mkpath
+    end
+
+    it "returns true when path_modified_time < days_default" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 2 * 60 * 60 * 24)
+      expect(path.prune?(1)).to be true
+    end
+
+    it "returns false when path_modified_time >= days_default" do
+      expect(path.prune?(2)).to be false
+    end
+  end
+end
+
 describe Homebrew::Cleanup do
   let(:ds_store) { Pathname.new("#{HOMEBREW_PREFIX}/Library/.DS_Store") }
   let(:lock_file) { Pathname.new("#{HOMEBREW_LOCK_DIR}/foo") }
-  let(:sec_in_a_day) { 60 * 60 * 24 }
 
   around do |example|
     begin
@@ -131,13 +153,13 @@ describe Homebrew::Cleanup do
     end
 
     it "cleans up logs if older than 14 days" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 15)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 15 * 60 * 60 * 24)
       described_class.cleanup_logs
       expect(path).not_to exist
     end
 
     it "does not clean up logs less than 14 days old" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 2 * 60 * 60 * 24)
       described_class.cleanup_logs
       expect(path).to exist
     end
@@ -212,7 +234,7 @@ describe Homebrew::Cleanup do
       foo = (HOMEBREW_CACHE/"--foo")
       foo.mkpath
       allow(ARGV).to receive(:value).with("prune").and_return("1")
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 2 * 60 * 60 * 24)
       described_class.cleanup_cache
       expect(foo).not_to exist
     end
@@ -255,25 +277,6 @@ describe Homebrew::Cleanup do
         expect(bottle).not_to exist
         expect(testball).not_to exist
       end
-    end
-  end
-
-  describe "::prune?" do
-    alias_matcher :be_pruned, :be_prune
-
-    before do
-      foo.mkpath
-    end
-
-    let(:foo) { HOMEBREW_CACHE/"foo" }
-
-    it "returns true when path_modified_time < days_default" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
-      expect(described_class).to be_pruned(foo, days_default: "1")
-    end
-
-    it "returns false when path_modified_time >= days_default" do
-      expect(described_class).not_to be_pruned(foo, days_default: "2")
     end
   end
 end
