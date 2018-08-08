@@ -1,3 +1,4 @@
+require "hbc/cask"
 require "uri"
 
 module Hbc
