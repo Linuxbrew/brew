@@ -1,5 +1,6 @@
 require "utils/bottles"
 require "formula"
+require "hbc/cask_loader"
 
 module CleanupRefinement
   refine Pathname do
@@ -67,22 +68,50 @@ end
 using CleanupRefinement
 
 module Homebrew
-  module Cleanup
-    @disk_cleanup_size = 0
+  class Cleanup
+    extend Predicable
 
-    class << self
-      attr_reader :disk_cleanup_size
+    attr_predicate :dry_run?, :scrub?
+    attr_reader :args, :days, :cache
+    attr_reader :disk_cleanup_size
+
+    def initialize(*args, dry_run: false, scrub: false, days: nil, cache: HOMEBREW_CACHE)
+      @disk_cleanup_size = 0
+      @args = args
+      @dry_run = dry_run
+      @scrub = scrub
+      @days = days
+      @cache = cache
     end
 
-    module_function
+    def clean!
+      if args.empty?
+        Formula.installed.each do |formula|
+          cleanup_formula(formula)
+        end
+        cleanup_cache
+        cleanup_logs
+        return if dry_run?
+        cleanup_lockfiles
+        rm_ds_store
+      else
+        args.each do |arg|
+          formula = begin
+            Formula[arg]
+          rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
+            nil
+          end
 
-    def cleanup
-      cleanup_cellar
-      cleanup_cache
-      cleanup_logs
-      return if ARGV.dry_run?
-      cleanup_lockfiles
-      rm_ds_store
+          cask = begin
+            Hbc::CaskLoader.load(arg)
+          rescue Hbc::CaskUnavailableError
+            nil
+          end
+
+          cleanup_formula(formula) if formula
+          cleanup_cask(cask) if cask
+        end
+      end
     end
 
     def update_disk_cleanup_size(path_size)
@@ -93,13 +122,11 @@ module Homebrew
       @unremovable_kegs ||= []
     end
 
-    def cleanup_cellar(formulae = Formula.installed)
-      formulae.each(&method(:cleanup_formula))
-    end
-
     def cleanup_formula(formula)
       formula.eligible_kegs_for_cleanup.each(&method(:cleanup_keg))
     end
+
+    def cleanup_cask(cask); end
 
     def cleanup_keg(keg)
       cleanup_path(keg) { keg.uninstall }
@@ -113,17 +140,17 @@ module Homebrew
     def cleanup_logs
       return unless HOMEBREW_LOGS.directory?
       HOMEBREW_LOGS.subdirs.each do |dir|
-        cleanup_path(dir) { dir.rmtree } if dir.prune?(ARGV.value("prune")&.to_i || DEFAULT_LOG_DAYS)
+        cleanup_path(dir) { dir.rmtree } if dir.prune?(days || DEFAULT_LOG_DAYS)
       end
     end
 
-    def cleanup_cache(cache = HOMEBREW_CACHE)
+    def cleanup_cache
       return unless cache.directory?
       cache.children.each do |path|
         next cleanup_path(path) { path.unlink } if path.incomplete?
         next cleanup_path(path) { FileUtils.rm_rf path } if path.nested_cache?
 
-        if path.prune?(ARGV.value("prune")&.to_i)
+        if path.prune?(days)
           if path.file?
             cleanup_path(path) { path.unlink }
           elsif path.directory? && path.to_s.include?("--")
@@ -139,7 +166,7 @@ module Homebrew
     def cleanup_path(path)
       disk_usage = path.disk_usage
 
-      if ARGV.dry_run?
+      if dry_run?
         puts "Would remove: #{path} (#{path.abv})"
       else
         puts "Removing: #{path}... (#{path.abv})"
