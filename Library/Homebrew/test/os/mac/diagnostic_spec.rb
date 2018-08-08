@@ -32,19 +32,6 @@ describe Homebrew::Diagnostic::Checks do
       .to match("Xcode alone is not sufficient on El Capitan")
   end
 
-  specify "#check_if_clt_needs_headers_installed" do
-    allow(MacOS).to receive(:version).and_return(OS::Mac::Version.new("10.14"))
-    allow(MacOS::CLT).to receive(:installed?).and_return(true)
-    allow(MacOS::CLT).to receive(:headers_installed?).and_return(false)
-
-    expect(subject.check_if_clt_needs_headers_installed)
-      .to match("The Command Line Tools header package must be installed on Mojave.")
-
-    allow(MacOS).to receive(:version).and_return(OS::Mac::Version.new("10.13"))
-    expect(subject.check_if_clt_needs_headers_installed)
-      .to be_nil
-  end
-
   specify "#check_homebrew_prefix" do
     # the integration tests are run in a special prefix
     expect(subject.check_homebrew_prefix)

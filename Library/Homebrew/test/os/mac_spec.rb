@@ -19,4 +19,44 @@ describe OS::Mac do
       expect { Locale.parse(subject.language) }.not_to raise_error
     end
   end
+
+  describe "::sdk_path_if_needed" do
+    it "calls sdk_path on Xcode-only systems" do
+      allow(OS::Mac::Xcode).to receive(:installed?) { true }
+      allow(OS::Mac::CLT).to receive(:installed?) { false }
+      expect(OS::Mac).to receive(:sdk_path)
+      OS::Mac.sdk_path_if_needed
+    end
+
+    it "does not call sdk_path on Xcode-and-CLT systems with system headers" do
+      allow(OS::Mac::Xcode).to receive(:installed?) { true }
+      allow(OS::Mac::CLT).to receive(:installed?) { true }
+      allow(OS::Mac::CLT).to receive(:separate_header_package?) { false }
+      expect(OS::Mac).not_to receive(:sdk_path)
+      OS::Mac.sdk_path_if_needed
+    end
+
+    it "does not call sdk_path on CLT-only systems with no CLT SDK" do
+      allow(OS::Mac::Xcode).to receive(:installed?) { false }
+      allow(OS::Mac::CLT).to receive(:installed?) { true }
+      expect(OS::Mac).not_to receive(:sdk_path)
+      OS::Mac.sdk_path_if_needed
+    end
+
+    it "does not call sdk_path on CLT-only systems with a CLT SDK if the system provides headers" do
+      allow(OS::Mac::Xcode).to receive(:installed?) { false }
+      allow(OS::Mac::CLT).to receive(:installed?) { true }
+      allow(OS::Mac::CLT).to receive(:separate_header_package?) { false }
+      expect(OS::Mac).not_to receive(:sdk_path)
+      OS::Mac.sdk_path_if_needed
+    end
+
+    it "calls sdk_path on CLT-only systems with a CLT SDK if the system does not provide headers" do
+      allow(OS::Mac::Xcode).to receive(:installed?) { false }
+      allow(OS::Mac::CLT).to receive(:installed?) { true }
+      allow(OS::Mac::CLT).to receive(:separate_header_package?) { true }
+      expect(OS::Mac).to receive(:sdk_path)
+      OS::Mac.sdk_path_if_needed
+    end
+  end
 end

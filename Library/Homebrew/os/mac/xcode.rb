@@ -96,6 +96,16 @@ module OS
         !prefix.nil?
       end
 
+      def sdk(v = nil)
+        @locator ||= XcodeSDKLocator.new
+
+        @locator.sdk_if_applicable(v)
+      end
+
+      def sdk_path(v = nil)
+        sdk(v)&.path
+      end
+
       def update_instructions
         if MacOS.version >= "10.9" && !OS::Mac.prerelease?
           <<~EOS
@@ -211,7 +221,11 @@ module OS
       end
 
       def separate_header_package?
-        MacOS.version >= :mojave
+        version >= "10"
+      end
+
+      def provides_sdk?
+        version >= "8"
       end
 
       def headers_installed?
@@ -220,6 +234,16 @@ module OS
         else
           headers_version == version
         end
+      end
+
+      def sdk(v = nil)
+        @locator ||= CLTSDKLocator.new
+
+        @locator.sdk_if_applicable(v)
+      end
+
+      def sdk_path(v = nil)
+        sdk(v)&.path
       end
 
       def update_instructions
