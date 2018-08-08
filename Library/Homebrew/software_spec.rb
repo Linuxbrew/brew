@@ -294,7 +294,7 @@ class Bottle
     checksum, tag = spec.checksum_for(Utils::Bottles.tag)
 
     filename = Filename.create(formula, tag, spec.rebuild)
-    @resource.url(build_url(spec.root_url, filename.bintray),
+    @resource.url("#{spec.root_url}/#{filename.bintray}",
                   select_download_strategy(spec.root_url_specs))
     @resource.version = formula.pkg_version
     @resource.checksum = checksum
@@ -317,10 +317,6 @@ class Bottle
   end
 
   private
-
-  def build_url(root_url, filename)
-    "#{root_url}/#{filename}"
-  end
 
   def select_download_strategy(specs)
     specs[:using] ||= DownloadStrategyDetector.detect(@spec.root_url)
