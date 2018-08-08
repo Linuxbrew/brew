@@ -4,7 +4,7 @@ require "software_spec"
 describe Bottle::Filename do
   subject { described_class.new(name, version, tag, rebuild) }
 
-  let(:name) { "foo" }
+  let(:name) { "user/repo/foo" }
   let(:version) { "1.0" }
   let(:tag) { :tag }
   let(:rebuild) { 0 }
