@@ -5,6 +5,30 @@ require "hbc/cask_loader"
 module CleanupRefinement
   LATEST_CASK_DAYS = 7
 
+  refine Enumerator do
+    def parallel
+      queue = Queue.new
+
+      each do |element|
+        queue.enq(element)
+      end
+
+      workers = (0...Hardware::CPU.cores).map do
+        Thread.new do
+          Kernel.loop do
+            begin
+              yield queue.deq(true)
+            rescue ThreadError
+              break # if queue is empty
+            end
+          end
+        end
+      end
+
+      workers.each(&:join)
+    end
+  end
+
   refine Pathname do
     def incomplete?
       extname.end_with?(".incomplete")
@@ -149,10 +173,12 @@ module Homebrew
     def cleanup_formula(formula)
       formula.eligible_kegs_for_cleanup.each(&method(:cleanup_keg))
       cleanup_cache(Pathname.glob(cache/"#{formula.name}--*"))
+      rm_ds_store([formula.rack])
     end
 
     def cleanup_cask(cask)
       cleanup_cache(Pathname.glob(cache/"Cask/#{cask.token}--*"))
+      rm_ds_store([cask.caskroom_path])
     end
 
     def cleanup_keg(keg)
@@ -214,22 +240,13 @@ module Homebrew
       end
     end
 
-    def rm_ds_store
-      paths = Queue.new
-      %w[Cellar Frameworks Library bin etc include lib opt sbin share var]
-        .map { |p| HOMEBREW_PREFIX/p }.each { |p| paths << p if p.exist? }
-      workers = (0...Hardware::CPU.cores).map do
-        Thread.new do
-          Kernel.loop do
-            begin
-              quiet_system "find", paths.deq(true), "-name", ".DS_Store", "-delete"
-            rescue ThreadError
-              break # if queue is empty
-            end
-          end
-        end
+    def rm_ds_store(dirs = nil)
+      dirs ||= %w[Caskroom Cellar Frameworks Library bin etc include lib opt sbin share var]
+               .map { |path| HOMEBREW_PREFIX/path }
+
+      dirs.select(&:directory?).each.parallel do |dir|
+        system_command "find", args: [dir, "-name", ".DS_Store", "-delete"], print_stderr: false
       end
-      workers.map(&:join)
     end
   end
 end
