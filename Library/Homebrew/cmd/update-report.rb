@@ -194,6 +194,8 @@ module Homebrew
 
     return if ENV.key?("HOMEBREW_DISABLE_LOAD_FORMULA")
 
+    ohai "Migrating cache entries..."
+
     Formula.each do |formula|
       specs = [*formula.stable, *formula.devel, *formula.head]
 
