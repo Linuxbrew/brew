@@ -3,7 +3,7 @@ describe Hbc::CLI::InternalStanza, :cask do
     command = described_class.new("gpg", "with-gpg")
     expect {
       command.run
-    }.to output("http://example.com/gpg-signature.asc\n").to_stdout
+    }.to output("https://example.com/gpg-signature.asc\n").to_stdout
   end
 
   it "raises an exception when stanza is unknown/unsupported" do

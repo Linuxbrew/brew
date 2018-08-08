@@ -5,13 +5,13 @@ describe Messages do
   before do
     @m = Messages.new
     f_foo = formula("foo") do
-      url "http://example.com/foo-0.1.tgz"
+      url "https://example.com/foo-0.1.tgz"
     end
     f_bar = formula("bar") do
-      url "http://example.com/bar-0.1.tgz"
+      url "https://example.com/bar-0.1.tgz"
     end
     f_baz = formula("baz") do
-      url "http://example.com/baz-0.1.tgz"
+      url "https://example.com/baz-0.1.tgz"
     end
     @m.formula_installed(f_foo, 1.1)
     @m.record_caveats(f_foo, "Zsh completions were installed")

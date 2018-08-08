@@ -38,6 +38,7 @@ module RuboCop
     module FormulaAuditStrict
       # This cop audits `desc` in Formulae
       #
+      # - Checks for leading/trailing whitespace in `desc`
       # - Checks if `desc` begins with an article
       # - Checks for correct usage of `command-line` in `desc`
       # - Checks description starts with a capital letter
@@ -61,6 +62,16 @@ module RuboCop
           return if desc_call.nil?
 
           desc = parameters(desc_call).first
+
+          # Check for leading whitespace.
+          if regex_match_group(desc, /^\s+/)
+            problem "Description shouldn't have a leading space"
+          end
+
+          # Check for trailing whitespace.
+          if regex_match_group(desc, /\s+$/)
+            problem "Description shouldn't have a trailing space"
+          end
 
           # Check if command-line is wrongly used in formula's desc
           if match = regex_match_group(desc, /(command ?line)/i)
@@ -104,6 +115,8 @@ module RuboCop
             correction.gsub!(/^(['"]?)\s+/, "\\1")
             correction.gsub!(/\s+(['"]?)$/, "\\1")
             correction.gsub!(/\.(['"]?)$/, "\\1")
+            correction.gsub!(/^\s+/, "")
+            correction.gsub!(/\s+$/, "")
             corrector.insert_before(node.source_range, correction)
             corrector.remove(node.source_range)
           end

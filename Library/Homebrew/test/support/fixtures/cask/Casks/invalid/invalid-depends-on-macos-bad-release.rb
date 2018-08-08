@@ -3,7 +3,7 @@ cask 'invalid-depends-on-macos-bad-release' do
   sha256 '67cdb8a02803ef37fdbf7e0be205863172e41a561ca446cd84f0d7ab35a99d94'
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
-  homepage 'http://example.com/invalid-depends-on-macos-bad-release'
+  homepage 'https://example.com/invalid-depends-on-macos-bad-release'
 
   depends_on macos: :no_such_release
 

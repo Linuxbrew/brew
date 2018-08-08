@@ -176,9 +176,9 @@ describe CurlDownloadStrategyError do
   end
 
   context "download failed" do
-    subject { described_class.new("http://brew.sh") }
+    subject { described_class.new("https://brew.sh") }
 
-    its(:to_s) { is_expected.to eq("Download failed: http://brew.sh") }
+    its(:to_s) { is_expected.to eq("Download failed: https://brew.sh") }
   end
 end
 

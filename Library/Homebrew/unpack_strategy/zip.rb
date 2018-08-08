@@ -18,7 +18,8 @@ module UnpackStrategy
       quiet_flags = verbose ? [] : ["-qq"]
       system_command! "unzip",
                       args: [*quiet_flags, path, "-d", unpack_dir],
-                      verbose: verbose
+                      verbose: verbose,
+                      print_stderr: false
     end
   end
 end

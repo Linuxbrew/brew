@@ -4,7 +4,7 @@ cask 'with-suite' do
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine-suite.zip"
   name 'Caffeine'
-  homepage 'http://example.com/with-suite'
+  homepage 'https://example.com/with-suite'
 
   suite 'Caffeine'
 end

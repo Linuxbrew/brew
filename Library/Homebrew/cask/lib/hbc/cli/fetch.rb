@@ -1,3 +1,5 @@
+require "hbc/download"
+
 module Hbc
   class CLI
     class Fetch < AbstractCommand

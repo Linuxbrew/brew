@@ -4,6 +4,7 @@ require "formula_installer"
 require "unpack_strategy"
 
 require "hbc/cask_dependencies"
+require "hbc/download"
 require "hbc/staged"
 require "hbc/verify"
 

@@ -192,6 +192,8 @@ module Homebrew
   def migrate_cache_entries_to_double_dashes(initial_version)
     return if initial_version > "1.7.1"
 
+    return if ENV.key?("HOMEBREW_DISABLE_LOAD_FORMULA")
+
     Formula.each do |formula|
       specs = [*formula.stable, *formula.devel, *formula.head]
 

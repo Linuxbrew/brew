@@ -5,7 +5,7 @@ cask 'devmate-without-appcast' do
   # dl.devmate.com/com.my.fancyapp was verified as official when first introduced to the cask
   url "https://dl.devmate.com/com.my.fancyapp/app_#{version}.zip"
   name 'DevMate'
-  homepage 'http://www.example.com/'
+  homepage 'https://www.example.com/'
 
   app 'DevMate.app'
 end

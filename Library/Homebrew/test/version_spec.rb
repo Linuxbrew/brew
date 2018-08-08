@@ -244,7 +244,7 @@ describe Version do
 
   describe "::parse" do
     it "returns a NULL version when the URL cannot be parsed" do
-      expect(described_class.parse("http://example.com/blah.tar")).to be_null
+      expect(described_class.parse("https://example.com/blah.tar")).to be_null
       expect(described_class.parse("foo")).to be_null
     end
   end
@@ -267,22 +267,22 @@ describe Version do
 
     specify "version all dots" do
       expect(described_class.create("1.14"))
-        .to be_detected_from("http://example.com/foo.bar.la.1.14.zip")
+        .to be_detected_from("https://example.com/foo.bar.la.1.14.zip")
     end
 
     specify "version underscore separator" do
       expect(described_class.create("1.1"))
-        .to be_detected_from("http://example.com/grc_1.1.tar.gz")
+        .to be_detected_from("https://example.com/grc_1.1.tar.gz")
     end
 
     specify "boost version style" do
       expect(described_class.create("1.39.0"))
-        .to be_detected_from("http://example.com/boost_1_39_0.tar.bz2")
+        .to be_detected_from("https://example.com/boost_1_39_0.tar.bz2")
     end
 
     specify "erlang version style" do
       expect(described_class.create("R13B"))
-        .to be_detected_from("http://erlang.org/download/otp_src_R13B.tar.gz")
+        .to be_detected_from("https://erlang.org/download/otp_src_R13B.tar.gz")
     end
 
     specify "another erlang version style" do
@@ -297,7 +297,7 @@ describe Version do
 
     specify "p7zip version style" do
       expect(described_class.create("9.04"))
-        .to be_detected_from("http://kent.dl.sourceforge.net/sourceforge/p7zip/p7zip_9.04_src_all.tar.bz2")
+        .to be_detected_from("https://kent.dl.sourceforge.net/sourceforge/p7zip/p7zip_9.04_src_all.tar.bz2")
     end
 
     specify "new github style" do
@@ -317,7 +317,7 @@ describe Version do
 
     specify "gloox beta style" do
       expect(described_class.create("1.0-beta7"))
-        .to be_detected_from("http://camaya.net/download/gloox-1.0-beta7.tar.bz2")
+        .to be_detected_from("https://camaya.net/download/gloox-1.0-beta7.tar.bz2")
     end
 
     specify "sphinx beta style" do
@@ -327,7 +327,7 @@ describe Version do
 
     specify "astyle version style" do
       expect(described_class.create("1.23"))
-        .to be_detected_from("http://kent.dl.sourceforge.net/sourceforge/astyle/astyle_1.23_macosx.tar.gz")
+        .to be_detected_from("https://kent.dl.sourceforge.net/sourceforge/astyle/astyle_1.23_macosx.tar.gz")
     end
 
     specify "version dos2unix" do
@@ -337,54 +337,54 @@ describe Version do
 
     specify "version internal dash" do
       expect(described_class.create("1.1-2"))
-        .to be_detected_from("http://example.com/foo-arse-1.1-2.tar.gz")
+        .to be_detected_from("https://example.com/foo-arse-1.1-2.tar.gz")
     end
 
     specify "version single digit" do
       expect(described_class.create("45"))
-        .to be_detected_from("http://example.com/foo_bar.45.tar.gz")
+        .to be_detected_from("https://example.com/foo_bar.45.tar.gz")
     end
 
     specify "noseparator single digit" do
       expect(described_class.create("45"))
-        .to be_detected_from("http://example.com/foo_bar45.tar.gz")
+        .to be_detected_from("https://example.com/foo_bar45.tar.gz")
     end
 
     specify "version developer that hates us format" do
       expect(described_class.create("1.2.3"))
-        .to be_detected_from("http://example.com/foo-bar-la.1.2.3.tar.gz")
+        .to be_detected_from("https://example.com/foo-bar-la.1.2.3.tar.gz")
     end
 
     specify "version regular" do
       expect(described_class.create("1.21"))
-        .to be_detected_from("http://example.com/foo_bar-1.21.tar.gz")
+        .to be_detected_from("https://example.com/foo_bar-1.21.tar.gz")
     end
 
     specify "version sourceforge download" do
       expect(described_class.create("1.21"))
-        .to be_detected_from("http://sourceforge.net/foo_bar-1.21.tar.gz/download")
+        .to be_detected_from("https://sourceforge.net/foo_bar-1.21.tar.gz/download")
       expect(described_class.create("1.21"))
-        .to be_detected_from("http://sf.net/foo_bar-1.21.tar.gz/download")
+        .to be_detected_from("https://sf.net/foo_bar-1.21.tar.gz/download")
     end
 
     specify "version github" do
       expect(described_class.create("1.0.5"))
-        .to be_detected_from("http://github.com/lloyd/yajl/tarball/1.0.5")
+        .to be_detected_from("https://github.com/lloyd/yajl/tarball/1.0.5")
     end
 
     specify "version github with high patch number" do
       expect(described_class.create("1.2.34"))
-        .to be_detected_from("http://github.com/lloyd/yajl/tarball/v1.2.34")
+        .to be_detected_from("https://github.com/lloyd/yajl/tarball/v1.2.34")
     end
 
     specify "yet another version" do
       expect(described_class.create("0.15.1b"))
-        .to be_detected_from("http://example.com/mad-0.15.1b.tar.gz")
+        .to be_detected_from("https://example.com/mad-0.15.1b.tar.gz")
     end
 
     specify "lame version style" do
       expect(described_class.create("398-2"))
-        .to be_detected_from("http://kent.dl.sourceforge.net/sourceforge/lame/lame-398-2.tar.gz")
+        .to be_detected_from("https://kent.dl.sourceforge.net/sourceforge/lame/lame-398-2.tar.gz")
     end
 
     specify "ruby version style" do
@@ -399,12 +399,12 @@ describe Version do
 
     specify "rc style" do
       expect(described_class.create("1.2.2rc1"))
-        .to be_detected_from("http://downloads.xiph.org/releases/vorbis/libvorbis-1.2.2rc1.tar.bz2")
+        .to be_detected_from("https://downloads.xiph.org/releases/vorbis/libvorbis-1.2.2rc1.tar.bz2")
     end
 
     specify "dash rc style" do
       expect(described_class.create("1.8.0-rc1"))
-        .to be_detected_from("http://ftp.mozilla.org/pub/mozilla.org/js/js-1.8.0-rc1.tar.gz")
+        .to be_detected_from("https://ftp.mozilla.org/pub/mozilla.org/js/js-1.8.0-rc1.tar.gz")
     end
 
     specify "angband version style" do
@@ -414,17 +414,17 @@ describe Version do
 
     specify "stable suffix" do
       expect(described_class.create("1.4.14b"))
-        .to be_detected_from("http://www.monkey.org/~provos/libevent-1.4.14b-stable.tar.gz")
+        .to be_detected_from("https://www.monkey.org/~provos/libevent-1.4.14b-stable.tar.gz")
     end
 
     specify "debian style 1" do
       expect(described_class.create("3.03"))
-        .to be_detected_from("http://ftp.de.debian.org/debian/pool/main/s/sl/sl_3.03.orig.tar.gz")
+        .to be_detected_from("https://ftp.de.debian.org/debian/pool/main/s/sl/sl_3.03.orig.tar.gz")
     end
 
     specify "debian style 2" do
       expect(described_class.create("1.01b"))
-        .to be_detected_from("http://ftp.de.debian.org/debian/pool/main/m/mmv/mmv_1.01b.orig.tar.gz")
+        .to be_detected_from("https://ftp.de.debian.org/debian/pool/main/m/mmv/mmv_1.01b.orig.tar.gz")
     end
 
     specify "bottle style" do
@@ -454,7 +454,7 @@ describe Version do
 
     specify "imagemagick style" do
       expect(described_class.create("6.7.5-7"))
-        .to be_detected_from("http://downloads.sf.net/project/machomebrew/mirror/ImageMagick-6.7.5-7.tar.bz2")
+        .to be_detected_from("https://downloads.sf.net/project/machomebrew/mirror/ImageMagick-6.7.5-7.tar.bz2")
     end
 
     specify "imagemagick bottle style" do
@@ -485,7 +485,7 @@ describe Version do
 
     specify "jenkins version style" do
       expect(described_class.create("1.486"))
-        .to be_detected_from("http://mirrors.jenkins-ci.org/war/1.486/jenkins.war")
+        .to be_detected_from("https://mirrors.jenkins-ci.org/war/1.486/jenkins.war")
       expect(described_class.create("0.10.11"))
         .to be_detected_from("https://github.com/hechoendrupal/DrupalConsole/releases/download/0.10.11/drupal.phar")
     end
@@ -508,7 +508,7 @@ describe Version do
 
     specify "dash version style" do
       expect(described_class.create("3.4"))
-        .to be_detected_from("http://www.antlr.org/download/antlr-3.4-complete.jar")
+        .to be_detected_from("https://www.antlr.org/download/antlr-3.4-complete.jar")
       expect(described_class.create("9.2"))
         .to be_detected_from("https://cdn.nuxeo.com/nuxeo-9.2/nuxeo-server-9.2-tomcat.zip")
       expect(described_class.create("0.181"))
@@ -519,29 +519,29 @@ describe Version do
 
     specify "apache version style" do
       expect(described_class.create("1.2.0-rc2"))
-        .to be_detected_from("http://www.apache.org/dyn/closer.cgi?path=/cassandra/1.2.0/apache-cassandra-1.2.0-rc2-bin.tar.gz")
+        .to be_detected_from("https://www.apache.org/dyn/closer.cgi?path=/cassandra/1.2.0/apache-cassandra-1.2.0-rc2-bin.tar.gz")
     end
 
     specify "jpeg version style" do
       expect(described_class.create("8d"))
-        .to be_detected_from("http://www.ijg.org/files/jpegsrc.v8d.tar.gz")
+        .to be_detected_from("https://www.ijg.org/files/jpegsrc.v8d.tar.gz")
     end
 
     specify "ghc version style" do
       expect(described_class.create("7.0.4"))
-        .to be_detected_from("http://www.haskell.org/ghc/dist/7.0.4/ghc-7.0.4-x86_64-apple-darwin.tar.bz2")
+        .to be_detected_from("https://www.haskell.org/ghc/dist/7.0.4/ghc-7.0.4-x86_64-apple-darwin.tar.bz2")
       expect(described_class.create("7.0.4"))
-        .to be_detected_from("http://www.haskell.org/ghc/dist/7.0.4/ghc-7.0.4-i386-apple-darwin.tar.bz2")
+        .to be_detected_from("https://www.haskell.org/ghc/dist/7.0.4/ghc-7.0.4-i386-apple-darwin.tar.bz2")
     end
 
     specify "pypy version style" do
       expect(described_class.create("1.4.1"))
-        .to be_detected_from("http://pypy.org/download/pypy-1.4.1-osx.tar.bz2")
+        .to be_detected_from("https://pypy.org/download/pypy-1.4.1-osx.tar.bz2")
     end
 
     specify "openssl version style" do
       expect(described_class.create("0.9.8s"))
-        .to be_detected_from("http://www.openssl.org/source/openssl-0.9.8s.tar.gz")
+        .to be_detected_from("https://www.openssl.org/source/openssl-0.9.8s.tar.gz")
     end
 
     specify "xaw3d version style" do
@@ -551,17 +551,17 @@ describe Version do
 
     specify "assimp version style" do
       expect(described_class.create("2.0.863"))
-        .to be_detected_from("http://downloads.sourceforge.net/project/assimp/assimp-2.0/assimp--2.0.863-sdk.zip")
+        .to be_detected_from("https://downloads.sourceforge.net/project/assimp/assimp-2.0/assimp--2.0.863-sdk.zip")
     end
 
     specify "cmucl version style" do
       expect(described_class.create("20c"))
-        .to be_detected_from("http://common-lisp.net/project/cmucl/downloads/release/20c/cmucl-20c-x86-darwin.tar.bz2")
+        .to be_detected_from("https://common-lisp.net/project/cmucl/downloads/release/20c/cmucl-20c-x86-darwin.tar.bz2")
     end
 
     specify "fann version style" do
       expect(described_class.create("2.1.0beta"))
-        .to be_detected_from("http://downloads.sourceforge.net/project/fann/fann/2.1.0beta/fann-2.1.0beta.zip")
+        .to be_detected_from("https://downloads.sourceforge.net/project/fann/fann/2.1.0beta/fann-2.1.0beta.zip")
     end
 
     specify "grads version style" do
@@ -571,7 +571,7 @@ describe Version do
 
     specify "haxe version style" do
       expect(described_class.create("2.08"))
-        .to be_detected_from("http://haxe.org/file/haxe-2.08-osx.tar.gz")
+        .to be_detected_from("https://haxe.org/file/haxe-2.08-osx.tar.gz")
     end
 
     specify "imap version style" do
@@ -581,7 +581,7 @@ describe Version do
 
     specify "suite3270 version style" do
       expect(described_class.create("3.3.12ga7"))
-        .to be_detected_from("http://downloads.sourceforge.net/project/x3270/x3270/3.3.12ga7/suite3270-3.3.12ga7-src.tgz")
+        .to be_detected_from("https://downloads.sourceforge.net/project/x3270/x3270/3.3.12ga7/suite3270-3.3.12ga7-src.tgz")
     end
 
     specify "wwwoffle version style" do
@@ -596,7 +596,7 @@ describe Version do
 
     specify "fontforge version style" do
       expect(described_class.create("20120731"))
-        .to be_detected_from("http://downloads.sourceforge.net/project/fontforge/fontforge-source/fontforge_full-20120731-b.tar.bz2")
+        .to be_detected_from("https://downloads.sourceforge.net/project/fontforge/fontforge-source/fontforge_full-20120731-b.tar.bz2")
     end
 
     specify "ezlupdate version style" do
@@ -611,22 +611,22 @@ describe Version do
 
     specify "win version style" do
       expect(described_class.create("0.9.17"))
-        .to be_detected_from("http://ftpmirror.gnu.org/libmicrohttpd/libmicrohttpd-0.9.17-w32.zip")
+        .to be_detected_from("https://ftpmirror.gnu.org/libmicrohttpd/libmicrohttpd-0.9.17-w32.zip")
       expect(described_class.create("1.29"))
-        .to be_detected_from("http://ftpmirror.gnu.org/libidn/libidn-1.29-win64.zip")
+        .to be_detected_from("https://ftpmirror.gnu.org/libidn/libidn-1.29-win64.zip")
     end
 
     specify "with arch" do
       expect(described_class.create("4.0.18-1"))
-        .to be_detected_from("http://ftpmirror.gnu.org/mtools/mtools-4.0.18-1.i686.rpm")
+        .to be_detected_from("https://ftpmirror.gnu.org/mtools/mtools-4.0.18-1.i686.rpm")
       expect(described_class.create("5.5.7-5"))
-        .to be_detected_from("http://ftpmirror.gnu.org/autogen/autogen-5.5.7-5.i386.rpm")
+        .to be_detected_from("https://ftpmirror.gnu.org/autogen/autogen-5.5.7-5.i386.rpm")
       expect(described_class.create("2.8"))
-        .to be_detected_from("http://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x86.zip")
+        .to be_detected_from("https://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x86.zip")
       expect(described_class.create("2.8"))
-        .to be_detected_from("http://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x64.zip")
+        .to be_detected_from("https://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x64.zip")
       expect(described_class.create("4.0.18"))
-        .to be_detected_from("http://ftpmirror.gnu.org/mtools/mtools_4.0.18_i386.deb")
+        .to be_detected_from("https://ftpmirror.gnu.org/mtools/mtools_4.0.18_i386.deb")
     end
 
     specify "opam version" do
@@ -665,7 +665,7 @@ describe Version do
 
     specify "from URL" do
       expect(described_class.create("1.2.3"))
-        .to be_detected_from("http://github.com/foo/bar.git", tag: "v1.2.3")
+        .to be_detected_from("https://github.com/foo/bar.git", tag: "v1.2.3")
     end
   end
 end

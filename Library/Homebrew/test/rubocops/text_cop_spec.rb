@@ -7,8 +7,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "with both openssl and libressl optional dependencies" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           depends_on "openssl"
           depends_on "libressl" => :optional
@@ -20,8 +20,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "with both openssl and libressl dependencies" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           depends_on "openssl"
           depends_on "libressl"
@@ -33,8 +33,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When xcodebuild is called without SYMROOT" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             xcodebuild "-project", "meow.xcodeproject"
@@ -47,8 +47,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When xcodebuild is called without any args" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             xcodebuild
@@ -61,8 +61,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When go get is executed" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             system "go", "get", "bar"
@@ -75,8 +75,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When xcodebuild is executed" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             system "xcodebuild", "foo", "bar"
@@ -89,8 +89,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When scons is executed" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             system "scons", "foo", "bar"
@@ -103,8 +103,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When plist_options are not defined when using a formula-defined plist", :ruby23 do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             system "xcodebuild", "foo", "bar"
@@ -134,8 +134,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
         ^^^^^^^^^^^^^^^^^^^^^ require "language/go" is unnecessary unless using `go_resource`s
 
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             system "go", "get", "bar"
@@ -148,8 +148,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When formula uses virtualenv and also `setuptools` resource" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           resource "setuptools" do
           ^^^^^^^^^^^^^^^^^^^^^ Formulae using virtualenvs do not need a `setuptools` resource.
@@ -167,8 +167,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When Formula.factory(name) is used" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             Formula.factory(name)
@@ -181,8 +181,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When dep ensure is used without `-vendor-only`" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             system "dep", "ensure"
@@ -195,8 +195,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
     it "When cargo build is executed" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
 
           def install
             system "cargo", "build"
