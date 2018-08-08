@@ -43,16 +43,14 @@ describe Homebrew::Cleanup do
 
   describe "::cleanup" do
     it "removes .DS_Store and lock files" do
-      described_class.cleanup
+      subject.clean!
 
       expect(ds_store).not_to exist
       expect(lock_file).not_to exist
     end
 
-    it "doesn't remove anything if `--dry-run` is specified" do
-      ARGV << "--dry-run"
-
-      described_class.cleanup
+    it "doesn't remove anything if `dry_run` is true" do
+      described_class.new(dry_run: true).clean!
 
       expect(ds_store).to exist
       expect(lock_file).to exist
@@ -61,7 +59,7 @@ describe Homebrew::Cleanup do
     it "doesn't remove the lock file if it is locked" do
       lock_file.open(File::RDWR | File::CREAT).flock(File::LOCK_EX | File::LOCK_NB)
 
-      described_class.cleanup
+      subject.clean!
 
       expect(lock_file).to exist
     end
@@ -69,10 +67,8 @@ describe Homebrew::Cleanup do
     context "when it can't remove a keg" do
       let(:f1) { Class.new(Testball) { version "0.1" }.new }
       let(:f2) { Class.new(Testball) { version "0.2" }.new }
-      let(:unremovable_kegs) { [] }
 
       before do
-        described_class.instance_variable_set(:@unremovable_kegs, [])
         [f1, f2].each do |f|
           f.brew do
             f.install
@@ -87,13 +83,13 @@ describe Homebrew::Cleanup do
       end
 
       it "doesn't remove any kegs" do
-        described_class.cleanup_formula f2
+        subject.cleanup_formula f2
         expect(f1.installed_kegs.size).to eq(2)
       end
 
       it "lists the unremovable kegs" do
-        described_class.cleanup_formula f2
-        expect(described_class.unremovable_kegs).to contain_exactly(f1.installed_kegs[0])
+        subject.cleanup_formula f2
+        expect(subject.unremovable_kegs).to contain_exactly(f1.installed_kegs[0])
       end
     end
   end
@@ -131,7 +127,7 @@ describe Homebrew::Cleanup do
     expect(f3).to be_installed
     expect(f4).to be_installed
 
-    described_class.cleanup_formula f3
+    subject.cleanup_formula f3
 
     expect(f1).not_to be_installed
     expect(f2).not_to be_installed
@@ -146,21 +142,20 @@ describe Homebrew::Cleanup do
       path.mkpath
     end
 
-    it "cleans all logs if prune all" do
-      ARGV << "--prune=all"
-      described_class.cleanup_logs
+    it "cleans all logs if prune is 0" do
+      described_class.new(days: 0).cleanup_logs
       expect(path).not_to exist
     end
 
     it "cleans up logs if older than 14 days" do
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 15 * 60 * 60 * 24)
-      described_class.cleanup_logs
+      subject.cleanup_logs
       expect(path).not_to exist
     end
 
     it "does not clean up logs less than 14 days old" do
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 2 * 60 * 60 * 24)
-      described_class.cleanup_logs
+      subject.cleanup_logs
       expect(path).to exist
     end
   end
@@ -170,7 +165,7 @@ describe Homebrew::Cleanup do
       incomplete = (HOMEBREW_CACHE/"something.incomplete")
       incomplete.mkpath
 
-      described_class.cleanup_cache
+      subject.cleanup_cache
 
       expect(incomplete).not_to exist
     end
@@ -179,7 +174,7 @@ describe Homebrew::Cleanup do
       glide_home = (HOMEBREW_CACHE/"glide_home")
       glide_home.mkpath
 
-      described_class.cleanup_cache
+      subject.cleanup_cache
 
       expect(glide_home).not_to exist
     end
@@ -188,7 +183,7 @@ describe Homebrew::Cleanup do
       java_cache = (HOMEBREW_CACHE/"java_cache")
       java_cache.mkpath
 
-      described_class.cleanup_cache
+      subject.cleanup_cache
 
       expect(java_cache).not_to exist
     end
@@ -197,7 +192,7 @@ describe Homebrew::Cleanup do
       npm_cache = (HOMEBREW_CACHE/"npm_cache")
       npm_cache.mkpath
 
-      described_class.cleanup_cache
+      subject.cleanup_cache
 
       expect(npm_cache).not_to exist
     end
@@ -211,9 +206,7 @@ describe Homebrew::Cleanup do
       gist.mkpath
       FileUtils.touch svn
 
-      allow(ARGV).to receive(:value).with("prune").and_return("all")
-
-      described_class.cleanup_cache
+      described_class.new(days: 0).cleanup_cache
 
       expect(git).not_to exist
       expect(gist).to exist
@@ -223,9 +216,8 @@ describe Homebrew::Cleanup do
     it "does not clean up directories that are not VCS checkouts" do
       git = (HOMEBREW_CACHE/"git")
       git.mkpath
-      allow(ARGV).to receive(:value).with("prune").and_return("all")
 
-      described_class.cleanup_cache
+      described_class.new(days: 0).cleanup_cache
 
       expect(git).to exist
     end
@@ -233,17 +225,15 @@ describe Homebrew::Cleanup do
     it "cleans up VCS checkout directories with modified time < prune time" do
       foo = (HOMEBREW_CACHE/"--foo")
       foo.mkpath
-      allow(ARGV).to receive(:value).with("prune").and_return("1")
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 2 * 60 * 60 * 24)
-      described_class.cleanup_cache
+      described_class.new(days: 1).cleanup_cache
       expect(foo).not_to exist
     end
 
     it "does not clean up VCS checkout directories with modified time >= prune time" do
       foo = (HOMEBREW_CACHE/"--foo")
       foo.mkpath
-      allow(ARGV).to receive(:value).with("prune").and_return("1")
-      described_class.cleanup_cache
+      described_class.new(days: 1).cleanup_cache
       expect(foo).to exist
     end
 
@@ -260,20 +250,19 @@ describe Homebrew::Cleanup do
 
       it "cleans up file if outdated" do
         allow(Utils::Bottles).to receive(:file_outdated?).with(any_args).and_return(true)
-        described_class.cleanup_cache
+        subject.cleanup_cache
         expect(bottle).not_to exist
         expect(testball).not_to exist
       end
 
-      it "cleans up file if ARGV has -s and formula not installed" do
-        ARGV << "-s"
-        described_class.cleanup_cache
+      it "cleans up file if `scrub` is true and formula not installed" do
+        described_class.new(scrub: true).cleanup_cache
         expect(bottle).not_to exist
         expect(testball).not_to exist
       end
 
       it "cleans up file if stale" do
-        described_class.cleanup_cache
+        subject.cleanup_cache
         expect(bottle).not_to exist
         expect(testball).not_to exist
       end

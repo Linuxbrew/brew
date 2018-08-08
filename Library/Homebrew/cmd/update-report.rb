@@ -147,10 +147,6 @@ module Homebrew
     return unless legacy_cache.writable_real?
     FileUtils.touch migration_attempted_file
 
-    # Cleanup to avoid copying files unnecessarily
-    ohai "Cleaning up #{legacy_cache}..."
-    Cleanup.cleanup_cache legacy_cache
-
     # This directory could have been compromised if it's world-writable/
     # a symlink/owned by another user so don't copy files in those cases.
     world_writable = legacy_cache.stat.mode & 0777 == 0777
