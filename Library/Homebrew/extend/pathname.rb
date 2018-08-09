@@ -213,11 +213,18 @@ class Pathname
 
   # extended to support common double extensions
   def extname(path = to_s)
-    bottle_ext = path[BOTTLE_EXTNAME_RX, 1]
+    basename = File.basename(path)
+
+    bottle_ext = basename[BOTTLE_EXTNAME_RX, 1]
     return bottle_ext if bottle_ext
-    archive_ext = path[/(\.(tar|cpio|pax)\.(gz|bz2|lz|xz|Z))$/, 1]
+
+    archive_ext = basename[/(\.(tar|cpio|pax)\.(gz|bz2|lz|xz|Z))\Z/, 1]
     return archive_ext if archive_ext
-    File.extname(path)
+
+    # Don't treat version numbers as extname.
+    return "" if basename.match?(/\b\d+\.\d+[^\.]*\Z/)
+
+    File.extname(basename)
   end
 
   # for filetypes we support, basename without extension

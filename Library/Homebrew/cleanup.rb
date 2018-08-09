@@ -1,6 +1,7 @@
 require "utils/bottles"
 require "formula"
 require "hbc/cask_loader"
+require "set"
 
 module CleanupRefinement
   LATEST_CASK_DAYS = 7
@@ -65,21 +66,25 @@ module CleanupRefinement
         end
       end
 
-      version ||= basename.to_s[/\A.*--(.*?)#{Regexp.escape(extname)}/, 1]
+      version ||= basename.to_s[/\A.*\-\-?(.*?)#{Regexp.escape(extname)}\Z/, 1]
 
       return false unless version
 
-      version = Version.parse(version)
+      version = Version.new(version)
 
-      return false unless (name = basename.to_s[/\A(.*?)\-\-?(?:#{Regexp.escape(version)})/, 1])
+      return false unless formula_name = basename.to_s[/\A(.*?)(\-\-.*)*\-\-?(?:#{Regexp.escape(version)})/, 1]
 
       formula = begin
-        Formulary.from_rack(HOMEBREW_CELLAR/name)
+        Formulary.from_rack(HOMEBREW_CELLAR/formula_name)
       rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
         return false
       end
 
-      if version.is_a?(PkgVersion)
+      resource_name = basename.to_s[/\A.*?\-\-(.*?)\-\-?(?:#{Regexp.escape(version)})/, 1]
+
+      if resource_name && resource_version = formula.stable&.resources&.dig(resource_name)&.version
+        return true if resource_version > version
+      elsif version.is_a?(PkgVersion)
         return true if formula.pkg_version > version
       elsif formula.version > version
         return true
@@ -134,6 +139,7 @@ module Homebrew
       @scrub = scrub
       @days = days
       @cache = cache
+      @cleaned_up_paths = Set.new
     end
 
     def clean!
@@ -220,6 +226,8 @@ module Homebrew
     end
 
     def cleanup_path(path)
+      return unless @cleaned_up_paths.add?(path)
+
       disk_usage = path.disk_usage
 
       if dry_run?

@@ -238,12 +238,14 @@ describe Homebrew::Cleanup do
     end
 
     context "cleans old files in HOMEBREW_CACHE" do
-      let(:bottle) { (HOMEBREW_CACHE/"testball--0.0.1.bottle.tar.gz") }
+      let(:bottle) { (HOMEBREW_CACHE/"testball--0.0.1.tag.bottle.tar.gz") }
       let(:testball) { (HOMEBREW_CACHE/"testball--0.0.1") }
+      let(:testball_resource) { (HOMEBREW_CACHE/"testball--rsrc--0.0.1.txt") }
 
       before do
-        FileUtils.touch(bottle)
-        FileUtils.touch(testball)
+        FileUtils.touch bottle
+        FileUtils.touch testball
+        FileUtils.touch testball_resource
         (HOMEBREW_CELLAR/"testball"/"0.0.1").mkpath
         FileUtils.touch(CoreTap.instance.formula_dir/"testball.rb")
       end
@@ -253,18 +255,21 @@ describe Homebrew::Cleanup do
         subject.cleanup_cache
         expect(bottle).not_to exist
         expect(testball).not_to exist
+        expect(testball_resource).not_to exist
       end
 
       it "cleans up file if `scrub` is true and formula not installed" do
         described_class.new(scrub: true).cleanup_cache
         expect(bottle).not_to exist
         expect(testball).not_to exist
+        expect(testball_resource).not_to exist
       end
 
       it "cleans up file if stale" do
         subject.cleanup_cache
         expect(bottle).not_to exist
         expect(testball).not_to exist
+        expect(testball_resource).not_to exist
       end
     end
   end

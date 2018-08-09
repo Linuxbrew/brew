@@ -133,6 +133,11 @@ describe Pathname do
       expect(described_class.new("foo-0.1.tar.gz").extname).to eq(".tar.gz")
       expect(described_class.new("foo-0.1.cpio.gz").extname).to eq(".cpio.gz")
     end
+
+    it "does not treat version numbers as extensions" do
+      expect(described_class.new("foo-0.1").extname).to eq("")
+      expect(described_class.new("foo-1.0-rc1").extname).to eq("")
+    end
   end
 
   describe "#stem" do
