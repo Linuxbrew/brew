@@ -174,11 +174,13 @@ module Homebrew
       formula.eligible_kegs_for_cleanup.each(&method(:cleanup_keg))
       cleanup_cache(Pathname.glob(cache/"#{formula.name}--*"))
       rm_ds_store([formula.rack])
+      cleanup_lockfiles(FormulaLock.new(formula.name).path)
     end
 
     def cleanup_cask(cask)
       cleanup_cache(Pathname.glob(cache/"Cask/#{cask.token}--*"))
       rm_ds_store([cask.caskroom_path])
+      cleanup_lockfiles(CaskLock.new(cask.token).path)
     end
 
     def cleanup_keg(keg)
@@ -230,13 +232,17 @@ module Homebrew
       @disk_cleanup_size += disk_usage
     end
 
-    def cleanup_lockfiles
+    def cleanup_lockfiles(*lockfiles)
       return unless HOMEBREW_LOCK_DIR.directory?
-      candidates = HOMEBREW_LOCK_DIR.children
-      lockfiles  = candidates.select(&:file?)
+
+      if lockfiles.empty?
+        lockfiles = HOMEBREW_LOCK_DIR.children.select(&:file?)
+      end
+
       lockfiles.each do |file|
         next unless file.readable?
-        file.open(File::RDWR).flock(File::LOCK_EX | File::LOCK_NB) && file.unlink
+        next unless file.open(File::RDWR).flock(File::LOCK_EX | File::LOCK_NB)
+        cleanup_path(file) { file.unlink }
       end
     end
 
