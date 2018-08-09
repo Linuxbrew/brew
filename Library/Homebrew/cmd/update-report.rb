@@ -62,10 +62,10 @@ module Homebrew
       updated = true
     end
 
-    initial_version = Version.new(system_command!("git",
+    initial_version = Version.new(system_command("git",
                                                   args: ["describe", "--tags", "--abbrev=0", initial_revision],
                                                   chdir: HOMEBREW_REPOSITORY,
-                                                  print_stderr: false).stdout)
+                                                  print_stderr: true).stdout)
 
     updated_taps = []
     Tap.each do |tap|
