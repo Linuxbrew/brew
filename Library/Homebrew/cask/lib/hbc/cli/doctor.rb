@@ -24,7 +24,6 @@ module Hbc
         check_software_versions
         check_install_location
         check_staging_location
-        check_cached_downloads
         check_taps
         check_load_path
         check_environment_variables
@@ -67,17 +66,6 @@ module Hbc
         end
 
         puts user_tilde(path.to_s)
-      end
-
-      def check_cached_downloads
-        ohai "Homebrew-Cask Cached Downloads"
-
-        cleanup = CLI::Cleanup.new
-        count = cleanup.cache_files.count
-        size = cleanup.disk_cleanup_size
-        msg = user_tilde(Cache.path.to_s)
-        msg << " (#{number_readable(count)} files, #{disk_usage_readable(size)})" unless count.zero?
-        puts msg
       end
 
       def check_taps

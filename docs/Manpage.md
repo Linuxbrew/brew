@@ -50,18 +50,19 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `cat` `formula`:
     Display the source to `formula`.
 
-  * `cleanup` [`--prune=``days`] [`--dry-run`] [`-s`] [`formulae`]:
-    For all installed or specific formulae, remove any older versions from the
-    cellar. In addition, old downloads from the Homebrew download-cache are deleted.
+  * `cleanup` [`--prune=``days`] [`--dry-run`] [`-s`] [<formula/cask> ...]:
+    Remove stale lock files and outdated downloads for formulae and casks,
+    and remove old versions of installed formulae. If arguments are specified,
+    only do this for the specified formulae and casks.
 
     If `--prune=``days` is specified, remove all cache files older than `days`.
 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
 
-    If `-s` is passed, scrub the cache, removing downloads for even the latest
-    versions of formulae. Note downloads for any installed formulae will still not be
-    deleted. If you want to delete those too: `rm -rf $(brew --cache)`
+    If `-s` is passed, scrub the cache, including downloads for even the latest
+    versions. Note downloads for any installed formula or cask will still not
+    be deleted. If you want to delete those too: `rm -rf $(brew --cache)`
 
   * `command` `cmd`:
     Display the path to the file which is used when invoking `brew` `cmd`.
