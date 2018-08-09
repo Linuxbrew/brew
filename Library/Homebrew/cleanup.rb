@@ -3,6 +3,8 @@ require "formula"
 require "hbc/cask_loader"
 
 module CleanupRefinement
+  LATEST_CASK_DAYS = 7
+
   refine Pathname do
     def incomplete?
       extname.end_with?(".incomplete")
@@ -23,7 +25,7 @@ module CleanupRefinement
     def stale?(scrub = false)
       return false unless file?
 
-      stale_formula?(scrub)
+      stale_formula?(scrub) || stale_cask?(scrub)
     end
 
     private
@@ -35,13 +37,16 @@ module CleanupRefinement
         begin
           Utils::Bottles.resolve_version(self)
         rescue
-          self.version
+          nil
         end
-      else
-        self.version
       end
 
+      version ||= basename.to_s[/\A.*--(.*?)#{Regexp.escape(extname)}/, 1]
+
       return false unless version
+
+      version = Version.parse(version)
+
       return false unless (name = basename.to_s[/\A(.*?)\-\-?(?:#{Regexp.escape(version)})/, 1])
 
       formula = begin
@@ -59,6 +64,29 @@ module CleanupRefinement
       return true if scrub && !formula.installed?
 
       return true if Utils::Bottles.file_outdated?(formula, self)
+
+      false
+    end
+
+    def stale_cask?(scrub)
+      return false unless name = basename.to_s[/\A(.*?)\-\-/, 1]
+
+      cask = begin
+        Hbc::CaskLoader.load(name)
+      rescue Hbc::CaskUnavailableError
+        return false
+      end
+
+      unless basename.to_s.match?(/\A#{Regexp.escape(name)}\-\-#{Regexp.escape(cask.version)}\b/)
+        return true
+      end
+
+      return true if scrub && !cask.versions.include?(cask.version)
+
+      if cask.version.latest?
+        # TODO: Replace with ActiveSupport's `.days.ago`.
+        return mtime < ((@time ||= Time.now) - LATEST_CASK_DAYS * 60 * 60 * 24)
+      end
 
       false
     end
@@ -114,19 +142,18 @@ module Homebrew
       end
     end
 
-    def update_disk_cleanup_size(path_size)
-      @disk_cleanup_size += path_size
-    end
-
     def unremovable_kegs
       @unremovable_kegs ||= []
     end
 
     def cleanup_formula(formula)
       formula.eligible_kegs_for_cleanup.each(&method(:cleanup_keg))
+      cleanup_cache(Pathname.glob(cache/"#{formula.name}--*"))
     end
 
-    def cleanup_cask(cask); end
+    def cleanup_cask(cask)
+      cleanup_cache(Pathname.glob(cache/"Cask/#{cask.token}--*"))
+    end
 
     def cleanup_keg(keg)
       cleanup_path(keg) { keg.uninstall }
@@ -144,9 +171,10 @@ module Homebrew
       end
     end
 
-    def cleanup_cache
-      return unless cache.directory?
-      cache.children.each do |path|
+    def cleanup_cache(entries = nil)
+      entries ||= [cache, cache/"Cask"].select(&:directory?).flat_map(&:children)
+
+      entries.each do |path|
         next cleanup_path(path) { path.unlink } if path.incomplete?
         next cleanup_path(path) { FileUtils.rm_rf path } if path.nested_cache?
 
@@ -159,7 +187,7 @@ module Homebrew
           next
         end
 
-        next cleanup_path(path) { path.unlink } if path.stale?(ARGV.switch?("s"))
+        next cleanup_path(path) { path.unlink } if path.stale?(scrub?)
       end
     end
 
@@ -173,7 +201,7 @@ module Homebrew
         yield
       end
 
-      update_disk_cleanup_size(disk_usage)
+      @disk_cleanup_size += disk_usage
     end
 
     def cleanup_lockfiles
