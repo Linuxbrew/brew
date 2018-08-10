@@ -37,6 +37,7 @@ module Homebrew
       ENV.delete("HOMEBREW_COLOR")
       ENV.delete("HOMEBREW_NO_COLOR")
       ENV.delete("HOMEBREW_VERBOSE")
+      ENV.delete("HOMEBREW_DEBUG")
       ENV.delete("VERBOSE")
       ENV.delete("HOMEBREW_CASK_OPTS")
       ENV.delete("HOMEBREW_TEMP")

@@ -7,6 +7,7 @@ require "migrator"
 require "formulary"
 require "descriptions"
 require "cleanup"
+require "hbc/download"
 
 module Homebrew
   module_function
@@ -112,6 +113,7 @@ module Homebrew
 
     migrate_legacy_cache_if_necessary
     migrate_cache_entries_to_double_dashes(initial_version)
+    migrate_cache_entries_to_symlinks(initial_version)
     migrate_legacy_keg_symlinks_if_necessary
 
     if !updated
@@ -206,6 +208,36 @@ module Homebrew
     end
   end
 
+  def formula_resources(formula)
+    specs = [formula.stable, formula.devel, formula.head].compact
+
+    [*formula.bottle&.resource] + specs.flat_map do |spec|
+      [
+        spec,
+        *spec.resources.values,
+        *spec.patches.select(&:external?).map(&:resource),
+      ]
+    end
+  end
+
+  def parse_extname(url)
+    uri_path = if URI::DEFAULT_PARSER.make_regexp =~ url
+      uri = URI(url)
+      uri.query ? "#{uri.path}?#{uri.query}" : uri.path
+    else
+      url
+    end
+
+    # Given a URL like https://example.com/download.php?file=foo-1.0.tar.gz
+    # the extension we want is ".tar.gz", not ".php".
+    Pathname.new(uri_path).ascend do |path|
+      ext = path.extname[/[^?&]+/]
+      return ext if ext
+    end
+
+    nil
+  end
+
   def migrate_cache_entries_to_double_dashes(initial_version)
     return if initial_version && initial_version > "1.7.1"
 
@@ -214,25 +246,16 @@ module Homebrew
     ohai "Migrating cache entries..."
 
     Formula.each do |formula|
-      specs = [*formula.stable, *formula.devel, *formula.head]
-
-      resources = [*formula.bottle&.resource] + specs.flat_map do |spec|
-        [
-          spec,
-          *spec.resources.values,
-          *spec.patches.select(&:external?).map(&:resource),
-        ]
-      end
-
-      resources.each do |resource|
+      formula_resources(formula).each do |resource|
         downloader = resource.downloader
 
+        url = downloader.url
         name = resource.download_name
         version = resource.version
 
-        new_location = downloader.cached_location
-        extname = new_location.extname
-        old_location = downloader.cached_location.dirname/"#{name}-#{version}#{extname}"
+        extname = parse_extname(url)
+        old_location = downloader.cache/"#{name}-#{version}#{extname}"
+        new_location = downloader.cache/"#{name}--#{version}#{extname}"
 
         next unless old_location.file?
 
@@ -248,6 +271,86 @@ module Homebrew
           rescue Errno::EACCES
             opoo "Could not move #{old_location} to #{new_location}, please do so manually."
           end
+        end
+      end
+    end
+  end
+
+  def migrate_cache_entries_to_symlinks(initial_version)
+    return if initial_version && initial_version > "1.7.2"
+
+    return if ENV.key?("HOMEBREW_DISABLE_LOAD_FORMULA")
+
+    ohai "Migrating cache entries..."
+
+    load_formula = lambda do |formula|
+      begin
+        Formula[formula]
+      rescue FormulaUnavailableError
+        nil
+      end
+    end
+
+    load_cask = lambda do |cask|
+      begin
+        Hbc::CaskLoader.load(cask)
+      rescue Hbc::CaskUnavailableError
+        nil
+      end
+    end
+
+    formula_downloaders = if HOMEBREW_CACHE.directory?
+      HOMEBREW_CACHE.children
+                    .select(&:file?)
+                    .map { |child| child.basename.to_s.sub(/\-\-.*/, "") }
+                    .uniq
+                    .map(&load_formula)
+                    .compact
+                    .flat_map { |formula| formula_resources(formula) }
+                    .map { |resource| [resource.downloader, resource.download_name, resource.version] }
+    else
+      []
+    end
+
+    cask_downloaders = if (HOMEBREW_CACHE/"Cask").directory?
+      (HOMEBREW_CACHE/"Cask").children
+                             .map { |child| child.basename.to_s.sub(/\-\-.*/, "") }
+                             .uniq
+                             .map(&load_cask)
+                             .compact
+                             .map { |cask| [Hbc::Download.new(cask).downloader, cask.token, cask.version] }
+    else
+      []
+    end
+
+    downloaders = formula_downloaders + cask_downloaders
+
+    downloaders.each do |downloader, name, version|
+      next unless downloader.respond_to?(:symlink_location)
+
+      url = downloader.url
+      extname = parse_extname(url)
+      old_location = downloader.cache/"#{name}--#{version}#{extname}"
+      next unless old_location.file?
+
+      new_symlink_location = downloader.symlink_location
+      new_location = downloader.cached_location
+
+      if new_location.exist? && new_symlink_location.symlink?
+        begin
+          FileUtils.rm_rf old_location unless old_location == new_symlink_location
+        rescue Errno::EACCES
+          opoo "Could not remove #{old_location}, please do so manually."
+        end
+      else
+        begin
+          new_location.dirname.mkpath
+          FileUtils.mv old_location, new_location unless new_location.exist?
+          symlink_target = new_location.relative_path_from(new_symlink_location.dirname)
+          new_symlink_location.dirname.mkpath
+          FileUtils.ln_s symlink_target, new_symlink_location, force: true
+        rescue Errno::EACCES
+          opoo "Could not move #{old_location} to #{new_location}, please do so manually."
         end
       end
     end

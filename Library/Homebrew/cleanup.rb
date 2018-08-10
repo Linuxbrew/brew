@@ -48,7 +48,7 @@ module CleanupRefinement
     end
 
     def stale?(scrub = false)
-      return false unless file?
+      return false unless file? || (symlink? && resolved_path.file?)
 
       stale_formula?(scrub) || stale_cask?(scrub)
     end
@@ -209,6 +209,19 @@ module Homebrew
       end
     end
 
+    def cleanup_unreferenced_downloads
+      return if dry_run?
+      return unless (cache/"downloads").directory?
+
+      downloads = (cache/"downloads").children.reject { |path| path.incomplete? } # rubocop:disable Style/SymbolProc
+      referenced_downloads = [cache, cache/"Cask"].select(&:directory?)
+                                                  .flat_map(&:children)
+                                                  .select(&:symlink?)
+                                                  .map(&:resolved_path)
+
+      (downloads - referenced_downloads).each(&:unlink)
+    end
+
     def cleanup_cache(entries = nil)
       entries ||= [cache, cache/"Cask"].select(&:directory?).flat_map(&:children)
 
@@ -217,7 +230,14 @@ module Homebrew
         next cleanup_path(path) { FileUtils.rm_rf path } if path.nested_cache?
 
         if path.prune?(days)
-          if path.file?
+          if path.symlink?
+            resolved_path = path.resolved_path
+
+            cleanup_path(path) do
+              resolved_path.unlink if resolved_path.exist?
+              path.unlink
+            end
+          elsif path.file?
             cleanup_path(path) { path.unlink }
           elsif path.directory? && path.to_s.include?("--")
             cleanup_path(path) { FileUtils.rm_rf path }
@@ -227,6 +247,8 @@ module Homebrew
 
         next cleanup_path(path) { path.unlink } if path.stale?(scrub?)
       end
+
+      cleanup_unreferenced_downloads
     end
 
     def cleanup_path(path)

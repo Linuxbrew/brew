@@ -24,6 +24,12 @@ module DiskUsageExtension
   private
 
   def compute_disk_usage
+    if symlink? && !exist?
+      @file_count = 1
+      @disk_usage = 0
+      return
+    end
+
     path = if symlink?
       resolved_path
     else
