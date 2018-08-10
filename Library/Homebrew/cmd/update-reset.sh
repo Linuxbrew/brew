@@ -33,7 +33,14 @@ EOS
     [[ -d "$DIR/.git" ]] || continue
     cd "$DIR" || continue
     echo "==> Fetching $DIR..."
-    git fetch --tags --force origin
+
+    if [[ "$DIR" = "$HOMEBREW_REPOSITORY" ]]; then
+      latest_tag="$(git ls-remote --tags --refs -q origin | tail -n1 | cut -f2)"
+      git fetch --force origin --shallow-since="$latest_tag"
+    else
+      git fetch --force --tags origin
+    fi
+
     echo
 
     echo "==> Resetting $DIR..."
