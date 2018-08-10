@@ -66,13 +66,14 @@ module CleanupRefinement
         end
       end
 
+      version ||= basename.to_s[/\A.*(?:\-\-.*?)*\-\-(.*?)#{Regexp.escape(extname)}\Z/, 1]
       version ||= basename.to_s[/\A.*\-\-?(.*?)#{Regexp.escape(extname)}\Z/, 1]
 
       return false unless version
 
       version = Version.new(version)
 
-      return false unless formula_name = basename.to_s[/\A(.*?)(\-\-.*)*\-\-?(?:#{Regexp.escape(version)})/, 1]
+      return false unless formula_name = basename.to_s[/\A(.*?)(?:\-\-.*?)*\-\-?(?:#{Regexp.escape(version)})/, 1]
 
       formula = begin
         Formulary.from_rack(HOMEBREW_CELLAR/formula_name)
@@ -82,8 +83,11 @@ module CleanupRefinement
 
       resource_name = basename.to_s[/\A.*?\-\-(.*?)\-\-?(?:#{Regexp.escape(version)})/, 1]
 
-      if resource_name && resource_version = formula.stable&.resources&.dig(resource_name)&.version
-        return true if resource_version > version
+      if resource_name == "patch"
+        patch_hashes = formula.stable&.patches&.map(&:resource)&.map(&:version)
+        return true unless patch_hashes&.include?(Checksum.new(:sha256, version.to_s))
+      elsif resource_name && resource_version = formula.stable&.resources&.dig(resource_name)&.version
+        return true if resource_version != version
       elsif version.is_a?(PkgVersion)
         return true if formula.pkg_version > version
       elsif formula.version > version
