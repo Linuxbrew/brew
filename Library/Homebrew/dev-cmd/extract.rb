@@ -15,96 +15,67 @@ require "utils/git"
 require "formulary"
 require "tap"
 
-class BottleSpecification
-  def method_missing(m, *_args, &_block)
-    if [:sha1, :md5].include?(m)
-      opoo "Formula has unknown or deprecated stanza: #{m}" if ARGV.debug?
-    else
-      super
-    end
-  end
-end
-
-class Module
-  def method_missing(m, *_args, &_block)
-    if [:sha1, :md5].include?(m)
-      opoo "Formula has unknown or deprecated stanza: #{m}" if ARGV.debug?
-    else
-      super
-    end
-  end
-end
-
-class DependencyCollector
-  def parse_symbol_spec(spec, tags)
-    case spec
-    when :x11        then X11Requirement.new(spec.to_s, tags)
-    when :xcode      then XcodeRequirement.new(tags)
-    when :linux      then LinuxRequirement.new(tags)
-    when :macos      then MacOSRequirement.new(tags)
-    when :arch       then ArchRequirement.new(tags)
-    when :java       then JavaRequirement.new(tags)
-    when :osxfuse    then OsxfuseRequirement.new(tags)
-    when :tuntap     then TuntapRequirement.new(tags)
-    when :ld64       then ld64_dep_if_needed(tags)
-    else
-      opoo "Unsupported special dependency #{spec.inspect}" if ARGV.debug?
+module ExtractExtensions
+  refine BottleSpecification do
+    def method_missing(m, *_args, &_block)
+      # no-op
     end
   end
 
-  module Compat
+  refine Module do
+    def method_missing(m, *_args, &_block)
+      # no-op
+    end
+  end
+
+  refine DependencyCollector do
+    def parse_symbol_spec(spec, tags)
+      case spec
+      when :x11        then X11Requirement.new(spec.to_s, tags)
+      when :xcode      then XcodeRequirement.new(tags)
+      when :linux      then LinuxRequirement.new(tags)
+      when :macos      then MacOSRequirement.new(tags)
+      when :arch       then ArchRequirement.new(tags)
+      when :java       then JavaRequirement.new(tags)
+      when :osxfuse    then OsxfuseRequirement.new(tags)
+      when :tuntap     then TuntapRequirement.new(tags)
+      when :ld64       then ld64_dep_if_needed(tags)
+      else
+        # no-op
+      end
+    end
+
     def parse_string_spec(spec, tags)
       opoo "'depends_on ... => :run' is disabled. There is no replacement." if tags.include?(:run) && ARGV.debug?
       super
     end
   end
-
-  prepend Compat
 end
 
 module Homebrew
+  using ExtractExtensions
   module_function
 
   def extract
     Homebrew::CLI::Parser.parse do
-      flag   "--tap="
       flag   "--version="
       switch :debug
       switch :force
     end
 
-    # If no formula args are given, ask specifically for a formula to be specified
-    raise FormulaUnspecifiedError if ARGV.named.empty?
+    # Expect exactly two named arguments: formula and tap
+    raise UsageError if ARGV.named.length != 2
 
-    # If some other number of args are given, provide generic usage information
-    raise UsageError if ARGV.named.length != 1
-
-    odie "The tap to which the formula is extracted must be specified!" if args.tap.nil?
-
-    begin
-      formula = Formulary.factory(ARGV.named.first)
-      name = formula.name
-      repo = formula.path.parent.parent
-      file = formula.path
-    rescue FormulaUnavailableError => e
-      opoo "'#{ARGV.named.first}' does not currently exist in the core tap" if ARGV.debug?
-      core = Tap.fetch("homebrew/core")
-      name = ARGV.named.first.downcase
-      repo = core.path
-      file = core.path.join("Formula", "#{name}.rb")
-    end
-
-    destination_tap = Tap.fetch(args.tap)
+    destination_tap = Tap.fetch(ARGV.named[1])
+    odie "Cannot extract formula to homebrew/core!" if destination_tap.core_tap?
     destination_tap.install unless destination_tap.installed?
 
-    odie "Cannot extract formula to homebrew/core!" if destination_tap.name == "homebrew/core"
+    core = CoreTap.instance
+    name = ARGV.named.first.downcase
+    repo = core.path
+    file = core.path/"Formula/#{name}.rb"
 
-    if args.version.nil?
-      rev = Git.last_revision_commit_of_file(repo, file)
-      version = formula_at_revision(repo, name, file, rev).version
-      odie "Could not find #{name}! The formula or version may not have existed." if rev.empty?
-      result = Git.last_revision_of_file(repo, file)
-    else
+    if args.version
       version = args.version
       rev = "HEAD"
       test_formula = nil
@@ -121,6 +92,11 @@ module Homebrew
       end
       odie "Could not find #{name}! The formula or version may not have existed." if test_formula.nil?
       result = Git.last_revision_of_file(repo, file, before_commit: rev)
+    else
+      rev = Git.last_revision_commit_of_file(repo, file)
+      version = formula_at_revision(repo, name, file, rev).version
+      odie "Could not find #{name}! The formula or version may not have existed." if rev.empty?
+      result = Git.last_revision_of_file(repo, file)
     end
 
     # The class name has to be renamed to match the new filename, e.g. Foo version 1.2.3 becomes FooAT123 and resides in Foo@1.2.3.rb.
@@ -128,7 +104,7 @@ module Homebrew
     versioned_name = Formulary.class_s("#{class_name}@#{version}")
     result.gsub!("class #{class_name} < Formula", "class #{versioned_name} < Formula")
 
-    path = destination_tap.path.join("Formula", "#{name}@#{version}.rb")
+    path = destination_tap.path/"Formula/#{name}@#{version}.rb"
     if path.exist?
       unless ARGV.force?
         odie <<~EOS
@@ -146,7 +122,7 @@ module Homebrew
 
   # @private
   def formula_at_revision(repo, name, file, rev)
-    return nil if rev.empty?
+    return if rev.empty?
     contents = Git.last_revision_of_file(repo, file, before_commit: rev)
     Formulary.from_contents(name, file, contents)
   end
