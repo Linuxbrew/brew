@@ -230,16 +230,16 @@ class Cmd
     # Allow references to self
     if formula_prefix && path.start_with?("#{formula_prefix}/")
       true
-    # first two paths: reject references to Cellar or opt paths
-    # for unspecified dependencies
-    elsif path.start_with?(cellar) || path.start_with?(opt)
-      dep = path[keg_regex, 2]
-      dep && @deps.include?(dep)
     elsif path.start_with?(prefix, tmpdir)
       true
     elsif path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
       # ignore MacPorts, Boxen's Homebrew, X11, fink
       false
+    # first two paths: reject references to Cellar or opt paths
+    # for unspecified dependencies
+    elsif path.start_with?(cellar) || path.start_with?(opt)
+      dep = path[keg_regex, 2]
+      dep && @deps.include?(dep)
     elsif mac?
       true
     else
