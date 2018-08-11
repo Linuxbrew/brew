@@ -148,12 +148,12 @@ module Homebrew
 
     def clean!
       if args.empty?
-        Formula.installed.each do |formula|
+        cleanup_lockfiles
+        Formula.installed.sort_by(&:name).each do |formula|
           cleanup_formula(formula)
         end
         cleanup_cache
         cleanup_logs
-        cleanup_lockfiles
         return if dry_run?
         rm_ds_store
       else
