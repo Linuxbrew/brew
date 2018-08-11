@@ -153,8 +153,8 @@ module Homebrew
         end
         cleanup_cache
         cleanup_logs
-        return if dry_run?
         cleanup_lockfiles
+        return if dry_run?
         rm_ds_store
       else
         args.each do |arg|
@@ -254,7 +254,12 @@ module Homebrew
       lockfiles.each do |file|
         next unless file.readable?
         next unless file.open(File::RDWR).flock(File::LOCK_EX | File::LOCK_NB)
-        cleanup_path(file) { file.unlink }
+
+        begin
+          cleanup_path(file) { file.unlink }
+        ensure
+          file.open(File::RDWR).flock(File::LOCK_UN) if file.exist?
+        end
       end
     end
 
