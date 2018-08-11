@@ -35,7 +35,8 @@ git_init_if_necessary() {
     git config --bool core.autocrlf false
     git config remote.origin.url "$BREW_OFFICIAL_REMOTE"
     git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-    git fetch --force --depth=1 origin refs/heads/master:refs/remotes/origin/master
+    latest_tag="$(git ls-remote --tags --refs -q origin | tail -n1 | cut -f2)"
+    git fetch --force origin --shallow-since="$latest_tag"
     git reset --hard origin/master
     SKIP_FETCH_BREW_REPOSITORY=1
     set +e
