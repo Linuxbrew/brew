@@ -803,6 +803,10 @@ module Homebrew
 
       problem "Use separate make calls" if line.include?("make && make")
 
+      if line =~ /shell_output\(['"].+['"], 0\)/
+        problem "Passing 0 to shell_output() is redundant"
+      end
+
       if line =~ /JAVA_HOME/i && !formula.requirements.map(&:class).include?(JavaRequirement)
         problem "Use `depends_on :java` to set JAVA_HOME"
       end
