@@ -62,10 +62,12 @@ module Homebrew
       updated = true
     end
 
-    initial_version = Version.new(system_command!("git",
-                                                  args: ["describe", "--tags", "--abbrev=0", initial_revision],
-                                                  chdir: HOMEBREW_REPOSITORY,
-                                                  print_stderr: false).stdout)
+    out, _, status = system_command("git",
+                                    args: ["describe", "--tags", "--abbrev=0", initial_revision],
+                                    chdir: HOMEBREW_REPOSITORY,
+                                    print_stderr: false)
+
+    initial_version = Version.new(out) if status.success?
 
     updated_taps = []
     Tap.each do |tap|
@@ -186,7 +188,7 @@ module Homebrew
   end
 
   def migrate_cache_entries_to_double_dashes(initial_version)
-    return if initial_version > "1.7.1"
+    return if initial_version && initial_version > "1.7.1"
 
     return if ENV.key?("HOMEBREW_DISABLE_LOAD_FORMULA")
 
