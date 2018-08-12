@@ -16,11 +16,11 @@ module EnvActivation
     end
   end
 
-  def with_build_environment
+  def with_build_environment(formula = nil)
     old_env = to_hash.dup
     tmp_env = to_hash.dup.extend(EnvActivation)
     tmp_env.activate_extensions!
-    tmp_env.setup_build_environment
+    tmp_env.setup_build_environment(formula)
     replace(tmp_env)
     yield
   ensure
