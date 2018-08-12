@@ -12,34 +12,36 @@
 #:    deleted. If you want to delete those too: `rm -rf $(brew --cache)`
 
 require "cleanup"
+require "cli_parser"
 
 module Homebrew
   module_function
 
   def cleanup
-    if ARGV.named.empty?
-      Cleanup.cleanup
-    else
-      Cleanup.cleanup_cellar(ARGV.resolved_formulae)
+    CLI::Parser.parse do
+      switch "-n", "--dry-run"
+      switch "-s"
+      flag   "--prune="
     end
 
-    report_disk_usage unless Cleanup.disk_cleanup_size.zero?
-    report_unremovable_kegs unless Cleanup.unremovable_kegs.empty?
-  end
+    cleanup = Cleanup.new(*args.remaining, dry_run: args.dry_run?, scrub: args.s?, days: args.prune&.to_i)
 
-  def report_disk_usage
-    disk_space = disk_usage_readable(Cleanup.disk_cleanup_size)
-    if ARGV.dry_run?
-      ohai "This operation would free approximately #{disk_space} of disk space."
-    else
-      ohai "This operation has freed approximately #{disk_space} of disk space."
+    cleanup.clean!
+
+    unless cleanup.disk_cleanup_size.zero?
+      disk_space = disk_usage_readable(cleanup.disk_cleanup_size)
+      if args.dry_run?
+        ohai "This operation would free approximately #{disk_space} of disk space."
+      else
+        ohai "This operation has freed approximately #{disk_space} of disk space."
+      end
     end
-  end
 
-  def report_unremovable_kegs
+    return if cleanup.unremovable_kegs.empty?
+
     ofail <<~EOS
       Could not cleanup old kegs! Fix your permissions on:
-        #{Cleanup.unremovable_kegs.join "\n  "}
+        #{cleanup.unremovable_kegs.join "\n  "}
     EOS
   end
 end

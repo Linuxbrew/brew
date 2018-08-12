@@ -1,6 +1,8 @@
 require "fcntl"
 
 class LockFile
+  attr_reader :path
+
   def initialize(name)
     @name = name.to_s
     @path = HOMEBREW_LOCK_DIR/"#{@name}.lock"

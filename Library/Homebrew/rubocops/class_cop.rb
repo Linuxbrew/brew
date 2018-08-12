@@ -25,13 +25,24 @@ module RuboCop
     end
 
     module FormulaAuditStrict
-      # - `test do ..end` should be defined in the formula
+      # - `test do ..end` should be meaningfully defined in the formula
       class Test < FormulaCop
-        MSG = "A `test do` test block should be added".freeze
-
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
-          return if find_block(body_node, :test)
-          problem MSG
+          test = find_block(body_node, :test)
+
+          unless test
+            problem "A `test do` test block should be added"
+            return
+          end
+
+          if test.body.nil?
+            problem "`test do` should not be empty"
+            return
+          end
+
+          return unless test.body.single_line? &&
+                        test.body.source.to_s == "true"
+          problem "`test do` should contain a real test"
         end
       end
     end

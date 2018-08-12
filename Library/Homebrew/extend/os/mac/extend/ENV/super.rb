@@ -58,7 +58,7 @@ module Superenv
   def homebrew_extra_library_paths
     paths = []
     if compiler == :llvm_clang
-      if MacOS::CLT.installed?
+      if !MacOS.sdk_path_if_needed
         paths << "/usr/lib"
       else
         paths << "#{MacOS.sdk_path}/usr/lib"
@@ -102,7 +102,7 @@ module Superenv
   end
 
   def effective_sysroot
-    MacOS.sdk_path.to_s if MacOS::Xcode.without_clt?
+    MacOS.sdk_path_if_needed&.to_s
   end
 
   def set_x11_env_if_installed
@@ -113,7 +113,6 @@ module Superenv
   def setup_build_environment(formula = nil)
     generic_setup_build_environment(formula)
     self["HOMEBREW_SDKROOT"] = effective_sysroot
-    self["SDKROOT"] = MacOS.sdk_path if MacOS::Xcode.without_clt?
 
     # Filter out symbols known not to be defined since GNU Autotools can't
     # reliably figure this out with Xcode 8 and above.
