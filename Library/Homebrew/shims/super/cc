@@ -232,7 +232,7 @@ class Cmd
       true
     # first two paths: reject references to Cellar or opt paths
     # for unspecified dependencies
-    elsif path.start_with?(cellar, opt)
+    elsif path.start_with?(cellar) || path.start_with?(opt)
       dep = path[keg_regex, 2]
       dep && @deps.include?(dep)
     elsif path.start_with?(prefix, tmpdir)
