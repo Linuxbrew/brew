@@ -9,13 +9,13 @@ require "formula_cellar_checks"
 require "install_renamed"
 require "debrew"
 require "sandbox"
-require "requirements/glibc_requirement"
 require "emoji"
 require "development_tools"
 require "cache_store"
 require "linkage_checker"
 require "install"
 require "messages"
+require "os/linux/glibc"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -485,9 +485,14 @@ class FormulaInstaller
 
     # Installing bottles on Linux require a recent version of glibc and gcc.
     # GCC is required for libgcc_s.so and libstdc++.so. It depends on glibc.
-    unless GlibcRequirement.new.satisfied?
-      gcc_dep = Dependency.new("gcc")
-      deps += Dependency.expand(gcc_dep.to_formula) << gcc_dep
+    begin
+      glibc = Formula["glibc"]
+      if !glibc.installed? && OS::Linux::Glibc.system_version < glibc.version
+        gcc_dep = Dependency.new("gcc")
+        deps += Dependency.expand(gcc_dep.to_formula) << gcc_dep
+      end
+    rescue FormulaUnavailableError
+      nil
     end
 
     deps = deps.reject do |dep|
