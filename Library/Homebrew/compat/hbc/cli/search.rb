@@ -6,7 +6,7 @@ module Hbc
     module Compat
       class Search < AbstractCommand
         def run
-          odeprecated "`brew cask search`", "`brew search`"
+          odeprecated "`brew cask search`", "`brew search`", disable_on: Time.new(2018, 9, 30)
           Homebrew.search(args.empty? ? "--casks" : args)
         end
 
