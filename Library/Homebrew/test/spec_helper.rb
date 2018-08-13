@@ -88,6 +88,10 @@ RSpec.configure do |config|
     skip "Requires subversion." unless File.executable? "/usr/bin/svn"
   end
 
+  config.before(:each, :needs_unzip) do
+    skip "Requires unzip." unless which("unzip")
+  end
+
   config.around(:each) do |example|
     def find_files
       Find.find(TEST_TMPDIR)
