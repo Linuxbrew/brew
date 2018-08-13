@@ -252,6 +252,15 @@ describe Homebrew::Cleanup do
       expect(npm_cache).not_to exist
     end
 
+    it "cleans up 'gclient_cache'" do
+      gclient_cache = (HOMEBREW_CACHE/"gclient_cache")
+      gclient_cache.mkpath
+
+      subject.cleanup_cache
+
+      expect(gclient_cache).not_to exist
+    end
+
     it "cleans up all files and directories" do
       git = (HOMEBREW_CACHE/"gist--git")
       gist = (HOMEBREW_CACHE/"gist")
