@@ -15,12 +15,14 @@ describe UnpackStrategy::Subversion do
     system "svn", "commit", working_copy, "-m", "Add `test` file."
   end
 
-  include_examples "UnpackStrategy::detect"
-  include_examples "#extract", children: ["test"]
-
-  context "when the directory name contains an '@' symbol" do
-    let(:working_copy) { mktmpdir(["", "@1.2.3"])  }
-
+  context "when svn is available", :needs_svn do
+    include_examples "UnpackStrategy::detect"
     include_examples "#extract", children: ["test"]
+
+    context "when the directory name contains an '@' symbol" do
+      let(:working_copy) { mktmpdir(["", "@1.2.3"])  }
+
+      include_examples "#extract", children: ["test"]
+    end
   end
 end
