@@ -25,7 +25,7 @@ module Hbc
       end
 
       def run
-        odeprecated "`brew cask cleanup`", "´brew cleanup`", disable_on: Time.new(2018, 9, 30)
+        odeprecated "`brew cask cleanup`", "`brew cleanup`", disable_on: Time.new(2018, 9, 30)
 
         cleanup = Homebrew::Cleanup.new
 
