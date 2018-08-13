@@ -1,5 +1,6 @@
 require "test/support/fixtures/testball"
 require "cleanup"
+require "hbc/cache"
 require "fileutils"
 
 using CleanupRefinement
@@ -133,6 +134,60 @@ describe Homebrew::Cleanup do
     expect(f2).not_to be_installed
     expect(f3).to be_installed
     expect(f4).to be_installed
+  end
+
+  describe "#cleanup_cask", :cask do
+    before(:each) do
+      Hbc::Cache.path.mkpath
+    end
+
+    context "when given a versioned cask" do
+      let(:cask) { Hbc::CaskLoader.load("local-transmission") }
+
+      it "removes the download if it is not for the latest version" do
+        download = Hbc::Cache.path/"#{cask.token}--7.8.9"
+
+        FileUtils.touch download
+
+        subject.cleanup_cask(cask)
+
+        expect(download).not_to exist
+      end
+
+      it "does not remove downloads for the latest version" do
+        download = Hbc::Cache.path/"#{cask.token}--#{cask.version}"
+
+        FileUtils.touch download
+
+        subject.cleanup_cask(cask)
+
+        expect(download).to exist
+      end
+    end
+
+    context "when given a `:latest` cask" do
+      let(:cask) { Hbc::CaskLoader.load("latest-with-appcast") }
+
+      it "does not remove the download for the latest version" do
+        download = Hbc::Cache.path/"#{cask.token}--#{cask.version}"
+
+        FileUtils.touch download
+
+        subject.cleanup_cask(cask)
+
+        expect(download).to exist
+      end
+
+      it "removes the download for the latest version after a week" do
+        download = Hbc::Cache.path/"#{cask.token}--#{cask.version}"
+
+        FileUtils.touch download, mtime: Time.now - 7 * 60 * 60 * 24
+
+        subject.cleanup_cask(cask)
+
+        expect(download).not_to exist
+      end
+    end
   end
 
   describe "::cleanup_logs" do

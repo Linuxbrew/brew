@@ -66,7 +66,7 @@ module Hbc
       def warn_for_unknown_directives(directives)
         unknown_keys = directives.keys - ORDERED_DIRECTIVES
         return if unknown_keys.empty?
-        opoo %Q(Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. Running "brew update; brew cleanup; brew cask cleanup" will likely fix it.)
+        opoo %Q(Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. Running "brew update; brew cleanup" will likely fix it.)
       end
 
       # Preserve prior functionality of script which runs first. Should rarely be needed.

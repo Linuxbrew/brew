@@ -600,18 +600,6 @@ __brew_cask_complete_outdated ()
     COMPREPLY=($(compgen -W "$outdated" -- "$cur"))
 }
 
-_brew_cask_cleanup ()
-{
-    local cur="${COMP_WORDS[COMP_CWORD]}"
-    case "$cur" in
-    -*)
-        __brew_caskcomp "--force"
-        return
-        ;;
-    esac
-    __brew_cask_complete_installed
-}
-
 _brew_cask_fetch ()
 {
     local cur="${COMP_WORDS[COMP_CWORD]}"
@@ -733,7 +721,6 @@ _brew_cask ()
       --version)              __brewcomp_null ;;
       audit)                  __brew_cask_complete_formulae ;;
       cat)                    __brew_cask_complete_formulae ;;
-      cleanup)                _brew_cask_cleanup ;;
       create)                 ;;
       doctor)                 __brewcomp_null ;;
       edit)                   __brew_cask_complete_formulae ;;

@@ -3,7 +3,7 @@ module Hbc
     module_function
 
     def path
-      @path ||= HOMEBREW_CACHE.join("Cask")
+      @path ||= HOMEBREW_CACHE/"Cask"
     end
   end
 end

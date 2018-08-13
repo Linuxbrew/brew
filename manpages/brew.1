@@ -56,7 +56,7 @@ Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is su
 \fBcat\fR \fIformula\fR: Display the source to \fIformula\fR\.
 .
 .IP "\(bu" 4
-\fBcleanup\fR [\fB\-\-prune=\fR\fIdays\fR] [\fB\-\-dry\-run\fR] [\fB\-s\fR] [\fIformulae\fR]: For all installed or specific formulae, remove any older versions from the cellar\. In addition, old downloads from the Homebrew download\-cache are deleted\.
+\fBcleanup\fR [\fB\-\-prune=\fR\fIdays\fR] [\fB\-\-dry\-run\fR] [\fB\-s\fR] [<formula/cask> \.\.\.]: Remove stale lock files and outdated downloads for formulae and casks, and remove old versions of installed formulae\. If arguments are specified, only do this for the specified formulae and casks\.
 .
 .IP
 If \fB\-\-prune=\fR\fIdays\fR is specified, remove all cache files older than \fIdays\fR\.
@@ -65,7 +65,7 @@ If \fB\-\-prune=\fR\fIdays\fR is specified, remove all cache files older than \f
 If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do not actually remove anything\.
 .
 .IP
-If \fB\-s\fR is passed, scrub the cache, removing downloads for even the latest versions of formulae\. Note downloads for any installed formulae will still not be deleted\. If you want to delete those too: \fBrm \-rf $(brew \-\-cache)\fR
+If \fB\-s\fR is passed, scrub the cache, including downloads for even the latest versions\. Note downloads for any installed formula or cask will still not be deleted\. If you want to delete those too: \fBrm \-rf $(brew \-\-cache)\fR
 .
 .IP "\(bu" 4
 \fBcommand\fR \fIcmd\fR: Display the path to the file which is used when invoking \fBbrew\fR \fIcmd\fR\.
