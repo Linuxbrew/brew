@@ -647,8 +647,6 @@ describe Version do
         .to be_detected_from("https://codeload.github.com/gsamokovarov/jump/tar.gz/v0.7.1")
       expect(described_class.create("0.9.1234"))
         .to be_detected_from("https://my.datomic.com/downloads/free/0.9.1234")
-      expect(described_class.create("0.9"))
-        .to be_detected_from("https://my.datomic.com/downloads/free/0.9.1t34")
       expect(described_class.create("1.2.3"))
         .to be_detected_from("https://my.datomic.com/downloads/free/1.2.3")
     end

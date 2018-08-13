@@ -1,3 +1,7 @@
+require "cleanup"
+
+using CleanupRefinement
+
 module Hbc
   class CLI
     class Cleanup < AbstractCommand
@@ -30,16 +34,12 @@ module Hbc
         outdated_only? && file && file.stat.mtime > OUTDATED_TIMESTAMP
       end
 
-      def incomplete?(file)
-        file.extname == ".incomplete"
-      end
-
       def cache_incompletes
-        cache_files.select(&method(:incomplete?))
+        cache_files.select(&:incomplete?)
       end
 
       def cache_completes
-        cache_files.reject(&method(:incomplete?))
+        cache_files.reject(&:incomplete?)
       end
 
       def disk_cleanup_size
