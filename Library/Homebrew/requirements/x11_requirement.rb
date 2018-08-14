@@ -27,20 +27,16 @@ class X11Requirement < Requirement
 
   satisfy build_env: false do
     if which_xorg = which("Xorg")
-      version = Utils.popen_read which_xorg, "-version", err: :out
-      next false unless $CHILD_STATUS.success?
-      version = version[/X Server (\d+\.\d+\.\d+)/, 1]
-      next false unless version
-      Version.new(version) >= min_version
-    elsif which_xdpyinfo = which("xdpyinfo")
-      version = Utils.popen_read which_xdpyinfo, "-version"
-      next false unless $CHILD_STATUS.success?
-      version = version[/^xdpyinfo (\d+\.\d+\.\d+)/, 1]
-      next false unless version
-      Version.new(version) >= min_xdpyinfo_version
-    else
-      false
+      version = Utils.popen_read(which_xorg, "-version", err: :out)[/X Server (\d+\.\d+\.\d+)/, 1]
+      next true if $CHILD_STATUS.success? && version && Version.new(version) >= min_version
     end
+
+    if which_xdpyinfo = which("xdpyinfo")
+      version = Utils.popen_read(which_xdpyinfo, "-version")[/^xdpyinfo (\d+\.\d+\.\d+)/, 1]
+      next true if $CHILD_STATUS.success? && version && Version.new(version) >= min_xdpyinfo_version
+    end
+
+    false
   end
 
   def message
