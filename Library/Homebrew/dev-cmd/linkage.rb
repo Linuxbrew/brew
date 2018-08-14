@@ -41,13 +41,6 @@ module Homebrew
         if args.test?
           result.display_test_output
           Homebrew.failed = true if result.broken_library_linkage?
-          unless OS.mac?
-            formula = keg.to_formula
-            CxxStdlib.check_compatibility(
-              formula, ARGV.one? ? formula.deps : formula.recursive_dependencies,
-              keg, Tab.for_keg(keg)
-            )
-          end
         elsif args.reverse?
           result.display_reverse_output
         else
