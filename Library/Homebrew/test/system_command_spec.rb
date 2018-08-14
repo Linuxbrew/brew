@@ -1,5 +1,3 @@
-require "system_command"
-
 describe SystemCommand do
   describe "#initialize" do
     let(:env_args) { ["bash", "-c", 'printf "%s" "${A?}" "${B?}" "${C?}"'] }
