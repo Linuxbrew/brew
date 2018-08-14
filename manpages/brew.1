@@ -1051,7 +1051,7 @@ Note that environment variables must have a value set to be detected\. For examp
 .
 .TP
 \fBHOMEBREW_ARTIFACT_DOMAIN\fR
-If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries\.
+If set, instructs Homebrew to prefix all download URLs, including those for bottles, with this variable\. For example, a formula with a URL of \fBhttps://example\.com/foo\.tar\.gz\fR but \fBHOMEBREW_ARTIFACT_DOMAIN=http://localhost:8080\fR would instead download from \fBhttp://localhost:8080/example\.com/foo\.tar\.gz\fR\.
 .
 .TP
 \fBHOMEBREW_AUTO_UPDATE_SECS\fR
@@ -1066,7 +1066,7 @@ When using the \fBS3\fR download strategy, Homebrew will look in these variables
 .
 .TP
 \fBHOMEBREW_BOTTLE_DOMAIN\fR
-If set, instructs Homebrew to use the given URL as a download mirror for bottles\.
+By default, Homebrew uses \fBhttps://homebrew\.bintray\.com/\fR as its download mirror for bottles\. If set, instructs Homebrew to instead use the given URL\. For example, \fBHOMEBREW_BOTTLE_DOMAIN=http://localhost:8080\fR will cause all bottles to download from the prefix \fBhttp://localhost:8080/\fR\.
 .
 .TP
 \fBHOMEBREW_BROWSER\fR
