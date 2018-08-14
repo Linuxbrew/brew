@@ -228,7 +228,6 @@ class Tab < OpenStruct
   end
 
   def include?(opt)
-    return true if OS.linux? && opt == "with-default-names"
     used_options.include? opt
   end
 

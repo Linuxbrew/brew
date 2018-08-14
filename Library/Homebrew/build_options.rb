@@ -9,9 +9,6 @@ class BuildOptions
   # (which isn't named `with-*` or `without-*`).
   # @deprecated
   def include?(name)
-    # Enable --with-default-names by default on Linux.
-    # It would be good to add a --without-default-names option.
-    return true if OS.linux? && ["default-names", "with-default-names"].include?(name)
     @args.include?("--#{name}")
   end
 
