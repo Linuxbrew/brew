@@ -50,17 +50,7 @@ module Homebrew
 
     includes, ignores = argv_includes_ignores(ARGV)
 
-    verbose_using_dots = !ENV["HOMEBREW_VERBOSE_USING_DOTS"].nil?
-    last_dot = Time.at(0)
-
     uses = formulae.select do |f|
-      # Print a dot every minute.
-      if verbose_using_dots && (Time.now - last_dot) > 60
-        last_dot = Time.now
-        $stderr.print "."
-        $stderr.flush
-      end
-
       used_formulae.all? do |ff|
         begin
           deps = f.runtime_dependencies if only_installed_arg
@@ -84,7 +74,6 @@ module Homebrew
         end
       end
     end
-    $stderr.puts if verbose_using_dots
 
     return if uses.empty?
     puts Formatter.columns(uses.map(&:full_name).sort)
