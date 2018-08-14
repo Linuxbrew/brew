@@ -7,23 +7,19 @@ describe "brew uses", :integration_test do
       depends_on "bar"
     RUBY
 
-    # This test would fail when HOMEBREW_VERBOSE_USING_DOTS is set,
-    # as is the case on Linuxbrew's Travis. Rather than convolute
-    # logic, just force that variable to be on and change the
-    # expectation.
-    expect { brew "uses", "baz", "HOMEBREW_VERBOSE_USING_DOTS" => "1" }
+    expect { brew "uses", "baz" }
       .to be_a_success
       .and not_to_output.to_stdout
-      .and output(".\n").to_stderr
+      .and not_to_output.to_stderr
 
-    expect { brew "uses", "bar", "HOMEBREW_VERBOSE_USING_DOTS" => "1" }
+    expect { brew "uses", "bar" }
       .to output("baz\n").to_stdout
-      .and output(".\n").to_stderr
+      .and not_to_output.to_stderr
       .and be_a_success
 
-    expect { brew "uses", "--recursive", "foo", "HOMEBREW_VERBOSE_USING_DOTS" => "1" }
+    expect { brew "uses", "--recursive", "foo" }
       .to output(/(bar\nbaz|baz\nbar)/).to_stdout
-      .and output(".\n").to_stderr
+      .and not_to_output.to_stderr
       .and be_a_success
   end
 end
