@@ -20,12 +20,14 @@ module Homebrew
 
   def update_report
     HOMEBREW_REPOSITORY.cd do
-      analytics_message_displayed = \
+      analytics_message_displayed =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
-      analytics_disabled = \
+      analytics_disabled =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
-      if analytics_message_displayed != "true" && analytics_disabled != "true" &&
-         !ENV["HOMEBREW_NO_ANALYTICS"] && !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
+      if analytics_message_displayed != "true" &&
+         analytics_disabled != "true" &&
+         !ENV["HOMEBREW_NO_ANALYTICS"] &&
+         !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
         ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
         # Use the shell's audible bell.
         print "\a"
@@ -41,6 +43,18 @@ module Homebrew
         # Consider the message possibly missed if not a TTY.
         if $stdout.tty?
           safe_system "git", "config", "--local", "--replace-all", "homebrew.analyticsmessage", "true"
+        end
+      end
+
+      donation_message_displayed =
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.donationmessage").chuzzle
+      if donation_message_displayed != "true"
+        ohai "Homebrew is run entirely by unpaid volunteers. Please consider donating:"
+        puts "  #{Formatter.url("https://github.com/Homebrew/brew#donations")}\n"
+
+        # Consider the message possibly missed if not a TTY.
+        if $stdout.tty?
+          safe_system "git", "config", "--local", "--replace-all", "homebrew.donationmessage", "true"
         end
       end
     end
