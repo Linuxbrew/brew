@@ -106,7 +106,7 @@ module Homebrew
     begin
       formulae = []
 
-      if OS.mac? && !ARGV.casks.empty?
+      unless ARGV.casks.empty?
         args = []
         args << "--force" if ARGV.force?
         args << "--debug" if ARGV.debug?
