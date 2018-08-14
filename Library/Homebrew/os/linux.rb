@@ -5,6 +5,8 @@ module OS
 
     ::MacOS = self # rubocop:disable Naming/ConstantName
 
+    raise "Loaded OS::Linux on generic OS!" if ENV["HOMEBREW_TEST_GENERIC_OS"]
+
     def prefer_64_bit?
       Hardware::CPU.is_64_bit?
     end
