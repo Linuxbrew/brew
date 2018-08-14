@@ -65,13 +65,13 @@ describe Hbc::CLI::Install, :cask do
     }.to raise_error(Hbc::CaskUnavailableError)
   end
 
-  it "returns a suggestion for a misspelled Cask", :needs_macos do
+  it "returns a suggestion for a misspelled Cask" do
     expect {
       described_class.run("localcaffeine")
     }.to raise_error(Hbc::CaskUnavailableError, /Cask 'localcaffeine' is unavailable: No Cask with this name exists\. Did you mean “local-caffeine”?/)
   end
 
-  it "returns multiple suggestions for a Cask fragment", :needs_macos do
+  it "returns multiple suggestions for a Cask fragment" do
     expect {
       described_class.run("local")
     }.to raise_error(Hbc::CaskUnavailableError, /Cask 'local' is unavailable: No Cask with this name exists\. Did you mean one of these\?\nlocal-caffeine\nlocal-transmission/)
