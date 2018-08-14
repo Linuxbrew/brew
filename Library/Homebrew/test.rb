@@ -15,7 +15,6 @@ begin
   error_pipe.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
 
   ENV.extend(Stdenv)
-  formula = ARGV.formulae.first
   ENV.setup_build_environment
 
   trap("INT", old_trap)
