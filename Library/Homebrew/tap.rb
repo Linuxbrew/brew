@@ -282,10 +282,6 @@ class Tap
     args << "--depth=1" unless full_clone
     args << "-q" if quiet
 
-    git_version = Version.new(`git --version`[/git version (\d\.\d+\.\d+)/, 1])
-    raise ErrorDuringExecution, cmd unless $CHILD_STATUS.success?
-    args << "--config" << "core.autocrlf=false" if git_version >= Version.new("1.7.10")
-
     begin
       safe_system "git", *args
       unless Readall.valid_tap?(self, aliases: true)
