@@ -22,18 +22,22 @@ module Homebrew
     HOMEBREW_REPOSITORY.cd do
       analytics_message_displayed =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
+      cask_analytics_message_displayed =
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.cask.analyticsmessage").chuzzle
       analytics_disabled =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
       if analytics_message_displayed != "true" &&
-         analytics_disabled != "true" &&
-         !ENV["HOMEBREW_NO_ANALYTICS"] &&
-         !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
+        cask_analytics_message_displayed != "true" && 
+        analytics_disabled != "true" &&
+        !ENV["HOMEBREW_NO_ANALYTICS"] &&
+        !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
+
         ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
         # Use the shell's audible bell.
         print "\a"
 
         # Use an extra newline and bold to avoid this being missed.
-        ohai "Homebrew has enabled anonymous aggregate user behaviour analytics."
+        ohai "Homebrew and Homebrew Cask have enabled anonymous aggregate user behaviour analytics."
         puts <<~EOS
           #{Tty.bold}Read the analytics documentation (and how to opt-out) here:
             #{Formatter.url("https://docs.brew.sh/Analytics")}#{Tty.reset}
@@ -43,6 +47,7 @@ module Homebrew
         # Consider the message possibly missed if not a TTY.
         if $stdout.tty?
           safe_system "git", "config", "--local", "--replace-all", "homebrew.analyticsmessage", "true"
+          safe_system "git", "config", "--local", "--replace-all", "homebrew.cask.analyticsmessage", "true"
         end
       end
 
