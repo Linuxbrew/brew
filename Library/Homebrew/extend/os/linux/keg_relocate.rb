@@ -58,7 +58,6 @@ class Keg
       results << :libcxx if dylibs.any? { |s| s.include? "libc++.so" }
       results << :libstdcxx if dylibs.any? { |s| s.include? "libstdc++.so" }
     end
-
     results.to_a
   end
 
@@ -75,7 +74,6 @@ class Keg
       next unless hardlinks.add? [pn.stat.dev, pn.stat.ino]
       elf_files << pn
     end
-
     elf_files
   end
 

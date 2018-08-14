@@ -19,8 +19,7 @@ class OsxfuseRequirement < Requirement
     msg = "libfuse is required to install this formula.\n"
     if libfuse_formula_exists?
       msg + <<~EOS
-        To install it, run:
-          brew install libfuse
+        Run "brew install libfuse" to install it.
       EOS
     else
       msg + super
