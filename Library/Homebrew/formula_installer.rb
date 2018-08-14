@@ -763,14 +763,25 @@ class FormulaInstaller
       raise "Empty installation"
     end
   rescue Exception => e # rubocop:disable Lint/RescueException
-    e.options = display_options(formula) if e.is_a?(BuildError)
+    # If we've rescued a ChildProcessError and that ChildProcessError
+    # contains a BuildError, then we reconstruct the inner build error
+    # to make analytics happy.
+    if e.is_a?(ChildProcessError) && e.inner["json_class"] == "BuildError"
+      build_error = BuildError.new(formula, e["cmd"], e["args"], e["env"])
+      build_error.set_backtrace e.backtrace
+      build_error.options = display_options(formula)
+
+      e = build_error
+    end
+
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
       formula.update_head_version
       formula.prefix.rmtree if formula.prefix.directory?
       formula.rack.rmdir_if_possible
     end
-    raise
+
+    raise e
   end
 
   def link(keg)

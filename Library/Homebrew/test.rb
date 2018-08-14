@@ -7,6 +7,7 @@ require "debrew"
 require "formula_assertions"
 require "fcntl"
 require "socket"
+require "json/add/core"
 
 TEST_TIMEOUT_SECONDS = 5 * 60
 
@@ -28,7 +29,7 @@ begin
     raise "test returned false" if formula.run_test == false
   end
 rescue Exception => e # rubocop:disable Lint/RescueException
-  Marshal.dump(e, error_pipe)
+  error_pipe.write e.to_json
   error_pipe.close
   exit! 1
 end

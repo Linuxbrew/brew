@@ -4,6 +4,7 @@ require "global"
 require "debrew"
 require "fcntl"
 require "socket"
+require "json/add/core"
 
 begin
   error_pipe = UNIXSocket.open(ENV["HOMEBREW_ERROR_PIPE"], &:recv_io)
@@ -15,7 +16,7 @@ begin
   formula.extend(Debrew::Formula) if ARGV.debug?
   formula.run_post_install
 rescue Exception => e # rubocop:disable Lint/RescueException
-  Marshal.dump(e, error_pipe)
+  error_pipe.write e.to_json
   error_pipe.close
   exit! 1
 end

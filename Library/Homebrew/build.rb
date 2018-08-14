@@ -11,6 +11,8 @@ require "extend/ENV"
 require "debrew"
 require "fcntl"
 require "socket"
+require "json"
+require "json/add/core"
 
 class Build
   attr_reader :formula, :deps, :reqs
@@ -190,7 +192,17 @@ begin
   build   = Build.new(formula, options)
   build.install
 rescue Exception => e # rubocop:disable Lint/RescueException
-  Marshal.dump(e, error_pipe)
+  error_hash = JSON.parse e.to_json
+
+  # Special case: We need to toss our build state into the error hash
+  # for proper analytics reporting and sensible error messages.
+  if e.is_a?(BuildError)
+    error_hash["cmd"] = e.cmd
+    error_hash["args"] = e.args
+    error_hash["env"] = e.env
+  end
+
+  error_pipe.write error_hash.to_json
   error_pipe.close
   exit! 1
 end

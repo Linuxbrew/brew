@@ -352,14 +352,16 @@ class FormulaAmbiguousPythonError < RuntimeError
 end
 
 class BuildError < RuntimeError
-  attr_reader :formula, :env
+  attr_reader :formula, :cmd, :args, :env
   attr_accessor :options
 
   def initialize(formula, cmd, args, env)
     @formula = formula
+    @cmd = cmd
+    @args = args
     @env = env
-    args = args.map { |arg| arg.to_s.gsub " ", "\\ " }.join(" ")
-    super "Failed executing: #{cmd} #{args}"
+    pretty_args = args.map { |arg| arg.to_s.gsub " ", "\\ " }.join(" ")
+    super "Failed executing: #{cmd} #{pretty_args}"
   end
 
   def issues
@@ -594,5 +596,22 @@ class BottleFormulaUnavailableError < RuntimeError
         #{bottle_path}
         #{formula_path}
     EOS
+  end
+end
+
+# Raised when a child process sends us an exception over its error pipe.
+class ChildProcessError < RuntimeError
+  attr_reader :inner
+
+  def initialize(inner)
+    @inner = inner
+
+    super <<~EOS
+      An exception occured within a build process:
+        #{inner["json_class"]}: #{inner["m"]}
+    EOS
+
+    # Clobber our real (but irrelevant) backtrace with that of the inner exception.
+    set_backtrace inner["b"]
   end
 end
