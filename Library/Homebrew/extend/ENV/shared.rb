@@ -29,6 +29,7 @@ module SharedEnvExtension
   # @private
   def setup_build_environment(formula = nil)
     @formula = formula
+    reset
   end
 
   # @private
