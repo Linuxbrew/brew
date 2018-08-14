@@ -1,13 +1,13 @@
-![Linuxbrew logo](http://linuxbrew.sh/images/linuxbrew-256x256.png)
+![Linuxbrew logo](https://linuxbrew.sh/images/linuxbrew-256x256.png)
 
 # Linuxbrew
 [![GitHub release](https://img.shields.io/github/tag/Linuxbrew/brew.svg)](https://github.com/Linuxbrew/brew/releases)
 
-[Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux.
+[Linuxbrew](https://linuxbrew.sh) is a fork of [Homebrew](https://brew.sh), the macOS package manager, for Linux.
 
 It can be installed in your home directory and does not require root access. The same package manager can be used on both your Linux server and your Mac laptop. Installing a modern version of *glibc* and *gcc* in your home directory on an old distribution of Linux takes five minutes.
 
-[Features](http://linuxbrew.sh#features), usage and installation instructions are [summarised on the homepage](http://linuxbrew.sh). Terminology (e.g. the difference between a Cellar, Tap, Cask and so forth) is [explained here](https://docs.brew.sh/Formula-Cookbook#homebrew-terminology).
+[Features](https://linuxbrew.sh#features), usage and installation instructions are [summarised on the homepage](https://linuxbrew.sh). Terminology (e.g. the difference between a Cellar, Tap, Cask and so forth) is [explained here](https://docs.brew.sh/Formula-Cookbook#homebrew-terminology).
 
 To receive updates of major changes to Linuxbrew subscribe to the [Linuxbrew Updates](https://github.com/Linuxbrew/brew/issues/1) issue on GitHub.
 
@@ -133,13 +133,13 @@ Please report security issues to our [HackerOne](https://hackerone.com/homebrew/
 
 ## Who Are You?
 
-Linuxbrew's lead maintainer is [Shaun Jackman](http://sjackman.ca).
+Linuxbrew's lead maintainer is [Shaun Jackman](https://sjackman.ca).
 
 Linuxbrew/homebrew-core's lead maintainer is [Michka Popoff](https://github.com/iMichka).
 
 Linuxbrew's other current maintainers are [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Alyssa Ross](https://github.com/alyssais).
 
-Linuxbrew/homebrew-core's other current maintainers are [Shaun Jackman](http://sjackman.ca).
+Linuxbrew/homebrew-core's other current maintainers are [Shaun Jackman](https://sjackman.ca).
 
 Former maintainers with significant contributions include [Bob W. Hogg](https://github.com/rwhogg).
 
@@ -158,7 +158,7 @@ Please consider [donating regularly to Linuxbrew through Patreon](https://www.pa
 
 [![Donate with Patreon](https://img.shields.io/badge/Patreon-Linuxbrew-green.svg)](https://www.patreon.com/linuxbrew)
 
-[Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux. Please consider [donating to Homebrew](https://github.com/Homebrew/brew#donations) as well if you use Homebrew on macOS.
+[Linuxbrew](https://linuxbrew.sh) is a fork of [Homebrew](https://brew.sh), the macOS package manager, for Linux. Please consider [donating to Homebrew](https://github.com/Homebrew/brew#donations) as well if you use Homebrew on macOS.
 
 [![Donate with Patreon](https://img.shields.io/badge/Patreon-Homebrew-green.svg)](https://www.patreon.com/homebrew)
 
