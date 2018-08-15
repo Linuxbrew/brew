@@ -4,7 +4,7 @@
 #:    Options for the `install` command are also valid here.
 #:
 #:    If `--cleanup` is specified or `HOMEBREW_UPGRADE_CLEANUP` is set then remove
-#:    previously installed <formulae> version(s).
+#:    previously installed version(s) of upgraded <formulae>.
 #:
 #:    If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
 #:    the HEAD installation of the formula is outdated. Otherwise, the
