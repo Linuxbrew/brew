@@ -12,7 +12,7 @@ class KegOnlyReason
   end
 
   def valid?
-    true
+    ![:provided_by_macos, :provided_by_osx, :shadowed_by_macos].include?(@reason)
   end
 
   def to_s
@@ -61,3 +61,5 @@ class BottleDisableReason
     @reason
   end
 end
+
+require "extend/os/formula_support"
