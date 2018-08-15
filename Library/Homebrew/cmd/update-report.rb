@@ -22,12 +22,12 @@ module Homebrew
     HOMEBREW_REPOSITORY.cd do
       analytics_message_displayed =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
-      cask_analytics_message_displayed =
+      caskanalyticsmessage =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.cask.analyticsmessage").chuzzle
       analytics_disabled =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
       if analytics_message_displayed != "true" &&
-        cask_analytics_message_displayed != "true" && 
+        caskanalyticsmessage != "true" && 
         analytics_disabled != "true" &&
         !ENV["HOMEBREW_NO_ANALYTICS"] &&
         !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
@@ -37,7 +37,7 @@ module Homebrew
         print "\a"
 
         # Use an extra newline and bold to avoid this being missed.
-        ohai "Homebrew and Homebrew Cask have enabled anonymous aggregate user behaviour analytics."
+        ohai "Homebrew (and Cask) have enabled anonymous aggregate user behaviour analytics."
         puts <<~EOS
           #{Tty.bold}Read the analytics documentation (and how to opt-out) here:
             #{Formatter.url("https://docs.brew.sh/Analytics")}#{Tty.reset}
