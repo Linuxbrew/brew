@@ -135,6 +135,7 @@ rescue MethodDeprecatedError => e
     $stderr.puts "If reporting this issue please do so at (not Homebrew/brew or Homebrew/core):"
     $stderr.puts "  #{Formatter.url(e.issues_url)}"
   end
+  $stderr.puts e.backtrace if ARGV.debug?
   exit 1
 rescue Exception => e # rubocop:disable Lint/RescueException
   onoe e

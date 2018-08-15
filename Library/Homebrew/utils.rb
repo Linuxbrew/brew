@@ -11,6 +11,7 @@ require "utils/link"
 require "utils/popen"
 require "utils/svn"
 require "utils/tty"
+require "tap_constants"
 require "time"
 
 def require?(path)
@@ -86,7 +87,6 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   # - Location outside of 'compat/'.
   # - Location of caller of deprecated method (if all else fails).
   backtrace = caller
-  tap_message = nil
 
   # Don't throw deprecations at all for cached, .brew or .metadata files.
   return if backtrace.any? do |line|
@@ -95,31 +95,26 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
     line.include?("/.metadata/")
   end
 
-  caller_message = backtrace.detect do |line|
-    next unless line =~ %r{^#{Regexp.escape(HOMEBREW_LIBRARY)}/Taps/([^/]+/[^/]+)/}
-    tap = Tap.fetch Regexp.last_match(1)
-    tap_message = "\nPlease report this to the #{tap} tap!"
-    true
-  end
-  caller_message ||= backtrace.detect do |line|
-    !line.start_with?("#{HOMEBREW_LIBRARY_PATH}/compat/")
-  end
-  caller_message ||= backtrace[1]
+  tap_message = nil
 
-  message = <<~EOS
-    Calling #{method} is #{verb}!
-    #{replacement_message}
-    #{caller_message}#{tap_message}
-  EOS
+  backtrace.each do |line|
+    next unless match = line.match(HOMEBREW_TAP_PATH_REGEX)
+    tap = Tap.fetch(match[:user], match[:repo])
+    tap_message = "\nPlease report this to the #{tap} tap"
+    tap_message += ", or even better, submit a PR to fix it" if replacement
+    tap_message << ":\n  #{line.sub(/^(.*\:\d+)\:.*$/, '\1')}\n\n"
+    break
+  end
 
-  if ARGV.homebrew_developer? || disable ||
-     Homebrew.raise_deprecation_exceptions?
-    if replacement || tap_message
-      message += "Or, even better, submit a PR to fix it!"
-    end
-    raise MethodDeprecatedError, message
+  message = "Calling #{method} is #{verb}! #{replacement_message}"
+  message << tap_message if tap_message
+
+  if ARGV.homebrew_developer? || disable || Homebrew.raise_deprecation_exceptions?
+    exception = MethodDeprecatedError.new(message)
+    exception.set_backtrace(backtrace)
+    raise exception
   elsif !Homebrew.auditing?
-    opoo "#{message}\n"
+    opoo message
   end
 end
 
