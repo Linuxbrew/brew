@@ -23,7 +23,7 @@ module Homebrew
       analytics_message_displayed =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
       caskanalyticsmessage =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.cask.analyticsmessage").chuzzle
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.caskanalyticsmessage").chuzzle
       analytics_disabled =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
       if analytics_message_displayed != "true" &&
@@ -47,7 +47,7 @@ module Homebrew
         # Consider the message possibly missed if not a TTY.
         if $stdout.tty?
           safe_system "git", "config", "--local", "--replace-all", "homebrew.analyticsmessage", "true"
-          safe_system "git", "config", "--local", "--replace-all", "homebrew.cask.analyticsmessage", "true"
+          safe_system "git", "config", "--local", "--replace-all", "homebrew.caskanalyticsmessage", "true"
         end
       end
 
