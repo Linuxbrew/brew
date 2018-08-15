@@ -56,14 +56,19 @@ module FormulaCellarChecks
     EOS
   end
 
+  VALID_LIBRARY_EXTENSIONS = %w[.a .dylib .framework .jnilib .la .o .so .jar .prl .pm .sh].freeze
+
+  def valid_library_extension?(filename)
+    VALID_LIBRARY_EXTENSIONS.include? filename.extname
+  end
+  alias generic_valid_library_extension? valid_library_extension?
+
   def check_non_libraries
     return unless formula.lib.directory?
 
-    valid_extensions = %w[.a .dylib .framework .jnilib .la .o .so
-                          .jar .prl .pm .sh]
     non_libraries = formula.lib.children.reject do |g|
       next true if g.directory?
-      valid_extensions.include? g.extname
+      valid_library_extension? g
     end
     return if non_libraries.empty?
 
