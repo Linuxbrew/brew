@@ -90,7 +90,7 @@ module Hbc
       install_artifacts
       enable_accessibility_access
 
-      Utils::Analytics.report_event("cask_install", @cask.token)
+      ::Utils::Analytics.report_event("cask_install", @cask.token)
 
       puts summary
     end
