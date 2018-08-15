@@ -154,7 +154,7 @@ module Hbc
 
       Tap.default_cask_tap.install unless Tap.default_cask_tap.installed?
       self.class.run_command(command, *args)
-    rescue CaskError, ArgumentError, OptionParser::InvalidOption => e
+    rescue CaskError, MethodDeprecatedError, ArgumentError, OptionParser::InvalidOption => e
       msg = e.message
       msg << e.backtrace.join("\n").prepend("\n") if ARGV.debug?
       onoe msg
