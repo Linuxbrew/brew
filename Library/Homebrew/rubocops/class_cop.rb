@@ -25,7 +25,10 @@ module RuboCop
 
       class TestCalls < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
-          test_calls(find_block(body_node, :test)) do |node, params|
+          test = find_block(body_node, :test)
+          return unless test
+
+          test_calls(test) do |node, params|
             p1, p2 = params
             if match = string_content(p1).match(%r{(/usr/local/(s?bin))})
               offending_node(p1)
