@@ -15,45 +15,46 @@ require "utils/git"
 require "formulary"
 require "tap"
 
-module ExtractExtensions
-  refine BottleSpecification do
-    def method_missing(m, *_args, &_block)
+class BottleSpecification
+  def method_missing(m, *_args, &_block)
+    # no-op
+  end
+end
+
+class Module
+  def method_missing(m, *_args, &_block)
+    # no-op
+  end
+end
+
+class DependencyCollector
+  def parse_symbol_spec(spec, tags)
+    case spec
+    when :x11        then X11Requirement.new(spec.to_s, tags)
+    when :xcode      then XcodeRequirement.new(tags)
+    when :linux      then LinuxRequirement.new(tags)
+    when :macos      then MacOSRequirement.new(tags)
+    when :arch       then ArchRequirement.new(tags)
+    when :java       then JavaRequirement.new(tags)
+    when :osxfuse    then OsxfuseRequirement.new(tags)
+    when :tuntap     then TuntapRequirement.new(tags)
+    when :ld64       then ld64_dep_if_needed(tags)
+    else
       # no-op
     end
   end
 
-  refine Module do
-    def method_missing(m, *_args, &_block)
-      # no-op
-    end
-  end
-
-  refine DependencyCollector do
-    def parse_symbol_spec(spec, tags)
-      case spec
-      when :x11        then X11Requirement.new(spec.to_s, tags)
-      when :xcode      then XcodeRequirement.new(tags)
-      when :linux      then LinuxRequirement.new(tags)
-      when :macos      then MacOSRequirement.new(tags)
-      when :arch       then ArchRequirement.new(tags)
-      when :java       then JavaRequirement.new(tags)
-      when :osxfuse    then OsxfuseRequirement.new(tags)
-      when :tuntap     then TuntapRequirement.new(tags)
-      when :ld64       then ld64_dep_if_needed(tags)
-      else
-        # no-op
-      end
-    end
-
+  module Compat
     def parse_string_spec(spec, tags)
       opoo "'depends_on ... => :run' is disabled. There is no replacement." if tags.include?(:run) && ARGV.debug?
       super
     end
   end
+
+  prepend Compat
 end
 
 module Homebrew
-  using ExtractExtensions
   module_function
 
   def extract
@@ -124,6 +125,8 @@ module Homebrew
   def formula_at_revision(repo, name, file, rev)
     return if rev.empty?
     contents = Git.last_revision_of_file(repo, file, before_commit: rev)
+    contents.gsub!("@url=", "url ")
+    contents.gsub!("require 'brewkit'", "require 'formula'")
     Formulary.from_contents(name, file, contents)
   end
 end
