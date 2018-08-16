@@ -76,6 +76,31 @@ describe RuboCop::Cop::FormulaAudit::TestCalls do
       end
     RUBY
   end
+
+  it "supports auto-correcting test calls" do
+    source = <<~RUBY
+      class Foo < Formula
+        url 'https://example.com/foo-1.0.tgz'
+
+        test do
+          shell_output("/usr/local/sbin/test", 0)
+        end
+      end
+    RUBY
+
+    corrected_source = <<~RUBY
+      class Foo < Formula
+        url 'https://example.com/foo-1.0.tgz'
+
+        test do
+          shell_output("\#{sbin}/test")
+        end
+      end
+    RUBY
+
+    new_source = autocorrect_source(source)
+    expect(new_source).to eq(corrected_source)
+  end
 end
 
 describe RuboCop::Cop::FormulaAuditStrict::Test do

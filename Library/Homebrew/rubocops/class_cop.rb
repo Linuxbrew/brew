@@ -39,6 +39,17 @@ module RuboCop
           end
         end
 
+        def autocorrect(node)
+          lambda do |corrector|
+            case node.type
+            when :str, :dstr
+              corrector.replace(node.source_range, node.source.to_s.sub(%r{(/usr/local/(s?bin))}, '#{\2}'))
+            when :int
+              corrector.remove(range_with_surrounding_comma(range_with_surrounding_space(range: node.source_range, side: :left)))
+            end
+          end
+        end
+
         def_node_search :test_calls, <<~EOS
           (send nil? ${:system :shell_output :pipe_output} $...)
         EOS
