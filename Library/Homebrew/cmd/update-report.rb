@@ -27,10 +27,10 @@ module Homebrew
       analytics_disabled =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
       if analytics_message_displayed != "true" &&
-        caskanalyticsmessage != "true" && 
-        analytics_disabled != "true" &&
-        !ENV["HOMEBREW_NO_ANALYTICS"] &&
-        !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
+         caskanalyticsmessage != "true" &&
+         analytics_disabled != "true" &&
+         !ENV["HOMEBREW_NO_ANALYTICS"] &&
+         !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
 
         ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
         # Use the shell's audible bell.
