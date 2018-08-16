@@ -914,10 +914,10 @@ Write all installed casks/formulae/taps into a Brewfile\.
 Uninstall all dependencies not listed in a Brewfile\.
 .
 .IP
-\fBbrew bundle check\fR [\fB\-\-no\-upgrade\fR] [\fB\-\-file\fR=\fIpath\fR|\fB\-\-global\fR]
+\fBbrew bundle check\fR [\fB\-\-no\-upgrade\fR] [\fB\-\-file\fR=\fIpath\fR|\fB\-\-global\fR] [\fB\-\-verbose\fR]
 .
 .IP
-Check if all dependencies are installed in a Brewfile\.
+Check if all dependencies are installed in a Brewfile\. Missing dependencies are listed in verbose mode\. \fBcheck\fR will exit on the first category missing a dependency unless in verbose mode\.
 .
 .IP
 \fBbrew bundle exec\fR \fIcommand\fR
