@@ -114,7 +114,7 @@ rescue UsageError => e
   require "help"
   Homebrew::Help.help cmd, usage_error: e.message
 rescue SystemExit => e
-  onoe "Kernel.exit" if ARGV.verbose? && !e.success?
+  onoe "Kernel.exit" if ARGV.debug? && !e.success?
   $stderr.puts e.backtrace if ARGV.debug?
   raise
 rescue Interrupt
