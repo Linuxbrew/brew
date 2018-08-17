@@ -524,7 +524,7 @@ If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full upd
 Options for the \fBinstall\fR command are also valid here\.
 .
 .IP
-If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_UPGRADE_CLEANUP\fR is set then remove previously installed \fIformula\fR version(s)\.
+If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_UPGRADE_CLEANUP\fR is set then remove previously installed version(s) of upgraded \fIformulae\fR\.
 .
 .IP
 If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if the HEAD installation of the formula is outdated\. Otherwise, the repository\'s HEAD will be checked for updates when a new stable or devel version has been released\.
@@ -914,10 +914,10 @@ Write all installed casks/formulae/taps into a Brewfile\.
 Uninstall all dependencies not listed in a Brewfile\.
 .
 .IP
-\fBbrew bundle check\fR [\fB\-\-no\-upgrade\fR] [\fB\-\-file\fR=\fIpath\fR|\fB\-\-global\fR]
+\fBbrew bundle check\fR [\fB\-\-no\-upgrade\fR] [\fB\-\-file\fR=\fIpath\fR|\fB\-\-global\fR] [\fB\-\-verbose\fR]
 .
 .IP
-Check if all dependencies are installed in a Brewfile\.
+Check if all dependencies are installed in a Brewfile\. Missing dependencies are listed in verbose mode\. \fBcheck\fR will exit on the first category missing a dependency unless in verbose mode\.
 .
 .IP
 \fBbrew bundle exec\fR \fIcommand\fR
@@ -1275,7 +1275,7 @@ Homebrew\'s lead maintainer is Mike McQuaid\.
 Homebrew\'s project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter\.
 .
 .P
-Homebrew/brew\'s other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter and William Woodruff\.
+Homebrew/brew\'s other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Jonathan Chang and William Woodruff\.
 .
 .P
 Homebrew/brew\'s Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman\.

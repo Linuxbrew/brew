@@ -576,7 +576,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Options for the `install` command are also valid here.
 
     If `--cleanup` is specified or `HOMEBREW_UPGRADE_CLEANUP` is set then remove
-    previously installed `formula` version(s).
+    previously installed version(s) of upgraded `formulae`.
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
     the HEAD installation of the formula is outdated. Otherwise, the
@@ -967,9 +967,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   
 
-      `brew bundle check` [`--no-upgrade`] [`--file`=`path`|`--global`]
+      `brew bundle check` [`--no-upgrade`] [`--file`=`path`|`--global`] [`--verbose`]
 
-      Check if all dependencies are installed in a Brewfile.
+      Check if all dependencies are installed in a Brewfile. Missing dependencies are listed in verbose mode. `check` will exit on the first category missing a dependency unless in verbose mode.
 
   
 
@@ -1316,7 +1316,7 @@ Homebrew's lead maintainer is Mike McQuaid.
 
 Homebrew's project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter.
 
-Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter and William Woodruff.
+Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Jonathan Chang and William Woodruff.
 
 Homebrew/brew's Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman.
 
