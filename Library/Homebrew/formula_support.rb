@@ -12,7 +12,6 @@ class KegOnlyReason
   end
 
   def valid?
-    return true if OS.mac?
     ![:provided_by_macos, :provided_by_osx, :shadowed_by_macos].include?(@reason)
   end
 
@@ -62,3 +61,5 @@ class BottleDisableReason
     @reason
   end
 end
+
+require "extend/os/formula_support"

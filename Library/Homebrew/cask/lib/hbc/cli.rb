@@ -10,7 +10,6 @@ require "hbc/cli/options"
 require "hbc/cli/abstract_command"
 require "hbc/cli/audit"
 require "hbc/cli/cat"
-require "hbc/cli/cleanup"
 require "hbc/cli/create"
 require "hbc/cli/doctor"
 require "hbc/cli/edit"
@@ -155,7 +154,7 @@ module Hbc
 
       Tap.default_cask_tap.install unless Tap.default_cask_tap.installed?
       self.class.run_command(command, *args)
-    rescue CaskError, ArgumentError, OptionParser::InvalidOption => e
+    rescue CaskError, MethodDeprecatedError, ArgumentError, OptionParser::InvalidOption => e
       msg = e.message
       msg << e.backtrace.join("\n").prepend("\n") if ARGV.debug?
       onoe msg

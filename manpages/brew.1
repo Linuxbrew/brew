@@ -56,7 +56,7 @@ Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is su
 \fBcat\fR \fIformula\fR: Display the source to \fIformula\fR\.
 .
 .IP "\(bu" 4
-\fBcleanup\fR [\fB\-\-prune=\fR\fIdays\fR] [\fB\-\-dry\-run\fR] [\fB\-s\fR] [\fIformulae\fR]: For all installed or specific formulae, remove any older versions from the cellar\. In addition, old downloads from the Homebrew download\-cache are deleted\.
+\fBcleanup\fR [\fB\-\-prune=\fR\fIdays\fR] [\fB\-\-dry\-run\fR] [\fB\-s\fR] [<formula/cask> \.\.\.]: Remove stale lock files and outdated downloads for formulae and casks, and remove old versions of installed formulae\. If arguments are specified, only do this for the specified formulae and casks\.
 .
 .IP
 If \fB\-\-prune=\fR\fIdays\fR is specified, remove all cache files older than \fIdays\fR\.
@@ -65,7 +65,7 @@ If \fB\-\-prune=\fR\fIdays\fR is specified, remove all cache files older than \f
 If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do not actually remove anything\.
 .
 .IP
-If \fB\-s\fR is passed, scrub the cache, removing downloads for even the latest versions of formulae\. Note downloads for any installed formulae will still not be deleted\. If you want to delete those too: \fBrm \-rf $(brew \-\-cache)\fR
+If \fB\-s\fR is passed, scrub the cache, including downloads for even the latest versions\. Note downloads for any installed formula or cask will still not be deleted\. If you want to delete those too: \fBrm \-rf $(brew \-\-cache)\fR
 .
 .IP "\(bu" 4
 \fBcommand\fR \fIcmd\fR: Display the path to the file which is used when invoking \fBbrew\fR \fIcmd\fR\.
@@ -524,7 +524,7 @@ If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full upd
 Options for the \fBinstall\fR command are also valid here\.
 .
 .IP
-If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_UPGRADE_CLEANUP\fR is set then remove previously installed \fIformula\fR version(s)\.
+If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_UPGRADE_CLEANUP\fR is set then remove previously installed version(s) of upgraded \fIformulae\fR\.
 .
 .IP
 If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if the HEAD installation of the formula is outdated\. Otherwise, the repository\'s HEAD will be checked for updates when a new stable or devel version has been released\.
@@ -1051,7 +1051,7 @@ Note that environment variables must have a value set to be detected\. For examp
 .
 .TP
 \fBHOMEBREW_ARTIFACT_DOMAIN\fR
-If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries\.
+If set, instructs Homebrew to prefix all download URLs, including those for bottles, with this variable\. For example, a formula with a URL of \fBhttps://example\.com/foo\.tar\.gz\fR but \fBHOMEBREW_ARTIFACT_DOMAIN=http://localhost:8080\fR would instead download from \fBhttp://localhost:8080/example\.com/foo\.tar\.gz\fR\.
 .
 .TP
 \fBHOMEBREW_AUTO_UPDATE_SECS\fR
@@ -1066,7 +1066,7 @@ When using the \fBS3\fR download strategy, Homebrew will look in these variables
 .
 .TP
 \fBHOMEBREW_BOTTLE_DOMAIN\fR
-If set, instructs Homebrew to use the given URL as a download mirror for bottles\.
+By default, Homebrew uses \fBhttps://homebrew\.bintray\.com/\fR as its download mirror for bottles\. If set, instructs Homebrew to instead use the given URL\. For example, \fBHOMEBREW_BOTTLE_DOMAIN=http://localhost:8080\fR will cause all bottles to download from the prefix \fBhttp://localhost:8080/\fR\.
 .
 .TP
 \fBHOMEBREW_BROWSER\fR

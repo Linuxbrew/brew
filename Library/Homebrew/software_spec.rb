@@ -412,3 +412,5 @@ class PourBottleCheck
     @formula.send(:define_method, :pour_bottle?, &block)
   end
 end
+
+require "extend/os/software_spec"

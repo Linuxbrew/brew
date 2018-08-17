@@ -107,7 +107,7 @@ module Homebrew
       ]
 
       unless OS.mac?
-        bundle_args << "--tag" << "~needs_macos"
+        bundle_args << "--tag" << "~needs_macos" << "--tag" << "~cask"
         files = files.reject { |p| p =~ %r{^test/(os/mac|cask)(/.*|_spec\.rb)$} }
       end
 
