@@ -85,7 +85,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :needs_svn) do
-    skip "subversion not installed." unless which "svn"
+    skip "subversion not installed." unless system which("svn"), "--help"
   end
 
   config.before(:each, :needs_unzip) do
