@@ -125,13 +125,11 @@ if [[ -n "$HOMEBREW_FORCE_BREWED_CURL" &&
          "$HOMEBREW_PREFIX/opt/curl/bin/curl" --version >/dev/null
 then
   HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
-else
-  HOMEBREW_CURL="curl"
-fi
-
-if [[ -n "$HOMEBREW_DEVELOPER" && -x "$HOMEBREW_CURL_PATH" ]]
+elif [[ -n "$HOMEBREW_DEVELOPER" && -x "$HOMEBREW_CURL_PATH" ]]
 then
   HOMEBREW_CURL="$HOMEBREW_CURL_PATH"
+else
+  HOMEBREW_CURL="curl"
 fi
 
 if [[ -n "$HOMEBREW_FORCE_BREWED_GIT" &&
@@ -139,14 +137,13 @@ if [[ -n "$HOMEBREW_FORCE_BREWED_GIT" &&
          "$HOMEBREW_PREFIX/opt/git/bin/git" --version >/dev/null
 then
   HOMEBREW_GIT="$HOMEBREW_PREFIX/opt/git/bin/git"
+elif [[ -n "$HOMEBREW_DEVELOPER" && -x "$HOMEBREW_GIT_PATH" ]]
+then
+  HOMEBREW_GIT="$HOMEBREW_GIT_PATH"
 else
   HOMEBREW_GIT="git"
 fi
 
-if [[ -n "$HOMEBREW_DEVELOPER" && -x "$HOMEBREW_GIT_PATH" ]]
-then
-  HOMEBREW_GIT="$HOMEBREW_GIT_PATH"
-fi
 
 HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_USER_AGENT_VERSION)"
 HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | awk '{print $1"/"$2}')"
