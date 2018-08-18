@@ -4,6 +4,7 @@ require "keg"
 require "tab"
 require "test/support/fixtures/testball"
 require "test/support/fixtures/testball_bottle"
+require "test/support/fixtures/failball"
 
 describe FormulaInstaller do
   define_negated_matcher :need_bottle, :be_bottle_unneeded
@@ -28,7 +29,7 @@ describe FormulaInstaller do
       Tab.clear_cache
       expect(Tab.for_keg(keg)).not_to be_poured_from_bottle
 
-      yield formula
+      yield formula if block_given?
     ensure
       Tab.clear_cache
       keg.unlink
@@ -131,5 +132,22 @@ describe FormulaInstaller do
     expect {
       fi.check_install_sanity
     }.to raise_error(CannotInstallFormulaError)
+  end
+
+  specify "install fails with BuildError when a system() call fails" do
+    ENV["HOMEBREW_TEST_NO_EXIT_CLEANUP"] = "1"
+    ENV["FAILBALL_BUILD_ERROR"] = "1"
+
+    expect {
+      temporary_install(Failball.new)
+    }.to raise_error(BuildError)
+  end
+
+  specify "install fails with a RuntimeError when #install raises" do
+    ENV["HOMEBREW_TEST_NO_EXIT_CLEANUP"] = "1"
+
+    expect {
+      temporary_install(Failball.new)
+    }.to raise_error(RuntimeError)
   end
 end
