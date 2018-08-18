@@ -1,7 +1,5 @@
 require "fcntl"
 require "socket"
-require "json"
-require "json/add/core"
 
 module Utils
   def self.safe_fork(&_block)
@@ -17,7 +15,7 @@ module Utils
             write.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
             yield
           rescue Exception => e # rubocop:disable Lint/RescueException
-            write.write e.to_json
+            Marshal.dump(e, write)
             write.close
             exit!
           else
@@ -38,7 +36,7 @@ module Utils
           data = read.read
           read.close
           Process.wait(pid) unless socket.nil?
-          raise ChildProcessError, JSON.parse(data) unless data.nil? || data.empty?
+          raise Marshal.load(data) unless data.nil? || data.empty? # rubocop:disable Security/MarshalLoad
           raise Interrupt if $CHILD_STATUS.exitstatus == 130
           raise "Forked child process failed: #{$CHILD_STATUS}" unless $CHILD_STATUS.success?
         end
