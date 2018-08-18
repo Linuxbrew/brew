@@ -744,14 +744,18 @@ class FormulaInstaller
       raise "Empty installation"
     end
   rescue Exception => e # rubocop:disable Lint/RescueException
-    e.options = display_options(formula) if e.is_a?(BuildError)
+    if e.is_a? BuildError
+      e.formula = formula
+      e.options = options
+    end
+
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
       formula.update_head_version
       formula.prefix.rmtree if formula.prefix.directory?
       formula.rack.rmdir_if_possible
     end
-    raise
+    raise e
   end
 
   def link(keg)
