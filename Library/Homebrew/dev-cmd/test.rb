@@ -93,14 +93,12 @@ module Homebrew
             exec(*args)
           end
         end
-      rescue ChildProcessError => e
+      rescue ::Test::Unit::AssertionFailedError => e
         ofail "#{f.full_name}: failed"
-        case e.inner["json_class"]
-        when "Test::Unit::AssertionFailedError"
-          puts e.inner["m"]
-        else
-          puts e.inner["json_class"], e.backtrace
-        end
+        puts e.message
+      rescue Exception => e # rubocop:disable Lint/RescueException
+        ofail "#{f.full_name}: failed"
+        puts e, e.backtrace
       ensure
         ENV.replace(env)
       end
