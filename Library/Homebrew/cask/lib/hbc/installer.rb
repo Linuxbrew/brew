@@ -90,6 +90,10 @@ module Hbc
       install_artifacts
       enable_accessibility_access
 
+      unless @cask.tap&.private?
+        ::Utils::Analytics.report_event("cask_install", @cask.token)
+      end
+
       puts summary
     end
 
