@@ -16,37 +16,21 @@ require "formulary"
 require "tap"
 
 class BottleSpecification
-  def method_missing(m, *_args, &_block)
-    # no-op
+  def method_missing(*)
   end
 end
 
 class Module
-  def method_missing(m, *_args, &_block)
-    # no-op
+  def method_missing(*)
   end
 end
 
 class DependencyCollector
   def parse_symbol_spec(spec, tags)
-    case spec
-    when :x11        then X11Requirement.new(spec.to_s, tags)
-    when :xcode      then XcodeRequirement.new(tags)
-    when :linux      then LinuxRequirement.new(tags)
-    when :macos      then MacOSRequirement.new(tags)
-    when :arch       then ArchRequirement.new(tags)
-    when :java       then JavaRequirement.new(tags)
-    when :osxfuse    then OsxfuseRequirement.new(tags)
-    when :tuntap     then TuntapRequirement.new(tags)
-    when :ld64       then ld64_dep_if_needed(tags)
-    else
-      # no-op
-    end
   end
 
   module Compat
     def parse_string_spec(spec, tags)
-      opoo "'depends_on ... => :run' is disabled. There is no replacement." if tags.include?(:run) && ARGV.debug?
       super
     end
   end
@@ -71,10 +55,12 @@ module Homebrew
     odie "Cannot extract formula to homebrew/core!" if destination_tap.core_tap?
     destination_tap.install unless destination_tap.installed?
 
-    core = CoreTap.instance
     name = ARGV.named.first.downcase
-    repo = core.path
-    file = core.path/"Formula/#{name}.rb"
+    repo = CoreTap.instance.path
+    # Formulae can technically live in "<repo>/<formula>.rb" or
+    # "<repo>/Formula/<formula>.rb", but explicitly use the latter for now
+    # since that is now core tap is structured.
+    file = repo/"Formula/#{name}.rb"
 
     if args.version
       version = args.version
@@ -100,7 +86,8 @@ module Homebrew
       result = Git.last_revision_of_file(repo, file)
     end
 
-    # The class name has to be renamed to match the new filename, e.g. Foo version 1.2.3 becomes FooAT123 and resides in Foo@1.2.3.rb.
+    # The class name has to be renamed to match the new filename,
+    # e.g. Foo version 1.2.3 becomes FooAT123 and resides in Foo@1.2.3.rb.
     class_name = name.capitalize
     versioned_name = Formulary.class_s("#{class_name}@#{version}")
     result.gsub!("class #{class_name} < Formula", "class #{versioned_name} < Formula")
