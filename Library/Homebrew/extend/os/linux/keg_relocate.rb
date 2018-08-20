@@ -1,5 +1,8 @@
 class Keg
   def relocate_dynamic_linkage(relocation)
+    # Patching the dynamic linker of glibc breaks it.
+    return if name == "glibc"
+
     # Patching patchelf using itself fails with "Text file busy" or SIGBUS.
     return if name == "patchelf"
 
