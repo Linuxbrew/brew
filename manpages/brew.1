@@ -727,8 +727,8 @@ Open all of Homebrew for editing\.
 Open \fIformula\fR in the editor\.
 .
 .TP
-\fBextract\fR [\fB\-\-force\fR] \fIformula\fR \fB\-\-tap=\fR\fItap\fR [\fB\-\-version=\fR\fIversion\fR]
-Looks through repository history to find the \fIversion\fR of \fIformula\fR and creates a copy in \fItap\fR/Formula/\fIformula\fR@\fIversion\fR\.rb\. If the tap is not installed yet, attempts to install/clone the tap before continuing\. A tap must be passed through \fB\-\-tap\fR in order for \fBextract\fR to work\.
+\fBextract\fR [\fB\-\-force\fR] \fIformula\fR \fItap\fR [\fB\-\-version=\fR\fIversion\fR]
+Looks through repository history to find the \fIversion\fR of \fIformula\fR and creates a copy in \fItap\fR/Formula/\fIformula\fR@\fIversion\fR\.rb\. If the tap is not installed yet, attempts to install/clone the tap before continuing\.
 .
 .IP
 If \fB\-\-force\fR is passed, the file at the destination will be overwritten if it already exists\. Otherwise, existing files will be preserved\.
