@@ -9,7 +9,7 @@ module UnpackStrategy
         ".tar",
         ".tbz", ".tbz2", ".tar.bz2",
         ".tgz", ".tar.gz",
-        ".tlz", ".tar.lz",
+        ".tlzma", ".tar.lzma",
         ".txz", ".tar.xz"
       ]
     end
