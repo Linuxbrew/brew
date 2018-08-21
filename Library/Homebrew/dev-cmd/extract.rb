@@ -16,18 +16,15 @@ require "formulary"
 require "tap"
 
 class BottleSpecification
-  def method_missing(*)
-  end
+  def method_missing(*); end
 end
 
 class Module
-  def method_missing(*)
-  end
+  def method_missing(*); end
 end
 
 class DependencyCollector
-  def parse_symbol_spec(spec, tags)
-  end
+  def parse_symbol_spec(*); end
 
   module Compat
     def parse_string_spec(spec, tags)
