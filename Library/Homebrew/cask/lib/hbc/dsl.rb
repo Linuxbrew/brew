@@ -138,7 +138,17 @@ module Hbc
         raise CaskInvalidError.new(cask, "No default language specified.")
       end
 
-      MacOS.languages.map(&Locale.method(:parse)).each do |locale|
+      locales = MacOS.languages
+                     .map do |language|
+                       begin
+                         Locale.parse(language)
+                       rescue Locale::ParserError
+                         nil
+                       end
+                     end
+                     .compact
+
+      locales.each do |locale|
         key = locale.detect(@language_blocks.keys)
 
         next if key.nil?
