@@ -105,7 +105,10 @@ can take several different forms:
 Note that environment variables must have a value set to be detected. For example, `export HOMEBREW_NO_INSECURE_REDIRECT=1` rather than just `export HOMEBREW_NO_INSECURE_REDIRECT`.
 
   * `HOMEBREW_ARTIFACT_DOMAIN`:
-    If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
+    If set, instructs Homebrew to prefix all download URLs, including those
+    for bottles, with this variable. For example, a formula with a URL of
+    `https://example.com/foo.tar.gz` but `HOMEBREW_ARTIFACT_DOMAIN=http://localhost:8080`
+    would instead download from `http://localhost:8080/example.com/foo.tar.gz`.
 
   * `HOMEBREW_AUTO_UPDATE_SECS`:
     If set, Homebrew will only check for autoupdates once per this seconds interval.
@@ -121,7 +124,10 @@ Note that environment variables must have a value set to be detected. For exampl
     (unsigned) URL.
 
   * `HOMEBREW_BOTTLE_DOMAIN`:
-    If set, instructs Homebrew to use the given URL as a download mirror for bottles.
+    By default, Homebrew uses `https://homebrew.bintray.com/` as its download
+    mirror for bottles. If set, instructs Homebrew to instead use the given
+    URL. For example, `HOMEBREW_BOTTLE_DOMAIN=http://localhost:8080` will
+    cause all bottles to download from the prefix `http://localhost:8080/`.
 
   * `HOMEBREW_BROWSER`:
     If set, uses this setting as the browser when opening project homepages,

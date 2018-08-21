@@ -11,7 +11,7 @@ HOMEBREW_CASK_DIRS = {
   :servicedir  => Pathname.new(TEST_TMPDIR).join("cask-servicedir"),
 }.freeze
 
-RSpec.shared_context "Homebrew-Cask" do
+RSpec.shared_context "Homebrew-Cask", :needs_macos do
   before do
     HOMEBREW_CASK_DIRS.each do |method, path|
       allow(Hbc::Config.global).to receive(method).and_return(path)

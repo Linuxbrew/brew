@@ -36,7 +36,7 @@ module CleanupRefinement
     end
 
     def nested_cache?
-      directory? && ["glide_home", "java_cache", "npm_cache"].include?(basename.to_s)
+      directory? && %w[glide_home java_cache npm_cache gclient_cache].include?(basename.to_s)
     end
 
     def prune?(days)
@@ -245,9 +245,9 @@ module Homebrew
     end
 
     def cleanup_lockfiles(*lockfiles)
-      return unless HOMEBREW_LOCK_DIR.directory?
+      return if dry_run?
 
-      if lockfiles.empty?
+      if lockfiles.empty? && HOMEBREW_LOCK_DIR.directory?
         lockfiles = HOMEBREW_LOCK_DIR.children.select(&:file?)
       end
 
@@ -256,7 +256,7 @@ module Homebrew
         next unless file.open(File::RDWR).flock(File::LOCK_EX | File::LOCK_NB)
 
         begin
-          cleanup_path(file) { file.unlink }
+          file.unlink
         ensure
           file.open(File::RDWR).flock(File::LOCK_UN) if file.exist?
         end
