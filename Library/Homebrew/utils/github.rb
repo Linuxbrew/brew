@@ -175,7 +175,7 @@ module GitHub
     end
 
     begin
-      if !http_code.start_with?("2") && !status.success?
+      if !http_code.start_with?("2") || !status.success?
         raise_api_error(output, errors, http_code, headers, scopes)
       end
       json = JSON.parse output

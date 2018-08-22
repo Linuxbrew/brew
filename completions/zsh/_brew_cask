@@ -35,7 +35,6 @@ __brew_cask_commands() {
   commands=(
     'audit:verifies installability of Casks'
     'cat:dump raw source of the given Cask to the standard output'
-    'cleanup:cleans up cached downloads and tracker symlinks'
     'create:creates the given Cask and opens it in an editor'
     'doctor:checks for configuration issues'
     'edit:edits the given Cask'
@@ -88,10 +87,6 @@ _brew_cask_cat() {
 
 _brew_cask_cat() {
   __brew_all_casks
-}
-
-_brew_cask_cleanup() {
-  _arguments '--outdated:only clean up cached downloads older than 10 days old'
 }
 
 _brew_cask_create() {

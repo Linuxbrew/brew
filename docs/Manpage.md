@@ -50,18 +50,19 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `cat` `formula`:
     Display the source to `formula`.
 
-  * `cleanup` [`--prune=``days`] [`--dry-run`] [`-s`] [`formulae`]:
-    For all installed or specific formulae, remove any older versions from the
-    cellar. In addition, old downloads from the Homebrew download-cache are deleted.
+  * `cleanup` [`--prune=``days`] [`--dry-run`] [`-s`] [<formula/cask> ...]:
+    Remove stale lock files and outdated downloads for formulae and casks,
+    and remove old versions of installed formulae. If arguments are specified,
+    only do this for the specified formulae and casks.
 
     If `--prune=``days` is specified, remove all cache files older than `days`.
 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
 
-    If `-s` is passed, scrub the cache, removing downloads for even the latest
-    versions of formulae. Note downloads for any installed formulae will still not be
-    deleted. If you want to delete those too: `rm -rf $(brew --cache)`
+    If `-s` is passed, scrub the cache, including downloads for even the latest
+    versions. Note downloads for any installed formula or cask will still not
+    be deleted. If you want to delete those too: `rm -rf $(brew --cache)`
 
   * `command` `cmd`:
     Display the path to the file which is used when invoking `brew` `cmd`.
@@ -575,7 +576,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Options for the `install` command are also valid here.
 
     If `--cleanup` is specified or `HOMEBREW_UPGRADE_CLEANUP` is set then remove
-    previously installed `formula` version(s).
+    previously installed version(s) of upgraded `formulae`.
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
     the HEAD installation of the formula is outdated. Otherwise, the
@@ -1107,7 +1108,10 @@ can take several different forms:
 Note that environment variables must have a value set to be detected. For example, `export HOMEBREW_NO_INSECURE_REDIRECT=1` rather than just `export HOMEBREW_NO_INSECURE_REDIRECT`.
 
   * `HOMEBREW_ARTIFACT_DOMAIN`:
-    If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
+    If set, instructs Homebrew to prefix all download URLs, including those
+    for bottles, with this variable. For example, a formula with a URL of
+    `https://example.com/foo.tar.gz` but `HOMEBREW_ARTIFACT_DOMAIN=http://localhost:8080`
+    would instead download from `http://localhost:8080/example.com/foo.tar.gz`.
 
   * `HOMEBREW_AUTO_UPDATE_SECS`:
     If set, Homebrew will only check for autoupdates once per this seconds interval.
@@ -1123,7 +1127,10 @@ Note that environment variables must have a value set to be detected. For exampl
     (unsigned) URL.
 
   * `HOMEBREW_BOTTLE_DOMAIN`:
-    If set, instructs Homebrew to use the given URL as a download mirror for bottles.
+    By default, Homebrew uses `https://homebrew.bintray.com/` as its download
+    mirror for bottles. If set, instructs Homebrew to instead use the given
+    URL. For example, `HOMEBREW_BOTTLE_DOMAIN=http://localhost:8080` will
+    cause all bottles to download from the prefix `http://localhost:8080/`.
 
   * `HOMEBREW_BROWSER`:
     If set, uses this setting as the browser when opening project homepages,

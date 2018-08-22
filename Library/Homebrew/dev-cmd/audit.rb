@@ -772,7 +772,7 @@ module Homebrew
       end
       bin_names.each do |name|
         ["system", "shell_output", "pipe_output"].each do |cmd|
-          if text =~ %r{(def test|test do).*(#{Regexp.escape(HOMEBREW_PREFIX)}/bin/)?#{cmd}[\(\s]+['"]#{Regexp.escape(name)}[\s'"]}m
+          if text =~ /test do.*#{cmd}[\(\s]+['"]#{Regexp.escape(name)}[\s'"]/m
             problem %Q(fully scope test #{cmd} calls e.g. #{cmd} "\#{bin}/#{name}")
           end
         end
@@ -802,10 +802,6 @@ module Homebrew
       end
 
       problem "Use separate make calls" if line.include?("make && make")
-
-      if line =~ /shell_output\(['"].+['"], 0\)/
-        problem "Passing 0 to shell_output() is redundant"
-      end
 
       if line =~ /JAVA_HOME/i && !formula.requirements.map(&:class).include?(JavaRequirement)
         problem "Use `depends_on :java` to set JAVA_HOME"

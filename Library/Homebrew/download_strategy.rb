@@ -197,11 +197,6 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
   end
 
-  def stage
-    super
-    chdir
-  end
-
   private
 
   def ext

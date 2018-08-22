@@ -10,7 +10,6 @@ module RuboCop
               "Use `keg_only :versioned_formula` instead.".freeze
 
         WHITELIST = %w[
-          node@
           bash-completion@
         ].freeze
 
