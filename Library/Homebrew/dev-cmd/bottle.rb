@@ -392,6 +392,7 @@ module Homebrew
           "tags" => {
             tag => {
               "filename" => filename.bintray,
+              "local_filename" => filename.to_s,
               "sha256" => sha256,
             },
           },
