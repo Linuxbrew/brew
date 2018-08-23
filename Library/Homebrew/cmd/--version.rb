@@ -8,6 +8,6 @@ module Homebrew
     odie "This command does not take arguments." if ARGV.any?
 
     puts "Homebrew #{HOMEBREW_VERSION}"
-    puts "Homebrew/homebrew-core #{CoreTap.instance.version_string}"
+    puts "#{CoreTap.instance.slug} #{CoreTap.instance.version_string}"
   end
 end
