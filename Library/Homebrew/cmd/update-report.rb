@@ -54,8 +54,8 @@ module Homebrew
       donation_message_displayed =
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.donationmessage").chuzzle
       if donation_message_displayed != "true"
-        ohai "Homebrew is run entirely by unpaid volunteers. Please consider donating:"
-        puts "  #{Formatter.url("https://github.com/Homebrew/brew#donations")}\n"
+        ohai "Linuxbrew and Homebrew are run entirely by unpaid volunteers. Please consider donating:"
+        puts "  #{Formatter.url("https://github.com/Linuxbrew/brew#donations")}\n"
 
         # Consider the message possibly missed if not a TTY.
         if $stdout.tty?
