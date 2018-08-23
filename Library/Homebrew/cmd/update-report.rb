@@ -21,11 +21,11 @@ module Homebrew
   def update_report
     HOMEBREW_REPOSITORY.cd do
       analytics_message_displayed =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
+        Utils.popen_read("git", "config", "--get", "homebrew.analyticsmessage").chuzzle
       cask_analytics_message_displayed =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.caskanalyticsmessage").chuzzle
+        Utils.popen_read("git", "config", "--get", "homebrew.caskanalyticsmessage").chuzzle
       analytics_disabled =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
+        Utils.popen_read("git", "config", "--get", "homebrew.analyticsdisabled").chuzzle
       if analytics_message_displayed != "true" &&
          cask_analytics_message_displayed != "true" &&
          analytics_disabled != "true" &&
@@ -46,20 +46,20 @@ module Homebrew
 
         # Consider the message possibly missed if not a TTY.
         if $stdout.tty?
-          safe_system "git", "config", "--local", "--replace-all", "homebrew.analyticsmessage", "true"
-          safe_system "git", "config", "--local", "--replace-all", "homebrew.caskanalyticsmessage", "true"
+          safe_system "git", "config", "--replace-all", "homebrew.analyticsmessage", "true"
+          safe_system "git", "config", "--replace-all", "homebrew.caskanalyticsmessage", "true"
         end
       end
 
       donation_message_displayed =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.donationmessage").chuzzle
+        Utils.popen_read("git", "config", "--get", "homebrew.donationmessage").chuzzle
       if donation_message_displayed != "true"
         ohai "Linuxbrew is run entirely by unpaid volunteers. Please consider donating:"
         puts "  #{Formatter.url("https://github.com/Linuxbrew/brew#donations")}\n"
 
         # Consider the message possibly missed if not a TTY.
         if $stdout.tty?
-          safe_system "git", "config", "--local", "--replace-all", "homebrew.donationmessage", "true"
+          safe_system "git", "config", "--replace-all", "homebrew.donationmessage", "true"
         end
       end
     end
