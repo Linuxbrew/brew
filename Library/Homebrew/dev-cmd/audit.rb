@@ -511,15 +511,6 @@ module Homebrew
       end
     end
 
-    def audit_bottle_spec
-      return unless @official_tap
-      return if @new_formula
-      return unless @online
-      return if formula.bottle_defined? || formula.bottle_disabled?
-      return if formula.name == "testbottest"
-      problem "`bottle` is not defined"
-    end
-
     def audit_github_repository
       return unless @online
       return unless @new_formula
