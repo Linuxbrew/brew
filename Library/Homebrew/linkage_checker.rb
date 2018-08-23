@@ -131,6 +131,7 @@ class LinkageChecker
       next if OS.mac?
       system_whitelist = %w[
         ld-linux-x86-64.so.2
+        libanl.so.1
         libc.so.6
         libcrypt.so.1
         libdl.so.2
