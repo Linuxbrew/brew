@@ -1001,6 +1001,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   
 
+      If `--zap` is passed, casks will be removed using the `zap` command instead of `uninstall`.
+
+  
+
       If `--file=`path is passed, the Brewfile path is set accordingly
 
       Use `--file=-` to output to console.
