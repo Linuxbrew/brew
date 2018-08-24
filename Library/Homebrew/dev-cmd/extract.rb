@@ -16,10 +16,18 @@ require "tap"
 
 class BottleSpecification
   def method_missing(*); end
+
+  def respond_to_missing?(*)
+    true
+  end
 end
 
 class Module
   def method_missing(*); end
+
+  def respond_to_missing?(*)
+    true
+  end
 end
 
 class DependencyCollector
@@ -75,6 +83,9 @@ module Homebrew
       end
       odie "Could not find #{name}! The formula or version may not have existed." if test_formula.nil?
       result = Git.last_revision_of_file(repo, file, before_commit: rev)
+    elsif File.exist?(file)
+      version = Formulary.factory(file).version
+      result = File.read(file)
     else
       rev = Git.last_revision_commit_of_file(repo, file)
       version = formula_at_revision(repo, name, file, rev).version
