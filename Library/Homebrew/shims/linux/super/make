@@ -16,11 +16,10 @@ then
 else
   SAVED_PATH="$PATH"
   pathremove "$HOMEBREW_LIBRARY/Homebrew/shims/linux/super"
-  export MAKE="$(which make)"
+  export MAKE="$(command -v make)"
   export PATH="$SAVED_PATH"
 fi
 
 export HOMEBREW_CCCFG="O$HOMEBREW_CCCFG"
 
 exec "$MAKE" "$@"
-
