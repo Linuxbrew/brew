@@ -16,3 +16,5 @@ module UnpackStrategy
     end
   end
 end
+
+require "extend/os/linux/unpack_strategy/jar" if OS.linux?

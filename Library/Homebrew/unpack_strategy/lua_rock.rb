@@ -16,3 +16,5 @@ module UnpackStrategy
     end
   end
 end
+
+require "extend/os/linux/unpack_strategy/lua_rock" if OS.linux?

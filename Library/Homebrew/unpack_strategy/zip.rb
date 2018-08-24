@@ -24,4 +24,8 @@ module UnpackStrategy
   end
 end
 
-require "extend/os/mac/unpack_strategy/zip" if OS.mac?
+if OS.mac?
+  require "extend/os/mac/unpack_strategy/zip"
+elsif OS.linux?
+  require "extend/os/linux/unpack_strategy/zip"
+end
