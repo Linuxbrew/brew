@@ -23,4 +23,3 @@ fi
 export HOMEBREW_CCCFG="O$HOMEBREW_CCCFG"
 
 exec "$MAKE" "$@"
-
