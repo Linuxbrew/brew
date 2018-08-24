@@ -83,13 +83,8 @@ class JavaRequirement < Requirement
   def possible_javas
     javas = []
     javas << Pathname.new(ENV["JAVA_HOME"])/"bin/java" if ENV["JAVA_HOME"]
-    jdk = begin
-      Formula["jdk"]
-    rescue FormulaUnavailableError
-      nil
-    end
-    javas << jdk.bin/"java" if jdk&.installed?
-    javas << which("java")
+    which_java = which "java"
+    javas << which_java if which_java
     javas
   end
 
