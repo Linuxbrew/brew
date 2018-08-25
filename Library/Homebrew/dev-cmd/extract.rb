@@ -32,6 +32,14 @@ class Module
   end
 end
 
+class Resource
+  def method_missing(*); end
+
+  def respond_to_missing?(*)
+    true
+  end
+end
+
 class DependencyCollector
   def parse_symbol_spec(*); end
 
