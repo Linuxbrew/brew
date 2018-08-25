@@ -297,9 +297,10 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
         ignore_interrupts do
           temporary_path.rename(cached_location)
           symlink_location.dirname.mkpath
-          FileUtils.ln_s cached_location.relative_path_from(symlink_location.dirname), symlink_location, force: true
         end
       end
+
+      FileUtils.ln_s cached_location.relative_path_from(symlink_location.dirname), symlink_location, force: true
     rescue CurlDownloadStrategyError
       raise if urls.empty?
       puts "Trying a mirror..."
