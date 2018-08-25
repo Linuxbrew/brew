@@ -1,6 +1,6 @@
-require "cmd/update-report"
+require "update_migrator"
 
-describe "brew update-report" do
+describe UpdateMigrator do
   describe "::migrate_cache_entries_to_double_dashes" do
     let(:formula_name) { "foo" }
     let(:f) {
@@ -18,7 +18,7 @@ describe "brew update-report" do
     end
 
     it "moves old files to use double dashes when upgrading from <= 1.7.1" do
-      Homebrew.migrate_cache_entries_to_double_dashes(Version.new("1.7.1"))
+      described_class.migrate_cache_entries_to_double_dashes(Version.new("1.7.1"))
 
       expect(old_cache_file).not_to exist
       expect(new_cache_file).to exist
@@ -28,8 +28,8 @@ describe "brew update-report" do
       let(:formula_name) { "foo-bar" }
 
       it "does not introduce extra double dashes when called multiple times" do
-        Homebrew.migrate_cache_entries_to_double_dashes(Version.new("1.7.1"))
-        Homebrew.migrate_cache_entries_to_double_dashes(Version.new("1.7.1"))
+        described_class.migrate_cache_entries_to_double_dashes(Version.new("1.7.1"))
+        described_class.migrate_cache_entries_to_double_dashes(Version.new("1.7.1"))
 
         expect(old_cache_file).not_to exist
         expect(new_cache_file).to exist
@@ -37,7 +37,7 @@ describe "brew update-report" do
     end
 
     it "does not move files if upgrading from > 1.7.1" do
-      Homebrew.migrate_cache_entries_to_double_dashes(Version.new("1.7.2"))
+      described_class.migrate_cache_entries_to_double_dashes(Version.new("1.7.2"))
 
       expect(old_cache_file).to exist
       expect(new_cache_file).not_to exist
@@ -63,7 +63,7 @@ describe "brew update-report" do
     end
 
     it "moves old files to use symlinks when upgrading from <= 1.7.2" do
-      Homebrew.migrate_cache_entries_to_symlinks(Version.new("1.7.2"))
+      described_class.migrate_cache_entries_to_symlinks(Version.new("1.7.2"))
 
       expect(old_cache_file).to eq(new_cache_symlink)
       expect(new_cache_symlink).to be_a_symlink
@@ -74,7 +74,7 @@ describe "brew update-report" do
     end
 
     it "does not move files if upgrading from > 1.7.2" do
-      Homebrew.migrate_cache_entries_to_symlinks(Version.new("1.7.3"))
+      described_class.migrate_cache_entries_to_symlinks(Version.new("1.7.3"))
 
       expect(old_cache_file).to exist
       expect(new_cache_file).not_to exist
