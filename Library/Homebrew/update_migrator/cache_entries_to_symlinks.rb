@@ -29,6 +29,7 @@ module UpdateMigrator
 
     formula_downloaders = if HOMEBREW_CACHE.directory?
       HOMEBREW_CACHE.children
+                    .reject(&:symlink?)
                     .select(&:file?)
                     .map { |child| child.basename.to_s.sub(/\-\-.*/, "") }
                     .uniq
@@ -42,6 +43,8 @@ module UpdateMigrator
 
     cask_downloaders = if (HOMEBREW_CACHE/"Cask").directory?
       (HOMEBREW_CACHE/"Cask").children
+                             .reject(&:symlink?)
+                             .select(&:file?)
                              .map { |child| child.basename.to_s.sub(/\-\-.*/, "") }
                              .uniq
                              .map(&load_cask)
