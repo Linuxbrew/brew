@@ -11,7 +11,7 @@ class AbstractDownloadStrategy
 
   module Pourable
     def stage
-      ohai "Pouring #{cached_location.basename}"
+      ohai "Pouring #{basename}"
       super
     end
   end
@@ -85,7 +85,7 @@ class AbstractDownloadStrategy
   end
 
   def basename
-    nil
+    cached_location.basename
   end
 
   private
