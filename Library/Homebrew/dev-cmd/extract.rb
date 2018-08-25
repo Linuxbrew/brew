@@ -14,6 +14,7 @@ require "utils/git"
 require "formulary"
 require "tap"
 
+# rubocop:disable Style/MethodMissingSuper
 class BottleSpecification
   def method_missing(*); end
 
@@ -42,6 +43,7 @@ class DependencyCollector
   prepend Compat
 end
 
+# rubocop:enable Style/MethodMissingSuper
 module Homebrew
   module_function
 
