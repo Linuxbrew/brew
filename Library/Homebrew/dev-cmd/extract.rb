@@ -10,6 +10,7 @@
 #:    will be extracted and placed in the destination tap. Otherwise, the most
 #:    recent version that can be found will be used.
 
+require "cli_parser"
 require "utils/git"
 require "formulary"
 require "tap"
