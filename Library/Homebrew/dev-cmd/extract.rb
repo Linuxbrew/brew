@@ -15,28 +15,49 @@ require "utils/git"
 require "formulary"
 require "tap"
 
-# rubocop:disable Style/MethodMissingSuper
-class BottleSpecification
-  def method_missing(*); end
-
-  def respond_to_missing?(*)
-    true
+def with_monkey_patch
+  BottleSpecification.class_eval do
+    if method_defined?(:method_missing)
+      alias_method :old_method_missing, :method_missing
+    end
+    define_method(:method_missing) { |*| }
   end
-end
 
-class Module
-  def method_missing(*); end
-
-  def respond_to_missing?(*)
-    true
+  Module.class_eval do
+    if method_defined?(:method_missing)
+      alias_method :old_method_missing, :method_missing
+    end
+    define_method(:method_missing) { |*| }
   end
-end
 
-class Resource
-  def method_missing(*); end
+  Resource.class_eval do
+    if method_defined?(:method_missing)
+      alias_method :old_method_missing, :method_missing
+    end
+    define_method(:method_missing) { |*| }
+  end
 
-  def respond_to_missing?(*)
-    true
+  yield
+ensure
+  BottleSpecification.class_eval do
+    if method_defined?(:old_method_missing)
+      alias_method :method_missing, :old_method_missing
+      undef :old_method_missing
+    end
+  end
+
+  Module.class_eval do
+    if method_defined?(:old_method_missing)
+      alias_method :method_missing, :old_method_missing
+      undef :old_method_missing
+    end
+  end
+
+  Resource.class_eval do
+    if method_defined?(:old_method_missing)
+      alias_method :method_missing, :old_method_missing
+      undef :old_method_missing
+    end
   end
 end
 
@@ -52,7 +73,6 @@ class DependencyCollector
   prepend Compat
 end
 
-# rubocop:enable Style/MethodMissingSuper
 module Homebrew
   module_function
 
@@ -135,6 +155,6 @@ module Homebrew
     contents = Git.last_revision_of_file(repo, file, before_commit: rev)
     contents.gsub!("@url=", "url ")
     contents.gsub!("require 'brewkit'", "require 'formula'")
-    Formulary.from_contents(name, file, contents)
+    with_monkey_patch { Formulary.from_contents(name, file, contents) }
   end
 end
