@@ -78,6 +78,7 @@ module Homebrew
     file = repo/"Formula/#{name}.rb"
 
     if args.version
+      ohai "Searching repository history"
       version = args.version
       rev = "HEAD"
       test_formula = nil
@@ -99,6 +100,7 @@ module Homebrew
       version = Formulary.factory(file).version
       result = File.read(file)
     else
+      ohai "Searching repository history"
       rev = Git.last_revision_commit_of_file(repo, file)
       version = formula_at_revision(repo, name, file, rev).version
       odie "Could not find #{name}! The formula or version may not have existed." if rev.empty?
