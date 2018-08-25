@@ -230,14 +230,7 @@ module Homebrew
         next cleanup_path(path) { FileUtils.rm_rf path } if path.nested_cache?
 
         if path.prune?(days)
-          if path.symlink?
-            resolved_path = path.resolved_path
-
-            cleanup_path(path) do
-              resolved_path.unlink if resolved_path.exist?
-              path.unlink
-            end
-          elsif path.file?
+          if path.file? || path.symlink?
             cleanup_path(path) { path.unlink }
           elsif path.directory? && path.to_s.include?("--")
             cleanup_path(path) { FileUtils.rm_rf path }
