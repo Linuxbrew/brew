@@ -95,6 +95,7 @@ module Homebrew
       odie "Could not find #{name}! The formula or version may not have existed." if test_formula.nil?
       result = Git.last_revision_of_file(repo, file, before_commit: rev)
     elsif File.exist?(file)
+      rev = "HEAD"
       version = Formulary.factory(file).version
       result = File.read(file)
     else
@@ -122,7 +123,7 @@ module Homebrew
       ohai "Overwriting existing formula at #{path}" if ARGV.debug?
       path.delete
     end
-    ohai "Writing formula for #{name} from #{rev} to #{path}"
+    ohai "Writing formula for #{name} from revision #{rev} to #{path}"
     path.write result
   end
 
