@@ -37,6 +37,20 @@ def with_monkey_patch
     define_method(:method_missing) { |*| }
   end
 
+  DependencyCollector.class_eval do
+    if method_defined?(:parse_symbol_spec)
+      alias_method :old_parse_symbol_spec, :parse_symbol_spec
+    end
+    define_method(:parse_symbol_spec) { |*| }
+  end
+
+  DependencyCollector::Compat.class_eval do
+    if method_defined?(:parse_string_spec)
+      alias_method :old_parse_string_spec, :parse_string_spec
+    end
+    define_method(:parse_string_spec) { |*| }
+  end
+
   yield
 ensure
   BottleSpecification.class_eval do
@@ -59,18 +73,20 @@ ensure
       undef :old_method_missing
     end
   end
-end
 
-class DependencyCollector
-  def parse_symbol_spec(*); end
-
-  module Compat
-    def parse_string_spec(spec, tags)
-      super
+  DependencyCollector.class_eval do
+    if method_defined?(:old_parse_symbol_spec)
+      alias_method :parse_symbol_spec, :old_parse_symbol_spec
+      undef :old_parse_symbol_spec
     end
   end
 
-  prepend Compat
+  DependencyCollector::Compat.class_eval do
+    if method_defined?(:old_parse_string_spec)
+      alias_method :parse_string_spec, :old_parse_string_spec
+      undef :old_parse_string_spec
+    end
+  end
 end
 
 module Homebrew
