@@ -600,5 +600,49 @@ module Homebrew
         expect(fa.problems).to eq([])
       end
     end
+
+    describe "#audit_versioned_keg_only" do
+      specify "it warns when a versioned formula is not `keg_only`" do
+        fa = formula_auditor "foo@1.1", <<~RUBY, core_tap: true
+          class FooAT11 < Formula
+            url "https://example.com/foo-1.1.tgz"
+          end
+        RUBY
+
+        fa.audit_versioned_keg_only
+
+        expect(fa.problems.first)
+          .to match("Versioned formulae should use `keg_only :versioned_formula`")
+      end
+
+      specify "it warns when a versioned formula has an incorrect `keg_only` reason" do
+        fa = formula_auditor "foo@1.1", <<~RUBY, core_tap: true
+          class FooAT11 < Formula
+            url "https://example.com/foo-1.1.tgz"
+
+            keg_only :provided_by_macos
+          end
+        RUBY
+
+        fa.audit_versioned_keg_only
+
+        expect(fa.problems.first)
+          .to match("Versioned formulae should use `keg_only :versioned_formula`")
+      end
+
+      specify "it does not warn when a versioned formula has `keg_only :versioned_formula`" do
+        fa = formula_auditor "foo@1.1", <<~RUBY, core_tap: true
+          class FooAT11 < Formula
+            url "https://example.com/foo-1.1.tgz"
+
+            keg_only :versioned_formula
+          end
+        RUBY
+
+        fa.audit_versioned_keg_only
+
+        expect(fa.problems).to eq([])
+      end
+    end
   end
 end

@@ -525,6 +525,25 @@ module Homebrew
       problem "keg_only reason should not end with a period."
     end
 
+    def audit_versioned_keg_only
+      return unless formula.versioned_formula?
+      return unless @core_tap
+
+      return if formula.keg_only? && formula.keg_only_reason.reason == :versioned_formula
+
+      keg_only_whitelist = %w[
+        autoconf@2.13
+        bash-completion@2
+        gnupg@1.4
+        lua@5.1
+        python@2
+      ].freeze
+
+      return if keg_only_whitelist.include?(formula.name) || formula.name.start_with?("gcc@")
+
+      problem "Versioned formulae should use `keg_only :versioned_formula`"
+    end
+
     def audit_homepage
       homepage = formula.homepage
 
