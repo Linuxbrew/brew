@@ -44,11 +44,13 @@ def with_monkey_patch
     define_method(:parse_symbol_spec) { |*| }
   end
 
-  DependencyCollector::Compat.class_eval do
-    if method_defined?(:parse_string_spec)
-      alias_method :old_parse_string_spec, :parse_string_spec
+  if defined?(DependencyCollector::Compat)
+    DependencyCollector::Compat.class_eval do
+      if method_defined?(:parse_string_spec)
+        alias_method :old_parse_string_spec, :parse_string_spec
+      end
+      define_method(:parse_string_spec) { |*| }
     end
-    define_method(:parse_string_spec) { |*| }
   end
 
   yield
@@ -81,10 +83,12 @@ ensure
     end
   end
 
-  DependencyCollector::Compat.class_eval do
-    if method_defined?(:old_parse_string_spec)
-      alias_method :parse_string_spec, :old_parse_string_spec
-      undef :old_parse_string_spec
+  if defined?(DependencyCollector::Compat)
+    DependencyCollector::Compat.class_eval do
+      if method_defined?(:old_parse_string_spec)
+        alias_method :parse_string_spec, :old_parse_string_spec
+        undef :old_parse_string_spec
+      end
     end
   end
 end
