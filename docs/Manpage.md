@@ -790,6 +790,18 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `edit` `formula`:
     Open `formula` in the editor.
 
+  * `extract` [`--force`] `formula` `tap` [`--version=``version`]:
+    Looks through repository history to find the `version` of `formula` and
+    creates a copy in `tap`/Formula/`formula`@`version`.rb. If the tap is
+    not installed yet, attempts to install/clone the tap before continuing.
+
+    If `--force` is passed, the file at the destination will be overwritten
+    if it already exists. Otherwise, existing files will be preserved.
+
+    If an argument is passed through `--version`, `version` of `formula`
+    will be extracted and placed in the destination tap. Otherwise, the most
+    recent version that can be found will be used.
+
   * `formula` `formula`:
     Display the path where `formula` is located.
 
