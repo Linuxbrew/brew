@@ -138,11 +138,19 @@ module Homebrew
         @severity[0].upcase
       end
 
+      def corrected?
+        @corrected
+      end
+
+      def correction_status
+        "[Corrected] " if corrected?
+      end
+
       def to_s(options = {})
         if options[:display_cop_name]
-          "#{severity_code}: #{location.to_short_s}: #{cop_name}: #{message}"
+          "#{severity_code}: #{location.to_short_s}: #{cop_name}: #{Tty.green}#{correction_status}#{Tty.reset}#{message}"
         else
-          "#{severity_code}: #{location.to_short_s}: #{message}"
+          "#{severity_code}: #{location.to_short_s}: #{Tty.green}#{correction_status}#{Tty.reset}#{message}"
         end
       end
     end

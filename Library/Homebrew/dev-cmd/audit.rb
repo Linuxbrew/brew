@@ -74,6 +74,7 @@ module Homebrew
 
     formula_count = 0
     problem_count = 0
+    corrected_problem_count = 0
     new_formula_problem_count = 0
     new_formula = args.new_formula?
     strict = new_formula || args.strict?
@@ -129,6 +130,7 @@ module Homebrew
       formula_count += 1
       problem_count += fa.problems.size
       problem_lines = format_problem_lines(fa.problems)
+      corrected_problem_count = options[:style_offenses].count(&:corrected?)
       new_formula_problem_lines = format_problem_lines(fa.new_formula_problems)
       if args.display_filename?
         puts problem_lines.map { |s| "#{f.path}: #{s}" }
@@ -156,7 +158,11 @@ module Homebrew
     total_problems_count = problem_count + new_formula_problem_count
     problem_plural = Formatter.pluralize(total_problems_count, "problem")
     formula_plural = Formatter.pluralize(formula_count, "formula")
-    errors_summary = "#{problem_plural} in #{formula_plural}"
+    corrected_problem_plural = Formatter.pluralize(corrected_problem_count, "problem")
+    errors_summary = "#{problem_plural} in #{formula_plural} detected"
+    if corrected_problem_count.positive?
+      errors_summary += ", #{corrected_problem_plural} corrected"
+    end
 
     if problem_count.positive? ||
        (new_formula_problem_count.positive? && !created_pr_comment)
