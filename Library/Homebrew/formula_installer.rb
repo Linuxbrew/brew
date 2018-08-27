@@ -155,8 +155,6 @@ class FormulaInstaller
 
     recursive_deps = formula.recursive_dependencies
     recursive_formulae = recursive_deps.map(&:to_formula)
-    recursive_runtime_formulae =
-      formula.runtime_formula_dependencies(undeclared: false)
 
     recursive_dependencies = []
     recursive_formulae.each do |dep|
@@ -179,25 +177,6 @@ class FormulaInstaller
                          .include?(formula.name)
       raise CannotInstallFormulaError, <<~EOS
         #{formula.full_name} contains a recursive dependency on itself!
-      EOS
-    end
-
-    version_hash = {}
-    version_conflicts = Set.new
-    recursive_runtime_formulae.each do |f|
-      name = f.name
-      unversioned_name, = name.split("@")
-      next if unversioned_name == "python"
-      version_hash[unversioned_name] ||= Set.new
-      version_hash[unversioned_name] << name
-      next if version_hash[unversioned_name].length < 2
-      version_conflicts += version_hash[unversioned_name]
-    end
-    unless version_conflicts.empty?
-      raise CannotInstallFormulaError, <<~EOS
-        #{formula.full_name} contains conflicting version recursive dependencies:
-          #{version_conflicts.to_a.join ", "}
-        View these with `brew deps --tree #{formula.full_name}`.
       EOS
     end
 
