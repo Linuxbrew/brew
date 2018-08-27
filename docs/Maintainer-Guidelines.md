@@ -115,3 +115,10 @@ Maintainers have a variety of ways to communicate with each other:
 All communication should ideally occur in public on GitHub. Where this is not possible or appropriate (e.g. a security disclosure, interpersonal issue between two maintainers, urgent breakage that needs to be resolved) this can move to maintainers' private group communication and, if necessary, 1:1 communication. Technical decisions should not happen in 1:1 communications but if they do (or did in the past) they must end up back as something linkable on GitHub. For example, if a technical decision was made a year ago on Slack and another maintainer/contributor/user asks about it on GitHub, that's a good chance to explain it to them and have something that can be linked to in the future.
 
 This makes it easier for other maintainers, contributors and users to follow along with what we're doing (and, more importantly, why we're doing it) and means that decisions have a linkable URL.
+
+## Lead maintainer guidelines
+There should be one lead maintainer for Homebrew. This person should (sparingly) be the tiebreaker for decisions where a mutual consensus cannot be reached amongst other maintainers. They should also be seen as the product manager for Homebrew itself and ensuring that changes made to the entire Homebrew ecosystem are consistent and providing an increasingly positive experience for Homebrew's users.
+
+In the same way that Homebrew maintainers are expected to be spending more of their time reviewing and merging contributions from non-maintainer contributors than making their own contributions, the lead maintainer should be spending most of their time reviewing work from and mentoring other maintainers.
+
+Individual Homebrew repositories should not have formal lead maintainers (although those who do the most work will have the loudest voices).
