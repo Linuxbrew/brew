@@ -11,6 +11,18 @@ module UpdateMigrator
 
     ohai "Migrating cache entries..."
 
+    cache_entries = lambda do |path|
+      if path.directory?
+        path.children
+            .reject(&:symlink?)
+            .select(&:file?)
+            .map { |child| child.basename.to_s.sub(/\-\-.*/, "") }
+            .uniq
+      else
+        []
+      end
+    end
+
     load_formula = lambda do |formula|
       begin
         Formula[formula]
@@ -27,32 +39,18 @@ module UpdateMigrator
       end
     end
 
-    formula_downloaders = if HOMEBREW_CACHE.directory?
-      HOMEBREW_CACHE.children
-                    .reject(&:symlink?)
-                    .select(&:file?)
-                    .map { |child| child.basename.to_s.sub(/\-\-.*/, "") }
-                    .uniq
-                    .map(&load_formula)
-                    .compact
-                    .flat_map { |formula| formula_resources(formula) }
-                    .map { |resource| [resource.downloader, resource.download_name, resource.version] }
-    else
-      []
-    end
+    formula_downloaders =
+      cache_entries.call(HOMEBREW_CACHE)
+                   .map(&load_formula)
+                   .compact
+                   .flat_map { |formula| formula_resources(formula) }
+                   .map { |resource| [resource.downloader, resource.download_name, resource.version] }
 
-    cask_downloaders = if (HOMEBREW_CACHE/"Cask").directory?
-      (HOMEBREW_CACHE/"Cask").children
-                             .reject(&:symlink?)
-                             .select(&:file?)
-                             .map { |child| child.basename.to_s.sub(/\-\-.*/, "") }
-                             .uniq
-                             .map(&load_cask)
-                             .compact
-                             .map { |cask| [Hbc::Download.new(cask).downloader, cask.token, cask.version] }
-    else
-      []
-    end
+    cask_downloaders =
+      cache_entries.call(HOMEBREW_CACHE/"Cask")
+                   .map(&load_cask)
+                   .compact
+                   .map { |cask| [Hbc::Download.new(cask).downloader, cask.token, cask.version] }
 
     downloaders = formula_downloaders + cask_downloaders
 
