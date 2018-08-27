@@ -80,6 +80,9 @@ If \fB\-\-quiet\fR is passed, list only the names of commands without the header
 \fBconfig\fR: Show Homebrew and system configuration useful for debugging\. If you file a bug report, you will likely be asked for this information if you do not provide it\.
 .
 .IP "\(bu" 4
+\fBconfigure\-shell\fR: Configure the shell to include Homebrew into your PATH, MANPATH, and INFOPATH\. A brew\.env file will be created that will be sourced in your ~/\.profile (or your \.bash_profile or \.zprofile \- only existing files will be modified)
+.
+.IP "\(bu" 4
 \fBdeps\fR [\fB\-\-1\fR] [\fB\-n\fR] [\fB\-\-union\fR] [\fB\-\-full\-name\fR] [\fB\-\-installed\fR] [\fB\-\-include\-build\fR] [\fB\-\-include\-optional\fR] [\fB\-\-skip\-recommended\fR] [\fB\-\-include\-requirements\fR] \fIformulae\fR: Show dependencies for \fIformulae\fR\. When given multiple formula arguments, show the intersection of dependencies for \fIformulae\fR\.
 .
 .IP

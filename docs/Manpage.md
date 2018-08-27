@@ -78,6 +78,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     a bug report, you will likely be asked for this information if you do not
     provide it.
 
+  * `configure-shell`:
+    Configure the shell to include Homebrew into your PATH, MANPATH, and INFOPATH.
+    A brew.env file will be created that will be sourced in your ~/.profile
+    (or your .bash_profile or .zprofile - only existing files will be modified)
+
   * `deps` [`--1`] [`-n`] [`--union`] [`--full-name`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--include-requirements`] `formulae`:
     Show dependencies for `formulae`. When given multiple formula arguments,
     show the intersection of dependencies for `formulae`.
