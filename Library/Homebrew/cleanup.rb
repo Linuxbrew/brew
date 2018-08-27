@@ -213,6 +213,7 @@ module Homebrew
       return if dry_run?
       return unless (cache/"downloads").directory?
 
+      # We can't use `.reject(&:incomplete?) here due to the refinement scope.
       downloads = (cache/"downloads").children.reject { |path| path.incomplete? } # rubocop:disable Style/SymbolProc
       referenced_downloads = [cache, cache/"Cask"].select(&:directory?)
                                                   .flat_map(&:children)
