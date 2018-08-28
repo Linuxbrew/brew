@@ -130,7 +130,7 @@ module Homebrew
       formula_count += 1
       problem_count += fa.problems.size
       problem_lines = format_problem_lines(fa.problems)
-      corrected_problem_count = options.fetch(:style_offenses, []).count(&:corrected?)
+      corrected_problem_count = options[:style_offenses].count(&:corrected?)
       new_formula_problem_lines = format_problem_lines(fa.new_formula_problems)
       if args.display_filename?
         puts problem_lines.map { |s| "#{f.path}: #{s}" }
