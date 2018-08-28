@@ -119,7 +119,7 @@ module Homebrew
       end
 
       def file_offenses(path)
-        @file_offenses[path.to_s]
+        @file_offenses.fetch(path.to_s, [])
       end
     end
 
