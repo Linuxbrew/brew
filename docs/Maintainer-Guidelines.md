@@ -117,7 +117,7 @@ All communication should ideally occur in public on GitHub. Where this is not po
 This makes it easier for other maintainers, contributors and users to follow along with what we're doing (and, more importantly, why we're doing it) and means that decisions have a linkable URL.
 
 ## Lead maintainer guidelines
-There should be one lead maintainer for Homebrew. This person should (sparingly) be the tiebreaker for decisions where a mutual consensus cannot be reached amongst other maintainers. They should also be seen as the product manager for Homebrew itself and ensuring that changes made to the entire Homebrew ecosystem are consistent and providing an increasingly positive experience for Homebrew's users.
+There should be one lead maintainer for Homebrew. Decisions are determined by a consensus of the maintainers. When a consensus is not reached, the lead maintainer has the final say in determining the outcome of any decision (though this power should be used sparingly). They should also be seen as the product manager for Homebrew itself and ensuring that changes made to the entire Homebrew ecosystem are consistent and providing an increasingly positive experience for Homebrew's users.
 
 In the same way that Homebrew maintainers are expected to be spending more of their time reviewing and merging contributions from non-maintainer contributors than making their own contributions, the lead maintainer should be spending most of their time reviewing work from and mentoring other maintainers.
 
