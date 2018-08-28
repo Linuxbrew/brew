@@ -48,8 +48,7 @@ module CleanupRefinement
     end
 
     def stale?(scrub = false)
-      return false unless file? || (symlink? && resolved_path.file?)
-
+      return false unless resolved_path.file?
       stale_formula?(scrub) || stale_cask?(scrub)
     end
 
