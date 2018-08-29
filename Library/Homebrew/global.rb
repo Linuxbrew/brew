@@ -8,6 +8,7 @@ require "pp"
 require_relative "load_path"
 
 require "config"
+require "os"
 require "extend/ARGV"
 require "messages"
 require "system_command"
@@ -36,8 +37,14 @@ HOMEBREW_USER_AGENT_FAKE_SAFARI =
 
 # Bintray fallback is here for people auto-updating from a version where
 # HOMEBREW_BOTTLE_DEFAULT_DOMAIN isn't set.
-HOMEBREW_BOTTLE_DEFAULT_DOMAIN = ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"] ||
-                                 "https://homebrew.bintray.com"
+HOMEBREW_BOTTLE_DEFAULT_DOMAIN = if ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"]
+  ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"]
+elsif OS.mac?
+  "https://homebrew.bintray.com".freeze
+else
+  "https://linuxbrew.bintray.com".freeze
+end
+
 HOMEBREW_BOTTLE_DOMAIN = ENV["HOMEBREW_BOTTLE_DOMAIN"] ||
                          HOMEBREW_BOTTLE_DEFAULT_DOMAIN
 
@@ -108,7 +115,6 @@ HOMEBREW_INTERNAL_COMMAND_ALIASES = {
 
 require "set"
 
-require "os"
 require "extend/pathname"
 
 require "extend/module"
