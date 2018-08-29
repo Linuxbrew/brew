@@ -120,6 +120,7 @@ class DependencyCollector
     case spec
     when :x11        then X11Requirement.new(spec.to_s, tags)
     when :xcode      then XcodeRequirement.new(tags)
+    when :skip_linux then SkipLinuxRequirement.new(tags)
     when :linux      then LinuxRequirement.new(tags)
     when :macos      then MacOSRequirement.new(tags)
     when :arch       then ArchRequirement.new(tags)
