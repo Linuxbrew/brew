@@ -7,7 +7,7 @@ ensure
   $VERBOSE = old_verbosity
 end
 
-require_relative "../../extend/string"
+require "extend/string"
 
 module RuboCop
   module Cop
