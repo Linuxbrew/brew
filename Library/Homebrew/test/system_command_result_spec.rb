@@ -2,8 +2,14 @@ require "system_command"
 
 describe SystemCommand::Result do
   describe "#to_ary" do
+    let(:output) {
+      [
+        [:stdout, "output"],
+        [:stderr, "error"],
+      ]
+    }
     subject(:result) {
-      described_class.new([], "output", "error", instance_double(Process::Status, exitstatus: 0, success?: true))
+      described_class.new([], output, instance_double(Process::Status, exitstatus: 0, success?: true))
     }
 
     it "can be destructed like `Open3.capture3`" do
@@ -16,7 +22,9 @@ describe SystemCommand::Result do
   end
 
   describe "#plist" do
-    subject { described_class.new(command, stdout, "", instance_double(Process::Status, exitstatus: 0)).plist }
+    subject {
+      described_class.new(command, [[:stdout, stdout]], instance_double(Process::Status, exitstatus: 0)).plist
+    }
 
     let(:command) { ["true"] }
     let(:garbage) {
