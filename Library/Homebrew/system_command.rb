@@ -119,7 +119,7 @@ class SystemCommand
     executable, *args = command
 
     raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
-      Open3.popen3(env, executable, *args, **options)
+      Open3.popen3(env, [executable, executable], *args, **options)
 
     write_input_to(raw_stdin)
     raw_stdin.close_write

@@ -21,7 +21,7 @@ describe SystemCommand do
         it "includes the given variables explicitly" do
           expect(Open3)
             .to receive(:popen3)
-            .with(an_instance_of(Hash), "env", "A=1", "B=2", "C=3", "env", *env_args, {})
+            .with(an_instance_of(Hash), ["env", "env"], "A=1", "B=2", "C=3", "env", *env_args, {})
             .and_call_original
 
           command.run!
@@ -46,7 +46,7 @@ describe SystemCommand do
         it "includes the given variables explicitly" do
           expect(Open3)
             .to receive(:popen3)
-            .with(an_instance_of(Hash), "/usr/bin/sudo", "-E", "--",
+            .with(an_instance_of(Hash), ["/usr/bin/sudo", "/usr/bin/sudo"], "-E", "--",
                   "env", "A=1", "B=2", "C=3", "env", *env_args, {})
             .and_wrap_original do |original_popen3, *_, &block|
               original_popen3.call("true", &block)
@@ -226,6 +226,23 @@ describe SystemCommand do
         system_command "bash",
                        args: ["-c", 'printf "\r%s" "###################                                                       27.6%" 1>&2']
       }.to output("\r###################                                                       27.6%").to_stderr
+    end
+
+    context "when given an executable with spaces and no arguments" do
+      let(:executable) { mktmpdir/"App Uninstaller" }
+
+      before(:each) do
+        executable.write <<~SH
+          #!/usr/bin/env bash
+          true
+        SH
+
+        FileUtils.chmod "+x", executable
+      end
+
+      it "does not interpret the executable as a shell line" do
+        expect(system_command(executable)).to be_a_success
+      end
     end
   end
 end
