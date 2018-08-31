@@ -32,13 +32,13 @@ module Hbc
 
   class CaskUnavailableError < AbstractCaskErrorWithToken
     def to_s
-      "Cask '#{token}' is unavailable" << (reason.empty? ? "." : ": #{reason}")
+      "Cask '#{token}' is unavailable#{reason.empty? ? "." : ": #{reason}"}"
     end
   end
 
   class CaskUnreadableError < CaskUnavailableError
     def to_s
-      "Cask '#{token}' is unreadable" << (reason.empty? ? "." : ": #{reason}")
+      "Cask '#{token}' is unreadable#{reason.empty? ? "." : ": #{reason}"}"
     end
   end
 
@@ -73,7 +73,7 @@ module Hbc
 
   class CaskCyclicDependencyError < AbstractCaskErrorWithToken
     def to_s
-      "Cask '#{token}' includes cyclic dependencies on other Casks" << (reason.empty? ? "." : ": #{reason}")
+      "Cask '#{token}' includes cyclic dependencies on other Casks#{reason.empty? ? "." : ": #{reason}"}"
     end
   end
 
@@ -91,7 +91,7 @@ module Hbc
 
   class CaskInvalidError < AbstractCaskErrorWithToken
     def to_s
-      "Cask '#{token}' definition is invalid" << (reason.empty? ? "." : ": #{reason}")
+      "Cask '#{token}' definition is invalid#{reason.empty? ? "." : ": #{reason}"}"
     end
   end
 
@@ -147,6 +147,41 @@ module Hbc
         Cask '#{token}' does not have a sha256 checksum defined and was not installed.
         This means you have the #{Formatter.identifier("--require-sha")} option set, perhaps in your HOMEBREW_CASK_OPTS.
       EOS
+    end
+  end
+
+  class CaskQuarantineError < CaskError
+    attr_reader :path, :reason
+
+    def initialize(path, reason)
+      @path = path
+      @reason = reason
+    end
+
+    def to_s
+      s = "Failed to quarantine #{path}."
+
+      unless reason.empty?
+        s << " Here's the reason:\n"
+        s << Formatter.error(reason)
+        s << "\n" unless reason.end_with?("\n")
+      end
+
+      s
+    end
+  end
+
+  class CaskQuarantinePropagationError < CaskQuarantineError
+    def to_s
+      s = "Failed to quarantine one or more files within #{path}."
+
+      unless reason.empty?
+        s << " Here's the reason:\n"
+        s << Formatter.error(reason)
+        s << "\n" unless reason.end_with?("\n")
+      end
+
+      s
     end
   end
 end

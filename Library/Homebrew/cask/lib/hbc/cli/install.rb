@@ -17,7 +17,8 @@ module Hbc
                                 verbose:        verbose?,
                                 force:          force?,
                                 skip_cask_deps: skip_cask_deps?,
-                                require_sha:    require_sha?).install
+                                require_sha:    require_sha?,
+                                quarantine:     quarantine?).install
           rescue CaskAlreadyInstalledError => e
             opoo e.message
           end
