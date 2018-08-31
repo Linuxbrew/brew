@@ -136,6 +136,7 @@ class LinkageChecker
         libcrypt.so.1
         libdl.so.2
         libm.so.6
+        libmvec.so.1
         libnsl.so.1
         libpthread.so.0
         libresolv.so.2
