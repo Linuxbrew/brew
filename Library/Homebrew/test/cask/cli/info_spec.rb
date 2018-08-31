@@ -51,7 +51,7 @@ describe Hbc::CLI::Info, :cask do
         Not installed
         From: https://github.com/Homebrew/homebrew-cask/blob/master/Casks/local-transmission.rb
         ==> Name
-        None
+        Transmission
         ==> Artifacts
         Transmission.app (App)
       EOS

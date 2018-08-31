@@ -36,7 +36,11 @@ module Hbc
 
           old_cask = CaskLoader.load(old_cask.installed_caskfile)
 
-          old_cask_installer = Installer.new(old_cask, binaries: binaries?, verbose: verbose?, force: force?, upgrade: true)
+          old_cask_installer =
+            Installer.new(old_cask, binaries:  binaries?,
+                                    verbose:   verbose?,
+                                    force:     force?,
+                                    upgrade:   true)
 
           new_cask = CaskLoader.load(old_cask.to_s)
 
@@ -46,7 +50,8 @@ module Hbc
                                     force:          force?,
                                     skip_cask_deps: skip_cask_deps?,
                                     require_sha:    require_sha?,
-                                    upgrade: true)
+                                    upgrade:        true,
+                                    quarantine:     quarantine?)
 
           started_upgrade = false
           new_artifacts_installed = false

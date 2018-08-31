@@ -18,7 +18,7 @@ Homebrew\-Cask works robustly enough that we welcome new users, but the project 
 .SH "FREQUENTLY USED COMMANDS"
 .
 .TP
-\fBinstall\fR [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha] [\-\-language=\fIiso\-language\fR[,\fIiso\-language\fR \.\.\. ]] \fItoken\fR [ \fItoken\fR \.\.\. ]
+\fBinstall\fR [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha] [\-\-no\-quarantine] [\-\-language=\fIiso\-language\fR[,\fIiso\-language\fR \.\.\. ]] \fItoken\fR [ \fItoken\fR \.\.\. ]
 Install Cask identified by \fItoken\fR\.
 .
 .TP
@@ -59,8 +59,8 @@ Check for configuration issues\. Can be useful to upload as a gist for developer
 Open the given Cask definition file for editing\.
 .
 .TP
-\fBfetch\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]
-Download remote application files for the given Cask to the local cache\. With \fB\-\-force\fR, force re\-download even if the files are already cached\.
+\fBfetch\fR [\-\-force] [\-\-no\-quarantine] \fItoken\fR [ \fItoken\fR \.\.\. ]
+Download remote application files for the given Cask to the local cache\. With \fB\-\-force\fR, force re\-download even if the files are already cached\. \fB\-\-no\-quarantine\fR will prevent Gatekeeper from enforcing its security restrictions on the Cask\.
 .
 .TP
 \fBhome\fR or \fBhomepage\fR [ \fItoken\fR \.\.\. ]
@@ -74,8 +74,8 @@ With no arguments, display the project page \fIhttps://caskroom\.github\.io/\fR\
 Display information about the given Cask\.
 .
 .TP
-\fBinstall\fR [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha] \fItoken\fR [ \fItoken\fR \.\.\. ]
-Install the given Cask\. With \fB\-\-force\fR, re\-install even if the Cask appears to be already present\. With \fB\-\-skip\-cask\-deps\fR, skip any Cask dependencies\. \fB\-\-require\-sha\fR will abort installation if the Cask does not have a checksum defined\.
+\fBinstall\fR [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha] [\-\-no\-quarantine] \fItoken\fR [ \fItoken\fR \.\.\. ]
+Install the given Cask\. With \fB\-\-force\fR, re\-install even if the Cask appears to be already present\. With \fB\-\-skip\-cask\-deps\fR, skip any Cask dependencies\. \fB\-\-require\-sha\fR will abort installation if the Cask does not have a checksum defined\. \fB\-\-no\-quarantine\fR will prevent Gatekeeper from enforcing its security restrictions on the Cask\.
 .
 .IP
 \fItoken\fR is usually the ID of a Cask, but see \fIOTHER WAYS TO SPECIFY A CASK\fR for variations\.
@@ -98,7 +98,7 @@ Without token arguments, display all the installed Casks that have newer version
 \fB\-\-quiet\fR suppresses the display of versions\.
 .
 .TP
-\fBreinstall\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+\fBreinstall\fR [\-\-no\-quarantine] \fItoken\fR [ \fItoken\fR \.\.\. ]
 Reinstall the given Cask\.
 .
 .TP
@@ -156,6 +156,10 @@ Skip Cask dependencies when installing\.
 .TP
 \fB\-\-require\-sha\fR
 Abort Cask installation if the Cask does not have a checksum defined\.
+.
+.TP
+\fB\-\-no\-quarantine\fR
+Prevent Gatekeeper from enforcing its security restrictions on the Cask\. This will let you run it straightaway\.
 .
 .TP
 \fB\-\-verbose\fR

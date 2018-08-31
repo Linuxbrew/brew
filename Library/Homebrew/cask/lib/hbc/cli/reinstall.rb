@@ -7,7 +7,8 @@ module Hbc
                               verbose:        verbose?,
                               force:          force?,
                               skip_cask_deps: skip_cask_deps?,
-                              require_sha:    require_sha?).reinstall
+                              require_sha:    require_sha?,
+                              quarantine:     quarantine?).reinstall
         end
       end
 

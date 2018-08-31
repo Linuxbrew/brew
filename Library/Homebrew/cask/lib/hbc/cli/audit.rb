@@ -18,7 +18,9 @@ module Hbc
 
       def audit(cask)
         odebug "Auditing Cask #{cask}"
-        Auditor.audit(cask, audit_download: download?, check_token_conflicts: token_conflicts?)
+        Auditor.audit(cask, audit_download: download?,
+                            check_token_conflicts: token_conflicts?,
+                            quarantine: quarantine?)
       end
     end
   end

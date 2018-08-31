@@ -90,7 +90,7 @@ module UnpackStrategy
                           args: ["--bom", bomfile.path, "--", path, unpack_dir],
                           verbose: verbose
 
-          FileUtils.chmod "u+w", Pathname.glob(unpack_dir/"**/*").reject(&:symlink?)
+          FileUtils.chmod "u+w", Pathname.glob(unpack_dir/"**/*", File::FNM_DOTMATCH).reject(&:symlink?)
         end
       end
     end
