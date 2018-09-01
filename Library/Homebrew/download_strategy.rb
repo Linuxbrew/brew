@@ -2,6 +2,8 @@ require "json"
 require "rexml/document"
 require "time"
 require "unpack_strategy"
+require "lazy_object"
+require "cgi"
 
 class AbstractDownloadStrategy
   extend Forwardable
@@ -9,12 +11,12 @@ class AbstractDownloadStrategy
 
   module Pourable
     def stage
-      ohai "Pouring #{cached_location.basename}"
+      ohai "Pouring #{basename}"
       super
     end
   end
 
-  attr_reader :cached_location
+  attr_reader :cache, :cached_location, :url
   attr_reader :meta, :name, :version, :shutup
   private :meta, :name, :version, :shutup
 
@@ -51,7 +53,7 @@ class AbstractDownloadStrategy
     UnpackStrategy.detect(cached_location,
                           extension_only: true,
                           ref_type: @ref_type, ref: @ref)
-                  .extract_nestedly(basename: basename_without_params,
+                  .extract_nestedly(basename: basename,
                                     extension_only: true,
                                     verbose: ARGV.verbose? && !shutup)
     chdir
@@ -82,11 +84,8 @@ class AbstractDownloadStrategy
     rm_rf(cached_location)
   end
 
-  def basename_without_params
-    return unless @url
-
-    # Strip any ?thing=wad out of .c?thing=wad style extensions
-    File.basename(@url)[/[^?]+/]
+  def basename
+    cached_location.basename
   end
 
   private
@@ -122,7 +121,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
   end
 
   def fetch
-    ohai "Cloning #{@url}"
+    ohai "Cloning #{url}"
 
     if cached_location.exist? && repo_valid?
       puts "Updating #{cached_location}"
@@ -193,30 +192,79 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
 
   def initialize(url, name, version, **meta)
     super
-    @cached_location = @cache/"#{name}--#{version}#{ext}"
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
+  end
+
+  def symlink_location
+    return @symlink_location if defined?(@symlink_location)
+    ext = Pathname(parse_basename(url)).extname
+    @symlink_location = @cache/"#{name}--#{version}#{ext}"
+  end
+
+  def cached_location
+    return @cached_location if defined?(@cached_location)
+
+    url_sha256 = Digest::SHA256.hexdigest(url)
+    downloads = Pathname.glob(HOMEBREW_CACHE/"downloads/#{url_sha256}--*")
+                        .reject { |path| path.extname.end_with?(".incomplete") }
+
+    @cached_location = if downloads.count == 1
+      downloads.first
+    else
+      HOMEBREW_CACHE/"downloads/#{url_sha256}--#{resolved_basename}"
+    end
+  end
+
+  def basename
+    cached_location.basename.sub(/^[\da-f]{64}\-\-/, "")
   end
 
   private
 
-  def ext
-    uri_path = if URI::DEFAULT_PARSER.make_regexp =~ @url
-      uri = URI(@url)
+  def resolved_url
+    resolved_url, = resolved_url_and_basename
+    resolved_url
+  end
+
+  def resolved_basename
+    _, resolved_basename = resolved_url_and_basename
+    resolved_basename
+  end
+
+  def resolved_url_and_basename
+    return @resolved_url_and_basename if defined?(@resolved_url_and_basename)
+    @resolved_url_and_basename = [url, parse_basename(url)]
+  end
+
+  def parse_basename(url)
+    uri_path = if URI::DEFAULT_PARSER.make_regexp =~ url
+      uri = URI(url)
+
+      if uri.query
+        query_params = CGI.parse(uri.query)
+        query_params["response-content-disposition"].each do |param|
+          query_basename = param[/attachment;\s*filename=(["']?)(.+)\1/i, 2]
+          return query_basename if query_basename
+        end
+      end
+
       uri.query ? "#{uri.path}?#{uri.query}" : uri.path
     else
-      @url
+      url
     end
+
+    uri_path = URI.decode_www_form_component(uri_path)
 
     # We need a Pathname because we've monkeypatched extname to support double
     # extensions (e.g. tar.gz).
-    # We can't use basename_without_params, because given a URL like
-    #   https://example.com/download.php?file=foo-1.0.tar.gz
-    # the extension we want is ".tar.gz", not ".php".
+    # Given a URL like https://example.com/download.php?file=foo-1.0.tar.gz
+    # the basename we want is "foo-1.0.tar.gz", not "download.php".
     Pathname.new(uri_path).ascend do |path|
       ext = path.extname[/[^?&]+/]
-      return ext if ext
+      return path.basename.to_s[/[^?&]+#{Regexp.escape(ext)}/] if ext
     end
-    nil
+
+    File.basename(uri_path)
   end
 end
 
@@ -229,23 +277,35 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
   end
 
   def fetch
-    ohai "Downloading #{@url}"
+    urls = [url, *mirrors]
 
-    if cached_location.exist?
-      puts "Already downloaded: #{cached_location}"
-    else
-      begin
-        _fetch
-      rescue ErrorDuringExecution
-        raise CurlDownloadStrategyError, @url
+    begin
+      url = urls.shift
+
+      ohai "Downloading #{url}"
+
+      if cached_location.exist?
+        puts "Already downloaded: #{cached_location}"
+      else
+        begin
+          resolved_url, = resolve_url_and_basename(url)
+
+          _fetch(url: url, resolved_url: resolved_url)
+        rescue ErrorDuringExecution
+          raise CurlDownloadStrategyError, url
+        end
+        ignore_interrupts do
+          temporary_path.rename(cached_location)
+          symlink_location.dirname.mkpath
+        end
       end
-      ignore_interrupts { temporary_path.rename(cached_location) }
+
+      FileUtils.ln_s cached_location.relative_path_from(symlink_location.dirname), symlink_location, force: true
+    rescue CurlDownloadStrategyError
+      raise if urls.empty?
+      puts "Trying a mirror..."
+      retry
     end
-  rescue CurlDownloadStrategyError
-    raise if mirrors.empty?
-    puts "Trying a mirror..."
-    @url = mirrors.shift
-    retry
   end
 
   def clear_cache
@@ -255,18 +315,52 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   private
 
-  # Private method, can be overridden if needed.
-  def _fetch
-    url = @url
+  def resolved_url_and_basename
+    return @resolved_url_and_basename if defined?(@resolved_url_and_basename)
+    @resolved_url_and_basename = resolve_url_and_basename(url)
+  end
 
+  def resolve_url_and_basename(url)
     if ENV["HOMEBREW_ARTIFACT_DOMAIN"]
       url = url.sub(%r{^((ht|f)tps?://)?}, ENV["HOMEBREW_ARTIFACT_DOMAIN"].chomp("/") + "/")
-      ohai "Downloading from #{url}"
     end
 
+    out, _, status= curl_output("--location", "--silent", "--head", url.to_s)
+
+    lines = status.success? ? out.lines.map(&:chomp) : []
+
+    locations = lines.map { |line| line[/^Location:\s*(.*)$/i, 1] }
+                     .compact
+
+    redirect_url = locations.reduce(url) do |current_url, location|
+      if location.start_with?("/")
+        uri = URI(current_url)
+        "#{uri.scheme}://#{uri.host}#{location}"
+      else
+        location
+      end
+    end
+
+    filenames = lines.map { |line| line[/^Content\-Disposition:\s*attachment;\s*filename=(["']?)(.+)\1$/i, 2] }
+                     .compact
+
+    basename = filenames.last || parse_basename(redirect_url)
+
+    [redirect_url, basename]
+  end
+
+  def _fetch(url:, resolved_url:)
     temporary_path.dirname.mkpath
 
-    curl_download resolved_url(url), to: temporary_path
+    ohai "Downloading from #{resolved_url}" if url != resolved_url
+
+    if ENV["HOMEBREW_NO_INSECURE_REDIRECT"] &&
+       url.start_with?("https://") && !resolved_url.start_with?("https://")
+      $stderr.puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
+      raise CurlDownloadStrategyError, url
+    end
+
+    curl_download resolved_url, to: temporary_path
   end
 
   # Curl options to be always passed to curl,
@@ -291,27 +385,6 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     {}
   end
 
-  def resolved_url(url)
-    redirect_url, _, status = curl_output(
-      "--silent", "--head",
-      "--write-out", "%{redirect_url}",
-      "--output", "/dev/null",
-      url.to_s
-    )
-
-    return url unless status.success?
-    return url if redirect_url.empty?
-
-    ohai "Downloading from #{redirect_url}"
-    if ENV["HOMEBREW_NO_INSECURE_REDIRECT"] &&
-       url.start_with?("https://") && !redirect_url.start_with?("https://")
-      puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
-      raise CurlDownloadStrategyError, url
-    end
-
-    redirect_url
-  end
-
   def curl_output(*args, **options)
     super(*_curl_args, *args, **_curl_opts, **options)
   end
@@ -324,23 +397,30 @@ end
 
 # Detect and download from Apache Mirror
 class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
-  def apache_mirrors
-    mirrors, = curl_output("--silent", "--location", "#{@url}&asjson=1")
-    JSON.parse(mirrors)
+  def mirrors
+    return @combined_mirrors if defined?(@combined_mirrors)
+
+    backup_mirrors = apache_mirrors.fetch("backup", [])
+                                   .map { |mirror| "#{mirror}#{apache_mirrors["path_info"]}" }
+
+    @combined_mirrors = [*@mirrors, *backup_mirrors]
   end
 
-  def _fetch
-    return super if @tried_apache_mirror
-    @tried_apache_mirror = true
+  private
 
-    mirrors = apache_mirrors
-    path_info = mirrors.fetch("path_info")
-    @url = mirrors.fetch("preferred") + path_info
-    @mirrors |= %W[https://archive.apache.org/dist/#{path_info}]
+  def resolved_url_and_basename
+    return @resolved_url_and_basename if defined?(@resolved_url_and_basename)
+    @resolved_url_and_basename = [
+      "#{apache_mirrors["preferred"]}#{apache_mirrors["path_info"]}",
+      File.basename(apache_mirrors["path_info"]),
+    ]
+  end
 
-    ohai "Best Mirror #{@url}"
-    super
-  rescue IndexError, JSON::ParserError
+  def apache_mirrors
+    return @apache_mirrors if defined?(@apache_mirrors)
+    json, = curl_output("--silent", "--location", "#{url}&asjson=1")
+    @apache_mirrors = JSON.parse(json)
+  rescue JSON::ParserError
     raise CurlDownloadStrategyError, "Couldn't determine mirror, try again later."
   end
 end
@@ -348,12 +428,14 @@ end
 # Download via an HTTP POST.
 # Query parameters on the URL are converted into POST parameters
 class CurlPostDownloadStrategy < CurlDownloadStrategy
-  def _fetch
+  private
+
+  def _fetch(url:, resolved_url:)
     args = if meta.key?(:data)
       escape_data = ->(d) { ["-d", URI.encode_www_form([d])] }
-      [@url, *meta[:data].flat_map(&escape_data)]
+      [url, *meta[:data].flat_map(&escape_data)]
     else
-      url, query = @url.split("?", 2)
+      url, query = url.split("?", 2)
       query.nil? ? [url, "-X", "POST"] : [url, "-d", query]
     end
 
@@ -366,7 +448,7 @@ end
 class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
     UnpackStrategy::Uncompressed.new(cached_location)
-                                .extract(basename: basename_without_params,
+                                .extract(basename: basename,
                                          verbose: ARGV.verbose? && !shutup)
   end
 end
@@ -386,10 +468,10 @@ end
 # because it lets you use a private S3 bucket as a repo for internal
 # distribution.  (It will work for public buckets as well.)
 class S3DownloadStrategy < CurlDownloadStrategy
-  def _fetch
-    if @url !~ %r{^https?://([^.].*)\.s3\.amazonaws\.com/(.+)$} &&
-       @url !~ %r{^s3://([^.].*?)/(.+)$}
-      raise "Bad S3 URL: " + @url
+  def _fetch(url:, resolved_url:)
+    if url !~ %r{^https?://([^.].*)\.s3\.amazonaws\.com/(.+)$} &&
+       url !~ %r{^s3://([^.].*?)/(.+)$}
+      raise "Bad S3 URL: " + url
     end
     bucket = Regexp.last_match(1)
     key = Regexp.last_match(2)
@@ -402,7 +484,7 @@ class S3DownloadStrategy < CurlDownloadStrategy
       s3url = signer.presigned_url :get_object, bucket: bucket, key: key
     rescue Aws::Sigv4::Errors::MissingCredentialsError
       ohai "AWS credentials missing, trying public URL instead."
-      s3url = @url
+      s3url = url
     end
 
     curl_download s3url, to: temporary_path
@@ -428,23 +510,22 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   end
 
   def parse_url_pattern
-    url_pattern = %r{https://github.com/([^/]+)/([^/]+)/(\S+)}
-    unless @url =~ url_pattern
+    unless match = url.match(%r{https://github.com/([^/]+)/([^/]+)/(\S+)})
       raise CurlDownloadStrategyError, "Invalid url pattern for GitHub Repository."
     end
 
-    _, @owner, @repo, @filepath = *@url.match(url_pattern)
+    _, @owner, @repo, @filepath = *match
   end
 
   def download_url
     "https://#{@github_token}@github.com/#{@owner}/#{@repo}/#{@filepath}"
   end
 
-  def _fetch
+  private
+
+  def _fetch(url:, resolved_url:)
     curl_download download_url, to: temporary_path
   end
-
-  private
 
   def set_github_token
     @github_token = ENV["HOMEBREW_GITHUB_API_TOKEN"]
@@ -486,13 +567,13 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
     "https://#{@github_token}@api.github.com/repos/#{@owner}/#{@repo}/releases/assets/#{asset_id}"
   end
 
-  def _fetch
+  private
+
+  def _fetch(url:, resolved_url:)
     # HTTP request header `Accept: application/octet-stream` is required.
     # Without this, the GitHub API will respond with metadata, not binary.
     curl_download download_url, "--header", "Accept: application/octet-stream", to: temporary_path
   end
-
-  private
 
   def asset_id
     @asset_id ||= resolve_asset_id
