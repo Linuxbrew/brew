@@ -69,7 +69,7 @@ module Hbc
       quarantine_status = status(from, command: command)
 
       quarantiner = command.run("/usr/bin/xattr",
-                                args: ["-w", "-r", QUARANTINE_ATTRIBUTE, quarantine_status, to],
+                                args: ["-w", "-rs", QUARANTINE_ATTRIBUTE, quarantine_status, to],
                                 print_stderr: false)
 
       return if quarantiner.success?
