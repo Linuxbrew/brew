@@ -188,11 +188,8 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
 end
 
 class AbstractFileDownloadStrategy < AbstractDownloadStrategy
-  attr_reader :temporary_path
-
-  def initialize(url, name, version, **meta)
-    super
-    @temporary_path = Pathname.new("#{cached_location}.incomplete")
+  def temporary_path
+    @temporary_path ||= Pathname.new("#{cached_location}.incomplete")
   end
 
   def symlink_location
