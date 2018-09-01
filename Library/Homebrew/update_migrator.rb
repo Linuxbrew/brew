@@ -85,7 +85,9 @@ module UpdateMigrator
           path.children
               .reject(&:symlink?)
               .select(&:file?)
-              .map { |child| child.basename.to_s.sub(/\-\-.*/, "") }
+              .map { |child| child.basename.to_s }
+              .select { |basename| basename.include?("--") }
+              .map { |basename| basename.sub(/\-\-.*/, "") }
               .uniq
         else
           []
