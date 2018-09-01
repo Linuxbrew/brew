@@ -43,6 +43,8 @@ module CleanupRefinement
       return false unless days
       return true if days.zero?
 
+      return true if symlink? && !exist?
+
       # TODO: Replace with ActiveSupport's `.days.ago`.
       mtime < ((@time ||= Time.now) - days * 60 * 60 * 24)
     end
