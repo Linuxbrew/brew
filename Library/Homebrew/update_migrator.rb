@@ -40,6 +40,9 @@ module UpdateMigrator
 
       return if ENV.key?("HOMEBREW_DISABLE_LOAD_FORMULA")
 
+      return unless HOMEBREW_CACHE.directory?
+      return if HOMEBREW_CACHE.children.empty?
+
       ohai "Migrating cache entries..."
 
       Formula.each do |formula|
@@ -77,6 +80,9 @@ module UpdateMigrator
       return if initial_version && initial_version > "1.7.2"
 
       return if ENV.key?("HOMEBREW_DISABLE_LOAD_FORMULA")
+
+      return unless HOMEBREW_CACHE.directory?
+      return if HOMEBREW_CACHE.children.empty?
 
       ohai "Migrating cache entries..."
 
