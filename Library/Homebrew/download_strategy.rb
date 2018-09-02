@@ -405,12 +405,15 @@ class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
 
   private
 
-  def resolved_url_and_basename
-    return @resolved_url_and_basename if defined?(@resolved_url_and_basename)
-    @resolved_url_and_basename = [
-      "#{apache_mirrors["preferred"]}#{apache_mirrors["path_info"]}",
-      File.basename(apache_mirrors["path_info"]),
-    ]
+  def resolve_url_and_basename(url)
+    if url == self.url
+      [
+        "#{apache_mirrors["preferred"]}#{apache_mirrors["path_info"]}",
+        File.basename(apache_mirrors["path_info"]),
+      ]
+    else
+      super
+    end
   end
 
   def apache_mirrors
