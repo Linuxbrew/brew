@@ -1,5 +1,5 @@
-require "rubocops/extend/formula_cop"
-require "extend/string"
+require_relative "./extend/formula_cop"
+require_relative "../extend/string"
 
 module RuboCop
   module Cop

@@ -1,4 +1,4 @@
-require "rubocops/components_order_cop"
+require_relative "../../rubocops/components_order_cop"
 
 describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
   subject(:cop) { described_class.new }

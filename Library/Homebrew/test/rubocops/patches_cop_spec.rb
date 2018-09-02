@@ -1,4 +1,4 @@
-require "rubocops/patches_cop"
+require_relative "../../rubocops/patches_cop"
 
 describe RuboCop::Cop::FormulaAudit::Patches do
   subject(:cop) { described_class.new }

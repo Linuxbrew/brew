@@ -271,7 +271,7 @@ class Tap
           raise "Cannot tap #{name}: invalid syntax in tap!"
         end
       end
-    rescue Interrupt, RuntimeError
+    rescue Interrupt, ErrorDuringExecution, RuntimeError
       ignore_interrupts do
         # wait for git to possibly cleanup the top directory when interrupt happens.
         sleep 0.1
