@@ -94,7 +94,7 @@ class JavaRequirement < Requirement
   end
 
   def preferred_java
-    possible_javas.detect do |java|
+    possible_javas.find do |java|
       next false unless java&.executable?
       next true unless @version
       next true if satisfies_version(java)

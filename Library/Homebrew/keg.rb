@@ -389,7 +389,7 @@ class Keg
 
   def oldname_opt_record
     @oldname_opt_record ||= if (opt_dir = HOMEBREW_PREFIX/"opt").directory?
-      opt_dir.subdirs.detect do |dir|
+      opt_dir.subdirs.find do |dir|
         dir.symlink? && dir != opt_record && path.parent == dir.resolved_path.parent
       end
     end

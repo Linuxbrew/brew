@@ -29,7 +29,7 @@ module Homebrew
 
     CacheStoreDatabase.use(:linkage) do |db|
       kegs = if ARGV.kegs.empty?
-        Formula.installed.collect(&:opt_or_installed_prefix_keg).reject(&:nil?)
+        Formula.installed.map(&:opt_or_installed_prefix_keg).reject(&:nil?)
       else
         ARGV.kegs
       end

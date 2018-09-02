@@ -47,7 +47,7 @@ module Hbc
 
       parent = metadata_timestamped_path(version: version, timestamp: timestamp, create: create)
 
-      return nil if parent.nil?
+      return if parent.nil?
 
       subdir = parent.join(leaf)
 

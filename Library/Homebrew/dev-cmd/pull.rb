@@ -513,7 +513,7 @@ module Homebrew
     def self.lookup(name)
       json = Utils.popen_read(HOMEBREW_BREW_FILE, "info", "--json=v1", name)
 
-      return nil unless $CHILD_STATUS.success?
+      return unless $CHILD_STATUS.success?
 
       Homebrew.force_utf8!(json)
       FormulaInfoFromJson.new(JSON.parse(json)[0])
@@ -526,9 +526,9 @@ module Homebrew
 
     def bottle_info(my_bottle_tag = Utils::Bottles.tag)
       tag_s = my_bottle_tag.to_s
-      return nil unless info["bottle"]["stable"]
+      return unless info["bottle"]["stable"]
       btl_info = info["bottle"]["stable"]["files"][tag_s]
-      return nil unless btl_info
+      return unless btl_info
       BottleInfo.new(btl_info["url"], btl_info["sha256"])
     end
 

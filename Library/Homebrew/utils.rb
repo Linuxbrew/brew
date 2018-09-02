@@ -182,7 +182,7 @@ module Homebrew
   def _system(cmd, *args, **options)
     pid = fork do
       yield if block_given?
-      args.collect!(&:to_s)
+      args.map!(&:to_s)
       begin
         exec(cmd, *args, **options)
       rescue
@@ -380,7 +380,7 @@ end
 
 # GZips the given paths, and returns the gzipped paths
 def gzip(*paths)
-  paths.collect do |path|
+  paths.map do |path|
     safe_system "gzip", path
     Pathname.new("#{path}.gz")
   end
@@ -426,7 +426,7 @@ def nostdout
 end
 
 def paths
-  @paths ||= PATH.new(ENV["HOMEBREW_PATH"]).collect do |p|
+  @paths ||= PATH.new(ENV["HOMEBREW_PATH"]).map do |p|
     begin
       File.expand_path(p).chomp("/")
     rescue ArgumentError

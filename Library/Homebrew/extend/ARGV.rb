@@ -93,7 +93,7 @@ module HomebrewArgvExtension
   def kegs
     require "keg"
     require "formula"
-    @kegs ||= downcased_unique_named.collect do |name|
+    @kegs ||= downcased_unique_named.map do |name|
       raise UsageError if name.empty?
 
       rack = Formulary.to_rack(name.downcase)

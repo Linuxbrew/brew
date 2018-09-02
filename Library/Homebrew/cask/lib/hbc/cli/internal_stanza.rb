@@ -63,7 +63,7 @@ module Hbc
 
           begin
             value = cask.send(stanza)
-          rescue StandardError
+          rescue
             opoo "failure calling '#{stanza}' on Cask '#{cask}'" unless quiet?
             puts ""
             next

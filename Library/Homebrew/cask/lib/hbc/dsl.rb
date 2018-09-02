@@ -102,7 +102,7 @@ module Hbc
       instance_variable_set("@#{stanza}", yield)
     rescue CaskInvalidError
       raise
-    rescue StandardError => e
+    rescue => e
       raise CaskInvalidError.new(cask, "'#{stanza}' stanza failed with: #{e}")
     end
 
@@ -271,7 +271,7 @@ module Hbc
           artifacts.add(klass.from_args(cask, *args))
         rescue CaskInvalidError
           raise
-        rescue StandardError => e
+        rescue => e
           raise CaskInvalidError.new(cask, "invalid '#{klass.dsl_key}' stanza: #{e}")
         end
       end

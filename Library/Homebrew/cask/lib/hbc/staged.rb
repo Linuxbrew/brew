@@ -13,13 +13,13 @@ module Hbc
 
     def plist_set(key, value)
       plist_exec("Set #{key} #{value}")
-    rescue StandardError => e
+    rescue => e
       raise CaskError, "#{@cask.token}: 'plist_set' failed with: #{e}"
     end
 
     def bundle_identifier
       plist_exec("Print CFBundleIdentifier").stdout.chomp
-    rescue StandardError => e
+    rescue => e
       raise CaskError, "#{@cask.token}: 'bundle_identifier' failed with: #{e}"
     end
 

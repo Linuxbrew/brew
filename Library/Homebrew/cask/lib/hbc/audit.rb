@@ -39,7 +39,7 @@ module Hbc
       check_latest_with_auto_updates
       check_stanza_requires_uninstall
       self
-    rescue StandardError => e
+    rescue => e
       odebug "#{e.message}\n#{e.backtrace.join("\n")}"
       add_error "exception while auditing #{cask}: #{e.message}"
       self

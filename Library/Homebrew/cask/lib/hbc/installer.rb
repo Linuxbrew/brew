@@ -74,7 +74,7 @@ module Hbc
 
       extract_primary_container
       save_caskfile
-    rescue StandardError => e
+    rescue => e
       purge_versioned_files
       raise e
     end
@@ -209,7 +209,7 @@ module Hbc
         artifact.install_phase(command: @command, verbose: verbose?, force: force?)
         already_installed_artifacts.unshift(artifact)
       end
-    rescue StandardError => e
+    rescue => e
       begin
         already_installed_artifacts.each do |artifact|
           next unless artifact.respond_to?(:uninstall_phase)
@@ -397,7 +397,7 @@ module Hbc
           See System Preferences to enable it manually.
         EOS
       end
-    rescue StandardError => e
+    rescue => e
       purge_versioned_files
       raise e
     end
@@ -503,12 +503,12 @@ module Hbc
     end
 
     def backup_path
-      return nil if @cask.staged_path.nil?
+      return if @cask.staged_path.nil?
       Pathname.new "#{@cask.staged_path}.upgrading"
     end
 
     def backup_metadata_path
-      return nil if @cask.metadata_versioned_path.nil?
+      return if @cask.metadata_versioned_path.nil?
       Pathname.new "#{@cask.metadata_versioned_path}.upgrading"
     end
 

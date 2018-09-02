@@ -27,7 +27,7 @@ module Hbc
       tried_ownership = false
       begin
         yield path
-      rescue StandardError
+      rescue
         # in case of permissions problems
         unless tried_permissions
           # TODO: Better handling for the case where path is a symlink.

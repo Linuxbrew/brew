@@ -257,8 +257,10 @@ module Homebrew
       wanted_mode = 0100644 & ~File.umask
       actual_mode = formula.path.stat.mode
       unless actual_mode == wanted_mode
-        problem format("Incorrect file permissions (%03o): chmod %03o %s",
-                       actual_mode & 0777, wanted_mode & 0777, formula.path)
+        problem format("Incorrect file permissions (%03<actual>o): chmod %03<wanted>o %{path}",
+                       actual: actual_mode & 0777,
+                       wanted: wanted_mode & 0777,
+                       path:   formula.path)
       end
 
       problem "'DATA' was found, but no '__END__'" if text.data? && !text.end?
@@ -407,7 +409,7 @@ module Homebrew
 
           dep.options.each do |opt|
             next if dep_f.option_defined?(opt)
-            next if dep_f.requirements.detect do |r|
+            next if dep_f.requirements.find do |r|
               if r.recommended?
                 opt.name == "with-#{r.name}"
               elsif r.optional?

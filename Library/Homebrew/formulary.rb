@@ -283,7 +283,7 @@ module Formulary
   # to install the formula will be set instead.
   def self.from_rack(rack, spec = nil, alias_path: nil)
     kegs = rack.directory? ? rack.subdirs.map { |d| Keg.new(d) } : []
-    keg = kegs.detect(&:linked?) || kegs.detect(&:optlinked?) || kegs.max_by(&:version)
+    keg = kegs.find(&:linked?) || kegs.find(&:optlinked?) || kegs.max_by(&:version)
 
     if keg
       from_keg(keg, spec, alias_path: alias_path)
@@ -432,7 +432,7 @@ module Formulary
                       "#{tap}HomebrewFormula/#{name}.rb",
                       "#{tap}#{name}.rb",
                       "#{tap}Aliases/#{name}",
-                    ]).detect(&:file?)
+                    ]).find(&:file?)
     end.compact
   end
 
