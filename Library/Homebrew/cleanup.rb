@@ -39,6 +39,12 @@ module CleanupRefinement
       directory? && %w[go_cache glide_home java_cache npm_cache gclient_cache].include?(basename.to_s)
     end
 
+    def go_cache_directory?
+      # Go makes its cache contents read-only to ensure cache integrity,
+      # which makes sense but is something we need to undo for cleanup.
+      directory? && %w[go_cache].include?(basename.to_s)
+    end
+
     def prune?(days)
       return false unless days
       return true if days.zero?
@@ -228,6 +234,7 @@ module Homebrew
       entries ||= [cache, cache/"Cask"].select(&:directory?).flat_map(&:children)
 
       entries.each do |path|
+        FileUtils.chmod_R 0755, path if path.go_cache_directory? && !dry_run?
         next cleanup_path(path) { path.unlink } if path.incomplete?
         next cleanup_path(path) { FileUtils.rm_rf path } if path.nested_cache?
 
