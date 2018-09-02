@@ -1,4 +1,4 @@
-require "rubocops/homepage_cop"
+require_relative "../../rubocops/homepage_cop"
 
 describe RuboCop::Cop::FormulaAudit::Homepage do
   subject(:cop) { described_class.new }
