@@ -124,11 +124,16 @@ module UnpackStrategy
       Dir.mktmpdir do |mount_dir|
         mount_dir = Pathname(mount_dir)
 
-        without_eula = system_command "hdiutil",
-                                      args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", mount_dir, path],
-                                      input: "qn\n",
-                                      print_stderr: false,
-                                      verbose: verbose
+        without_eula = system_command(
+          "hdiutil",
+          args: [
+            "attach", "-plist", "-nobrowse", "-readonly", "-noidme",
+            "-mountrandom", mount_dir, path
+          ],
+          input: "qn\n",
+          print_stderr: false,
+          verbose: verbose,
+        )
 
         # If mounting without agreeing to EULA succeeded, there is none.
         plist = if without_eula.success?
@@ -136,13 +141,22 @@ module UnpackStrategy
         else
           cdr_path = mount_dir/path.basename.sub_ext(".cdr")
 
-          system_command! "hdiutil",
-                          args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path],
-                          verbose: verbose
+          system_command!(
+            "hdiutil",
+            args: [
+              "convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path
+            ],
+            verbose: verbose,
+          )
 
-          with_eula = system_command! "hdiutil",
-                                      args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", mount_dir, cdr_path],
-                                      verbose: verbose
+          with_eula = system_command!(
+            "hdiutil",
+            args: [
+              "attach", "-plist", "-nobrowse", "-readonly", "-noidme",
+              "-mountrandom", mount_dir, cdr_path
+            ],
+            verbose: verbose,
+          )
 
           if verbose && !(eula_text = without_eula.stdout).empty?
             ohai "Software License Agreement for '#{path}':"

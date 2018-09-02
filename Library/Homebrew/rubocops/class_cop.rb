@@ -46,9 +46,16 @@ module RuboCop
           lambda do |corrector|
             case node.type
             when :str, :dstr
-              corrector.replace(node.source_range, node.source.to_s.sub(%r{(/usr/local/(s?bin))}, '#{\2}'))
+              corrector.replace(node.source_range,
+                                node.source.to_s.sub(%r{(/usr/local/(s?bin))},
+                                                     '#{\2}'))
             when :int
-              corrector.remove(range_with_surrounding_comma(range_with_surrounding_space(range: node.source_range, side: :left)))
+              corrector.remove(
+                range_with_surrounding_comma(
+                  range_with_surrounding_space(range: node.source_range,
+                                               side: :left),
+                ),
+              )
             end
           end
         end

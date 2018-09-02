@@ -1073,7 +1073,8 @@ class Formula
       # file doesn't belong to any keg.
     else
       tab_tap = Tab.for_keg(keg).tap
-      return false if tab_tap.nil? # this keg doesn't below to any core/tap formula, most likely coming from a DIY install.
+      # this keg doesn't below to any core/tap formula, most likely coming from a DIY install.
+      return false if tab_tap.nil?
       begin
         Formulary.factory(keg.name)
       rescue FormulaUnavailableError # rubocop:disable Lint/HandleExceptions

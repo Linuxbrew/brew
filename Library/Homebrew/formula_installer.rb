@@ -186,7 +186,8 @@ class FormulaInstaller
 
     return if pinned_unsatisfied_deps.empty?
     raise CannotInstallFormulaError,
-      "You must `brew unpin #{pinned_unsatisfied_deps * " "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
+      "You must `brew unpin #{pinned_unsatisfied_deps * " "}` as installing " \
+      "#{formula.full_name} requires the latest version of pinned dependencies"
   end
 
   def build_bottle_preinstall
@@ -527,8 +528,9 @@ class FormulaInstaller
     if deps.empty? && only_deps?
       puts "All dependencies for #{formula.full_name} are satisfied."
     elsif !deps.empty?
-      oh1 "Installing dependencies for #{formula.full_name}: #{deps.map(&:first).map(&Formatter.method(:identifier)).join(", ")}",
-        truncate: false
+      oh1 "Installing dependencies for #{formula.full_name}: " \
+          "#{deps.map(&:first).map(&Formatter.method(:identifier)).join(", ")}",
+          truncate: false
       deps.each { |dep, options| install_dependency(dep, options) }
     end
 

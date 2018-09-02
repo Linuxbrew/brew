@@ -73,8 +73,8 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/LineLength:
-  # 124 is the goal as GitHub diff UI wraps beyond that
-  Max: 190
+  # 118 is the goal as GitHub diff UI wraps beyond that
+  Max: 189
   # ignore manpage comments and long single-line strings
   IgnoredPatterns: ['#: ', ' url "', ' mirror "', ' plist_options :']
 

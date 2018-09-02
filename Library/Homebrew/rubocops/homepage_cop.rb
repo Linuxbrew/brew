@@ -58,7 +58,9 @@ module RuboCop
 
           # There's an auto-redirect here, but this mistake is incredibly common too.
           # Only applies to the homepage and subdomains for now, not the FTP URLs.
-          when %r{^http://((?:build|cloud|developer|download|extensions|git|glade|help|library|live|nagios|news|people|projects|rt|static|wiki|www)\.)?gnome\.org}
+          when %r{^http://((?:build|cloud|developer|download|extensions|git|
+                              glade|help|library|live|nagios|news|people|
+                              projects|rt|static|wiki|www)\.)?gnome\.org}x
             problem "Please use https:// for #{homepage}"
 
           # Compact the above into this list as we're able to remove detailed notations, etc over time.

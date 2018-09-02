@@ -48,7 +48,8 @@ module RuboCop
             end
           end
 
-          gh_patch_diff_pattern = %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
+          gh_patch_diff_pattern =
+            %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
           if match_obj = regex_match_group(patch, gh_patch_diff_pattern)
             problem <<~EOS
               use GitHub pull request URLs:

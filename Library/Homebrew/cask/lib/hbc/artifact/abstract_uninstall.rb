@@ -66,7 +66,8 @@ module Hbc
       def warn_for_unknown_directives(directives)
         unknown_keys = directives.keys - ORDERED_DIRECTIVES
         return if unknown_keys.empty?
-        opoo %Q(Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. Running "brew update; brew cleanup" will likely fix it.)
+        opoo "Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. " \
+             "Running \"brew update; brew cleanup\" will likely fix it."
       end
 
       # Preserve prior functionality of script which runs first. Should rarely be needed.
@@ -81,7 +82,11 @@ module Hbc
         services.each do |service|
           ohai "Removing launchctl service #{service}"
           [false, true].each do |with_sudo|
-            plist_status = command.run("/bin/launchctl", args: ["list", service], sudo: with_sudo, print_stderr: false).stdout
+            plist_status = command.run(
+              "/bin/launchctl",
+              args: ["list", service],
+              sudo: with_sudo, print_stderr: false
+            ).stdout
             if plist_status =~ /^\{/
               command.run!("/bin/launchctl", args: ["remove", service], sudo: with_sudo)
               sleep 1
@@ -157,9 +162,14 @@ module Hbc
       def uninstall_login_item(*login_items, command: nil, **_)
         login_items.each do |name|
           ohai "Removing login item #{name}"
-          command.run!("/usr/bin/osascript",
-                        args: ["-e", %Q(tell application "System Events" to delete every login item whose name is "#{name}")],
-                        sudo: false)
+          command.run!(
+            "/usr/bin/osascript",
+            args: [
+              "-e",
+              %Q(tell application "System Events" to delete every login item whose name is "#{name}"),
+            ],
+            sudo: false,
+          )
           sleep 1
         end
       end
@@ -243,7 +253,12 @@ module Hbc
         ohai "Removing files:"
         each_resolved_path(:delete, paths) do |path, resolved_paths|
           puts path
-          command.run!("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "-r", "-f", "--"], input: resolved_paths.join("\0"), sudo: true)
+          command.run!(
+            "/usr/bin/xargs",
+            args: ["-0", "--", "/bin/rm", "-r", "-f", "--"],
+            input: resolved_paths.join("\0"),
+            sudo: true,
+          )
         end
       end
 

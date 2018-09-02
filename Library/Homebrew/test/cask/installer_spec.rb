@@ -110,7 +110,19 @@ describe Hbc::Installer, :cask do
 
       expect {
         Hbc::Installer.new(with_installer_manual).install
-      }.to output(/To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'/).to_stdout
+      }.to output(
+        <<~EOS
+          ==> Satisfying dependencies
+          ==> Downloading file:#{HOMEBREW_LIBRARY_PATH}/test/support/fixtures/cask/caffeine.zip
+          ==> Verifying checksum for Cask with-installer-manual
+          ==> Installing Cask with-installer-manual
+          To complete the installation of Cask with-installer-manual, you must also
+          run the installer at
+
+            '#{with_installer_manual.staged_path.join("Caffeine.app")}'
+          🍺  with-installer-manual was successfully installed!
+        EOS
+      ).to_stdout
 
       expect(with_installer_manual).to be_installed
     end
@@ -227,7 +239,8 @@ describe Hbc::Installer, :cask do
 
       expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).to be_a_directory
       expect(Hbc::Caskroom.path.join("local-caffeine", mutated_version)).not_to be_a_directory
-      FileUtils.mv(Hbc::Caskroom.path.join("local-caffeine", caffeine.version), Hbc::Caskroom.path.join("local-caffeine", mutated_version))
+      FileUtils.mv(Hbc::Caskroom.path.join("local-caffeine", caffeine.version),
+                   Hbc::Caskroom.path.join("local-caffeine", mutated_version))
       expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
       expect(Hbc::Caskroom.path.join("local-caffeine", mutated_version)).to be_a_directory
 

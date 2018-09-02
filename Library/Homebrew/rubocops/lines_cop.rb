@@ -27,7 +27,8 @@ module RuboCop
           begin_pos = start_column(parent_class_node)
           end_pos = end_column(class_node)
           return unless begin_pos-end_pos != 3
-          problem "Use a space in class inheritance: class #{@formula_name.capitalize} < #{class_name(parent_class_node)}"
+          problem "Use a space in class inheritance: " \
+                  "class #{@formula_name.capitalize} < #{class_name(parent_class_node)}"
         end
       end
 
@@ -112,7 +113,8 @@ module RuboCop
           find_instance_method_call(body_node, :build, :without?) do |method|
             arg = parameters(method).first
             next unless match = regex_match_group(arg, /^-?-?without-(.*)/)
-            problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
+            problem "Don't duplicate 'without': " \
+                    "Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
           end
 
           find_instance_method_call(body_node, :build, :with?) do |method|
@@ -124,7 +126,8 @@ module RuboCop
           find_instance_method_call(body_node, :build, :include?) do |method|
             arg = parameters(method).first
             next unless match = regex_match_group(arg, /^with(out)?-(.*)/)
-            problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
+            problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of " \
+                    "build.include? 'with#{match[1]}-#{match[2]}'"
           end
 
           find_instance_method_call(body_node, :build, :include?) do |method|
@@ -345,7 +348,11 @@ module RuboCop
             problem "Dir([\"#{string_content(path)}\"]) is unnecessary; just use \"#{match[0]}\""
           end
 
-          fileutils_methods = Regexp.new(FileUtils.singleton_methods(false).map { |m| "(?-mix:^" + Regexp.escape(m) + "$)" }.join("|"))
+          fileutils_methods = Regexp.new(
+            FileUtils.singleton_methods(false)
+                     .map { |m| "(?-mix:^" + Regexp.escape(m) + "$)" }
+                     .join("|"),
+          )
           find_every_method_call_by_name(body_node, :system).each do |method|
             param = parameters(method).first
             next unless match = regex_match_group(param, fileutils_methods)

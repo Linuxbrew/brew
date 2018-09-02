@@ -63,7 +63,10 @@ describe Hbc::Artifact::App, :cask do
       end
 
       it "avoids clobbering an existing app" do
-        expect { install_phase }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
+        expect { install_phase }.to raise_error(
+          Hbc::CaskError,
+          "It seems there is already an App at '#{target_path}'.",
+        )
 
         expect(source_path).to be_a_directory
         expect(target_path).to be_a_directory
@@ -110,12 +113,21 @@ describe Hbc::Artifact::App, :cask do
           end
 
           it "overwrites the existing app" do
-            expect(command).to receive(:run).with("/bin/chmod", args: ["-R", "--", "u+rwx", target_path], must_succeed: false)
-              .and_call_original
-            expect(command).to receive(:run).with("/bin/chmod", args: ["-R", "-N", target_path], must_succeed: false)
-              .and_call_original
-            expect(command).to receive(:run).with("/usr/bin/chflags", args: ["-R", "--", "000", target_path], must_succeed: false)
-              .and_call_original
+            expect(command).to receive(:run).with(
+              "/bin/chmod", args: [
+                "-R", "--", "u+rwx", target_path
+              ], must_succeed: false
+            ).and_call_original
+            expect(command).to receive(:run).with(
+              "/bin/chmod", args: [
+                "-R", "-N", target_path
+              ], must_succeed: false
+            ).and_call_original
+            expect(command).to receive(:run).with(
+              "/usr/bin/chflags", args: [
+                "-R", "--", "000", target_path
+              ], must_succeed: false
+            ).and_call_original
 
             stdout = <<~EOS
               ==> Removing App '#{target_path}'.
@@ -154,7 +166,9 @@ describe Hbc::Artifact::App, :cask do
       end
 
       it "leaves the target alone" do
-        expect { install_phase }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
+        expect { install_phase }.to raise_error(
+          Hbc::CaskError, "It seems there is already an App at '#{target_path}'."
+        )
         expect(target_path).to be_a_symlink
       end
 

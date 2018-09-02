@@ -135,10 +135,14 @@ module Hbc
       def self.check_sip
         csrutil = "/usr/bin/csrutil"
         return "N/A" unless File.executable?(csrutil)
-        Open3.capture2(csrutil, "status")[0]
-             .gsub("This is an unsupported configuration, likely to break in the future and leave your machine in an unknown state.", "")
+        Open3.capture2(csrutil, "status")
+             .first
+             .gsub("This is an unsupported configuration, likely to break in " \
+                   "the future and leave your machine in an unknown state.", "")
              .gsub("System Integrity Protection status: ", "")
-             .delete("\t\.").capitalize.strip
+             .delete("\t\.")
+             .capitalize
+             .strip
       end
 
       def self.locale_variables

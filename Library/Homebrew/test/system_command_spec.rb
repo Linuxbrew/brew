@@ -223,9 +223,15 @@ describe SystemCommand do
 
     it 'does not format `stderr` when it starts with \r' do
       expect {
-        system_command "bash",
-                       args: ["-c", 'printf "\r%s" "###################                                                       27.6%" 1>&2']
-      }.to output("\r###################                                                       27.6%").to_stderr
+        system_command \
+          "bash",
+          args: [
+            "-c",
+            'printf "\r%s" "###################                                                       27.6%" 1>&2',
+          ]
+      }.to output( \
+        "\r###################                                                       27.6%",
+      ).to_stderr
     end
 
     context "when given an executable with spaces and no arguments" do

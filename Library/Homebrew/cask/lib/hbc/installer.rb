@@ -241,15 +241,23 @@ module Hbc
       if @cask.depends_on.macos.first.is_a?(Array)
         operator, release = @cask.depends_on.macos.first
         unless MacOS.version.send(operator, release)
-          raise CaskError, "Cask #{@cask} depends on macOS release #{operator} #{release}, but you are running release #{MacOS.version}."
+          raise CaskError,
+            "Cask #{@cask} depends on macOS release #{operator} #{release}, " \
+            "but you are running release #{MacOS.version}."
         end
       elsif @cask.depends_on.macos.length > 1
         unless @cask.depends_on.macos.include?(Gem::Version.new(MacOS.version.to_s))
-          raise CaskError, "Cask #{@cask} depends on macOS release being one of [#{@cask.depends_on.macos.map(&:to_s).join(", ")}], but you are running release #{MacOS.version}."
+          raise CaskError,
+            "Cask #{@cask} depends on macOS release being one of " \
+            "[#{@cask.depends_on.macos.map(&:to_s).join(", ")}], " \
+            "but you are running release #{MacOS.version}."
         end
       else
         unless MacOS.version == @cask.depends_on.macos.first
-          raise CaskError, "Cask #{@cask} depends on macOS release #{@cask.depends_on.macos.first}, but you are running release #{MacOS.version}."
+          raise CaskError,
+            "Cask #{@cask} depends on macOS release " \
+            "#{@cask.depends_on.macos.first}, " \
+            "but you are running release #{MacOS.version}."
         end
       end
     end
@@ -261,7 +269,10 @@ module Hbc
         arch[:type] == @current_arch[:type] &&
         Array(arch[:bits]).include?(@current_arch[:bits])
       end
-      raise CaskError, "Cask #{@cask} depends on hardware architecture being one of [#{@cask.depends_on.arch.map(&:to_s).join(", ")}], but you are running #{@current_arch}"
+      raise CaskError,
+        "Cask #{@cask} depends on hardware architecture being one of " \
+        "[#{@cask.depends_on.arch.map(&:to_s).join(", ")}], " \
+        "but you are running #{@current_arch}"
     end
 
     def x11_dependencies
@@ -307,7 +318,13 @@ module Hbc
 
       ohai "Installing Cask dependencies: #{not_installed.map(&:to_s).join(", ")}"
       not_installed.each do |cask|
-        Installer.new(cask, binaries: binaries?, verbose: verbose?, installed_as_dependency: true, force: false).install
+        Installer.new(
+          cask,
+          binaries: binaries?,
+          verbose: verbose?,
+          installed_as_dependency: true,
+          force: false,
+        ).install
       end
     end
 
@@ -349,23 +366,31 @@ module Hbc
       return unless @cask.accessibility_access
       ohai "Enabling accessibility access"
       if MacOS.version <= :mountain_lion
-        @command.run!("/usr/bin/touch",
-                      args: [MacOS.pre_mavericks_accessibility_dotfile],
-                      sudo: true)
+        @command.run!(
+          "/usr/bin/touch",
+          args: [MacOS.pre_mavericks_accessibility_dotfile],
+          sudo: true,
+        )
       elsif MacOS.version <= :yosemite
-        @command.run!("/usr/bin/sqlite3",
-                      args: [
-                        MacOS.tcc_db,
-                        "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
-                      ],
-                      sudo: true)
+        @command.run!(
+          "/usr/bin/sqlite3",
+          args: [
+            MacOS.tcc_db,
+            "INSERT OR REPLACE INTO access " \
+            "VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
+          ],
+          sudo: true,
+        )
       elsif MacOS.version <= :el_capitan
-        @command.run!("/usr/bin/sqlite3",
-                      args: [
-                        MacOS.tcc_db,
-                        "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
-                      ],
-                      sudo: true)
+        @command.run!(
+          "/usr/bin/sqlite3",
+          args: [
+            MacOS.tcc_db,
+            "INSERT OR REPLACE INTO access " \
+            "VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
+          ],
+          sudo: true,
+        )
       else
         opoo <<~EOS
           Accessibility access cannot be enabled automatically on this version of macOS.

@@ -27,7 +27,8 @@ module Hbc
 
       def move(force: false, command: nil, **options)
         if Utils.path_occupied?(target)
-          message = "It seems there is already #{self.class.english_article} #{self.class.english_name} at '#{target}'"
+          message = "It seems there is already #{self.class.english_article} " \
+                    "#{self.class.english_name} at '#{target}'"
           raise CaskError, "#{message}." unless force
           opoo "#{message}; overwriting."
           delete(target, force: force, command: command, **options)
@@ -51,7 +52,8 @@ module Hbc
 
       def move_back(skip: false, force: false, command: nil, **options)
         if Utils.path_occupied?(source)
-          message = "It seems there is already #{self.class.english_article} #{self.class.english_name} at '#{source}'"
+          message = "It seems there is already #{self.class.english_article} " \
+                    "#{self.class.english_name} at '#{source}'"
           raise CaskError, "#{message}." unless force
           opoo "#{message}; overwriting."
           delete(source, force: force, command: command, **options)

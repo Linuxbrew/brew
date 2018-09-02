@@ -312,7 +312,10 @@ describe Version do
 
     specify "elasticsearch alpha style" do
       expect(described_class.create("5.0.0-alpha5"))
-        .to be_detected_from("https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/5.0.0-alpha5/elasticsearch-5.0.0-alpha5.tar.gz")
+        .to be_detected_from(
+          "https://download.elastic.co/elasticsearch/release/org/elasticsearch" \
+          "/distribution/tar/elasticsearch/5.0.0-alpha5/elasticsearch-5.0.0-alpha5.tar.gz",
+        )
     end
 
     specify "gloox beta style" do
@@ -480,7 +483,9 @@ describe Version do
       expect(described_class.create("2.074.0-rc1"))
         .to be_detected_from("https://github.com/dlang/dmd/archive/v2.074.0-rc1.tar.gz")
       expect(described_class.create("5.0.0-alpha10"))
-        .to be_detected_from("https://github.com/premake/premake-core/releases/download/v5.0.0-alpha10/premake-5.0.0-alpha10-src.zip")
+        .to be_detected_from(
+          "https://github.com/premake/premake-core/releases/download/v5.0.0-alpha10/premake-5.0.0-alpha10-src.zip",
+        )
     end
 
     specify "jenkins version style" do
@@ -512,14 +517,21 @@ describe Version do
       expect(described_class.create("9.2"))
         .to be_detected_from("https://cdn.nuxeo.com/nuxeo-9.2/nuxeo-server-9.2-tomcat.zip")
       expect(described_class.create("0.181"))
-        .to be_detected_from("https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-cli/0.181/presto-cli-0.181-executable.jar")
+        .to be_detected_from(
+          "https://search.maven.org/remotecontent?filepath=" \
+          "com/facebook/presto/presto-cli/0.181/presto-cli-0.181-executable.jar",
+        )
       expect(described_class.create("1.2.3"))
-        .to be_detected_from("https://search.maven.org/remotecontent?filepath=org/apache/orc/orc-tools/1.2.3/orc-tools-1.2.3-uber.jar")
+        .to be_detected_from(
+          "https://search.maven.org/remotecontent?filepath=org/apache/orc/orc-tools/1.2.3/orc-tools-1.2.3-uber.jar",
+        )
     end
 
     specify "apache version style" do
       expect(described_class.create("1.2.0-rc2"))
-        .to be_detected_from("https://www.apache.org/dyn/closer.cgi?path=/cassandra/1.2.0/apache-cassandra-1.2.0-rc2-bin.tar.gz")
+        .to be_detected_from(
+          "https://www.apache.org/dyn/closer.cgi?path=/cassandra/1.2.0/apache-cassandra-1.2.0-rc2-bin.tar.gz",
+        )
     end
 
     specify "jpeg version style" do
@@ -556,7 +568,9 @@ describe Version do
 
     specify "cmucl version style" do
       expect(described_class.create("20c"))
-        .to be_detected_from("https://common-lisp.net/project/cmucl/downloads/release/20c/cmucl-20c-x86-darwin.tar.bz2")
+        .to be_detected_from(
+          "https://common-lisp.net/project/cmucl/downloads/release/20c/cmucl-20c-x86-darwin.tar.bz2",
+        )
     end
 
     specify "fann version style" do
@@ -581,7 +595,9 @@ describe Version do
 
     specify "suite3270 version style" do
       expect(described_class.create("3.3.12ga7"))
-        .to be_detected_from("https://downloads.sourceforge.net/project/x3270/x3270/3.3.12ga7/suite3270-3.3.12ga7-src.tgz")
+        .to be_detected_from(
+          "https://downloads.sourceforge.net/project/x3270/x3270/3.3.12ga7/suite3270-3.3.12ga7-src.tgz",
+        )
     end
 
     specify "wwwoffle version style" do
@@ -596,12 +612,17 @@ describe Version do
 
     specify "fontforge version style" do
       expect(described_class.create("20120731"))
-        .to be_detected_from("https://downloads.sourceforge.net/project/fontforge/fontforge-source/fontforge_full-20120731-b.tar.bz2")
+        .to be_detected_from(
+          "https://downloads.sourceforge.net/project/fontforge/fontforge-source/fontforge_full-20120731-b.tar.bz2",
+        )
     end
 
     specify "ezlupdate version style" do
       expect(described_class.create("2011.10"))
-        .to be_detected_from("https://github.com/downloads/ezsystems/ezpublish-legacy/ezpublish_community_project-2011.10-with_ezc.tar.bz2")
+        .to be_detected_from(
+          "https://github.com/downloads/ezsystems" \
+          "/ezpublish-legacy/ezpublish_community_project-2011.10-with_ezc.tar.bz2",
+        )
     end
 
     specify "aespipe version style" do

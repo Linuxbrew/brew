@@ -42,7 +42,13 @@ module Hbc
             path
           end
 
-          command.run!(executable, **args, env: { "PATH" => PATH.new(HOMEBREW_PREFIX/"bin", HOMEBREW_PREFIX/"sbin", ENV["PATH"]) })
+          command.run!(
+            executable,
+            **args,
+            env: { "PATH" => PATH.new(
+              HOMEBREW_PREFIX/"bin", HOMEBREW_PREFIX/"sbin", ENV["PATH"]
+            ) },
+          )
         end
       end
 
@@ -60,7 +66,10 @@ module Hbc
         end
 
         unless args.keys.count == 1
-          raise CaskInvalidError.new(cask, "invalid 'installer' stanza: Only one of #{VALID_KEYS.inspect} is permitted.")
+          raise CaskInvalidError.new(
+            cask,
+            "invalid 'installer' stanza: Only one of #{VALID_KEYS.inspect} is permitted.",
+          )
         end
 
         args.assert_valid_keys!(*VALID_KEYS)

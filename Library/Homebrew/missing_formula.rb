@@ -136,7 +136,9 @@ module Homebrew
             end
           end
 
-          log_command = "git log --since='1 month ago' --diff-filter=D --name-only --max-count=1 --format=%H\\\\n%h\\\\n%B -- #{relative_path}"
+          log_command = "git log --since='1 month ago' --diff-filter=D " \
+                        "--name-only --max-count=1 " \
+                        "--format=%H\\\\n%h\\\\n%B -- #{relative_path}"
           hash, short_hash, *commit_message, relative_path =
             Utils.popen_read(log_command).gsub("\\n", "\n").lines.map(&:chomp)
 

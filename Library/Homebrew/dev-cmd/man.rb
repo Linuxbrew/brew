@@ -66,18 +66,24 @@ module Homebrew
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
     variables[:developer_commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
     readme = HOMEBREW_REPOSITORY/"README.md"
-    variables[:lead_maintainer] = readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
-                                        .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:leadership] = readme.read[/(Homebrew's project leadership committee .*\.)/, 1]
-                                   .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:brew_maintainers] = readme.read[%r{(Homebrew/brew's other current maintainers .*\.)}, 1]
-                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:linux_maintainers] = readme.read[%r{(Homebrew/brew's Linux support \(and Linuxbrew\) maintainers are .*\.)}, 1]
-                                          .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:core_maintainers] = readme.read[%r{(Homebrew/homebrew-core's other current maintainers .*\.)}, 1]
-                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
-                                           .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:lead_maintainer] =
+      readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:leadership] =
+      readme.read[/(Homebrew's project leadership committee .*\.)/, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:brew_maintainers] =
+      readme.read[%r{(Homebrew/brew's other current maintainers .*\.)}, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:linux_maintainers] =
+      readme.read[%r{(Homebrew/brew's Linux support \(and Linuxbrew\) maintainers are .*\.)}, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:core_maintainers] =
+      readme.read[%r{(Homebrew/homebrew-core's other current maintainers .*\.)}, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:former_maintainers] =
+      readme.read[/(Former maintainers .*\.)/, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
     variables[:homebrew_bundle] = help_output(:bundle)
     variables[:homebrew_services] = help_output(:services)

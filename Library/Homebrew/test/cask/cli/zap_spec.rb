@@ -27,28 +27,4 @@ describe Hbc::CLI::Zap, :cask do
     expect(transmission).not_to be_installed
     expect(Hbc::Config.global.appdir.join("Transmission.app")).not_to be_a_symlink
   end
-
-  # TODO: Explicit test that both zap and uninstall directives get dispatched.
-  #       The above tests that implicitly.
-  #
-  # it "dispatches both uninstall and zap stanzas" do
-  #   with_zap = Hbc::CaskLoader.load('with-zap')
-  #
-  #   Hbc::Installer.new(with_zap).install
-  #
-  #   with_zap.must_be :installed?
-  #
-  #   FakeSystemCommand.stubs_command(['/usr/bin/sudo', '-E', '--', '/usr/bin/osascript', '-e', 'tell application "System Events" to count processes whose bundle identifier is "my.fancy.package.app"'], '1')
-  #   FakeSystemCommand.stubs_command(['/usr/bin/sudo', '-E', '--', '/usr/bin/osascript', '-e', 'tell application id "my.fancy.package.app" to quit'])
-  #   FakeSystemCommand.stubs_command(['/usr/bin/sudo', '-E', '--', '/usr/bin/osascript', '-e', 'tell application "System Events" to count processes whose bundle identifier is "my.fancy.package.app.from.uninstall"'], '1')
-  #   FakeSystemCommand.stubs_command(['/usr/bin/sudo', '-E', '--', '/usr/bin/osascript', '-e', 'tell application id "my.fancy.package.app.from.uninstall" to quit'])
-  #
-  #   FakeSystemCommand.expects_command(['/usr/bin/sudo', '-E', '--', with_zap.staged_path.join('MyFancyPkg','FancyUninstaller.tool'), '--please'])
-  #   FakeSystemCommand.expects_command(['/usr/bin/sudo', '-E', '--', '/bin/rm', '-rf', '--',
-  #                                             Pathname.new('~/Library/Preferences/my.fancy.app.plist').expand_path])
-  #
-  #   Hbc::CLI::Zap.run('with-zap')
-  #
-  #   with_zap.wont_be :installed?
-  # end
 end

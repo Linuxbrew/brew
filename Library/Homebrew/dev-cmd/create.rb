@@ -79,7 +79,11 @@ module Homebrew
     # unless --force is specified.
     unless args.force?
       if reason = MissingFormula.blacklisted_reason(fc.name)
-        raise "#{fc.name} is blacklisted for creation.\n#{reason}\nIf you really want to create this formula use --force."
+        raise <<~EOS
+          #{fc.name} is blacklisted for creation.
+          #{reason}
+          If you really want to create this formula use --force.
+        EOS
       end
 
       if Formula.aliases.include? fc.name

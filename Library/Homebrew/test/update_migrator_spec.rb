@@ -54,7 +54,9 @@ describe UpdateMigrator do
     }
     let(:old_cache_file) { HOMEBREW_CACHE/"#{formula_name}--1.2.3.tar.gz" }
     let(:new_cache_symlink) { HOMEBREW_CACHE/"#{formula_name}--1.2.3.tar.gz" }
-    let(:new_cache_file) { HOMEBREW_CACHE/"downloads/5994e3a27baa3f448a001fb071ab1f0bf25c87aebcb254d91a6d0b02f46eef86--foo-1.2.3.tar.gz" }
+    let(:new_cache_file) {
+      HOMEBREW_CACHE/"downloads/5994e3a27baa3f448a001fb071ab1f0bf25c87aebcb254d91a6d0b02f46eef86--foo-1.2.3.tar.gz"
+    }
 
     before(:each) do
       old_cache_file.dirname.mkpath

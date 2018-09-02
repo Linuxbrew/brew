@@ -57,7 +57,9 @@ describe Hbc::Pkg, :cask do
     it "removes broken symlinks" do
       fake_root = mktmpdir
       fake_dir  = mktmpdir
-      fake_file = fake_dir.join("ima_file").tap { |path| FileUtils.touch(path) }
+      fake_file = fake_dir.join("ima_file").tap do |path|
+        FileUtils.touch(path)
+      end
 
       intact_symlink = fake_dir.join("intact_symlink").tap { |path| path.make_symlink(fake_file) }
       broken_symlink = fake_dir.join("broken_symlink").tap { |path| path.make_symlink("im_nota_file") }

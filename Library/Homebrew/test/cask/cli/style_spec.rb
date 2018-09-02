@@ -61,7 +61,10 @@ describe Hbc::CLI::Style, :cask do
     end
 
     specify "`rubocop-cask` supports `HOMEBREW_RUBOCOP_VERSION`", :needs_network do
-      stdout, status = Open3.capture2("gem", "dependency", "rubocop-cask", "--version", HOMEBREW_RUBOCOP_CASK_VERSION, "--pipe", "--remote")
+      stdout, status = Open3.capture2(
+        "gem", "dependency", "rubocop-cask",
+        "--version", HOMEBREW_RUBOCOP_CASK_VERSION, "--pipe", "--remote"
+      )
 
       expect(status).to be_a_success
 
@@ -89,7 +92,10 @@ describe Hbc::CLI::Style, :cask do
         end
       end
 
-      it { is_expected.to contain_exactly(a_path_ending_with("/homebrew/homebrew-cask/Casks"), a_path_ending_with("/third-party/homebrew-tap/Casks")) }
+      it {
+        is_expected.to contain_exactly(a_path_ending_with("/homebrew/homebrew-cask/Casks"),
+                                       a_path_ending_with("/third-party/homebrew-tap/Casks"))
+      }
     end
 
     context "when at least one cask token is a path that exists" do

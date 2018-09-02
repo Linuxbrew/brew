@@ -178,48 +178,87 @@ module Homebrew
 
     replacement_pairs = []
     if requested_spec == :stable && formula.revision.nonzero?
-      replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
+      replacement_pairs << [
+        /^  revision \d+\n(\n(  head "))?/m,
+        "\\2",
+      ]
     end
 
     replacement_pairs += formula_spec.mirrors.map do |mirror|
-      [/ +mirror \"#{Regexp.escape(mirror)}\"\n/m, ""]
+      [
+        / +mirror \"#{Regexp.escape(mirror)}\"\n/m,
+        "",
+      ]
     end
 
     replacement_pairs += if new_url_hash
       [
-        [/#{Regexp.escape(formula_spec.url)}/, new_url],
-        [old_hash, new_hash],
+        [
+          /#{Regexp.escape(formula_spec.url)}/,
+          new_url,
+        ],
+        [
+          old_hash,
+          new_hash,
+        ],
       ]
     else
       [
-        [formula_spec.specs[:tag], new_tag],
-        [formula_spec.specs[:revision], new_revision],
+        [
+          formula_spec.specs[:tag],
+          new_tag,
+        ],
+        [
+          formula_spec.specs[:revision],
+          new_revision,
+        ],
       ]
     end
 
     backup_file = File.read(formula.path) unless args.dry_run?
 
     if new_mirror
-      replacement_pairs << [/^( +)(url \"#{Regexp.escape(new_url)}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
+      replacement_pairs << [
+        /^( +)(url \"#{Regexp.escape(new_url)}\"\n)/m,
+        "\\1\\2\\1mirror \"#{new_mirror}\"\n",
+      ]
     end
 
     if forced_version && forced_version != "0"
       if requested_spec == :stable
         if File.read(formula.path).include?("version \"#{old_formula_version}\"")
-          replacement_pairs << [old_formula_version.to_s, forced_version]
+          replacement_pairs << [
+            old_formula_version.to_s,
+            forced_version,
+          ]
         elsif new_mirror
-          replacement_pairs << [/^( +)(mirror \"#{new_mirror}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+          replacement_pairs << [
+            /^( +)(mirror \"#{new_mirror}\"\n)/m,
+            "\\1\\2\\1version \"#{forced_version}\"\n",
+          ]
         else
-          replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+          replacement_pairs << [
+            /^( +)(url \"#{new_url}\"\n)/m,
+            "\\1\\2\\1version \"#{forced_version}\"\n",
+          ]
         end
       elsif requested_spec == :devel
-        replacement_pairs << [/(  devel do.+?version \")#{old_formula_version}(\"\n.+?end\n)/m, "\\1#{forced_version}\\2"]
+        replacement_pairs << [
+          /(  devel do.+?version \")#{old_formula_version}(\"\n.+?end\n)/m,
+          "\\1#{forced_version}\\2",
+        ]
       end
     elsif forced_version && forced_version == "0"
       if requested_spec == :stable
-        replacement_pairs << [/^  version \"[\w\.\-\+]+\"\n/m, ""]
+        replacement_pairs << [
+          /^  version \"[\w\.\-\+]+\"\n/m,
+          "",
+        ]
       elsif requested_spec == :devel
-        replacement_pairs << [/(  devel do.+?)^ +version \"[^\n]+\"\n(.+?end\n)/m, "\\1\\2"]
+        replacement_pairs << [
+          /(  devel do.+?)^ +version \"[^\n]+\"\n(.+?end\n)/m,
+          "\\1\\2",
+        ]
       end
     end
     new_contents = inreplace_pairs(formula.path, replacement_pairs)
@@ -270,7 +309,8 @@ module Homebrew
         ohai "fork repository with GitHub API"
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
-        ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
+        ohai "git commit --no-edit --verbose --message='#{formula.name} " \
+             "#{new_formula_version}#{devel_message}' -- #{formula.path}"
         ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
         ohai "create pull request with GitHub API"
         ohai "git checkout -"
