@@ -49,6 +49,10 @@ module Homebrew
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if args.generic?
       ENV["HOMEBREW_TEST_ONLINE"] = "1" if args.online?
 
+      # Avoid local configuration messing with tests e.g. git being configured
+      # to use GPG to sign by default
+      ENV["HOME"] = "#{HOMEBREW_LIBRARY_PATH}/test"
+
       if args.coverage?
         ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
         FileUtils.rm_f "test/coverage/.resultset.json"
