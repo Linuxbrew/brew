@@ -19,15 +19,18 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://search.mcpan.org/CPAN/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-0.003.tar.gz",
-        "msg" => "http://search.mcpan.org/CPAN/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-0.003.tar.gz should be `https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-0.003.tar.gz`",
+        "msg" => "http://search.mcpan.org/CPAN/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-0.003.tar.gz should be " \
+                 "`https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-0.003.tar.gz`",
         "col" => 2,
       }, {
         "url" => "http://ftp.gnome.org/pub/GNOME/binaries/mac/banshee/banshee-2.macosx.intel.dmg",
-        "msg" => "http://ftp.gnome.org/pub/GNOME/binaries/mac/banshee/banshee-2.macosx.intel.dmg should be `https://download.gnome.org/binaries/mac/banshee/banshee-2.macosx.intel.dmg`",
+        "msg" => "http://ftp.gnome.org/pub/GNOME/binaries/mac/banshee/banshee-2.macosx.intel.dmg should be " \
+                 "`https://download.gnome.org/binaries/mac/banshee/banshee-2.macosx.intel.dmg`",
         "col" => 2,
       }, {
         "url" => "git://anonscm.debian.org/users/foo/foostrap.git",
-        "msg" => "git://anonscm.debian.org/users/foo/foostrap.git should be `https://anonscm.debian.org/git/users/foo/foostrap.git`",
+        "msg" => "git://anonscm.debian.org/users/foo/foostrap.git should be " \
+                 "`https://anonscm.debian.org/git/users/foo/foostrap.git`",
         "col" => 2,
       }, {
         "url" => "ftp://ftp.mirrorservice.org/foo-1.tar.gz",
@@ -39,15 +42,18 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://sourceforge.net/projects/something/files/Something-1.2.3.dmg",
-        "msg" => "Use https://downloads.sourceforge.net to get geolocation (url is http://sourceforge.net/projects/something/files/Something-1.2.3.dmg).",
+        "msg" => "Use https://downloads.sourceforge.net to get geolocation (url is " \
+                 "http://sourceforge.net/projects/something/files/Something-1.2.3.dmg).",
         "col" => 2,
       }, {
         "url" => "https://downloads.sourceforge.net/project/foo/download",
-        "msg" => "Don't use /download in SourceForge urls (url is https://downloads.sourceforge.net/project/foo/download).",
+        "msg" => "Don't use /download in SourceForge urls (url is " \
+                 "https://downloads.sourceforge.net/project/foo/download).",
         "col" => 2,
       }, {
         "url" => "https://sourceforge.net/project/foo",
-        "msg" => "Use https://downloads.sourceforge.net to get geolocation (url is https://sourceforge.net/project/foo).",
+        "msg" => "Use https://downloads.sourceforge.net to get geolocation " \
+                 "(url is https://sourceforge.net/project/foo).",
         "col" => 2,
       }, {
         "url" => "http://prdownloads.sourceforge.net/foo/foo-1.tar.gz",
@@ -58,7 +64,8 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://foo.dl.sourceforge.net/sourceforge/foozip/foozip_1.0.tar.bz2",
-        "msg" => "Don't use specific dl mirrors in SourceForge urls (url is http://foo.dl.sourceforge.net/sourceforge/foozip/foozip_1.0.tar.bz2).",
+        "msg" => "Don't use specific dl mirrors in SourceForge urls (url is " \
+                 "http://foo.dl.sourceforge.net/sourceforge/foozip/foozip_1.0.tar.bz2).",
         "col" => 2,
       }, {
         "url" => "http://downloads.sourceforge.net/project/foo/foo/2/foo-2.zip",
@@ -107,7 +114,8 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "https://central.maven.org/maven2/com/bar/foo/1.1/foo-1.1.jar",
-        "msg" => "https://central.maven.org/maven2/com/bar/foo/1.1/foo-1.1.jar should be `https://search.maven.org/remotecontent?filepath=com/bar/foo/1.1/foo-1.1.jar`",
+        "msg" => "https://central.maven.org/maven2/com/bar/foo/1.1/foo-1.1.jar should be " \
+                 "`https://search.maven.org/remotecontent?filepath=com/bar/foo/1.1/foo-1.1.jar`",
         "col" => 2,
       }]
       formulas.each do |formula|

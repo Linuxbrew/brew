@@ -399,7 +399,10 @@ module Homebrew
           if @new_formula && dep_f.keg_only_reason &&
              !["openssl", "apr", "apr-util"].include?(dep.name) &&
              dep_f.keg_only_reason.reason == :provided_by_macos
-            new_formula_problem "Dependency '#{dep.name}' may be unnecessary as it is provided by macOS; try to build this formula without it."
+            new_formula_problem(
+              "Dependency '#{dep.name}' may be unnecessary as it is provided " \
+              "by macOS; try to build this formula without it.",
+            )
           end
 
           dep.options.each do |opt|
@@ -572,7 +575,10 @@ module Homebrew
 
         next if spec.patches.empty?
         next unless @new_formula
-        new_formula_problem "Formulae should not require patches to build. Patches should be submitted and accepted upstream first."
+        new_formula_problem(
+          "Formulae should not require patches to build. " \
+          "Patches should be submitted and accepted upstream first.",
+        )
       end
 
       %w[Stable Devel].each do |name|
@@ -693,7 +699,11 @@ module Homebrew
         next unless spec = formula.send(spec_sym)
         next unless previous_version_and_checksum[spec_sym][:version] == spec.version
         next if previous_version_and_checksum[spec_sym][:checksum] == spec.checksum
-        problem "#{spec_sym}: sha256 changed without the version also changing; please create an issue upstream to rule out malicious circumstances and to find out why the file changed."
+        problem(
+          "#{spec_sym}: sha256 changed without the version also changing; " \
+          "please create an issue upstream to rule out malicious " \
+          "circumstances and to find out why the file changed.",
+        )
       end
 
       attributes = [:revision, :version_scheme]
@@ -795,7 +805,10 @@ module Homebrew
 
       # Prefer formula path shortcuts in Pathname+
       if line =~ %r{\(\s*(prefix\s*\+\s*(['"])(bin|include|libexec|lib|sbin|share|Frameworks)[/'"])}
-        problem "\"(#{Regexp.last_match(1)}...#{Regexp.last_match(2)})\" should be \"(#{Regexp.last_match(3).downcase}+...)\""
+        problem(
+          "\"(#{Regexp.last_match(1)}...#{Regexp.last_match(2)})\" should" \
+          " be \"(#{Regexp.last_match(3).downcase}+...)\"",
+        )
       end
 
       problem "Use separate make calls" if line.include?("make && make")

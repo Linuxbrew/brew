@@ -243,7 +243,10 @@ describe Tab do
     end
 
     it "raises a parse exception message including the Tab filename" do
-      expect { described_class.from_file_content("''", "receipt.json") }.to raise_error(JSON::ParserError, /receipt.json:/)
+      expect { described_class.from_file_content("''", "receipt.json") }.to raise_error(
+        JSON::ParserError,
+        /receipt.json:/,
+      )
     end
   end
 

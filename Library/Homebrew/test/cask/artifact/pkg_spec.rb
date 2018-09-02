@@ -57,7 +57,11 @@ describe Hbc::Artifact::Pkg, :cask do
 
       expect(fake_system_command).to receive(:run!).with(
         "/usr/sbin/installer",
-        args: ["-pkg", cask.staged_path.join("MyFancyPkg", "Fancy.pkg"), "-target", "/", "-applyChoiceChangesXML", cask.staged_path.join("/tmp/choices.xml")],
+        args: [
+          "-pkg", cask.staged_path.join("MyFancyPkg", "Fancy.pkg"),
+          "-target", "/", "-applyChoiceChangesXML",
+          cask.staged_path.join("/tmp/choices.xml")
+        ],
         sudo: true,
         print_stdout: true,
         env: {

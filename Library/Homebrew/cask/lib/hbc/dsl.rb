@@ -263,7 +263,8 @@ module Hbc
     ORDINARY_ARTIFACT_CLASSES.each do |klass|
       define_method(klass.dsl_key) do |*args|
         begin
-          if [*artifacts.map(&:class), klass].include?(Artifact::StageOnly) && (artifacts.map(&:class) & ACTIVATABLE_ARTIFACT_CLASSES).any?
+          if [*artifacts.map(&:class), klass].include?(Artifact::StageOnly) &&
+             (artifacts.map(&:class) & ACTIVATABLE_ARTIFACT_CLASSES).any?
             raise CaskInvalidError.new(cask, "'stage_only' must be the only activatable artifact.")
           end
 

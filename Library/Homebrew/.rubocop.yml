@@ -51,8 +51,8 @@ Metrics/CyclomaticComplexity:
   Max: 75
 
 Metrics/LineLength:
-  # 124 is the goal as GitHub diff UI wraps beyond that
-  Max: 244
+  # 118 is the goal as GitHub diff UI wraps beyond that
+  Max: 118
   # ignore manpage comments
   IgnoredPatterns: ['#: ']
 

@@ -130,7 +130,8 @@ describe Hbc::Cask, :cask do
 
       shared_examples ":latest cask" do |greedy, tap_version, expectations|
         expectations.each do |installed_version, expected_output|
-          context "when versions #{installed_version} are installed and the tap version is #{tap_version}, #{greedy ? "" : "not"} greedy" do
+          context "when versions #{installed_version} are installed and the " \
+                  "tap version is #{tap_version}, #{"not" unless greedy} greedy" do
             subject { cask.outdated_versions greedy }
 
             it {

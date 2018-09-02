@@ -234,13 +234,21 @@ describe CurlDownloadStrategy do
     subject { described_class.new(url, name, version, **specs).cached_location }
 
     context "when URL ends with file" do
-      it { is_expected.to eq(HOMEBREW_CACHE/"downloads/3d1c0ae7da22be9d83fb1eb774df96b7c4da71d3cf07e1cb28555cf9a5e5af70--foo.tar.gz") }
+      it {
+        is_expected.to eq(
+          HOMEBREW_CACHE/"downloads/3d1c0ae7da22be9d83fb1eb774df96b7c4da71d3cf07e1cb28555cf9a5e5af70--foo.tar.gz",
+        )
+      }
     end
 
     context "when URL file is in middle" do
       let(:url) { "https://example.com/foo.tar.gz/from/this/mirror" }
 
-      it { is_expected.to eq(HOMEBREW_CACHE/"downloads/1ab61269ba52c83994510b1e28dd04167a2f2e8393a35a9c50c1f7d33fd8f619--foo.tar.gz") }
+      it {
+        is_expected.to eq(
+          HOMEBREW_CACHE/"downloads/1ab61269ba52c83994510b1e28dd04167a2f2e8393a35a9c50c1f7d33fd8f619--foo.tar.gz",
+        )
+      }
     end
   end
 
@@ -282,7 +290,12 @@ describe CurlDownloadStrategy do
 
       it "adds the appropriate curl args" do
         expect(subject).to receive(:system_command!) { |*, args:, **|
-          expect(args.each_cons(2).to_a).to include(["--user-agent", a_string_matching(/Mozilla.*Mac OS X 10.*AppleWebKit/)])
+          expect(args.each_cons(2).to_a).to include(
+            [
+              "--user-agent",
+              a_string_matching(/Mozilla.*Mac OS X 10.*AppleWebKit/),
+            ],
+          )
         }
 
         subject.fetch
@@ -505,8 +518,8 @@ describe SubversionDownloadStrategy do
 
       it "adds the appropriate svn args" do
         expect(subject).to receive(:system_command!)
-          .with("svn", args: array_including("--trust-server-cert", "--non-interactive"))
-
+          .with("svn", args: array_including("--trust-server-cert",
+                                             "--non-interactive"))
         subject.fetch
       end
     end

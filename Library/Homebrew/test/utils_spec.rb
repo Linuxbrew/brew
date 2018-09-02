@@ -261,7 +261,10 @@ describe "globally-scoped helper methods" do
           caller: ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
           disable: true
         )
-      }.to raise_error(MethodDeprecatedError, %r{method.*replacement.*homebrew/core.*\/Taps\/homebrew\/homebrew-core\/}m)
+      }.to raise_error(
+        MethodDeprecatedError,
+        %r{method.*replacement.*homebrew/core.*\/Taps\/homebrew\/homebrew-core\/}m,
+      )
     end
   end
 

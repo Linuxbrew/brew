@@ -92,7 +92,9 @@ module Homebrew
         system(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", *args)
         !$CHILD_STATUS.success?
       when :json
-        json, err, status = Open3.capture3(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", "--format", "json", *args)
+        json, err, status =
+          Open3.capture3(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_",
+                         "--format", "json", *args)
         # exit status of 1 just means violations were found; other numbers mean
         # execution errors.
         # exitstatus can also be nil if RuboCop process crashes, e.g. due to
@@ -148,7 +150,8 @@ module Homebrew
 
       def to_s(options = {})
         if options[:display_cop_name]
-          "#{severity_code}: #{location.to_short_s}: #{cop_name}: #{Tty.green}#{correction_status}#{Tty.reset}#{message}"
+          "#{severity_code}: #{location.to_short_s}: #{cop_name}: " \
+          "#{Tty.green}#{correction_status}#{Tty.reset}#{message}"
         else
           "#{severity_code}: #{location.to_short_s}: #{Tty.green}#{correction_status}#{Tty.reset}#{message}"
         end

@@ -38,8 +38,11 @@ RUBY_PATH = Pathname.new(RbConfig.ruby)
 RUBY_BIN = RUBY_PATH.dirname
 
 HOMEBREW_USER_AGENT_CURL = ENV["HOMEBREW_USER_AGENT_CURL"]
-HOMEBREW_USER_AGENT_RUBY = "#{ENV["HOMEBREW_USER_AGENT"]} ruby/#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}".freeze
-HOMEBREW_USER_AGENT_FAKE_SAFARI = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Version/10.0.3 Safari/602.4.8".freeze
+HOMEBREW_USER_AGENT_RUBY =
+  "#{ENV["HOMEBREW_USER_AGENT"]} ruby/#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}".freeze
+HOMEBREW_USER_AGENT_FAKE_SAFARI =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 " \
+  "(KHTML, like Gecko) Version/10.0.3 Safari/602.4.8".freeze
 
 # Bintray fallback is here for people auto-updating from a version where
 # HOMEBREW_BOTTLE_DEFAULT_DOMAIN isn't set.
