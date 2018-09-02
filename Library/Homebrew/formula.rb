@@ -1120,7 +1120,7 @@ class Formula
 
       begin
         yield self, staging
-      rescue StandardError
+      rescue
         staging.retain! if ARGV.interactive? || ARGV.debug?
         raise
       ensure
@@ -1373,7 +1373,7 @@ class Formula
     files.each do |file|
       begin
         yield Formulary.factory(file)
-      rescue StandardError => e
+      rescue => e
         # Don't let one broken formula break commands. But do complain.
         onoe "Failed to import: #{file}"
         puts e
@@ -1812,7 +1812,9 @@ class Formula
 
     @exec_count ||= 0
     @exec_count += 1
-    logfn = format("#{logs}/#{active_log_prefix}%02d.%s", @exec_count, File.basename(cmd).split(" ").first)
+    logfn = format("#{logs}/#{active_log_prefix}%02<exec_count>d.%{cmd_base}",
+                   exec_count: @exec_count,
+                   cmd_base: File.basename(cmd).split(" ").first)
     logs.mkpath
 
     File.open(logfn, "w") do |log|
@@ -2006,7 +2008,7 @@ class Formula
     $stdout.reopen(out)
     $stderr.reopen(out)
     out.close
-    args.collect!(&:to_s)
+    args.map!(&:to_s)
     begin
       exec(cmd, *args)
     rescue

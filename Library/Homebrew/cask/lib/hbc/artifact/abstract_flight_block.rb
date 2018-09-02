@@ -30,7 +30,7 @@ module Hbc
 
       def class_for_dsl_key(dsl_key)
         namespace = self.class.name.to_s.sub(/::.*::.*$/, "")
-        self.class.const_get("#{namespace}::DSL::#{dsl_key.to_s.split("_").collect(&:capitalize).join}")
+        self.class.const_get("#{namespace}::DSL::#{dsl_key.to_s.split("_").map(&:capitalize).join}")
       end
 
       def abstract_phase(dsl_key)

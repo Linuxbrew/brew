@@ -10,13 +10,10 @@ AllCops:
     - '**/Casks/**/*'
     - '**/vendor/**/*'
 
+# make rspec formatting more flexible
 Layout/MultilineMethodCallIndentation:
   Exclude:
     - '**/*_spec.rb'
-
-# Gets false positives with our heredocs nested inside arrays
-Layout/ClosingHeredocIndentation:
-  Enabled: false
 
 # so many of these in formulae but none in here
 Lint/AmbiguousRegexpLiteral:
@@ -31,70 +28,101 @@ Lint/NestedMethodDefinition:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: true
 
+# unused keyword arguments improve APIs
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true
 
 # TODO: try to bring down all metrics maximums
 Metrics/AbcSize:
-  Max: 250
-
+  Enabled: true
+  Max: 275
 Metrics/BlockLength:
-  Max: 1250
-
+  Enabled: true
+  Max: 1100
 Metrics/BlockNesting:
+  Enabled: true
   Max: 5
-
 Metrics/ClassLength:
-  Max: 1226
-
+  Enabled: true
+  Max: 1400
 Metrics/CyclomaticComplexity:
+  Enabled: true
   Max: 75
+Metrics/MethodLength:
+  Enabled: true
+  Max: 300
+Metrics/ModuleLength:
+  Enabled: true
+  Max: 500
+Metrics/PerceivedComplexity:
+  Enabled: true
+  Max: 100
 
+# GitHub diff UI wraps beyond 118 characters
 Metrics/LineLength:
-  # 118 is the goal as GitHub diff UI wraps beyond that
   Max: 118
   # ignore manpage comments
   IgnoredPatterns: ['#: ']
 
-Metrics/MethodLength:
-  Max: 195
-
-Metrics/ModuleLength:
-  Max: 222
-
-Metrics/PerceivedComplexity:
-  Max: 100
-
-# we won't change backward compatible method names
-Naming/MethodName:
-  Exclude:
-    - 'compat/**/*'
-
 # we won't change backward compatible predicate names
+# TODO: deprecate whitelisted names and move to compat
 Naming/PredicateName:
   Exclude:
     - 'compat/**/*'
   NameWhitelist: is_32_bit?, is_64_bit?
 
-# f meaning formulae is pretty standard
+# whitelist those that are standard
+# TODO: try to remove some of these
 Naming/UncommunicativeMethodParamName:
-  Enabled: false
+  AllowedNames:
+    - '_'
+    - 'a'
+    - 'b'
+    - 'cc'
+    - 'c1'
+    - 'c2'
+    - 'd'
+    - 'e'
+    - 'f'
+    - 'ff'
+    - 'fn'
+    - 'id'
+    - 'io'
+    - 'o'
+    - 'p'
+    - 'pr'
+    - 'r'
+    - 'rb'
+    - 's'
+    - 'to'
+    - 'v'
 
 # Avoid false positives on modifiers used on symbols of methods
 # See https://github.com/rubocop-hq/rubocop/issues/5953
 Style/AccessModifierDeclarations:
   Enabled: false
 
+# make rspec formatting more flexible
 Style/BlockDelimiters:
   Exclude:
     - '**/*_spec.rb'
     - '**/shared_examples/**/*.rb'
 
+# document our public APIs
+Style/Documentation:
+  Enabled: true
+  Include:
+    - 'Library/Homebrew/formula.rb'
+Style/DocumentationMethod:
+  Enabled: true
+  Include:
+    - 'Library/Homebrew/formula.rb'
+
 # so many of these in formulae but none in here
 Style/GuardClause:
   Enabled: true
 
-# hash-rockets preferred for formulae, a: 1 preferred elsewhere
+# hash-rockets preferred for formulae, a: 1 preferred here
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
 

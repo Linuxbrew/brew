@@ -88,7 +88,7 @@ module Homebrew
       end
 
       json << { name: f.full_name,
-                installed_versions: outdated_versions.collect(&:to_s),
+                installed_versions: outdated_versions.map(&:to_s),
                 current_version: current_version,
                 pinned: f.pinned?,
                 pinned_version: f.pinned_version }

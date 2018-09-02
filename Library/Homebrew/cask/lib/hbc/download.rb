@@ -39,7 +39,7 @@ module Hbc
     def fetch
       downloader.fetch
       @downloaded_path = downloader.cached_location
-    rescue StandardError => e
+    rescue => e
       error = CaskError.new("Download failed on Cask '#{cask}' with message: #{e}")
       error.set_backtrace e.backtrace
       raise error

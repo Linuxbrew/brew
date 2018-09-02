@@ -60,7 +60,7 @@ module Debrew
         if i.positive?
           choice = menu.entries[i - 1]
         else
-          possible = menu.entries.find_all { |e| e.name.start_with?(input) }
+          possible = menu.entries.select { |e| e.name.start_with?(input) }
 
           case possible.size
           when 0 then puts "No such option"

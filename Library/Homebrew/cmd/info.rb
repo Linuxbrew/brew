@@ -182,7 +182,7 @@ module Homebrew
   end
 
   def decorate_dependencies(dependencies)
-    deps_status = dependencies.collect do |dep|
+    deps_status = dependencies.map do |dep|
       if dep.satisfied?([])
         pretty_installed(dep_display_s(dep))
       else
@@ -193,7 +193,7 @@ module Homebrew
   end
 
   def decorate_requirements(requirements)
-    req_status = requirements.collect do |req|
+    req_status = requirements.map do |req|
       req_s = req.display_s
       req.satisfied? ? pretty_installed(req_s) : pretty_uninstalled(req_s)
     end

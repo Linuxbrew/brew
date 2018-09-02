@@ -69,8 +69,8 @@ class Locale
   alias == eql?
 
   def detect(locale_groups)
-    locale_groups.detect { |locales| locales.any? { |locale| eql?(locale) } } ||
-      locale_groups.detect { |locales| locales.any? { |locale| include?(locale) } }
+    locale_groups.find { |locales| locales.any? { |locale| eql?(locale) } } ||
+      locale_groups.find { |locales| locales.any? { |locale| include?(locale) } }
   end
 
   def to_s

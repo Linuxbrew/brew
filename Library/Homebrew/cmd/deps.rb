@@ -151,7 +151,7 @@ module Homebrew
   end
 
   def deps_for_formulae(formulae, recursive = false, &block)
-    formulae.map { |f| deps_for_formula(f, recursive) }.inject(&block)
+    formulae.map { |f| deps_for_formula(f, recursive) }.reduce(&block)
   end
 
   def puts_deps(formulae)

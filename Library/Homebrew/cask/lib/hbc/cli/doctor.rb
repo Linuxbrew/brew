@@ -49,7 +49,7 @@ module Hbc
         if locations.empty?
           puts self.class.none_string
         else
-          locations.collect do |l|
+          locations.map do |l|
             add_error "Legacy install at #{l}. Run \"brew uninstall --force brew-cask\"."
             puts l
           end
@@ -163,7 +163,7 @@ module Hbc
 
       def self.cask_count_for_tap(tap)
         Formatter.pluralize(tap.cask_files.count, "cask")
-      rescue StandardError
+      rescue
         add_error "Unable to read from Tap: #{tap.path}"
         "0"
       end
