@@ -1,23 +1,15 @@
-require "pathname"
 require "English"
 require "json"
 require "json/add/exception"
+require "pathname"
+require "ostruct"
+require "pp"
 
-HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
-
-unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
-  $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.to_s)
-end
+require_relative "load_path"
 
 require "config"
-
-require "English"
-require "ostruct"
-require "messages"
-
-require "pp"
 require "extend/ARGV"
-
+require "messages"
 require "system_command"
 
 ARGV.extend(HomebrewArgvExtension)
