@@ -1,4 +1,4 @@
-require "cask/cli/abstract_command"
+require "cask/cmd/abstract_command"
 require "cleanup"
 
 using CleanupRefinement
