@@ -71,7 +71,7 @@ module UnpackStrategy
     }.fetch(type, type)
 
     begin
-      const_get(type.to_s.split("_").map(&:capitalize).join)
+      const_get(type.to_s.split("_").map(&:capitalize).join.gsub(/\d+[a-z]/, &:upcase))
     rescue NameError
       nil
     end
