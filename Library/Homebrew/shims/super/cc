@@ -17,6 +17,10 @@ def mac?
   RUBY_PLATFORM[/darwin/]
 end
 
+def mojave_or_later?
+  mac? && RUBY_PLATFORM[/darwin\d+/][/\d+/].to_i >= 18
+end
+
 def linux?
   RUBY_PLATFORM[/linux/]
 end
@@ -182,6 +186,9 @@ class Cmd
       "-fuse-linker-plugin", "-frounding-math"
       # clang doesn't support these flags
       args << arg unless tool =~ /^clang/
+    when /-mmacosx-version-min=10\.(\d)/
+      arg = "-mmacosx-version-min=10.6" if mojave_or_later? && $1.to_i < 6
+      args << arg
     when "--fast-math"
       arg = "-ffast-math" if tool =~ /^clang/
       args << arg
