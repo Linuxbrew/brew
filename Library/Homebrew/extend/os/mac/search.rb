@@ -1,5 +1,5 @@
-require "hbc/cask"
-require "hbc/cask_loader"
+require "cask/cask"
+require "cask/cask_loader"
 
 module Homebrew
   module Search

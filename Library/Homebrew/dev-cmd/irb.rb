@@ -46,8 +46,7 @@ module Homebrew
 
     require "formula"
     require "keg"
-
-    require "hbc"
+    require "cask/all"
 
     ohai "Interactive Homebrew Shell"
     puts "Example commands available with: brew irb --examples"

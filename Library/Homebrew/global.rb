@@ -3,10 +3,6 @@ require "English"
 
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
 
-unless $LOAD_PATH.include?("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
-  $LOAD_PATH.push("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
-end
-
 unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
   $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.to_s)
 end

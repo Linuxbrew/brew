@@ -1,6 +1,6 @@
 require "utils/bottles"
 require "formula"
-require "hbc/cask_loader"
+require "cask/cask_loader"
 require "set"
 
 module CleanupRefinement

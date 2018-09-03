@@ -1,4 +1,4 @@
-require "hbc"
+require "cask/all"
 
 module Homebrew
   module_function

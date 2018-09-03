@@ -1,4 +1,4 @@
-require "hbc"
+require "cask/all"
 
 require "test/support/helper/cask/fake_system_command"
 require "test/support/helper/cask/install_helper"

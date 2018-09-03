@@ -1,5 +1,5 @@
-require "test/support/helper/spec/shared_examples/hbc_dsl_base"
-require "test/support/helper/spec/shared_examples/hbc_staged"
+require "test/support/helper/spec/shared_examples/cask_dsl_base"
+require "test/support/helper/spec/shared_examples/cask_staged"
 
 describe Hbc::DSL::UninstallPreflight, :cask do
   let(:cask) { Hbc::CaskLoader.load(cask_path("basic-cask")) }
