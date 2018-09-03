@@ -12,7 +12,6 @@ require "hbc/dsl/caveats"
 require "hbc/dsl/conflicts_with"
 require "hbc/dsl/container"
 require "hbc/dsl/depends_on"
-require "hbc/dsl/gpg"
 require "hbc/dsl/postflight"
 require "hbc/dsl/preflight"
 require "hbc/dsl/uninstall_postflight"
@@ -64,7 +63,6 @@ module Hbc
       :conflicts_with,
       :container,
       :depends_on,
-      :gpg,
       :homepage,
       :language,
       :languages,
@@ -177,10 +175,6 @@ module Hbc
 
     def appcast(*args)
       set_unique_stanza(:appcast, args.empty?) { DSL::Appcast.new(*args) }
-    end
-
-    def gpg(*args)
-      set_unique_stanza(:gpg, args.empty?) { DSL::Gpg.new(*args) }
     end
 
     def container(*args)

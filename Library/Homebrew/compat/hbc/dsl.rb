@@ -1,8 +1,12 @@
 module Hbc
   class DSL
     module Compat
+      def gpg(*)
+        odeprecated "the `gpg` stanza", disable_on: Time.new(2018, 12, 31)
+      end
+
       def license(*)
-        odisabled "Hbc::DSL#license"
+        odisabled "the `license` stanza"
       end
     end
 

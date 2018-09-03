@@ -18,7 +18,7 @@ module Hbc
 
       def verify
         return unless self.class.me?(cask)
-        ohai "Verifying checksum for Cask #{cask}"
+        ohai "Verifying SHA-256 checksum for Cask '#{cask}'."
         verify_checksum
       end
 
@@ -36,7 +36,7 @@ module Hbc
         raise CaskSha256MissingError.new(cask.token, expected, computed) if expected.nil? || expected.empty?
 
         if expected == computed
-          odebug "SHA256 checksums match"
+          odebug "SHA-256 checksums match."
         else
           ohai 'Note: running "brew update" may fix sha256 checksum errors'
           raise CaskSha256MismatchError.new(cask.token, expected, computed, downloaded_path)

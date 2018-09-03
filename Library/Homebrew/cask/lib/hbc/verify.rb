@@ -1,5 +1,4 @@
 require "hbc/verify/checksum"
-require "hbc/verify/gpg"
 
 module Hbc
   module Verify
@@ -7,8 +6,7 @@ module Hbc
 
     def verifications
       [
-        Hbc::Verify::Checksum
-        # TODO: Hbc::Verify::Gpg
+        Hbc::Verify::Checksum,
       ]
     end
 
