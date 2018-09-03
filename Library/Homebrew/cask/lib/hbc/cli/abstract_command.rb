@@ -7,11 +7,12 @@ module Hbc
       include Options
       include Homebrew::Search
 
-      option "--[no-]binaries", :binaries,      true
-      option "--debug",         :debug,         false
-      option "--verbose",       :verbose,       false
-      option "--outdated",      :outdated_only, false
-      option "--require-sha",   :require_sha,   false
+      option "--[no-]binaries",   :binaries,      true
+      option "--debug",           :debug,         false
+      option "--verbose",         :verbose,       false
+      option "--outdated",        :outdated_only, false
+      option "--require-sha",     :require_sha,   false
+      option "--[no-]quarantine", :quarantine,    true
 
       def self.command_name
         @command_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase

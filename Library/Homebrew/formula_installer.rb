@@ -156,8 +156,6 @@ class FormulaInstaller
 
     recursive_deps = formula.recursive_dependencies
     recursive_formulae = recursive_deps.map(&:to_formula)
-    recursive_runtime_formulae =
-      formula.runtime_formula_dependencies(undeclared: false)
 
     recursive_dependencies = []
     recursive_formulae.each do |dep|
@@ -183,32 +181,14 @@ class FormulaInstaller
       EOS
     end
 
-    version_hash = {}
-    version_conflicts = Set.new
-    recursive_runtime_formulae.each do |f|
-      name = f.name
-      unversioned_name, = name.split("@")
-      next if unversioned_name == "python"
-      version_hash[unversioned_name] ||= Set.new
-      version_hash[unversioned_name] << name
-      next if version_hash[unversioned_name].length < 2
-      version_conflicts += version_hash[unversioned_name]
-    end
-    unless version_conflicts.empty?
-      raise CannotInstallFormulaError, <<~EOS
-        #{formula.full_name} contains conflicting version recursive dependencies:
-          #{version_conflicts.to_a.join ", "}
-        View these with `brew deps --tree #{formula.full_name}`.
-      EOS
-    end
-
     pinned_unsatisfied_deps = recursive_deps.select do |dep|
       dep.to_formula.pinned? && !dep.satisfied?(inherited_options_for(dep))
     end
 
     return if pinned_unsatisfied_deps.empty?
     raise CannotInstallFormulaError,
-      "You must `brew unpin #{pinned_unsatisfied_deps * " "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
+      "You must `brew unpin #{pinned_unsatisfied_deps * " "}` as installing " \
+      "#{formula.full_name} requires the latest version of pinned dependencies"
   end
 
   def build_bottle_preinstall
@@ -570,8 +550,9 @@ class FormulaInstaller
     if deps.empty? && only_deps?
       puts "All dependencies for #{formula.full_name} are satisfied."
     elsif !deps.empty?
-      oh1 "Installing dependencies for #{formula.full_name}: #{deps.map(&:first).map(&Formatter.method(:identifier)).join(", ")}",
-        truncate: false
+      oh1 "Installing dependencies for #{formula.full_name}: " \
+          "#{deps.map(&:first).map(&Formatter.method(:identifier)).join(", ")}",
+          truncate: false
       deps.each { |dep, options| install_dependency(dep, options) }
     end
 

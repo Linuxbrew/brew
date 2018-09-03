@@ -182,7 +182,7 @@ module Homebrew
   def _system(cmd, *args, **options)
     pid = fork do
       yield if block_given?
-      args.collect!(&:to_s)
+      args.map!(&:to_s)
       begin
         exec(cmd, *args, **options)
       rescue
@@ -380,7 +380,7 @@ end
 
 # GZips the given paths, and returns the gzipped paths
 def gzip(*paths)
-  paths.collect do |path|
+  paths.map do |path|
     safe_system "gzip", path
     Pathname.new("#{path}.gz")
   end
@@ -426,7 +426,7 @@ def nostdout
 end
 
 def paths
-  @paths ||= PATH.new(ENV["HOMEBREW_PATH"]).collect do |p|
+  @paths ||= PATH.new(ENV["HOMEBREW_PATH"]).map do |p|
     begin
       File.expand_path(p).chomp("/")
     rescue ArgumentError
@@ -496,45 +496,6 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
   out.encode!("UTF-16", invalid: :replace)
   out.encode!("UTF-8")
   out
-end
-
-def migrate_legacy_keg_symlinks_if_necessary
-  legacy_linked_kegs = HOMEBREW_LIBRARY/"LinkedKegs"
-  return unless legacy_linked_kegs.directory?
-
-  HOMEBREW_LINKED_KEGS.mkpath unless legacy_linked_kegs.children.empty?
-  legacy_linked_kegs.children.each do |link|
-    name = link.basename.to_s
-    src = begin
-      link.realpath
-    rescue Errno::ENOENT
-      begin
-        (HOMEBREW_PREFIX/"opt/#{name}").realpath
-      rescue Errno::ENOENT
-        begin
-          Formulary.factory(name).installed_prefix
-        rescue
-          next
-        end
-      end
-    end
-    dst = HOMEBREW_LINKED_KEGS/name
-    dst.unlink if dst.exist?
-    FileUtils.ln_sf(src.relative_path_from(dst.parent), dst)
-  end
-  FileUtils.rm_rf legacy_linked_kegs
-
-  legacy_pinned_kegs = HOMEBREW_LIBRARY/"PinnedKegs"
-  return unless legacy_pinned_kegs.directory?
-
-  HOMEBREW_PINNED_KEGS.mkpath unless legacy_pinned_kegs.children.empty?
-  legacy_pinned_kegs.children.each do |link|
-    name = link.basename.to_s
-    src = link.realpath
-    dst = HOMEBREW_PINNED_KEGS/name
-    FileUtils.ln_sf(src.relative_path_from(dst.parent), dst)
-  end
-  FileUtils.rm_rf legacy_pinned_kegs
 end
 
 # Calls the given block with the passed environment variables

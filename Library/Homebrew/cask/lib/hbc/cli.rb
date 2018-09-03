@@ -94,7 +94,7 @@ module Hbc
       path = PATH.new(tap_cmd_directories, ENV["HOMEBREW_PATH"])
 
       external_ruby_cmd = tap_cmd_directories.map { |d| d/"brewcask-#{command}.rb" }
-                                             .detect(&:file?)
+                                             .find(&:file?)
       external_ruby_cmd ||= which("brewcask-#{command}.rb", path)
 
       if external_ruby_cmd
@@ -126,7 +126,7 @@ module Hbc
     end
 
     def detect_command_and_arguments(*args)
-      command = args.detect do |arg|
+      command = args.find do |arg|
         if self.class.commands.include?(arg)
           true
         else

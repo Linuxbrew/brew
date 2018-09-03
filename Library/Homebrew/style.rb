@@ -92,7 +92,9 @@ module Homebrew
         system(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", *args)
         !$CHILD_STATUS.success?
       when :json
-        json, err, status = Open3.capture3(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", "--format", "json", *args)
+        json, err, status =
+          Open3.capture3(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_",
+                         "--format", "json", *args)
         # exit status of 1 just means violations were found; other numbers mean
         # execution errors.
         # exitstatus can also be nil if RuboCop process crashes, e.g. due to
@@ -119,7 +121,7 @@ module Homebrew
       end
 
       def file_offenses(path)
-        @file_offenses[path.to_s]
+        @file_offenses.fetch(path.to_s, [])
       end
     end
 
@@ -138,11 +140,20 @@ module Homebrew
         @severity[0].upcase
       end
 
+      def corrected?
+        @corrected
+      end
+
+      def correction_status
+        "[Corrected] " if corrected?
+      end
+
       def to_s(options = {})
         if options[:display_cop_name]
-          "#{severity_code}: #{location.to_short_s}: #{cop_name}: #{message}"
+          "#{severity_code}: #{location.to_short_s}: #{cop_name}: " \
+          "#{Tty.green}#{correction_status}#{Tty.reset}#{message}"
         else
-          "#{severity_code}: #{location.to_short_s}: #{message}"
+          "#{severity_code}: #{location.to_short_s}: #{Tty.green}#{correction_status}#{Tty.reset}#{message}"
         end
       end
     end

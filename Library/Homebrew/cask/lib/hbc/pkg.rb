@@ -16,12 +16,26 @@ module Hbc
     def uninstall
       unless pkgutil_bom_files.empty?
         odebug "Deleting pkg files"
-        @command.run!("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "--"], input: pkgutil_bom_files.join("\0"), sudo: true)
+        @command.run!(
+          "/usr/bin/xargs",
+          args: [
+            "-0", "--", "/bin/rm", "--"
+          ],
+          input: pkgutil_bom_files.join("\0"),
+          sudo: true,
+        )
       end
 
       unless pkgutil_bom_specials.empty?
         odebug "Deleting pkg symlinks and special files"
-        @command.run!("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "--"], input: pkgutil_bom_specials.join("\0"), sudo: true)
+        @command.run!(
+          "/usr/bin/xargs",
+          args: [
+            "-0", "--", "/bin/rm", "--"
+          ],
+          input: pkgutil_bom_specials.join("\0"),
+          sudo: true,
+        )
       end
 
       unless pkgutil_bom_dirs.empty?

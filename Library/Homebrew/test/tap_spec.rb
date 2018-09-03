@@ -214,7 +214,9 @@ describe Tap do
       touch subject.path/".git/shallow"
       expect(already_tapped_tap).to be_installed
       wrong_remote = "#{subject.remote}-oops"
-      expect { already_tapped_tap.install clone_target: wrong_remote, full_clone: true }.to raise_error(TapRemoteMismatchError)
+      expect {
+        already_tapped_tap.install clone_target: wrong_remote, full_clone: true
+      }.to raise_error(TapRemoteMismatchError)
     end
 
     it "raises an error when the Tap is already unshallow" do

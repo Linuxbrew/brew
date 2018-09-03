@@ -19,7 +19,7 @@ names, and other aspects of this manual are still subject to change.
 
 ## FREQUENTLY USED COMMANDS
 
-  * `install` [--force] [--skip-cask-deps] [--require-sha] [--language=<iso-language>[,<iso-language> ... ]] <token> [ <token> ... ]:
+  * `install` [--force] [--skip-cask-deps] [--require-sha] [--no-quarantine] [--language=<iso-language>[,<iso-language> ... ]] <token> [ <token> ... ]:
     Install Cask identified by <token>.
 
   * `uninstall` [--force] <token> [ <token> ... ]:
@@ -56,10 +56,11 @@ names, and other aspects of this manual are still subject to change.
   * `edit` <token>:
     Open the given Cask definition file for editing.
 
-  * `fetch` [--force] <token> [ <token> ... ]:
+  * `fetch` [--force] [--no-quarantine] <token> [ <token> ... ]:
     Download remote application files for the given Cask to the local
     cache. With `--force`, force re-download even if the files are already
-    cached.
+    cached. `--no-quarantine` will prevent Gatekeeper from
+    enforcing its security restrictions on the Cask.
 
   * `home` or `homepage` [ <token> ... ]:
     Display the homepage associated with a given Cask in a browser.
@@ -69,11 +70,12 @@ names, and other aspects of this manual are still subject to change.
   * `info` or `abv` <token> [ <token> ... ]:
     Display information about the given Cask.
 
-  * `install` [--force] [--skip-cask-deps] [--require-sha] <token> [ <token> ... ]:
+  * `install` [--force] [--skip-cask-deps] [--require-sha] [--no-quarantine] <token> [ <token> ... ]:
     Install the given Cask. With `--force`, re-install even if the Cask
     appears to be already present. With `--skip-cask-deps`, skip any Cask
     dependencies. `--require-sha` will abort installation if the Cask does not
-    have a checksum defined.
+    have a checksum defined. `--no-quarantine` will prevent Gatekeeper from
+    enforcing its security restrictions on the Cask.
 
     <token> is usually the ID of a Cask,
     but see [OTHER WAYS TO SPECIFY A CASK][] for variations.
@@ -97,7 +99,7 @@ names, and other aspects of this manual are still subject to change.
     `--verbose` forces the display of the outdated and latest version.<br>
     `--quiet` suppresses the display of versions.
 
-  * `reinstall` <token> [ <token> ... ]:
+  * `reinstall` [--no-quarantine] <token> [ <token> ... ]:
     Reinstall the given Cask.
 
   * `search` or `-S` [<text> | /<regexp>/]:
@@ -161,6 +163,10 @@ in a future version.
 
   *  `--require-sha`:
     Abort Cask installation if the Cask does not have a checksum defined.
+
+  *  `--no-quarantine`:
+    Prevent Gatekeeper from enforcing its security restrictions on the Cask.
+    This will let you run it straightaway.
 
   * `--verbose`:
     Give additional feedback during installation.

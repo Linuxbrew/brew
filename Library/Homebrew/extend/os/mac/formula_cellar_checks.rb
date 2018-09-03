@@ -94,4 +94,9 @@ module FormulaCellarChecks
     problem_if_output(check_python_framework_links(formula.lib))
     check_linkage
   end
+
+  def valid_library_extension?(filename)
+    macos_lib_extensions = %w[.dylib .framework]
+    generic_valid_library_extension?(filename) || macos_lib_extensions.include?(filename.extname)
+  end
 end

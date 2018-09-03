@@ -80,11 +80,11 @@ module UnpackStrategy
   def self.from_extension(extension)
     strategies.sort_by { |s| s.extensions.map(&:length).max(0) }
               .reverse
-              .detect { |s| s.extensions.any? { |ext| extension.end_with?(ext) } }
+              .find { |s| s.extensions.any? { |ext| extension.end_with?(ext) } }
   end
 
   def self.from_magic(path)
-    strategies.detect { |s| s.can_extract?(path) }
+    strategies.find { |s| s.can_extract?(path) }
   end
 
   def self.detect(path, extension_only: false, type: nil, ref_type: nil, ref: nil)
@@ -93,7 +93,7 @@ module UnpackStrategy
     if extension_only
       strategy ||= from_extension(path.extname)
       strategy ||= strategies.select { |s| s < Directory || s == Fossil }
-                             .detect { |s| s.can_extract?(path) }
+                             .find { |s| s.can_extract?(path) }
     else
       strategy ||= from_magic(path)
       strategy ||= from_extension(path.extname)

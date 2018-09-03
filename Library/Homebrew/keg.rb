@@ -66,7 +66,9 @@ class Keg
   INFOFILE_RX = %r{info/([^.].*?\.info|dir)$}
   TOP_LEVEL_DIRECTORIES = %w[bin etc include lib sbin share var Frameworks].freeze
   ALL_TOP_LEVEL_DIRECTORIES = (TOP_LEVEL_DIRECTORIES + %w[lib/pkgconfig share/locale share/man opt]).freeze
-  PRUNEABLE_DIRECTORIES = %w[bin etc include lib sbin share opt Frameworks LinkedKegs var/homebrew/linked].map do |dir|
+  PRUNEABLE_DIRECTORIES = %w[
+    bin etc include lib sbin share opt Frameworks LinkedKegs var/homebrew/linked
+  ].map do |dir|
     case dir
     when "LinkedKegs"
       HOMEBREW_LIBRARY/dir
@@ -387,7 +389,7 @@ class Keg
 
   def oldname_opt_record
     @oldname_opt_record ||= if (opt_dir = HOMEBREW_PREFIX/"opt").directory?
-      opt_dir.subdirs.detect do |dir|
+      opt_dir.subdirs.find do |dir|
         dir.symlink? && dir != opt_record && path.parent == dir.resolved_path.parent
       end
     end

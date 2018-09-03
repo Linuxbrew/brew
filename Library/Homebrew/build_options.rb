@@ -65,7 +65,8 @@ class BuildOptions
     include? "devel"
   end
 
-  # True if a {Formula} is being built with {Formula.stable} instead of {Formula.devel} or {Formula.head}. This is the default.
+  # True if a {Formula} is being built with {Formula.stable} instead of {Formula.devel}
+  # or {Formula.head}. This is the default.
   # <pre>args << "--some-beta" if build.devel?</pre>
   def stable?
     !(head? || devel?)

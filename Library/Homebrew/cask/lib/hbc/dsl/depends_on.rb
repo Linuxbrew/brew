@@ -48,7 +48,7 @@ module Hbc
           else
             raise
           end
-        rescue StandardError
+        rescue
           raise "invalid 'depends_on macos' value: #{arg.inspect}"
         end
       end

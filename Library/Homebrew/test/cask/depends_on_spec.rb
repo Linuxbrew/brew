@@ -12,8 +12,11 @@ describe "Satisfy Dependencies and Requirements", :cask do
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-cask-cyclic")) }
 
       it {
-        is_expected.to raise_error(Hbc::CaskCyclicDependencyError,
-        "Cask 'with-depends-on-cask-cyclic' includes cyclic dependencies on other Casks: with-depends-on-cask-cyclic-helper")
+        is_expected.to raise_error(
+          Hbc::CaskCyclicDependencyError,
+          "Cask 'with-depends-on-cask-cyclic' includes cyclic dependencies "\
+          "on other Casks: with-depends-on-cask-cyclic-helper",
+        )
       }
     end
 

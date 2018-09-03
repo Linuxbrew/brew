@@ -7,6 +7,7 @@ require "hbc/cask_dependencies"
 require "hbc/download"
 require "hbc/staged"
 require "hbc/verify"
+require "hbc/quarantine"
 
 require "cgi"
 
@@ -23,7 +24,10 @@ module Hbc
 
     PERSISTENT_METADATA_SUBDIRS = ["gpg"].freeze
 
-    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, binaries: true, verbose: false, require_sha: false, upgrade: false, installed_as_dependency: false)
+    def initialize(cask, command: SystemCommand, force: false,
+                   skip_cask_deps: false, binaries: true, verbose: false,
+                   require_sha: false, upgrade: false,
+                   installed_as_dependency: false, quarantine: true)
       @cask = cask
       @command = command
       @force = force
@@ -34,9 +38,12 @@ module Hbc
       @reinstall = false
       @upgrade = upgrade
       @installed_as_dependency = installed_as_dependency
+      @quarantine = quarantine
     end
 
-    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?, :installed_as_dependency?
+    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?,
+                   :upgrade?, :verbose?, :installed_as_dependency?,
+                   :quarantine?
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
@@ -67,7 +74,7 @@ module Hbc
 
       extract_primary_container
       save_caskfile
-    rescue StandardError => e
+    rescue => e
       purge_versioned_files
       raise e
     end
@@ -86,6 +93,7 @@ module Hbc
       uninstall_existing_cask if @reinstall
 
       oh1 "Installing Cask #{Formatter.identifier(@cask)}"
+      opoo "macOS's Gatekeeper has been disabled for this Cask" unless quarantine?
       stage
       install_artifacts
       enable_accessibility_access
@@ -137,7 +145,7 @@ module Hbc
 
     def download
       odebug "Downloading"
-      @downloaded_path = Download.new(@cask, force: false).perform
+      @downloaded_path = Download.new(@cask, force: false, quarantine: quarantine?).perform
       odebug "Downloaded to -> #{@downloaded_path}"
       @downloaded_path
     end
@@ -176,6 +184,11 @@ module Hbc
       else
         primary_container.extract_nestedly(to: @cask.staged_path, basename: basename, verbose: verbose?)
       end
+
+      return unless quarantine?
+      return unless Quarantine.available?
+
+      Quarantine.propagate(from: @downloaded_path, to: @cask.staged_path, command: @command)
     end
 
     def install_artifacts
@@ -196,7 +209,7 @@ module Hbc
         artifact.install_phase(command: @command, verbose: verbose?, force: force?)
         already_installed_artifacts.unshift(artifact)
       end
-    rescue StandardError => e
+    rescue => e
       begin
         already_installed_artifacts.each do |artifact|
           next unless artifact.respond_to?(:uninstall_phase)
@@ -228,15 +241,23 @@ module Hbc
       if @cask.depends_on.macos.first.is_a?(Array)
         operator, release = @cask.depends_on.macos.first
         unless MacOS.version.send(operator, release)
-          raise CaskError, "Cask #{@cask} depends on macOS release #{operator} #{release}, but you are running release #{MacOS.version}."
+          raise CaskError,
+            "Cask #{@cask} depends on macOS release #{operator} #{release}, " \
+            "but you are running release #{MacOS.version}."
         end
       elsif @cask.depends_on.macos.length > 1
         unless @cask.depends_on.macos.include?(Gem::Version.new(MacOS.version.to_s))
-          raise CaskError, "Cask #{@cask} depends on macOS release being one of [#{@cask.depends_on.macos.map(&:to_s).join(", ")}], but you are running release #{MacOS.version}."
+          raise CaskError,
+            "Cask #{@cask} depends on macOS release being one of " \
+            "[#{@cask.depends_on.macos.map(&:to_s).join(", ")}], " \
+            "but you are running release #{MacOS.version}."
         end
       else
         unless MacOS.version == @cask.depends_on.macos.first
-          raise CaskError, "Cask #{@cask} depends on macOS release #{@cask.depends_on.macos.first}, but you are running release #{MacOS.version}."
+          raise CaskError,
+            "Cask #{@cask} depends on macOS release " \
+            "#{@cask.depends_on.macos.first}, " \
+            "but you are running release #{MacOS.version}."
         end
       end
     end
@@ -248,7 +269,10 @@ module Hbc
         arch[:type] == @current_arch[:type] &&
         Array(arch[:bits]).include?(@current_arch[:bits])
       end
-      raise CaskError, "Cask #{@cask} depends on hardware architecture being one of [#{@cask.depends_on.arch.map(&:to_s).join(", ")}], but you are running #{@current_arch}"
+      raise CaskError,
+        "Cask #{@cask} depends on hardware architecture being one of " \
+        "[#{@cask.depends_on.arch.map(&:to_s).join(", ")}], " \
+        "but you are running #{@current_arch}"
     end
 
     def x11_dependencies
@@ -294,7 +318,13 @@ module Hbc
 
       ohai "Installing Cask dependencies: #{not_installed.map(&:to_s).join(", ")}"
       not_installed.each do |cask|
-        Installer.new(cask, binaries: binaries?, verbose: verbose?, installed_as_dependency: true, force: false).install
+        Installer.new(
+          cask,
+          binaries: binaries?,
+          verbose: verbose?,
+          installed_as_dependency: true,
+          force: false,
+        ).install
       end
     end
 
@@ -336,30 +366,38 @@ module Hbc
       return unless @cask.accessibility_access
       ohai "Enabling accessibility access"
       if MacOS.version <= :mountain_lion
-        @command.run!("/usr/bin/touch",
-                      args: [MacOS.pre_mavericks_accessibility_dotfile],
-                      sudo: true)
+        @command.run!(
+          "/usr/bin/touch",
+          args: [MacOS.pre_mavericks_accessibility_dotfile],
+          sudo: true,
+        )
       elsif MacOS.version <= :yosemite
-        @command.run!("/usr/bin/sqlite3",
-                      args: [
-                        MacOS.tcc_db,
-                        "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
-                      ],
-                      sudo: true)
+        @command.run!(
+          "/usr/bin/sqlite3",
+          args: [
+            MacOS.tcc_db,
+            "INSERT OR REPLACE INTO access " \
+            "VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
+          ],
+          sudo: true,
+        )
       elsif MacOS.version <= :el_capitan
-        @command.run!("/usr/bin/sqlite3",
-                      args: [
-                        MacOS.tcc_db,
-                        "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
-                      ],
-                      sudo: true)
+        @command.run!(
+          "/usr/bin/sqlite3",
+          args: [
+            MacOS.tcc_db,
+            "INSERT OR REPLACE INTO access " \
+            "VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
+          ],
+          sudo: true,
+        )
       else
         opoo <<~EOS
           Accessibility access cannot be enabled automatically on this version of macOS.
           See System Preferences to enable it manually.
         EOS
       end
-    rescue StandardError => e
+    rescue => e
       purge_versioned_files
       raise e
     end
@@ -465,12 +503,12 @@ module Hbc
     end
 
     def backup_path
-      return nil if @cask.staged_path.nil?
+      return if @cask.staged_path.nil?
       Pathname.new "#{@cask.staged_path}.upgrading"
     end
 
     def backup_metadata_path
-      return nil if @cask.metadata_versioned_path.nil?
+      return if @cask.metadata_versioned_path.nil?
       Pathname.new "#{@cask.metadata_versioned_path}.upgrading"
     end
 

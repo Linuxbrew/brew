@@ -102,7 +102,7 @@ module Hbc
       instance_variable_set("@#{stanza}", yield)
     rescue CaskInvalidError
       raise
-    rescue StandardError => e
+    rescue => e
       raise CaskInvalidError.new(cask, "'#{stanza}' stanza failed with: #{e}")
     end
 
@@ -138,7 +138,17 @@ module Hbc
         raise CaskInvalidError.new(cask, "No default language specified.")
       end
 
-      MacOS.languages.map(&Locale.method(:parse)).each do |locale|
+      locales = MacOS.languages
+                     .map do |language|
+                       begin
+                         Locale.parse(language)
+                       rescue Locale::ParserError
+                         nil
+                       end
+                     end
+                     .compact
+
+      locales.each do |locale|
         key = locale.detect(@language_blocks.keys)
 
         next if key.nil?
@@ -253,14 +263,15 @@ module Hbc
     ORDINARY_ARTIFACT_CLASSES.each do |klass|
       define_method(klass.dsl_key) do |*args|
         begin
-          if [*artifacts.map(&:class), klass].include?(Artifact::StageOnly) && (artifacts.map(&:class) & ACTIVATABLE_ARTIFACT_CLASSES).any?
+          if [*artifacts.map(&:class), klass].include?(Artifact::StageOnly) &&
+             (artifacts.map(&:class) & ACTIVATABLE_ARTIFACT_CLASSES).any?
             raise CaskInvalidError.new(cask, "'stage_only' must be the only activatable artifact.")
           end
 
           artifacts.add(klass.from_args(cask, *args))
         rescue CaskInvalidError
           raise
-        rescue StandardError => e
+        rescue => e
           raise CaskInvalidError.new(cask, "invalid '#{klass.dsl_key}' stanza: #{e}")
         end
       end

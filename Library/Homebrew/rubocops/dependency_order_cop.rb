@@ -142,7 +142,9 @@ module RuboCop
 
         def component_problem(c1, c2)
           offending_node(c1)
-          problem "dependency \"#{dependency_name(c1)}\" (line #{line_number(c1)}) should be put before dependency \"#{dependency_name(c2)}\" (line #{line_number(c2)})"
+          problem "dependency \"#{dependency_name(c1)}\" " \
+                  "(line #{line_number(c1)}) should be put before dependency "\
+                  "\"#{dependency_name(c2)}\" (line #{line_number(c2)})"
         end
 
         # Reorder two nodes in the source, using the corrector instance in autocorrect method

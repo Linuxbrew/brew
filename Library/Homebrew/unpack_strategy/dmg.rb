@@ -31,8 +31,10 @@ module UnpackStrategy
         end
 
         def bom
+          # rubocop:disable Style/AsciiComments
           # We need to use `find` here instead of Ruby in order to properly handle
           # file names containing special characters, such as “e” + “´” vs. “é”.
+          # rubocop:enable Style/AsciiComments
           system_command("find", args: [".", "-print0"], chdir: self, print_stderr: false)
             .stdout
             .split("\0")
@@ -90,7 +92,7 @@ module UnpackStrategy
                           args: ["--bom", bomfile.path, "--", path, unpack_dir],
                           verbose: verbose
 
-          FileUtils.chmod "u+w", Pathname.glob(unpack_dir/"**/*").reject(&:symlink?)
+          FileUtils.chmod "u+w", Pathname.glob(unpack_dir/"**/*", File::FNM_DOTMATCH).reject(&:symlink?)
         end
       end
     end
@@ -124,11 +126,16 @@ module UnpackStrategy
       Dir.mktmpdir do |mount_dir|
         mount_dir = Pathname(mount_dir)
 
-        without_eula = system_command "hdiutil",
-                                      args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", mount_dir, path],
-                                      input: "qn\n",
-                                      print_stderr: false,
-                                      verbose: verbose
+        without_eula = system_command(
+          "hdiutil",
+          args: [
+            "attach", "-plist", "-nobrowse", "-readonly", "-noidme",
+            "-mountrandom", mount_dir, path
+          ],
+          input: "qn\n",
+          print_stderr: false,
+          verbose: verbose,
+        )
 
         # If mounting without agreeing to EULA succeeded, there is none.
         plist = if without_eula.success?
@@ -136,13 +143,22 @@ module UnpackStrategy
         else
           cdr_path = mount_dir/path.basename.sub_ext(".cdr")
 
-          system_command! "hdiutil",
-                          args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path],
-                          verbose: verbose
+          system_command!(
+            "hdiutil",
+            args: [
+              "convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path
+            ],
+            verbose: verbose,
+          )
 
-          with_eula = system_command! "hdiutil",
-                                      args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", mount_dir, cdr_path],
-                                      verbose: verbose
+          with_eula = system_command!(
+            "hdiutil",
+            args: [
+              "attach", "-plist", "-nobrowse", "-readonly", "-noidme",
+              "-mountrandom", mount_dir, cdr_path
+            ],
+            verbose: verbose,
+          )
 
           if verbose && !(eula_text = without_eula.stdout).empty?
             ohai "Software License Agreement for '#{path}':"

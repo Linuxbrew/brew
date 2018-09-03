@@ -211,7 +211,8 @@ module OS
       EXECUTABLE_PKG_ID = "com.apple.pkg.CLTools_Executables".freeze
       MAVERICKS_NEW_PKG_ID = "com.apple.pkg.CLTools_Base".freeze # obsolete
       PKG_PATH = "/Library/Developer/CommandLineTools".freeze
-      HEADER_PKG_PATH = "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_:macos_version.pkg".freeze
+      HEADER_PKG_PATH =
+        "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_:macos_version.pkg".freeze
       HEADER_PKG_ID = "com.apple.pkg.macOS_SDK_headers_for_macOS_10.14".freeze
 
       # Returns true even if outdated tools are installed, e.g.

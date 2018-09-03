@@ -144,7 +144,9 @@ describe Hbc::CLI::Uninstall, :cask do
   describe "when Casks in Taps have been renamed or removed" do
     let(:app) { Hbc::Config.global.appdir.join("ive-been-renamed.app") }
     let(:caskroom_path) { Hbc::Caskroom.path.join("ive-been-renamed").tap(&:mkpath) }
-    let(:saved_caskfile) { caskroom_path.join(".metadata", "latest", "timestamp", "Casks").join("ive-been-renamed.rb") }
+    let(:saved_caskfile) {
+      caskroom_path.join(".metadata", "latest", "timestamp", "Casks").join("ive-been-renamed.rb")
+    }
 
     before do
       app.tap(&:mkpath)

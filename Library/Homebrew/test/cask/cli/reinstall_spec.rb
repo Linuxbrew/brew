@@ -10,7 +10,7 @@ describe Hbc::CLI::Reinstall, :cask do
 
     output = Regexp.new <<~EOS
       ==> Downloading file:.*caffeine.zip
-      Already downloaded: .*local-caffeine--1.2.3.zip
+      Already downloaded: .*caffeine.zip
       ==> Verifying checksum for Cask local-caffeine
       ==> Uninstalling Cask local-caffeine
       ==> Backing App 'Caffeine.app' up to '.*Caffeine.app'.

@@ -225,6 +225,15 @@ describe Homebrew::Cleanup do
       expect(incomplete).not_to exist
     end
 
+    it "cleans up 'go_cache'" do
+      go_cache = (HOMEBREW_CACHE/"go_cache")
+      go_cache.mkpath
+
+      subject.cleanup_cache
+
+      expect(go_cache).not_to exist
+    end
+
     it "cleans up 'glide_home'" do
       glide_home = (HOMEBREW_CACHE/"glide_home")
       glide_home.mkpath

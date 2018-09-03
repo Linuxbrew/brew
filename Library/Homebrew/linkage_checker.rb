@@ -20,6 +20,7 @@ class LinkageChecker
     @undeclared_deps  = []
     @unnecessary_deps = []
     @unwanted_system_dylibs = []
+    @version_conflict_deps = []
 
     check_dylibs(rebuild_cache: rebuild_cache)
   end
@@ -53,11 +54,15 @@ class LinkageChecker
     display_items "Missing libraries", @broken_dylibs, puts_output: puts_output
     display_items "Broken dependencies", @broken_deps, puts_output: puts_output
     display_items "Unwanted system libraries", @unwanted_system_dylibs, puts_output: puts_output
+    display_items "Conflicting libraries", @version_conflict_deps, puts_output: puts_output
     puts "No broken library linkage" unless broken_library_linkage?
   end
 
   def broken_library_linkage?
-    !@broken_dylibs.empty? || !@broken_deps.empty? || !@unwanted_system_dylibs.empty?
+    !@broken_dylibs.empty? ||
+      !@broken_deps.empty? ||
+      !@unwanted_system_dylibs.empty? ||
+      !@version_conflict_deps.empty?
   end
 
   private
@@ -152,8 +157,8 @@ class LinkageChecker
     end
 
     if formula
-      @indirect_deps, @undeclared_deps, @unnecessary_deps =
-        check_undeclared_deps
+      @indirect_deps, @undeclared_deps, @unnecessary_deps,
+        @version_conflict_deps = check_formula_deps
       @undeclared_deps -= ["gcc", "glibc"] unless OS.mac?
     end
 
@@ -162,7 +167,7 @@ class LinkageChecker
     store&.update!(keg_files_dylibs: keg_files_dylibs)
   end
 
-  def check_undeclared_deps
+  def check_formula_deps
     filter_out = proc do |dep|
       next true if dep.build?
       next false unless dep.optional? || dep.recommended?
@@ -196,13 +201,25 @@ class LinkageChecker
     unnecessary_deps = declared_deps_full_names.reject do |full_name|
       next true if Formula[full_name].bin.directory?
       name = full_name.split("/").last
-      @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
+      @brewed_dylibs.keys.map { |l| l.split("/").last }.include?(name)
     end
 
     missing_deps = @broken_deps.values.flatten.map { |d| dylib_to_dep(d) }
     unnecessary_deps -= missing_deps
 
-    [indirect_deps, undeclared_deps, unnecessary_deps]
+    version_hash = {}
+    version_conflict_deps = Set.new
+    @brewed_dylibs.keys.each do |l|
+      name = l.split("/").last
+      unversioned_name, = name.split("@")
+      version_hash[unversioned_name] ||= Set.new
+      version_hash[unversioned_name] << name
+      next if version_hash[unversioned_name].length < 2
+      version_conflict_deps += version_hash[unversioned_name]
+    end
+
+    [indirect_deps, undeclared_deps,
+     unnecessary_deps, version_conflict_deps.to_a]
   end
 
   def sort_by_formula_full_name!(arr)

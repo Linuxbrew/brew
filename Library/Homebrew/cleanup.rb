@@ -36,20 +36,27 @@ module CleanupRefinement
     end
 
     def nested_cache?
-      directory? && %w[glide_home java_cache npm_cache gclient_cache].include?(basename.to_s)
+      directory? && %w[go_cache glide_home java_cache npm_cache gclient_cache].include?(basename.to_s)
+    end
+
+    def go_cache_directory?
+      # Go makes its cache contents read-only to ensure cache integrity,
+      # which makes sense but is something we need to undo for cleanup.
+      directory? && %w[go_cache].include?(basename.to_s)
     end
 
     def prune?(days)
       return false unless days
       return true if days.zero?
 
+      return true if symlink? && !exist?
+
       # TODO: Replace with ActiveSupport's `.days.ago`.
       mtime < ((@time ||= Time.now) - days * 60 * 60 * 24)
     end
 
     def stale?(scrub = false)
-      return false unless file?
-
+      return false unless resolved_path.file?
       stale_formula?(scrub) || stale_cask?(scrub)
     end
 
@@ -209,15 +216,30 @@ module Homebrew
       end
     end
 
+    def cleanup_unreferenced_downloads
+      return if dry_run?
+      return unless (cache/"downloads").directory?
+
+      # We can't use `.reject(&:incomplete?) here due to the refinement scope.
+      downloads = (cache/"downloads").children.reject { |path| path.incomplete? } # rubocop:disable Style/SymbolProc
+      referenced_downloads = [cache, cache/"Cask"].select(&:directory?)
+                                                  .flat_map(&:children)
+                                                  .select(&:symlink?)
+                                                  .map(&:resolved_path)
+
+      (downloads - referenced_downloads).each(&:unlink)
+    end
+
     def cleanup_cache(entries = nil)
       entries ||= [cache, cache/"Cask"].select(&:directory?).flat_map(&:children)
 
       entries.each do |path|
+        FileUtils.chmod_R 0755, path if path.go_cache_directory? && !dry_run?
         next cleanup_path(path) { path.unlink } if path.incomplete?
         next cleanup_path(path) { FileUtils.rm_rf path } if path.nested_cache?
 
         if path.prune?(days)
-          if path.file?
+          if path.file? || path.symlink?
             cleanup_path(path) { path.unlink }
           elsif path.directory? && path.to_s.include?("--")
             cleanup_path(path) { FileUtils.rm_rf path }
@@ -227,6 +249,8 @@ module Homebrew
 
         next cleanup_path(path) { path.unlink } if path.stale?(scrub?)
       end
+
+      cleanup_unreferenced_downloads
     end
 
     def cleanup_path(path)

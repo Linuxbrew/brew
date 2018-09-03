@@ -71,7 +71,9 @@ module RuboCop
         # Method to format message for reporting component precedence violations
         def component_problem(c1, c2)
           return if WHITELIST.include?(@formula_name)
-          problem "`#{format_component(c1)}` (line #{line_number(c1)}) should be put before `#{format_component(c2)}` (line #{line_number(c2)})"
+          problem "`#{format_component(c1)}` (line #{line_number(c1)}) " \
+                  "should be put before `#{format_component(c2)}` " \
+                  "(line #{line_number(c2)})"
         end
 
         # autocorrect method gets called just after component_problem method call

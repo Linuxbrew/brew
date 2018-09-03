@@ -56,7 +56,7 @@ module FormulaCellarChecks
     EOS
   end
 
-  VALID_LIBRARY_EXTENSIONS = %w[.a .dylib .framework .jnilib .la .o .so .jar .prl .pm .sh].freeze
+  VALID_LIBRARY_EXTENSIONS = %w[.a .jnilib .la .o .so .jar .prl .pm .sh].freeze
 
   def valid_library_extension?(filename)
     VALID_LIBRARY_EXTENSIONS.include? filename.extname

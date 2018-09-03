@@ -37,7 +37,7 @@ module ArchitectureListExtension
   end
 
   def as_arch_flags
-    collect { |a| "-arch #{a}" }.join(" ")
+    map { |a| "-arch #{a}" }.join(" ")
   end
 
   def as_cmake_arch_flags

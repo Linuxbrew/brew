@@ -49,7 +49,7 @@ module Hbc
         if locations.empty?
           puts self.class.none_string
         else
-          locations.collect do |l|
+          locations.map do |l|
             add_error "Legacy install at #{l}. Run \"brew uninstall --force brew-cask\"."
             puts l
           end
@@ -135,10 +135,14 @@ module Hbc
       def self.check_sip
         csrutil = "/usr/bin/csrutil"
         return "N/A" unless File.executable?(csrutil)
-        Open3.capture2(csrutil, "status")[0]
-             .gsub("This is an unsupported configuration, likely to break in the future and leave your machine in an unknown state.", "")
+        Open3.capture2(csrutil, "status")
+             .first
+             .gsub("This is an unsupported configuration, likely to break in " \
+                   "the future and leave your machine in an unknown state.", "")
              .gsub("System Integrity Protection status: ", "")
-             .delete("\t\.").capitalize.strip
+             .delete("\t\.")
+             .capitalize
+             .strip
       end
 
       def self.locale_variables
@@ -159,7 +163,7 @@ module Hbc
 
       def self.cask_count_for_tap(tap)
         Formatter.pluralize(tap.cask_files.count, "cask")
-      rescue StandardError
+      rescue
         add_error "Unable to read from Tap: #{tap.path}"
         "0"
       end

@@ -19,7 +19,7 @@ describe Hbc::CLI::Audit, :cask do
       expect(Hbc::CaskLoader).to receive(:load).with(cask_token).and_return(cask)
 
       expect(Hbc::Auditor).to receive(:audit)
-        .with(cask, audit_download: false, check_token_conflicts: false)
+        .with(cask, audit_download: false, check_token_conflicts: false, quarantine: true)
         .and_return(true)
 
       described_class.run(cask_token)
@@ -30,7 +30,7 @@ describe Hbc::CLI::Audit, :cask do
     it "does not download the Cask per default" do
       allow(Hbc::CaskLoader).to receive(:load).and_return(cask)
       expect(Hbc::Auditor).to receive(:audit)
-        .with(cask, audit_download: false, check_token_conflicts: false)
+        .with(cask, audit_download: false, check_token_conflicts: false, quarantine: true)
         .and_return(true)
 
       described_class.run("casktoken")
@@ -39,7 +39,7 @@ describe Hbc::CLI::Audit, :cask do
     it "download a Cask if --download flag is set" do
       allow(Hbc::CaskLoader).to receive(:load).and_return(cask)
       expect(Hbc::Auditor).to receive(:audit)
-        .with(cask, audit_download: true, check_token_conflicts: false)
+        .with(cask, audit_download: true, check_token_conflicts: false, quarantine: true)
         .and_return(true)
 
       described_class.run("casktoken", "--download")
@@ -50,7 +50,7 @@ describe Hbc::CLI::Audit, :cask do
     it "does not check for token conflicts per default" do
       allow(Hbc::CaskLoader).to receive(:load).and_return(cask)
       expect(Hbc::Auditor).to receive(:audit)
-        .with(cask, audit_download: false, check_token_conflicts: false)
+        .with(cask, audit_download: false, check_token_conflicts: false, quarantine: true)
         .and_return(true)
 
       described_class.run("casktoken")
@@ -59,7 +59,7 @@ describe Hbc::CLI::Audit, :cask do
     it "checks for token conflicts if --token-conflicts flag is set" do
       allow(Hbc::CaskLoader).to receive(:load).and_return(cask)
       expect(Hbc::Auditor).to receive(:audit)
-        .with(cask, audit_download: false, check_token_conflicts: true)
+        .with(cask, audit_download: false, check_token_conflicts: true, quarantine: true)
         .and_return(true)
 
       described_class.run("casktoken", "--token-conflicts")

@@ -18,6 +18,8 @@
 /Library/Homebrew/test/bin
 /Library/Homebrew/test/coverage
 /Library/Homebrew/test/fs_leak_log
+/Library/Homebrew/test/.gem
+/Library/Homebrew/test/.subversion
 /Library/Homebrew/tmp
 /Library/Homebrew/.npmignore
 /Library/LinkedKegs
