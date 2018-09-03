@@ -33,7 +33,7 @@ module Hbc
       end
 
       def check_software_versions
-        ohai "Homebrew-Cask Version", Hbc.full_version
+        ohai "Homebrew Cask Version", Hbc.full_version
         ohai "macOS", MacOS.full_version
         ohai "SIP", self.class.check_sip
         ohai "Java", SystemConfig.describe_java
@@ -43,7 +43,7 @@ module Hbc
       # where "doctor" is needed is precisely the situation where such
       # things are less dependable.
       def check_install_location
-        ohai "Homebrew-Cask Install Location"
+        ohai "Homebrew Cask Install Location"
 
         locations = Dir.glob(HOMEBREW_CELLAR.join("brew-cask", "*")).reverse
         if locations.empty?
@@ -57,7 +57,7 @@ module Hbc
       end
 
       def check_staging_location
-        ohai "Homebrew-Cask Staging Location"
+        ohai "Homebrew Cask Staging Location"
 
         path = Caskroom.path
 
@@ -72,7 +72,7 @@ module Hbc
         default_tap = Tap.default_cask_tap
         alt_taps = Tap.select { |t| t.cask_dir.exist? && t != default_tap }
 
-        ohai "Homebrew-Cask Taps:"
+        ohai "Homebrew Cask Taps:"
         [default_tap, *alt_taps].each do |tap|
           if tap.path.nil? || tap.path.to_s.empty?
             puts none_string

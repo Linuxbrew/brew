@@ -16,7 +16,7 @@ let dataLocationUrl: NSURL = NSURL.init(fileURLWithPath: CommandLine.arguments[1
 var errorBag: NSError?
 
 let quarantineProperties: [String: Any] = [
-  kLSQuarantineAgentNameKey as String: "Homebrew-Cask",
+  kLSQuarantineAgentNameKey as String: "Homebrew Cask",
   kLSQuarantineTypeKey as String: kLSQuarantineTypeWebDownload,
   kLSQuarantineDataURLKey as String: CommandLine.arguments[2],
   kLSQuarantineOriginURLKey as String: CommandLine.arguments[3]

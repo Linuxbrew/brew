@@ -34,7 +34,7 @@ class Requirement
     s = "#{class_name} unsatisfied!\n"
     if cask
       s += <<~EOS
-        You can install with Homebrew-Cask:
+        You can install with Homebrew Cask:
          brew cask install #{cask}
       EOS
     end

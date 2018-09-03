@@ -225,8 +225,8 @@ module Hbc
 
       def purpose
         puts <<~EOS
-          brew-cask provides a friendly homebrew-style CLI workflow for the
-          administration of macOS applications distributed as binaries.
+          Homebrew Cask provides a friendly CLI workflow for the administration
+          of macOS applications distributed as binaries.
 
         EOS
       end

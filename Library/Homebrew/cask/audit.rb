@@ -65,7 +65,7 @@ module Hbc
       return if tap.user != "Homebrew"
 
       return unless cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
-      add_warning "allow_untrusted is not permitted in official Homebrew-Cask taps"
+      add_warning "allow_untrusted is not permitted in official Homebrew Cask taps"
     end
 
     def check_stanza_requires_uninstall
@@ -204,7 +204,7 @@ module Hbc
       return unless cask.appcast
       return unless cask.appcast.checkpoint
 
-      add_error "Appcast checkpoints have been removed from Homebrew-Cask"
+      add_error "Appcast checkpoints have been removed from Homebrew Cask"
     end
 
     def check_latest_with_appcast

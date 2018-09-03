@@ -79,7 +79,7 @@ module Hbc
         <<~EOS
           Cask #{@cask} installs files under /usr/local. The presence of such
           files can cause warnings when running "brew doctor", which is considered
-          to be a bug in Homebrew-Cask.
+          to be a bug in Homebrew Cask.
         EOS
       end
 

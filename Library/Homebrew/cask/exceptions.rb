@@ -62,7 +62,7 @@ module Hbc
   class CaskX11DependencyError < AbstractCaskErrorWithToken
     def to_s
       <<~EOS
-        Cask '#{token}' requires XQuartz/X11, which can be installed using Homebrew-Cask by running
+        Cask '#{token}' requires XQuartz/X11, which can be installed using Homebrew Cask by running
           #{Formatter.identifier("brew cask install xquartz")}
 
         or manually, by downloading the package from

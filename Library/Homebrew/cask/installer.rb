@@ -520,7 +520,7 @@ module Hbc
       # versioned staged distribution
       gain_permissions_remove(backup_path) if backup_path&.exist?
 
-      # Homebrew-Cask metadata
+      # Homebrew Cask metadata
       return unless backup_metadata_path.directory?
 
       backup_metadata_path.children.each do |subdir|
@@ -535,7 +535,7 @@ module Hbc
       # versioned staged distribution
       gain_permissions_remove(@cask.staged_path) if @cask.staged_path&.exist?
 
-      # Homebrew-Cask metadata
+      # Homebrew Cask metadata
       if @cask.metadata_versioned_path.directory?
         @cask.metadata_versioned_path.children.each do |subdir|
           gain_permissions_remove(subdir)

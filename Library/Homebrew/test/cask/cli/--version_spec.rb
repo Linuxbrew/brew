@@ -1,8 +1,8 @@
 describe Hbc::CLI::Version, :cask do
   describe "::run" do
-    it "outputs the current Homebrew-Cask version" do
+    it "outputs the current Homebrew Cask version" do
       expect { described_class.run }
-        .to output(/\AHomebrew-Cask.*\d+\.\d+\.\d+/).to_stdout
+        .to output(/\AHomebrew Cask.*\d+\.\d+\.\d+/).to_stdout
         .and not_to_output.to_stderr
     end
 

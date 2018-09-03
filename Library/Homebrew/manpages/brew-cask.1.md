@@ -7,13 +7,13 @@ brew-cask(1) - a friendly binary installer for macOS
 
 ## DESCRIPTION
 
-Homebrew-Cask is a tool for installing precompiled macOS binaries (such as
+Homebrew Cask is a tool for installing precompiled macOS binaries (such as
 Applications) from the command line. The user is never required to use the
 graphical user interface.
 
 ## ALPHA-QUALITY SOFTWARE
 
-Homebrew-Cask works robustly enough that we welcome new users, but the
+Homebrew Cask works robustly enough that we welcome new users, but the
 project is still in early development. That means command names, option
 names, and other aspects of this manual are still subject to change.
 
@@ -221,9 +221,9 @@ in a future version.
 
 ## INTERACTION WITH HOMEBREW
 
-Homebrew-Cask is implemented as a external command for Homebrew. That means
+Homebrew Cask is implemented as a external command for Homebrew. That means
 this project is entirely built upon the Homebrew infrastructure. For
-example, upgrades to the Homebrew-Cask tool are received through Homebrew:
+example, upgrades to the Homebrew Cask tool are received through Homebrew:
 
     brew update; brew cask upgrade; brew cleanup
 
@@ -234,12 +234,12 @@ the Homebrew command:
 
 ## OTHER WAYS TO SPECIFY A CASK
 
-Most Homebrew-Cask commands can accept a Cask token as an argument. As
+Most Homebrew Cask commands can accept a Cask token as an argument. As
 described above, the argument can take the form of:
 
   * A simple token, e.g. `google-chrome`
 
-Homebrew-Cask also accepts three other forms in place of plain tokens:
+Homebrew Cask also accepts three other forms in place of plain tokens:
 
   * A fully-qualified token which includes the Tap name, e.g.
     `homebrew/cask-fonts/font-symbola`
@@ -252,11 +252,11 @@ Homebrew-Cask also accepts three other forms in place of plain tokens:
 
 ## ENVIRONMENT
 
-Homebrew-Cask respects many of the environment variables used by the
+Homebrew Cask respects many of the environment variables used by the
 parent command `brew`. Please refer to the `brew`(1) man page for more
 information.
 
-Environment variables specific to Homebrew-Cask:
+Environment variables specific to Homebrew Cask:
 
   * `HOMEBREW_CASK_OPTS`:
     This variable may contain any arguments normally used as options on
@@ -268,14 +268,14 @@ Environment variables specific to Homebrew-Cask:
 Other environment variables:
 
   * `SUDO_ASKPASS`:
-    When this variable is set, Homebrew-Cask will call `sudo`(8) with the `-A` option.
+    When this variable is set, Homebrew Cask will call `sudo`(8) with the `-A` option.
 
 
 ## SEE ALSO
 
-The Homebrew-Cask home page: <https://caskroom.github.io/>
+The Homebrew Cask home page: <https://caskroom.github.io/>
 
-The Homebrew-Cask GitHub page: <https://github.com/Homebrew/homebrew-cask>
+The Homebrew Cask GitHub page: <https://github.com/Homebrew/homebrew-cask>
 
 `brew`(1), `curl`(1)
 
@@ -290,6 +290,6 @@ Man page format based on `brew.1.md` from Homebrew.
 We still have bugs - and we are busy fixing them!  If you have a problem, don't
 be shy about reporting it on our [GitHub issues page](https://github.com/Homebrew/homebrew-cask/issues?state=open).
 
-When reporting bugs, remember that Homebrew-Cask is an independent project from
+When reporting bugs, remember that Homebrew Cask is an independent project from
 Homebrew. Do your best to direct bug reports to the appropriate project. If
 your command-line started with `brew cask`, bring the bug to us first!

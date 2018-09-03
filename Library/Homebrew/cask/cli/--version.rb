@@ -16,7 +16,7 @@ module Hbc
       end
 
       def self.help
-        "displays the Homebrew-Cask version"
+        "displays the Homebrew Cask version"
       end
     end
   end
