@@ -69,9 +69,6 @@ module Homebrew
     variables[:lead_maintainer] =
       readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
             .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:core_maintainer] =
-      readme.read[%r{(Linuxbrew/homebrew-core's lead maintainer .*\.)}, 1]
-            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
     variables[:leadership] =
       readme.read[/(Homebrew's project leadership committee .*\.)/, 1]
             .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
@@ -86,6 +83,19 @@ module Homebrew
             .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
     variables[:former_maintainers] =
       readme.read[/(Former maintainers .*\.)/, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+
+    variables[:linuxbrew_lead_maintainer] =
+      readme.read[/(Linuxbrew's lead maintainer .*\.)/, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:linuxbrew_core_maintainer] =
+      readme.read[%r{(Linuxbrew/homebrew-core's lead maintainer .*\.)}, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:linuxbrew_other_maintainers] =
+      readme.read[/(Linuxbrew's other current maintainers .*\.)/, 1]
+            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:linuxbrew_former_maintainers] =
+      readme.read[/(Former Linuxbrew maintainers .*\.)/, 1]
             .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
     variables[:homebrew_bundle] = help_output(:bundle)

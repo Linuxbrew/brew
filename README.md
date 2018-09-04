@@ -131,7 +131,7 @@ Good luck!
 ## Security
 Please report security issues to our [HackerOne](https://hackerone.com/homebrew/).
 
-## Who Are You?
+## Who Are You (Linuxbrew)?
 
 Linuxbrew's lead maintainer is [Shaun Jackman](https://sjackman.ca).
 
@@ -139,9 +139,20 @@ Linuxbrew/homebrew-core's lead maintainer is [Michka Popoff](https://github.com/
 
 Linuxbrew's other current maintainers are [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Alyssa Ross](https://github.com/alyssais).
 
-Linuxbrew/homebrew-core's other current maintainers are [Shaun Jackman](https://sjackman.ca).
+Former Linuxbrew maintainers with significant contributions include [Bob W. Hogg](https://github.com/rwhogg).
 
-Former maintainers with significant contributions include [Bob W. Hogg](https://github.com/rwhogg).
+## Who Are You (Homebrew)?
+Homebrew's lead maintainer is [Mike McQuaid](https://github.com/mikemcquaid).
+
+Homebrew's project leadership committee is [Mike McQuaid](https://github.com/mikemcquaid), [JCount](https://github.com/jcount), [Misty De Meo](https://github.com/mistydemeo) and [Markus Reiter](https://github.com/reitermarkus).
+
+Homebrew/brew's other current maintainers are [Dominyk Tiller](https://github.com/DomT4), [Claudia](https://github.com/claui), [Michka Popoff](https://github.com/imichka), [Shaun Jackman](https://github.com/sjackman), [Chongyu Zhu](https://github.com/lembacon), [commitay](https://github.com/commitay), [Vitor Galvao](https://github.com/vitorgalvao), [JCount](https://github.com/jcount), [Misty De Meo](https://github.com/mistydemeo), [Gautham Goli](https://github.com/GauthamGoli), [Markus Reiter](https://github.com/reitermarkus), [Jonathan Chang](https://github.com/jonchang) and [William Woodruff](https://github.com/woodruffw).
+
+Homebrew/brew's Linux support (and Linuxbrew) maintainers are [Michka Popoff](https://github.com/imichka) and [Shaun Jackman](https://github.com/sjackman).
+
+Homebrew/homebrew-core's other current maintainers are [Dominyk Tiller](https://github.com/DomT4), [Claudia](https://github.com/claui), [Michka Popoff](https://github.com/imichka), [Shaun Jackman](https://github.com/sjackman), [Chongyu Zhu](https://github.com/lembacon), [commitay](https://github.com/commitay), [Izaak Beekman](https://github.com/zbeekman), [Sean Molenaar](https://github.com/SMillerDev), [Jan Viljanen](https://github.com/javian), [Viktor Szakats](https://github.com/vszakats), [FX Coudert](https://github.com/fxcoudert), [JCount](https://github.com/jcount), [Misty De Meo](https://github.com/mistydemeo) and [Tom Schoonjans](https://github.com/tschoonj).
+
+Former maintainers with significant contributions include [Tim Smith](https://github.com/tdsmith), [Baptiste Fontaine](https://github.com/bfontaine), [Xu Cheng](https://github.com/xu-cheng), [Martin Afanasjew](https://github.com/UniqMartin),  [Brett Koonce](https://github.com/asparagui), [Charlie Sharpsteen](https://github.com/Sharpie), [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv), [Andrew Janke](https://github.com/apjanke), [Alex Dunn](https://github.com/dunn), [neutric](https://github.com/neutric), [Tomasz Pajor](https://github.com/nijikon), [Uladzislau Shablinski](https://github.com/vladshablinsky), [Alyssa Ross](https://github.com/alyssais), [ilovezfs](https://github.com/ilovezfs) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
 
 ## Linuxbrew Community
 - [@Linuxbrew (Twitter)](https://twitter.com/Linuxbrew)

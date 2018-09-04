@@ -1331,7 +1331,7 @@ Homebrew Documentation: <https://docs.brew.sh>
 
 `brew-cask`(1), `git`(1), `git-log`(1)
 
-## AUTHORS
+## LINUXBREW AUTHORS
 
 Linuxbrew's lead maintainer is Shaun Jackman.
 
@@ -1339,9 +1339,21 @@ Linuxbrew/homebrew-core's lead maintainer is Michka Popoff.
 
 Linuxbrew's other current maintainers are Piotr Gaczkowski, Maxim Belkin, Jonathan Chang, and Alyssa Ross.
 
-Linuxbrew/homebrew-core's other current maintainers are Shaun Jackman.
+Former Linuxbrew maintainers with significant contributions include Bob W. Hogg.
 
-Former maintainers with significant contributions include Bob W. Hogg.
+## HOMEBREW AUTHORS
+
+Homebrew's lead maintainer is Mike McQuaid.
+
+Homebrew's project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter.
+
+Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Jonathan Chang and William Woodruff.
+
+Homebrew/brew's Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman.
+
+Homebrew/homebrew-core's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, JCount, Misty De Meo and Tom Schoonjans.
+
+Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
 
 ## BUGS
 
@@ -1363,7 +1375,8 @@ See our issues on GitHub:
 [ENVIRONMENT]: #ENVIRONMENT "ENVIRONMENT"
 [USING HOMEBREW BEHIND A PROXY]: #USING-HOMEBREW-BEHIND-A-PROXY "USING HOMEBREW BEHIND A PROXY"
 [SEE ALSO]: #SEE-ALSO "SEE ALSO"
-[AUTHORS]: #AUTHORS "AUTHORS"
+[LINUXBREW AUTHORS]: #LINUXBREW-AUTHORS "LINUXBREW AUTHORS"
+[HOMEBREW AUTHORS]: #HOMEBREW-AUTHORS "HOMEBREW AUTHORS"
 [BUGS]: #BUGS "BUGS"
 
 
