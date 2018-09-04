@@ -186,7 +186,7 @@ module Hbc
       return unless quarantine?
       return unless Quarantine.available?
 
-      Quarantine.propagate(from: @downloaded_path, to: @cask.staged_path, command: @command)
+      Quarantine.propagate(from: @downloaded_path, to: @cask.staged_path)
     end
 
     def install_artifacts

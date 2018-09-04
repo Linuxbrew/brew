@@ -12,10 +12,29 @@ module Hbc
       @swift ||= DevelopmentTools.locate("swift")
     end
 
+    def check_quarantine_support
+      odebug "Checking quarantine support"
+
+      if swift.nil?
+        odebug "Swift is not available on this system."
+        return :no_swift
+      end
+
+      api_check = system_command(swift, args: [QUARANTINE_SCRIPT])
+
+      if api_check.exit_status == 5
+        odebug "This feature requires the macOS 10.10 SDK or higher."
+        return :no_quarantine
+      end
+
+      odebug "Quarantine is available."
+      :quarantine_available
+    end
+
     def available?
-      status = !swift.nil?
-      odebug "Quarantine is #{status ? "available" : "not available"}."
-      status
+      @status ||= check_quarantine_support
+
+      @status == :quarantine_available
     end
 
     def detect(file)
@@ -30,24 +49,24 @@ module Hbc
       quarantine_status
     end
 
-    def status(file, command: SystemCommand)
-      command.run("/usr/bin/xattr",
-                  args:        ["-p", QUARANTINE_ATTRIBUTE, file],
-                  print_stderr: false).stdout.rstrip
+    def status(file)
+      system_command("/usr/bin/xattr",
+                     args:         ["-p", QUARANTINE_ATTRIBUTE, file],
+                     print_stderr: false).stdout.rstrip
     end
 
-    def cask(cask: nil, download_path: nil, command: SystemCommand)
+    def cask(cask: nil, download_path: nil)
       return if cask.nil? || download_path.nil?
 
       odebug "Quarantining #{download_path}"
 
-      quarantiner = command.run(swift,
-                                args: [
-                                  QUARANTINE_SCRIPT,
-                                  download_path,
-                                  cask.url.to_s,
-                                  cask.homepage.to_s,
-                                ])
+      quarantiner = system_command(swift,
+                                   args: [
+                                     QUARANTINE_SCRIPT,
+                                     download_path,
+                                     cask.url.to_s,
+                                     cask.homepage.to_s,
+                                   ])
 
       return if quarantiner.success?
 
@@ -59,18 +78,29 @@ module Hbc
       end
     end
 
-    def propagate(from: nil, to: nil, command: SystemCommand)
+    def propagate(from: nil, to: nil)
       return if from.nil? || to.nil?
 
       raise CaskError, "#{from} was not quarantined properly." unless detect(from)
 
       odebug "Propagating quarantine from #{from} to #{to}"
 
-      quarantine_status = status(from, command: command)
+      quarantine_status = status(from)
 
-      quarantiner = command.run("/usr/bin/xattr",
-                                args: ["-w", "-rs", QUARANTINE_ATTRIBUTE, quarantine_status, to],
-                                print_stderr: false)
+      resolved_paths = Pathname.glob(to/"**/*", File::FNM_DOTMATCH)
+
+      quarantiner = system_command("/usr/bin/xargs",
+                                   args: [
+                                     "-0",
+                                     "--",
+                                     "/usr/bin/xattr",
+                                     "-w",
+                                     "-s",
+                                     QUARANTINE_ATTRIBUTE,
+                                     quarantine_status,
+                                   ],
+                                   input: resolved_paths.join("\0"),
+                                   print_stderr: false)
 
       return if quarantiner.success?
 
