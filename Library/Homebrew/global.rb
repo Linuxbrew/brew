@@ -1,7 +1,5 @@
 require "pathname"
 require "English"
-require "json"
-require "json/add/core"
 
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
 

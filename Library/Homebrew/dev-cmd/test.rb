@@ -93,6 +93,9 @@ module Homebrew
             exec(*args)
           end
         end
+      rescue ::Test::Unit::AssertionFailedError => e
+        ofail "#{f.full_name}: failed"
+        puts e.message
       rescue Exception => e # rubocop:disable Lint/RescueException
         ofail "#{f.full_name}: failed"
         puts e, e.backtrace

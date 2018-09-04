@@ -352,16 +352,14 @@ class FormulaAmbiguousPythonError < RuntimeError
 end
 
 class BuildError < RuntimeError
-  attr_reader :cmd, :args, :env
-  attr_accessor :formula, :options
+  attr_reader :formula, :env
+  attr_accessor :options
 
   def initialize(formula, cmd, args, env)
     @formula = formula
-    @cmd = cmd
-    @args = args
     @env = env
-    pretty_args = args.map { |arg| arg.to_s.gsub " ", "\\ " }.join(" ")
-    super "Failed executing: #{cmd} #{pretty_args}"
+    args = args.map { |arg| arg.to_s.gsub " ", "\\ " }.join(" ")
+    super "Failed executing: #{cmd} #{args}"
   end
 
   def issues
@@ -528,22 +526,12 @@ end
 
 # raised by safe_system in utils.rb
 class ErrorDuringExecution < RuntimeError
-  attr_reader :cmd
   attr_reader :status
-  attr_reader :output
 
   def initialize(cmd, status:, output: nil)
-    @cmd = cmd
     @status = status
-    @output = output
 
-    exitstatus = if status.respond_to?(:exitstatus)
-      status.exitstatus
-    else
-      status
-    end
-
-    s = "Failure while executing; `#{cmd.shelljoin.gsub(/\\=/, "=")}` exited with #{exitstatus}."
+    s = "Failure while executing; `#{cmd.shelljoin.gsub(/\\=/, "=")}` exited with #{status.exitstatus}."
 
     unless [*output].empty?
       format_output_line = lambda do |type, line|
@@ -606,24 +594,5 @@ class BottleFormulaUnavailableError < RuntimeError
         #{bottle_path}
         #{formula_path}
     EOS
-  end
-end
-
-# Raised when a child process sends us an exception over its error pipe.
-class ChildProcessError < RuntimeError
-  attr_reader :inner
-  attr_reader :inner_class
-
-  def initialize(inner)
-    @inner = inner
-    @inner_class = Object.const_get inner["json_class"]
-
-    super <<~EOS
-      An exception occured within a build process:
-        #{inner_class}: #{inner["m"]}
-    EOS
-
-    # Clobber our real (but irrelevant) backtrace with that of the inner exception.
-    set_backtrace inner["b"]
   end
 end

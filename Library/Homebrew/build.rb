@@ -190,20 +190,7 @@ begin
   build   = Build.new(formula, options)
   build.install
 rescue Exception => e # rubocop:disable Lint/RescueException
-  error_hash = JSON.parse e.to_json
-
-  # Special case: need to recreate BuildErrors in full
-  # for proper analytics reporting and error messages.
-  # BuildErrors are specific to build processses and not other
-  # children, which is why we create the necessary state here
-  # and not in Utils.safe_fork.
-  if error_hash["json_class"] == "BuildError"
-    error_hash["cmd"] = e.cmd
-    error_hash["args"] = e.args
-    error_hash["env"] = e.env
-  end
-
-  error_pipe.puts error_hash.to_json
+  Marshal.dump(e, error_pipe)
   error_pipe.close
   exit! 1
 end
