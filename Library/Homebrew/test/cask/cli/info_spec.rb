@@ -1,7 +1,7 @@
 require_relative "shared_examples/requires_cask_token"
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::Info, :cask do
+describe Hbc::Cmd::Info, :cask do
   it_behaves_like "a command that requires a Cask token"
   it_behaves_like "a command that handles invalid options"
 

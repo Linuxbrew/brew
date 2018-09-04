@@ -1,6 +1,6 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::List, :cask do
+describe Hbc::Cmd::List, :cask do
   it_behaves_like "a command that handles invalid options"
 
   it "lists the installed Casks in a pretty fashion" do

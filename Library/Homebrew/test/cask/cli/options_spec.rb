@@ -1,4 +1,4 @@
-describe Hbc::CLI, :cask do
+describe Hbc::Cmd, :cask do
   it "supports setting the appdir" do
     allow(Hbc::Config.global).to receive(:appdir).and_call_original
 

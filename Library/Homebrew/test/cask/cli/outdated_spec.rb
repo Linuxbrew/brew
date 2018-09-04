@@ -1,6 +1,6 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::Outdated, :cask do
+describe Hbc::Cmd::Outdated, :cask do
   let(:installed) do
     [
       Hbc::CaskLoader.load(cask_path("basic-cask")),

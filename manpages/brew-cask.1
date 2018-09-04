@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW\-CASK" "1" "August 2018" "Homebrew" "brew-cask"
+.TH "BREW\-CASK" "1" "September 2018" "Homebrew" "brew-cask"
 .
 .SH "NAME"
 \fBbrew\-cask\fR \- a friendly binary installer for macOS
@@ -10,10 +10,10 @@
 \fBbrew cask\fR command [options] [ \fItoken\fR \.\.\. ]
 .
 .SH "DESCRIPTION"
-Homebrew\-Cask is a tool for installing precompiled macOS binaries (such as Applications) from the command line\. The user is never required to use the graphical user interface\.
+Homebrew Cask is a tool for installing precompiled macOS binaries (such as Applications) from the command line\. The user is never required to use the graphical user interface\.
 .
 .SH "ALPHA\-QUALITY SOFTWARE"
-Homebrew\-Cask works robustly enough that we welcome new users, but the project is still in early development\. That means command names, option names, and other aspects of this manual are still subject to change\.
+Homebrew Cask works robustly enough that we welcome new users, but the project is still in early development\. That means command names, option names, and other aspects of this manual are still subject to change\.
 .
 .SH "FREQUENTLY USED COMMANDS"
 .
@@ -230,7 +230,7 @@ Do not link "helper" executables to \fB/usr/local/bin\fR\.
 Output debugging information of use to Cask authors and developers\.
 .
 .SH "INTERACTION WITH HOMEBREW"
-Homebrew\-Cask is implemented as a external command for Homebrew\. That means this project is entirely built upon the Homebrew infrastructure\. For example, upgrades to the Homebrew\-Cask tool are received through Homebrew:
+Homebrew Cask is implemented as a external command for Homebrew\. That means this project is entirely built upon the Homebrew infrastructure\. For example, upgrades to the Homebrew Cask tool are received through Homebrew:
 .
 .IP "" 4
 .
@@ -256,7 +256,7 @@ brew update
 .IP "" 0
 .
 .SH "OTHER WAYS TO SPECIFY A CASK"
-Most Homebrew\-Cask commands can accept a Cask token as an argument\. As described above, the argument can take the form of:
+Most Homebrew Cask commands can accept a Cask token as an argument\. As described above, the argument can take the form of:
 .
 .IP "\(bu" 4
 A simple token, e\.g\. \fBgoogle\-chrome\fR
@@ -264,7 +264,7 @@ A simple token, e\.g\. \fBgoogle\-chrome\fR
 .IP "" 0
 .
 .P
-Homebrew\-Cask also accepts three other forms in place of plain tokens:
+Homebrew Cask also accepts three other forms in place of plain tokens:
 .
 .IP "\(bu" 4
 A fully\-qualified token which includes the Tap name, e\.g\. \fBhomebrew/cask\-fonts/font\-symbola\fR
@@ -278,10 +278,10 @@ A \fBcurl\fR\-retrievable URI to a Cask file, e\.g\. \fBhttps://raw\.githubuserc
 .IP "" 0
 .
 .SH "ENVIRONMENT"
-Homebrew\-Cask respects many of the environment variables used by the parent command \fBbrew\fR\. Please refer to the \fBbrew\fR(1) man page for more information\.
+Homebrew Cask respects many of the environment variables used by the parent command \fBbrew\fR\. Please refer to the \fBbrew\fR(1) man page for more information\.
 .
 .P
-Environment variables specific to Homebrew\-Cask:
+Environment variables specific to Homebrew Cask:
 .
 .TP
 \fBHOMEBREW_CASK_OPTS\fR
@@ -303,13 +303,13 @@ Other environment variables:
 .
 .TP
 \fBSUDO_ASKPASS\fR
-When this variable is set, Homebrew\-Cask will call \fBsudo\fR(8) with the \fB\-A\fR option\.
+When this variable is set, Homebrew Cask will call \fBsudo\fR(8) with the \fB\-A\fR option\.
 .
 .SH "SEE ALSO"
-The Homebrew\-Cask home page: \fIhttps://caskroom\.github\.io/\fR
+The Homebrew Cask home page: \fIhttps://caskroom\.github\.io/\fR
 .
 .P
-The Homebrew\-Cask GitHub page: \fIhttps://github\.com/Homebrew/homebrew\-cask\fR
+The Homebrew Cask GitHub page: \fIhttps://github\.com/Homebrew/homebrew\-cask\fR
 .
 .P
 \fBbrew\fR(1), \fBcurl\fR(1)
@@ -324,4 +324,4 @@ Man page format based on \fBbrew\.1\.md\fR from Homebrew\.
 We still have bugs \- and we are busy fixing them! If you have a problem, don\'t be shy about reporting it on our GitHub issues page \fIhttps://github\.com/Homebrew/homebrew\-cask/issues?state=open\fR\.
 .
 .P
-When reporting bugs, remember that Homebrew\-Cask is an independent project from Homebrew\. Do your best to direct bug reports to the appropriate project\. If your command\-line started with \fBbrew cask\fR, bring the bug to us first!
+When reporting bugs, remember that Homebrew Cask is an separate repository within Homebrew\. Do your best to direct bug reports to the appropriate repository\. If your command\-line started with \fBbrew cask\fR, bring the bug to us first!

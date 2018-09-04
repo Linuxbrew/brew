@@ -94,7 +94,7 @@ describe Hbc::Audit, :cask do
     end
 
     describe "pkg allow_untrusted checks" do
-      let(:warning_msg) { "allow_untrusted is not permitted in official Homebrew-Cask taps" }
+      let(:warning_msg) { "allow_untrusted is not permitted in official Homebrew Cask taps" }
 
       context "when the Cask has no pkg stanza" do
         let(:cask_token) { "basic-cask" }
@@ -318,7 +318,7 @@ describe Hbc::Audit, :cask do
     end
 
     describe "appcast checkpoint check" do
-      let(:error_msg) { "Appcast checkpoints have been removed from Homebrew-Cask" }
+      let(:error_msg) { "Appcast checkpoints have been removed from Homebrew Cask" }
 
       context "when the Cask does not have a checkpoint" do
         let(:cask_token) { "with-appcast" }

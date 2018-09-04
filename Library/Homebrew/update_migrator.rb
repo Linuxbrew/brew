@@ -1,5 +1,5 @@
-require "hbc/cask_loader"
-require "hbc/download"
+require "cask/cask_loader"
+require "cask/download"
 
 module UpdateMigrator
   class << self

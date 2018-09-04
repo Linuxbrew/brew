@@ -1,6 +1,6 @@
 require "test/support/fixtures/testball"
 require "cleanup"
-require "hbc/cache"
+require "cask/cache"
 require "fileutils"
 
 using CleanupRefinement

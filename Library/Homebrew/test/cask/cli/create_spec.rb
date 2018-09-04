@@ -1,7 +1,7 @@
 require_relative "shared_examples/requires_cask_token"
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::Create, :cask do
+describe Hbc::Cmd::Create, :cask do
   around do |example|
     begin
       example.run
