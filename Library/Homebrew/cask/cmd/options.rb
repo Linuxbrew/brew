@@ -1,5 +1,5 @@
 module Hbc
-  class CLI
+  class Cmd
     module Options
       def self.included(klass)
         klass.extend(ClassMethods)

@@ -31,7 +31,7 @@ require "cask/cmd/internal_help"
 require "cask/cmd/internal_stanza"
 
 module Hbc
-  class CLI
+  class Cmd
     ALIASES = {
       "ls"       => "list",
       "homepage" => "home",
@@ -232,10 +232,10 @@ module Hbc
       end
 
       def usage
-        max_command_len = CLI.commands.map(&:length).max
+        max_command_len = Cmd.commands.map(&:length).max
 
         puts "Commands:\n\n"
-        CLI.command_classes.each do |klass|
+        Cmd.command_classes.each do |klass|
           next unless klass.visible
           puts "    #{klass.command_name.ljust(max_command_len)}  #{_help_for(klass)}"
         end

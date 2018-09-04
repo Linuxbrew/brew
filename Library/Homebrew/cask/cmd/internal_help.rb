@@ -1,5 +1,5 @@
 module Hbc
-  class CLI
+  class Cmd
     class InternalHelp < AbstractInternalCommand
       def initialize(*)
         super
@@ -8,9 +8,9 @@ module Hbc
       end
 
       def run
-        max_command_len = CLI.commands.map(&:length).max
+        max_command_len = Cmd.commands.map(&:length).max
         puts "Unstable Internal-use Commands:\n\n"
-        CLI.command_classes.each do |klass|
+        Cmd.command_classes.each do |klass|
           next if klass.visible
           puts "    #{klass.command_name.ljust(max_command_len)}  #{self.class.help_for(klass)}"
         end

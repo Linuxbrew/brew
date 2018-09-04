@@ -1,6 +1,6 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::Upgrade, :cask do
+describe Hbc::Cmd::Upgrade, :cask do
   it_behaves_like "a command that handles invalid options"
 
   context "successful upgrade" do
@@ -14,7 +14,7 @@ describe Hbc::CLI::Upgrade, :cask do
     }
 
     before do
-      installed.each { |cask| Hbc::CLI::Install.run(cask) }
+      installed.each { |cask| Hbc::Cmd::Install.run(cask) }
 
       allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
     end
@@ -177,7 +177,7 @@ describe Hbc::CLI::Upgrade, :cask do
     }
 
     before do
-      installed.each { |cask| Hbc::CLI::Install.run(cask) }
+      installed.each { |cask| Hbc::Cmd::Install.run(cask) }
 
       allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
     end

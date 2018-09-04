@@ -1,6 +1,6 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::Reinstall, :cask do
+describe Hbc::Cmd::Reinstall, :cask do
   it_behaves_like "a command that handles invalid options"
 
   it "displays the reinstallation progress" do
@@ -22,23 +22,23 @@ describe Hbc::CLI::Reinstall, :cask do
     EOS
 
     expect {
-      Hbc::CLI::Reinstall.run("local-caffeine")
+      Hbc::Cmd::Reinstall.run("local-caffeine")
     }.to output(output).to_stdout
   end
 
   it "allows reinstalling a Cask" do
-    Hbc::CLI::Install.run("local-transmission")
+    Hbc::Cmd::Install.run("local-transmission")
 
     expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
 
-    Hbc::CLI::Reinstall.run("local-transmission")
+    Hbc::Cmd::Reinstall.run("local-transmission")
     expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
   end
 
   it "allows reinstalling a non installed Cask" do
     expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).not_to be_installed
 
-    Hbc::CLI::Reinstall.run("local-transmission")
+    Hbc::Cmd::Reinstall.run("local-transmission")
     expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
   end
 end

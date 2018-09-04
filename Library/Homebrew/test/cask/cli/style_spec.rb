@@ -3,7 +3,7 @@ require "rubygems"
 
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::Style, :cask do
+describe Hbc::Cmd::Style, :cask do
   let(:args) { [] }
   let(:cli) { described_class.new(*args) }
 

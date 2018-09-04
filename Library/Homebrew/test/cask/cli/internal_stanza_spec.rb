@@ -1,4 +1,4 @@
-describe Hbc::CLI::InternalStanza, :cask do
+describe Hbc::Cmd::InternalStanza, :cask do
   it "shows stanza of the Specified Cask" do
     command = described_class.new("homepage", "local-caffeine")
     expect {

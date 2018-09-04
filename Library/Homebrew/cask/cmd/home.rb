@@ -1,5 +1,5 @@
 module Hbc
-  class CLI
+  class Cmd
     class Home < AbstractCommand
       def run
         if casks.none?

@@ -1,5 +1,5 @@
 module Hbc
-  class CLI
+  class Cmd
     class Install < AbstractCommand
       option "--force",          :force,          false
       option "--skip-cask-deps", :skip_cask_deps, false

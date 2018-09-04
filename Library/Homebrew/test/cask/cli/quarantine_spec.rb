@@ -9,7 +9,7 @@ describe Hbc::Quarantine, :cask do
 
   describe "by default" do
     it "quarantines a nice fresh Cask" do
-      Hbc::CLI::Install.run("local-transmission")
+      Hbc::Cmd::Install.run("local-transmission")
 
       expect(
         Hbc::CaskLoader.load(cask_path("local-transmission")),
@@ -21,7 +21,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines Cask fetches" do
-      Hbc::CLI::Fetch.run("local-transmission")
+      Hbc::Cmd::Fetch.run("local-transmission")
       local_transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
       cached_location = Hbc::Download.new(local_transmission, force: false, quarantine: false).perform
 
@@ -29,7 +29,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines Cask audits" do
-      Hbc::CLI::Audit.run("local-transmission", "--download")
+      Hbc::Cmd::Audit.run("local-transmission", "--download")
 
       local_transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
       cached_location = Hbc::Download.new(local_transmission, force: false, quarantine: false).perform
@@ -38,7 +38,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines dmg-based Casks" do
-      Hbc::CLI::Install.run("container-dmg")
+      Hbc::Cmd::Install.run("container-dmg")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-dmg")),
@@ -48,7 +48,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines tar-gz-based Casks" do
-      Hbc::CLI::Install.run("container-tar-gz")
+      Hbc::Cmd::Install.run("container-tar-gz")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-tar-gz")),
@@ -58,7 +58,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines xar-based Casks" do
-      Hbc::CLI::Install.run("container-xar")
+      Hbc::Cmd::Install.run("container-xar")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-xar")),
@@ -68,7 +68,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines pure bzip2-based Casks" do
-      Hbc::CLI::Install.run("container-bzip2")
+      Hbc::Cmd::Install.run("container-bzip2")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-bzip2")),
@@ -78,7 +78,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines pure gzip-based Casks" do
-      Hbc::CLI::Install.run("container-gzip")
+      Hbc::Cmd::Install.run("container-gzip")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-gzip")),
@@ -88,7 +88,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines the pkg in naked-pkg-based Casks" do
-      Hbc::CLI::Install.run("container-pkg")
+      Hbc::Cmd::Install.run("container-pkg")
 
       naked_pkg = Hbc::CaskLoader.load(cask_path("container-pkg"))
 
@@ -100,7 +100,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "quarantines a nested container" do
-      Hbc::CLI::Install.run("nested-app")
+      Hbc::Cmd::Install.run("nested-app")
 
       expect(
         Hbc::CaskLoader.load(cask_path("nested-app")),
@@ -112,7 +112,7 @@ describe Hbc::Quarantine, :cask do
 
   describe "when disabled" do
     it "does not quarantine even a nice, fresh Cask" do
-      Hbc::CLI::Install.run("local-transmission", "--no-quarantine")
+      Hbc::Cmd::Install.run("local-transmission", "--no-quarantine")
 
       expect(
         Hbc::CaskLoader.load(cask_path("local-transmission")),
@@ -122,7 +122,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine Cask fetches" do
-      Hbc::CLI::Fetch.run("local-transmission", "--no-quarantine")
+      Hbc::Cmd::Fetch.run("local-transmission", "--no-quarantine")
       local_transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
       cached_location = Hbc::Download.new(local_transmission, force: false, quarantine: false).perform
 
@@ -130,7 +130,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine dmg-based Casks" do
-      Hbc::CLI::Install.run("container-dmg", "--no-quarantine")
+      Hbc::Cmd::Install.run("container-dmg", "--no-quarantine")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-dmg")),
@@ -140,7 +140,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine tar-gz-based Casks" do
-      Hbc::CLI::Install.run("container-tar-gz", "--no-quarantine")
+      Hbc::Cmd::Install.run("container-tar-gz", "--no-quarantine")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-tar-gz")),
@@ -150,7 +150,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine xar-based Casks" do
-      Hbc::CLI::Install.run("container-xar", "--no-quarantine")
+      Hbc::Cmd::Install.run("container-xar", "--no-quarantine")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-xar")),
@@ -160,7 +160,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine pure bzip2-based Casks" do
-      Hbc::CLI::Install.run("container-bzip2", "--no-quarantine")
+      Hbc::Cmd::Install.run("container-bzip2", "--no-quarantine")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-bzip2")),
@@ -170,7 +170,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine pure gzip-based Casks" do
-      Hbc::CLI::Install.run("container-gzip", "--no-quarantine")
+      Hbc::Cmd::Install.run("container-gzip", "--no-quarantine")
 
       expect(
         Hbc::CaskLoader.load(cask_path("container-gzip")),
@@ -180,7 +180,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine the pkg in naked-pkg-based Casks" do
-      Hbc::CLI::Install.run("container-pkg", "--no-quarantine")
+      Hbc::Cmd::Install.run("container-pkg", "--no-quarantine")
 
       naked_pkg = Hbc::CaskLoader.load(cask_path("container-pkg"))
 
@@ -192,7 +192,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine a nested container" do
-      Hbc::CLI::Install.run("nested-app", "--no-quarantine")
+      Hbc::Cmd::Install.run("nested-app", "--no-quarantine")
 
       expect(
         Hbc::CaskLoader.load(cask_path("nested-app")),
@@ -202,7 +202,7 @@ describe Hbc::Quarantine, :cask do
     end
 
     it "does not quarantine Cask audits" do
-      Hbc::CLI::Audit.run("local-transmission", "--download", "--no-quarantine")
+      Hbc::Cmd::Audit.run("local-transmission", "--download", "--no-quarantine")
 
       local_transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
       cached_location = Hbc::Download.new(local_transmission, force: false, quarantine: false).perform

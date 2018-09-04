@@ -1,7 +1,7 @@
 require "cask/download"
 
 module Hbc
-  class CLI
+  class Cmd
     class Fetch < AbstractCommand
       option "--force", :force, false
 

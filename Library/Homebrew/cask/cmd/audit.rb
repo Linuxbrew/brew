@@ -1,5 +1,5 @@
 module Hbc
-  class CLI
+  class Cmd
     class Audit < AbstractCommand
       option "--download",        :download,        false
       option "--token-conflicts", :token_conflicts, false

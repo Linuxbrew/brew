@@ -1,5 +1,5 @@
 module Hbc
-  class CLI
+  class Cmd
     class Upgrade < AbstractCommand
       option "--greedy", :greedy, false
       option "--quiet",  :quiet, false

@@ -1,4 +1,4 @@
-describe Hbc::CLI, :cask do
+describe Hbc::Cmd, :cask do
   it "lists the taps for Casks that show up in two taps" do
     listing = described_class.nice_listing(%w[
                                              homebrew/cask/adium
@@ -28,13 +28,13 @@ describe Hbc::CLI, :cask do
 
   context "when no option is specified" do
     it "--binaries is true by default" do
-      command = Hbc::CLI::Install.new("some-cask")
+      command = Hbc::Cmd::Install.new("some-cask")
       expect(command.binaries?).to be true
     end
   end
 
   context "::run" do
-    let(:noop_command) { double("CLI::Noop") }
+    let(:noop_command) { double("Cmd::Noop") }
 
     before do
       allow(described_class).to receive(:lookup_command).with("noop").and_return(noop_command)
@@ -42,7 +42,7 @@ describe Hbc::CLI, :cask do
     end
 
     it "passes `--version` along to the subcommand" do
-      version_command = double("CLI::Version")
+      version_command = double("Cmd::Version")
       allow(described_class).to receive(:lookup_command).with("--version").and_return(version_command)
       expect(described_class).to receive(:run_command).with(version_command)
       described_class.run("--version")

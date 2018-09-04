@@ -2,7 +2,7 @@ require "cask/cmd/abstract_command"
 require "cmd/search"
 
 module Hbc
-  class CLI
+  class Cmd
     module Compat
       class Search < AbstractCommand
         def run

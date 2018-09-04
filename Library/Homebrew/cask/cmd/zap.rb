@@ -1,5 +1,5 @@
 module Hbc
-  class CLI
+  class Cmd
     class Zap < AbstractCommand
       option "--force", :force, false
 

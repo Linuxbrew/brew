@@ -1,6 +1,6 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::Audit, :cask do
+describe Hbc::Cmd::Audit, :cask do
   let(:cask) { Hbc::Cask.new(nil) }
 
   it_behaves_like "a command that handles invalid options"

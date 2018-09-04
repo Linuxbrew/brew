@@ -1,5 +1,5 @@
 module Hbc
-  class CLI
+  class Cmd
     class Edit < AbstractCommand
       def initialize(*)
         super

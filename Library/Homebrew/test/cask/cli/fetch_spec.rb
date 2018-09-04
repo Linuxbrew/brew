@@ -1,7 +1,7 @@
 require_relative "shared_examples/requires_cask_token"
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::CLI::Fetch, :cask do
+describe Hbc::Cmd::Fetch, :cask do
   let(:local_transmission) {
     Hbc::CaskLoader.load(cask_path("local-transmission"))
   }
