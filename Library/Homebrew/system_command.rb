@@ -30,16 +30,16 @@ class SystemCommand
   def run!
     puts command.shelljoin.gsub(/\\=/, "=") if verbose? || ARGV.debug?
 
-    @merged_output = []
+    @output = []
 
     each_output_line do |type, line|
       case type
       when :stdout
         $stdout << line if print_stdout?
-        @merged_output << [:stdout, line]
+        @output << [:stdout, line]
       when :stderr
         $stderr << line if print_stderr?
-        @merged_output << [:stderr, line]
+        @output << [:stderr, line]
       end
     end
 
@@ -100,7 +100,7 @@ class SystemCommand
     return if @status.success?
     raise ErrorDuringExecution.new(command,
                                    status: @status,
-                                   output: @merged_output)
+                                   output: @output)
   end
 
   def expanded_args
@@ -128,7 +128,7 @@ class SystemCommand
     @status = raw_wait_thr.value
   rescue SystemCallError => e
     @status = $CHILD_STATUS
-    @merged_output << [:stderr, e.message]
+    @output << [:stderr, e.message]
   end
 
   def write_input_to(raw_stdin)
@@ -158,22 +158,29 @@ class SystemCommand
   end
 
   def result
-    output = @merged_output.each_with_object(stdout: "", stderr: "") do |(type, line), hash|
-      hash[type] << line
-    end
-
-    Result.new(command, output[:stdout], output[:stderr], @status)
+    Result.new(command, @output, @status)
   end
 
   class Result
-    attr_accessor :command, :stdout, :stderr, :status, :exit_status
+    attr_accessor :command, :status, :exit_status
 
-    def initialize(command, stdout, stderr, status)
-      @command     = command
-      @stdout      = stdout
-      @stderr      = stderr
-      @status      = status
-      @exit_status = status.exitstatus
+    def initialize(command, output, status)
+      @command       = command
+      @output        = output
+      @status        = status
+      @exit_status   = status.exitstatus
+    end
+
+    def stdout
+      @stdout ||= @output.select { |type,| type == :stdout }
+                         .map { |_, line| line }
+                         .join
+    end
+
+    def stderr
+      @stderr ||= @output.select { |type,| type == :stderr }
+                         .map { |_, line| line }
+                         .join
     end
 
     def success?
