@@ -290,6 +290,6 @@ Man page format based on `brew.1.md` from Homebrew.
 We still have bugs - and we are busy fixing them!  If you have a problem, don't
 be shy about reporting it on our [GitHub issues page](https://github.com/Homebrew/homebrew-cask/issues?state=open).
 
-When reporting bugs, remember that Homebrew Cask is an independent project from
-Homebrew. Do your best to direct bug reports to the appropriate project. If
+When reporting bugs, remember that Homebrew Cask is an separate repository within
+Homebrew. Do your best to direct bug reports to the appropriate repository. If
 your command-line started with `brew cask`, bring the bug to us first!
