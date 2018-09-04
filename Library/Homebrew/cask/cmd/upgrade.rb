@@ -25,7 +25,7 @@ module Hbc
           oh1 "No Casks to upgrade"
           return
         end
-        
+
         ohai "Casks with `auto_updates` or `version :latest` will not be upgraded" if args.empty? && !greedy?
         oh1 "Upgrading #{Formatter.pluralize(outdated_casks.length, "outdated package")}, with result:"
         puts outdated_casks.map { |f| "#{f.full_name} #{f.version}" } * ", "
