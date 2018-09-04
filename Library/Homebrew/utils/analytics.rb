@@ -11,7 +11,9 @@ module Utils
       def os_prefix_ci
         @os_prefix_ci ||= begin
           os = OS_VERSION
-          prefix = (OS.mac? ? ", non-/usr/local" : ", custom-prefix") if HOMEBREW_PREFIX.to_s != HOMEBREW_DEFAULT_PREFIX
+          if HOMEBREW_PREFIX.to_s != HOMEBREW_DEFAULT_PREFIX
+            prefix = OS.mac? ? ", non-/usr/local" : ", custom-prefix"
+          end
           ci = ", CI" if ENV["CI"]
           "#{os}#{prefix}#{ci}"
         end

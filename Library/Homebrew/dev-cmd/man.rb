@@ -69,7 +69,7 @@ module Homebrew
     variables[:lead_maintainer] =
       readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
             .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:core_maintainer] = 
+    variables[:core_maintainer] =
       readme.read[%r{(Linuxbrew/homebrew-core's lead maintainer .*\.)}, 1]
             .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
     variables[:leadership] =

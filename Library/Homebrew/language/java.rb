@@ -1,7 +1,7 @@
 module Language
   module Java
     def self.java_home_cmd(version = nil)
-      return nil unless OS.mac?
+      return unless OS.mac?
       version_flag = " --version #{version}" if version
       "/usr/libexec/java_home#{version_flag}"
     end

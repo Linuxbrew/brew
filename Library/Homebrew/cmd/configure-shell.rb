@@ -23,7 +23,10 @@ module Homebrew
     env_path = HOMEBREW_PREFIX/"etc/brew.env"
     File.write env_path, brew_env unless File.file?(env_path)
     if File.read(env_path) != brew_env
-      odie "#{env_path} already exists. If you wish to replace this file, remove this file and run brew configure-shell again."
+      odie <<~EOS
+        "#{env_path} already exists. If you wish to replace this file,
+        remove this file and run brew configure-shell again."
+      EOS
     end
 
     # Now that brew.env has been written, tell the current user's ~/.profile and friends to source it

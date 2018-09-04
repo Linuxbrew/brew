@@ -398,7 +398,12 @@ class BuildError < RuntimeError
     if formula.tap && defined?(OS::ISSUES_URL)
       if formula.tap.official?
         puts Formatter.error(Formatter.url(OS::ISSUES_URL), label: "READ THIS")
-        puts "Please do not report this issue to Homebrew/brew or Homebrew/core, which support macOS only." unless OS.mac?
+        unless OS.mac?
+          puts <<~EOS
+            Please do not report this issue to Homebrew/brew or Homebrew/core,
+            which support macOS only."
+          EOS
+        end
       elsif issues_url = formula.tap.issues_url
         puts <<~EOS
           If reporting this issue please do so at (not Homebrew/brew or Homebrew/core):
