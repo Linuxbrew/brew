@@ -396,12 +396,7 @@ system "make", "target", "VAR2=value1", "VAR2=value2", "VAR3=values can have spa
 ```
 
 ```ruby
-args = %W[
-  CC=#{ENV.cc}
-  PREFIX=#{prefix}
-]
-
-system "make", *args
+system "make", "CC=#{ENV.cc}", "PREFIX=#{prefix}"
 ```
 
 Note that values *can* contain unescaped spaces if you use the multiple-argument form of `system`.
