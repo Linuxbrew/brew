@@ -28,7 +28,7 @@ begin
     raise "test returned false" if formula.run_test == false
   end
 rescue Exception => e # rubocop:disable Lint/RescueException
-  error_pipe.puts e.to_json
+  Marshal.dump(e, error_pipe)
   error_pipe.close
   exit! 1
 end
