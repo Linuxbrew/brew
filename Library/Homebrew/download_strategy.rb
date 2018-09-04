@@ -292,6 +292,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
           raise CurlDownloadStrategyError, url
         end
         ignore_interrupts do
+          cached_location.dirname.mkpath
           temporary_path.rename(cached_location)
           symlink_location.dirname.mkpath
         end
@@ -347,8 +348,6 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
   end
 
   def _fetch(url:, resolved_url:)
-    temporary_path.dirname.mkpath
-
     ohai "Downloading from #{resolved_url}" if url != resolved_url
 
     if ENV["HOMEBREW_NO_INSECURE_REDIRECT"] &&
