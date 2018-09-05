@@ -132,40 +132,18 @@ class LinkageChecker
           @brewed_dylibs[f] << dylib
         end
       end
-
-      next if OS.mac?
-      system_whitelist = %w[
-        ld-linux-x86-64.so.2
-        libanl.so.1
-        libc.so.6
-        libcrypt.so.1
-        libdl.so.2
-        libm.so.6
-        libmvec.so.1
-        libnsl.so.1
-        libpthread.so.0
-        libresolv.so.2
-        librt.so.1
-        libutil.so.1
-
-        libgcc_s.so.1
-        libgomp.so.1
-        libstdc++.so.6
-      ]
-      system_sonames = @system_dylibs.to_a.map { |s| File.basename s }
-      @unwanted_system_dylibs += system_sonames - system_whitelist
     end
 
     if formula
       @indirect_deps, @undeclared_deps, @unnecessary_deps,
         @version_conflict_deps = check_formula_deps
-      @undeclared_deps -= ["gcc", "glibc"] unless OS.mac?
     end
 
     return unless keg_files_dylibs_was_empty
 
     store&.update!(keg_files_dylibs: keg_files_dylibs)
   end
+  alias generic_check_dylibs check_dylibs
 
   def check_formula_deps
     filter_out = proc do |dep|
@@ -271,3 +249,5 @@ class LinkageChecker
     opoo "Formula unavailable: #{keg.name}"
   end
 end
+
+require "extend/os/linkage_checker"
