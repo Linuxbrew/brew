@@ -1,31 +1,24 @@
-require "cask/verify/checksum"
-
 module Hbc
   module Verify
     module_function
 
-    def verifications
-      [
-        Hbc::Verify::Checksum,
-      ]
-    end
-
     def all(cask, downloaded_path)
-      odebug "Verifying download"
-      verifications = for_cask(cask)
-      odebug "#{verifications.size} verifications defined", verifications
-      verifications.each do |verification|
-        odebug "Running verification of class #{verification}"
-        verification.new(cask, downloaded_path).verify
+      if cask.sha256 == :no_check
+        ohai "No SHA-256 checksum defined for Cask '#{cask}', skipping verification."
+        return
       end
-    end
 
-    def for_cask(cask)
-      odebug "Determining which verifications to run for Cask #{cask}"
-      verifications.select do |verification|
-        odebug "Checking for verification class #{verification}"
-        verification.me?(cask)
-      end
+      ohai "Verifying SHA-256 checksum for Cask '#{cask}'."
+
+      expected = cask.sha256
+      computed = downloaded_path.sha256
+
+      raise CaskSha256MissingError.new(cask.token, expected, computed) if expected.nil? || expected.empty?
+
+      return if expected == computed
+
+      ohai "Note: Running `brew update` may fix SHA-256 checksum errors."
+      raise CaskSha256MismatchError.new(cask.token, expected, computed, downloaded_path)
     end
   end
 end
