@@ -242,6 +242,9 @@ class Cmd
       false
     elsif mac?
       true
+    elsif path.start_with?("/usr/lib/jvm")
+      # keep path to JDK
+      true
     else
       false
     end
