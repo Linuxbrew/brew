@@ -1680,6 +1680,7 @@ class Formula
       HOMEBREW_PATH: nil,
       _JAVA_OPTIONS: "#{ENV["_JAVA_OPTIONS"]} -Duser.home=#{HOMEBREW_CACHE}/java_cache",
       GOCACHE: "#{HOMEBREW_CACHE}/go_cache",
+      CARGO_HOME: "#{HOMEBREW_CACHE}/cargo_cache",
     }
 
     ENV.clear_sensitive_environment!
@@ -2034,6 +2035,7 @@ class Formula
         stage_env[:_JAVA_OPTIONS] =
           "#{ENV["_JAVA_OPTIONS"]} -Duser.home=#{HOMEBREW_CACHE}/java_cache"
         stage_env[:GOCACHE] = "#{HOMEBREW_CACHE}/go_cache"
+        stage_env[:CARGO_HOME] = "#{HOMEBREW_CACHE}/cargo_cache"
         stage_env[:CURL_HOME] = ENV["CURL_HOME"] || ENV["HOME"]
       end
 

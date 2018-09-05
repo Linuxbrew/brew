@@ -225,6 +225,15 @@ describe Homebrew::Cleanup do
       expect(incomplete).not_to exist
     end
 
+    it "cleans up 'cargo_cache'" do
+      cargo_cache = (HOMEBREW_CACHE/"cargo_cache")
+      cargo_cache.mkpath
+
+      subject.cleanup_cache
+
+      expect(cargo_cache).not_to exist
+    end
+
     it "cleans up 'go_cache'" do
       go_cache = (HOMEBREW_CACHE/"go_cache")
       go_cache.mkpath

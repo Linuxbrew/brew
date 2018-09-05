@@ -36,7 +36,7 @@ module CleanupRefinement
     end
 
     def nested_cache?
-      directory? && %w[go_cache glide_home java_cache npm_cache gclient_cache].include?(basename.to_s)
+      directory? && %w[cargo_cache go_cache glide_home java_cache npm_cache gclient_cache].include?(basename.to_s)
     end
 
     def go_cache_directory?
