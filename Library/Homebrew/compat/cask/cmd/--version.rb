@@ -1,3 +1,6 @@
+require "cask/cmd/abstract_command"
+require "cmd/--version"
+
 module Hbc
   class Cmd
     class Version < AbstractCommand
@@ -12,11 +15,17 @@ module Hbc
       end
 
       def run
-        puts Hbc.full_version
+        odeprecated "`brew cask --version`", "`brew --version`", disable_on: Time.new(2018, 10, 31)
+        ARGV.clear
+        Homebrew.__version
       end
 
       def self.help
         "displays the Homebrew Cask version"
+      end
+
+      def self.visible
+        false
       end
     end
   end

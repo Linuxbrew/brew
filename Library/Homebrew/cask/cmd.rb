@@ -23,7 +23,6 @@ require "cask/cmd/reinstall"
 require "cask/cmd/style"
 require "cask/cmd/uninstall"
 require "cask/cmd/upgrade"
-require "cask/cmd/--version"
 require "cask/cmd/zap"
 
 require "cask/cmd/abstract_internal_command"
