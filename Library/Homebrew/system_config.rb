@@ -112,9 +112,9 @@ class SystemConfig
         f.puts "Core tap: N/A"
       end
       defaults_hash = {
-        HOMEBREW_PREFIX: "/usr/local",
-        HOMEBREW_REPOSITORY: "/usr/local/Homebrew",
-        HOMEBREW_CELLAR: "/usr/local/Cellar",
+        HOMEBREW_PREFIX: Homebrew::DEFAULT_PREFIX,
+        HOMEBREW_REPOSITORY: "#{Homebrew::DEFAULT_PREFIX}/Homebrew",
+        HOMEBREW_CELLAR: "#{Homebrew::DEFAULT_PREFIX}/Cellar",
         HOMEBREW_CACHE: "#{ENV["HOME"]}/Library/Caches/Homebrew",
         HOMEBREW_RUBY_WARNINGS: "-W0",
         HOMEBREW_TEMP: ENV["HOMEBREW_SYSTEM_TEMP"],

@@ -8,9 +8,9 @@ describe Utils::Analytics do
         described_class.clear_os_prefix_ci
       end
 
-      it "returns OS_VERSION and prefix when HOMEBREW_PREFIX is not /usr/local" do
+      it "returns OS_VERSION and prefix when HOMEBREW_PREFIX is a custom prefix" do
         stub_const("HOMEBREW_PREFIX", "blah")
-        expect(described_class.os_prefix_ci).to include("#{OS_VERSION}, non-/usr/local")
+        expect(described_class.os_prefix_ci).to include("#{OS_VERSION}, #{Utils::Analytics.custom_prefix_label}")
       end
 
       it "includes CI when ENV['CI'] is set" do
@@ -18,9 +18,9 @@ describe Utils::Analytics do
         expect(described_class.os_prefix_ci).to include("CI")
       end
 
-      it "does not include prefix when HOMEBREW_PREFIX is /usr/local" do
-        stub_const("HOMEBREW_PREFIX", "/usr/local")
-        expect(described_class.os_prefix_ci).not_to include("non-/usr/local")
+      it "does not include prefix when HOMEBREW_PREFIX is the default prefix" do
+        stub_const("HOMEBREW_PREFIX", Homebrew::DEFAULT_PREFIX)
+        expect(described_class.os_prefix_ci).not_to include(Utils::Analytics.custom_prefix_label)
       end
     end
   end

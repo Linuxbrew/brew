@@ -42,12 +42,20 @@ HOMEBREW_BOTTLE_DOMAIN = ENV["HOMEBREW_BOTTLE_DOMAIN"] ||
                          HOMEBREW_BOTTLE_DEFAULT_DOMAIN
 
 require "fileutils"
+require "os"
+require "os/global"
 
 module Homebrew
   extend FileUtils
 
+  DEFAULT_PREFIX ||= "/usr/local".freeze
+
   class << self
     attr_writer :failed, :raise_deprecation_exceptions, :auditing, :args
+
+    def Homebrew.default_prefix?(prefix = HOMEBREW_PREFIX)
+      prefix.to_s == DEFAULT_PREFIX
+    end
 
     def failed?
       @failed ||= false
@@ -108,7 +116,6 @@ HOMEBREW_INTERNAL_COMMAND_ALIASES = {
 
 require "set"
 
-require "os"
 require "extend/pathname"
 
 require "extend/module"

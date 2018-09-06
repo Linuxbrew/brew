@@ -3,6 +3,10 @@ require "erb"
 module Utils
   module Analytics
     class << self
+      def custom_prefix_label
+        "generic-prefix".freeze
+      end
+
       def clear_os_prefix_ci
         return unless instance_variable_defined?(:@os_prefix_ci)
         remove_instance_variable(:@os_prefix_ci)
@@ -11,7 +15,7 @@ module Utils
       def os_prefix_ci
         @os_prefix_ci ||= begin
           os = OS_VERSION
-          prefix = ", non-/usr/local" if HOMEBREW_PREFIX.to_s != "/usr/local"
+          prefix = ", #{custom_prefix_label}" if HOMEBREW_PREFIX.to_s != Homebrew::DEFAULT_PREFIX
           ci = ", CI" if ENV["CI"]
           "#{os}#{prefix}#{ci}"
         end
@@ -79,3 +83,5 @@ module Utils
     end
   end
 end
+
+require "extend/os/analytics"
