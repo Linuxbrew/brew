@@ -7,29 +7,22 @@
 # Unignore the contents of `Library` as that's where our code lives.
 !/Library/
 
-# Ignore generated files within `Library` (again).
-/Library/Homebrew/**/.bundle
-/Library/Homebrew/**/vendor/bundle
-/Library/Homebrew/bin/
+# Ignore files within `Library` (again).
+/Library/Homebrew/.npmignore
+/Library/Homebrew/bin
 /Library/Homebrew/doc
-/Library/Homebrew/cask/bin
-/Library/Homebrew/cask/coverage
-/Library/Homebrew/cask/tmp
-/Library/Homebrew/test/bin
-/Library/Homebrew/test/coverage
-/Library/Homebrew/test/fs_leak_log
 /Library/Homebrew/test/.gem
 /Library/Homebrew/test/.subversion
-/Library/Homebrew/tmp
-/Library/Homebrew/.npmignore
-/Library/LinkedKegs
-/Library/Locks
-/Library/PinnedKegs
-/Library/PinnedTaps
+/Library/Homebrew/test/coverage
+/Library/Homebrew/test/fs_leak_log
+/Library/Homebrew/vendor/portable-ruby
 /Library/Taps
 
-# Ignore vendored files within `Library`.
-/Library/Homebrew/vendor/portable-ruby
+# Ignore Bundler files
+**/.bundle/bin
+**/.bundle/cache
+**/vendor/bundle
+**/vendor/ruby
 
 # Ignore `bin` contents (again).
 /bin
@@ -37,20 +30,16 @@
 # Unignore our `brew` script.
 !/bin/brew
 
-# Unignore our documentation.
+# Unignore our documentation/completions.
 !/.github
+!/completions
 !/docs
 !/manpages
 
 # Ignore generated documentation site
 /docs/_site
-/docs/.bundle
 /docs/bin
-/docs/vendor
 /docs/.jekyll-metadata
-
-# Unignore our shell completion
-!/completions
 
 # Unignore our root-level metadata files.
 !/.gitignore
@@ -64,4 +53,4 @@
 !/README.md
 
 # Unignore tests' bundle config
-!/Library/Homebrew/test/.bundle
+!/Library/Homebrew/test/.bundle/config
