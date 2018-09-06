@@ -33,7 +33,7 @@ module Hbc
       end
 
       def check_software_versions
-        ohai "Homebrew Cask Version", Hbc.full_version
+        ohai "Homebrew Version", HOMEBREW_VERSION
         ohai "macOS", MacOS.full_version
         ohai "SIP", self.class.check_sip
         ohai "Java", SystemConfig.describe_java
