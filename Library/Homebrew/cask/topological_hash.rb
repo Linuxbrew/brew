@@ -1,7 +1,7 @@
 require "tsort"
 
 # a basic topologically sortable hashmap
-module Hbc
+module Cask
   class TopologicalHash < Hash
     include TSort
 

@@ -1,7 +1,7 @@
 require_relative "shared_examples/requires_cask_token"
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::Cmd::Cat, :cask do
+describe Cask::Cmd::Cat, :cask do
   it_behaves_like "a command that requires a Cask token"
   it_behaves_like "a command that handles invalid options"
 
@@ -35,6 +35,6 @@ describe Hbc::Cmd::Cat, :cask do
 
   it "raises an exception when the Cask does not exist" do
     expect { described_class.run("notacask") }
-      .to raise_error(Hbc::CaskUnavailableError, /is unavailable/)
+      .to raise_error(Cask::CaskUnavailableError, /is unavailable/)
   end
 end

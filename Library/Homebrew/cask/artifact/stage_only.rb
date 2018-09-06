@@ -1,6 +1,6 @@
 require "cask/artifact/abstract_artifact"
 
-module Hbc
+module Cask
   module Artifact
     class StageOnly < AbstractArtifact
       def self.from_args(cask, *args)

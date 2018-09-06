@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class DSL
     class Appcast
       attr_reader :uri, :checkpoint, :parameters

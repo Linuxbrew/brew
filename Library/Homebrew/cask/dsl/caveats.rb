@@ -5,7 +5,7 @@
 # ( The return value of the last method in the block is also sent
 #   to the output by the caller, but that feature is only for the
 #   convenience of Cask authors. )
-module Hbc
+module Cask
   class DSL
     class Caveats < Base
       def initialize(*args)

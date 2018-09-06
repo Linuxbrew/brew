@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   module Verify
     module_function
 

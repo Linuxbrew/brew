@@ -3,7 +3,7 @@ require "cask/artifact/abstract_artifact"
 require "extend/hash_validator"
 using HashValidator
 
-module Hbc
+module Cask
   module Artifact
     class Installer < AbstractArtifact
       VALID_KEYS = Set.new [

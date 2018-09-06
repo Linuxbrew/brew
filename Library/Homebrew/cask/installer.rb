@@ -11,10 +11,10 @@ require "cask/quarantine"
 
 require "cgi"
 
-module Hbc
+module Cask
   class Installer
     extend Predicable
-    # TODO: it is unwise for Hbc::Staged to be a module, when we are
+    # TODO: it is unwise for Cask::Staged to be a module, when we are
     #       dealing with both staged and unstaged Casks here. This should
     #       either be a class which is only sometimes instantiated, or there
     #       should be explicit checks on whether staged state is valid in
@@ -54,7 +54,7 @@ module Hbc
     end
 
     def fetch
-      odebug "Hbc::Installer#fetch"
+      odebug "Cask::Installer#fetch"
 
       satisfy_dependencies
 
@@ -64,7 +64,7 @@ module Hbc
     end
 
     def stage
-      odebug "Hbc::Installer#stage"
+      odebug "Cask::Installer#stage"
 
       Caskroom.ensure_caskroom_exists
 
@@ -78,7 +78,7 @@ module Hbc
     end
 
     def install
-      odebug "Hbc::Installer#install"
+      odebug "Cask::Installer#install"
 
       if @cask.installed? && !force? && !@reinstall && !upgrade?
         raise CaskAlreadyInstalledError, @cask
@@ -119,7 +119,7 @@ module Hbc
     end
 
     def reinstall
-      odebug "Hbc::Installer#reinstall"
+      odebug "Cask::Installer#reinstall"
       @reinstall = true
       install
     end

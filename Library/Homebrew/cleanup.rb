@@ -112,8 +112,8 @@ module CleanupRefinement
       return false unless name = basename.to_s[/\A(.*?)\-\-/, 1]
 
       cask = begin
-        Hbc::CaskLoader.load(name)
-      rescue Hbc::CaskUnavailableError
+        Cask::CaskLoader.load(name)
+      rescue Cask::CaskUnavailableError
         return false
       end
 
@@ -172,8 +172,8 @@ module Homebrew
           end
 
           cask = begin
-            Hbc::CaskLoader.load(arg)
-          rescue Hbc::CaskUnavailableError
+            Cask::CaskLoader.load(arg)
+          rescue Cask::CaskUnavailableError
             nil
           end
 

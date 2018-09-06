@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   module Checkable
     def errors
       @errors ||= []

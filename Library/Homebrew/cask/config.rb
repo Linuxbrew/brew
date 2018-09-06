@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Config
     def self.global
       @global ||= new

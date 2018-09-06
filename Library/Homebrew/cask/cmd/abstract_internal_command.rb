@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Cmd
     class AbstractInternalCommand < AbstractCommand
       def self.command_name

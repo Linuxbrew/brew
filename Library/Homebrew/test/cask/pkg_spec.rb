@@ -1,4 +1,4 @@
-describe Hbc::Pkg, :cask do
+describe Cask::Pkg, :cask do
   describe "#uninstall" do
     let(:fake_system_command) { NeverSudoSystemCommand }
     let(:empty_response) { double(stdout: "", plist: { "volume" => "/", "install-location" => "", "paths" => {} }) }
@@ -144,7 +144,7 @@ describe Hbc::Pkg, :cask do
     end
 
     it "correctly parses a Property List" do
-      pkg = Hbc::Pkg.new(pkg_id, fake_system_command)
+      pkg = Cask::Pkg.new(pkg_id, fake_system_command)
 
       expect(fake_system_command).to receive(:run!).with(
         "/usr/sbin/pkgutil",

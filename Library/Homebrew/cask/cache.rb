@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   module Cache
     module_function
 

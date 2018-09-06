@@ -1,115 +1,115 @@
-describe Hbc::Installer, :cask do
+describe Cask::Installer, :cask do
   describe "install" do
     let(:empty_depends_on_stub) {
       double(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
     }
 
     it "downloads and installs a nice fresh Cask" do
-      caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
+      caffeine = Cask::CaskLoader.load(cask_path("local-caffeine"))
 
-      Hbc::Installer.new(caffeine).install
+      Cask::Installer.new(caffeine).install
 
-      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).to be_a_directory
-      expect(Hbc::Config.global.appdir.join("Caffeine.app")).to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine", caffeine.version)).to be_a_directory
+      expect(Cask::Config.global.appdir.join("Caffeine.app")).to be_a_directory
     end
 
     it "works with dmg-based Casks" do
-      asset = Hbc::CaskLoader.load(cask_path("container-dmg"))
+      asset = Cask::CaskLoader.load(cask_path("container-dmg"))
 
-      Hbc::Installer.new(asset).install
+      Cask::Installer.new(asset).install
 
-      expect(Hbc::Caskroom.path.join("container-dmg", asset.version)).to be_a_directory
-      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
+      expect(Cask::Caskroom.path.join("container-dmg", asset.version)).to be_a_directory
+      expect(Cask::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "works with tar-gz-based Casks" do
-      asset = Hbc::CaskLoader.load(cask_path("container-tar-gz"))
+      asset = Cask::CaskLoader.load(cask_path("container-tar-gz"))
 
-      Hbc::Installer.new(asset).install
+      Cask::Installer.new(asset).install
 
-      expect(Hbc::Caskroom.path.join("container-tar-gz", asset.version)).to be_a_directory
-      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
+      expect(Cask::Caskroom.path.join("container-tar-gz", asset.version)).to be_a_directory
+      expect(Cask::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "works with xar-based Casks" do
-      asset = Hbc::CaskLoader.load(cask_path("container-xar"))
+      asset = Cask::CaskLoader.load(cask_path("container-xar"))
 
-      Hbc::Installer.new(asset).install
+      Cask::Installer.new(asset).install
 
-      expect(Hbc::Caskroom.path.join("container-xar", asset.version)).to be_a_directory
-      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
+      expect(Cask::Caskroom.path.join("container-xar", asset.version)).to be_a_directory
+      expect(Cask::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "works with pure bzip2-based Casks" do
-      asset = Hbc::CaskLoader.load(cask_path("container-bzip2"))
+      asset = Cask::CaskLoader.load(cask_path("container-bzip2"))
 
-      Hbc::Installer.new(asset).install
+      Cask::Installer.new(asset).install
 
-      expect(Hbc::Caskroom.path.join("container-bzip2", asset.version)).to be_a_directory
-      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
+      expect(Cask::Caskroom.path.join("container-bzip2", asset.version)).to be_a_directory
+      expect(Cask::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "works with pure gzip-based Casks" do
-      asset = Hbc::CaskLoader.load(cask_path("container-gzip"))
+      asset = Cask::CaskLoader.load(cask_path("container-gzip"))
 
-      Hbc::Installer.new(asset).install
+      Cask::Installer.new(asset).install
 
-      expect(Hbc::Caskroom.path.join("container-gzip", asset.version)).to be_a_directory
-      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
+      expect(Cask::Caskroom.path.join("container-gzip", asset.version)).to be_a_directory
+      expect(Cask::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "blows up on a bad checksum" do
-      bad_checksum = Hbc::CaskLoader.load(cask_path("bad-checksum"))
+      bad_checksum = Cask::CaskLoader.load(cask_path("bad-checksum"))
       expect {
-        Hbc::Installer.new(bad_checksum).install
-      }.to raise_error(Hbc::CaskSha256MismatchError)
+        Cask::Installer.new(bad_checksum).install
+      }.to raise_error(Cask::CaskSha256MismatchError)
     end
 
     it "blows up on a missing checksum" do
-      missing_checksum = Hbc::CaskLoader.load(cask_path("missing-checksum"))
+      missing_checksum = Cask::CaskLoader.load(cask_path("missing-checksum"))
       expect {
-        Hbc::Installer.new(missing_checksum).install
-      }.to raise_error(Hbc::CaskSha256MissingError)
+        Cask::Installer.new(missing_checksum).install
+      }.to raise_error(Cask::CaskSha256MissingError)
     end
 
     it "installs fine if sha256 :no_check is used" do
-      no_checksum = Hbc::CaskLoader.load(cask_path("no-checksum"))
+      no_checksum = Cask::CaskLoader.load(cask_path("no-checksum"))
 
-      Hbc::Installer.new(no_checksum).install
+      Cask::Installer.new(no_checksum).install
 
       expect(no_checksum).to be_installed
     end
 
     it "fails to install if sha256 :no_check is used with --require-sha" do
-      no_checksum = Hbc::CaskLoader.load(cask_path("no-checksum"))
+      no_checksum = Cask::CaskLoader.load(cask_path("no-checksum"))
       expect {
-        Hbc::Installer.new(no_checksum, require_sha: true).install
-      }.to raise_error(Hbc::CaskNoShasumError)
+        Cask::Installer.new(no_checksum, require_sha: true).install
+      }.to raise_error(Cask::CaskNoShasumError)
     end
 
     it "installs fine if sha256 :no_check is used with --require-sha and --force" do
-      no_checksum = Hbc::CaskLoader.load(cask_path("no-checksum"))
+      no_checksum = Cask::CaskLoader.load(cask_path("no-checksum"))
 
-      Hbc::Installer.new(no_checksum, require_sha: true, force: true).install
+      Cask::Installer.new(no_checksum, require_sha: true, force: true).install
 
       expect(no_checksum).to be_installed
     end
 
     it "prints caveats if they're present" do
-      with_caveats = Hbc::CaskLoader.load(cask_path("with-caveats"))
+      with_caveats = Cask::CaskLoader.load(cask_path("with-caveats"))
 
       expect {
-        Hbc::Installer.new(with_caveats).install
+        Cask::Installer.new(with_caveats).install
       }.to output(/Here are some things you might want to know/).to_stdout
 
       expect(with_caveats).to be_installed
     end
 
     it "prints installer :manual instructions when present" do
-      with_installer_manual = Hbc::CaskLoader.load(cask_path("with-installer-manual"))
+      with_installer_manual = Cask::CaskLoader.load(cask_path("with-installer-manual"))
 
       expect {
-        Hbc::Installer.new(with_installer_manual).install
+        Cask::Installer.new(with_installer_manual).install
       }.to output(
         <<~EOS
           ==> Satisfying dependencies
@@ -128,89 +128,89 @@ describe Hbc::Installer, :cask do
     end
 
     it "does not extract __MACOSX directories from zips" do
-      with_macosx_dir = Hbc::CaskLoader.load(cask_path("with-macosx-dir"))
+      with_macosx_dir = Cask::CaskLoader.load(cask_path("with-macosx-dir"))
 
-      Hbc::Installer.new(with_macosx_dir).install
+      Cask::Installer.new(with_macosx_dir).install
 
       expect(with_macosx_dir.staged_path.join("__MACOSX")).not_to be_a_directory
     end
 
     it "allows already-installed Casks which auto-update to be installed if force is provided" do
-      with_auto_updates = Hbc::CaskLoader.load(cask_path("auto-updates"))
+      with_auto_updates = Cask::CaskLoader.load(cask_path("auto-updates"))
 
       expect(with_auto_updates).not_to be_installed
 
-      Hbc::Installer.new(with_auto_updates).install
+      Cask::Installer.new(with_auto_updates).install
 
       expect {
-        Hbc::Installer.new(with_auto_updates, force: true).install
+        Cask::Installer.new(with_auto_updates, force: true).install
       }.not_to raise_error
     end
 
     # unlike the CLI, the internal interface throws exception on double-install
     it "installer method raises an exception when already-installed Casks are attempted" do
-      transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
+      transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
 
       expect(transmission).not_to be_installed
 
-      installer = Hbc::Installer.new(transmission)
+      installer = Cask::Installer.new(transmission)
 
       installer.install
 
       expect {
         installer.install
-      }.to raise_error(Hbc::CaskAlreadyInstalledError)
+      }.to raise_error(Cask::CaskAlreadyInstalledError)
     end
 
     it "allows already-installed Casks to be installed if force is provided" do
-      transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
+      transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
 
       expect(transmission).not_to be_installed
 
-      Hbc::Installer.new(transmission).install
+      Cask::Installer.new(transmission).install
 
       expect {
-        Hbc::Installer.new(transmission, force: true).install
+        Cask::Installer.new(transmission, force: true).install
       }.not_to raise_error
     end
 
     it "works naked-pkg-based Casks" do
-      naked_pkg = Hbc::CaskLoader.load(cask_path("container-pkg"))
+      naked_pkg = Cask::CaskLoader.load(cask_path("container-pkg"))
 
-      Hbc::Installer.new(naked_pkg).install
+      Cask::Installer.new(naked_pkg).install
 
-      expect(Hbc::Caskroom.path.join("container-pkg", naked_pkg.version, "container.pkg")).to be_a_file
+      expect(Cask::Caskroom.path.join("container-pkg", naked_pkg.version, "container.pkg")).to be_a_file
     end
 
     it "works properly with an overridden container :type" do
-      naked_executable = Hbc::CaskLoader.load(cask_path("naked-executable"))
+      naked_executable = Cask::CaskLoader.load(cask_path("naked-executable"))
 
-      Hbc::Installer.new(naked_executable).install
+      Cask::Installer.new(naked_executable).install
 
-      expect(Hbc::Caskroom.path.join("naked-executable", naked_executable.version, "naked_executable")).to be_a_file
+      expect(Cask::Caskroom.path.join("naked-executable", naked_executable.version, "naked_executable")).to be_a_file
     end
 
     it "works fine with a nested container" do
-      nested_app = Hbc::CaskLoader.load(cask_path("nested-app"))
+      nested_app = Cask::CaskLoader.load(cask_path("nested-app"))
 
-      Hbc::Installer.new(nested_app).install
+      Cask::Installer.new(nested_app).install
 
-      expect(Hbc::Config.global.appdir.join("MyNestedApp.app")).to be_a_directory
+      expect(Cask::Config.global.appdir.join("MyNestedApp.app")).to be_a_directory
     end
 
     it "generates and finds a timestamped metadata directory for an installed Cask" do
-      caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
+      caffeine = Cask::CaskLoader.load(cask_path("local-caffeine"))
 
-      Hbc::Installer.new(caffeine).install
+      Cask::Installer.new(caffeine).install
 
       m_path = caffeine.metadata_timestamped_path(timestamp: :now, create: true)
       expect(caffeine.metadata_timestamped_path(timestamp: :latest)).to eq(m_path)
     end
 
     it "generates and finds a metadata subdirectory for an installed Cask" do
-      caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
+      caffeine = Cask::CaskLoader.load(cask_path("local-caffeine"))
 
-      Hbc::Installer.new(caffeine).install
+      Cask::Installer.new(caffeine).install
 
       subdir_name = "Casks"
       m_subdir = caffeine.metadata_subdir(subdir_name, timestamp: :now, create: true)
@@ -220,35 +220,35 @@ describe Hbc::Installer, :cask do
 
   describe "uninstall" do
     it "fully uninstalls a Cask" do
-      caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
-      installer = Hbc::Installer.new(caffeine)
+      caffeine = Cask::CaskLoader.load(cask_path("local-caffeine"))
+      installer = Cask::Installer.new(caffeine)
 
       installer.install
       installer.uninstall
 
-      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version, "Caffeine.app")).not_to be_a_directory
-      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
-      expect(Hbc::Caskroom.path.join("local-caffeine")).not_to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine", caffeine.version, "Caffeine.app")).not_to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine")).not_to be_a_directory
     end
 
     it "uninstalls all versions if force is set" do
-      caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
+      caffeine = Cask::CaskLoader.load(cask_path("local-caffeine"))
       mutated_version = caffeine.version + ".1"
 
-      Hbc::Installer.new(caffeine).install
+      Cask::Installer.new(caffeine).install
 
-      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).to be_a_directory
-      expect(Hbc::Caskroom.path.join("local-caffeine", mutated_version)).not_to be_a_directory
-      FileUtils.mv(Hbc::Caskroom.path.join("local-caffeine", caffeine.version),
-                   Hbc::Caskroom.path.join("local-caffeine", mutated_version))
-      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
-      expect(Hbc::Caskroom.path.join("local-caffeine", mutated_version)).to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine", caffeine.version)).to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine", mutated_version)).not_to be_a_directory
+      FileUtils.mv(Cask::Caskroom.path.join("local-caffeine", caffeine.version),
+                   Cask::Caskroom.path.join("local-caffeine", mutated_version))
+      expect(Cask::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine", mutated_version)).to be_a_directory
 
-      Hbc::Installer.new(caffeine, force: true).uninstall
+      Cask::Installer.new(caffeine, force: true).uninstall
 
-      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
-      expect(Hbc::Caskroom.path.join("local-caffeine", mutated_version)).not_to be_a_directory
-      expect(Hbc::Caskroom.path.join("local-caffeine")).not_to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine", mutated_version)).not_to be_a_directory
+      expect(Cask::Caskroom.path.join("local-caffeine")).not_to be_a_directory
     end
   end
 end

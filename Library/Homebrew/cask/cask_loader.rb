@@ -1,7 +1,7 @@
 require "cask/cask"
 require "uri"
 
-module Hbc
+module Cask
   module CaskLoader
     class FromContentLoader
       attr_reader :content

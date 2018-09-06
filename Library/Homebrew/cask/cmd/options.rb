@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Cmd
     module Options
       def self.included(klass)

@@ -1,6 +1,6 @@
 require "rubygems"
 
-module Hbc
+module Cask
   class DSL
     class DependsOn < DelegateClass(Hash)
       VALID_KEYS = Set.new [

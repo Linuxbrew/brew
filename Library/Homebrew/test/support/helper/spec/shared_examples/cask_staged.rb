@@ -1,6 +1,6 @@
 require "cask/staged"
 
-shared_examples Hbc::Staged do
+shared_examples Cask::Staged do
   let(:existing_path) { Pathname.new("/path/to/file/that/exists") }
   let(:non_existent_path) { Pathname.new("/path/to/file/that/does/not/exist") }
 
@@ -22,7 +22,7 @@ shared_examples Hbc::Staged do
   end
 
   it "can get the Info.plist file for the primary app" do
-    expect(staged.info_plist_file).to eq Hbc::Config.global.appdir.join("TestCask.app/Contents/Info.plist")
+    expect(staged.info_plist_file).to eq Cask::Config.global.appdir.join("TestCask.app/Contents/Info.plist")
   end
 
   it "can execute commands on the Info.plist file" do

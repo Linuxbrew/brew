@@ -1,6 +1,6 @@
 require "cask/dsl/base"
 
-shared_examples Hbc::DSL::Base do
+shared_examples Cask::DSL::Base do
   it "supports the token method" do
     expect(dsl.token).to eq(cask.token)
   end

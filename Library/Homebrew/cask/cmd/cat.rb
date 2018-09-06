@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Cmd
     class Cat < AbstractCommand
       def initialize(*)

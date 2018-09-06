@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Cmd
     class Style < AbstractCommand
       def self.help

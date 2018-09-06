@@ -1,6 +1,6 @@
 require "cask/staged"
 
-module Hbc
+module Cask
   class DSL
     class Postflight < Base
       include Staged

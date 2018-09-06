@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Cmd
     class Audit < AbstractCommand
       option "--download",        :download,        false

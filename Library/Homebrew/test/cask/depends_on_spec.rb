@@ -3,17 +3,17 @@
 describe "Satisfy Dependencies and Requirements", :cask do
   subject {
     lambda do
-      Hbc::Installer.new(cask).install
+      Cask::Installer.new(cask).install
     end
   }
 
   describe "depends_on cask" do
     context "when depends_on cask is cyclic" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-cask-cyclic")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-cask-cyclic")) }
 
       it {
         is_expected.to raise_error(
-          Hbc::CaskCyclicDependencyError,
+          Cask::CaskCyclicDependencyError,
           "Cask 'with-depends-on-cask-cyclic' includes cyclic dependencies "\
           "on other Casks: with-depends-on-cask-cyclic-helper",
         )
@@ -21,8 +21,8 @@ describe "Satisfy Dependencies and Requirements", :cask do
     end
 
     context do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-cask")) }
-      let(:dependency) { Hbc::CaskLoader.load(cask.depends_on.cask.first) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-cask")) }
+      let(:dependency) { Cask::CaskLoader.load(cask.depends_on.cask.first) }
 
       it "installs the dependency of a Cask and the Cask itself" do
         expect(subject).not_to raise_error
@@ -34,39 +34,39 @@ describe "Satisfy Dependencies and Requirements", :cask do
 
   describe "depends_on macos" do
     context "given an array" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-array")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-macos-array")) }
 
       it { is_expected.not_to raise_error }
     end
 
     context "given a comparison" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-comparison")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-macos-comparison")) }
 
       it { is_expected.not_to raise_error }
     end
 
     context "given a string" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-string")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-macos-string")) }
 
       it { is_expected.not_to raise_error }
     end
 
     context "given a symbol" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-symbol")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-macos-symbol")) }
 
       it { is_expected.not_to raise_error }
     end
 
     context "when not satisfied" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-failure")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-macos-failure")) }
 
-      it { is_expected.to raise_error(Hbc::CaskError) }
+      it { is_expected.to raise_error(Cask::CaskError) }
     end
   end
 
   describe "depends_on arch" do
     context "when satisfied" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-arch")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-arch")) }
 
       it { is_expected.not_to raise_error }
     end
@@ -78,21 +78,21 @@ describe "Satisfy Dependencies and Requirements", :cask do
     end
 
     context "when satisfied" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-x11")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-x11")) }
       let(:x11_installed) { true }
 
       it { is_expected.not_to raise_error }
     end
 
     context "when not satisfied" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-x11")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-x11")) }
       let(:x11_installed) { false }
 
-      it { is_expected.to raise_error(Hbc::CaskX11DependencyError) }
+      it { is_expected.to raise_error(Cask::CaskX11DependencyError) }
     end
 
     context "when depends_on x11: false" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-x11-false")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-x11-false")) }
       let(:x11_installed) { false }
 
       it { is_expected.not_to raise_error }

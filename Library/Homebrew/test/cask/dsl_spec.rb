@@ -1,5 +1,5 @@
-describe Hbc::DSL, :cask do
-  let(:cask) { Hbc::CaskLoader.load(cask_path(token.to_s)) }
+describe Cask::DSL, :cask do
+  let(:cask) { Cask::CaskLoader.load(cask_path(token.to_s)) }
   let(:token) { "basic-cask" }
 
   context "stanzas" do
@@ -13,7 +13,7 @@ describe Hbc::DSL, :cask do
   describe "when a Cask includes an unknown method" do
     let(:attempt_unknown_method) {
       lambda do
-        Hbc::Cask.new("unexpected-method-cask") do
+        Cask::Cask.new("unexpected-method-cask") do
           future_feature :not_yet_on_your_machine
         end
       end
@@ -46,7 +46,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-header-format" }
 
       it "raises an error" do
-        expect { cask }.to raise_error(Hbc::CaskUnreadableError)
+        expect { cask }.to raise_error(Cask::CaskUnreadableError)
       end
     end
 
@@ -56,7 +56,7 @@ describe Hbc::DSL, :cask do
       it "raises an error" do
         expect {
           cask
-        }.to raise_error(Hbc::CaskTokenMismatchError, /header line does not match the file name/)
+        }.to raise_error(Cask::CaskTokenMismatchError, /header line does not match the file name/)
       end
     end
 
@@ -74,7 +74,7 @@ describe Hbc::DSL, :cask do
 
   describe "name stanza" do
     it "lets you set the full name via a name stanza" do
-      cask = Hbc::Cask.new("name-cask") do
+      cask = Cask::Cask.new("name-cask") do
         name "Proper Name"
       end
 
@@ -84,7 +84,7 @@ describe Hbc::DSL, :cask do
     end
 
     it "Accepts an array value to the name stanza" do
-      cask = Hbc::Cask.new("array-name-cask") do
+      cask = Cask::Cask.new("array-name-cask") do
         name ["Proper Name", "Alternate Name"]
       end
 
@@ -95,7 +95,7 @@ describe Hbc::DSL, :cask do
     end
 
     it "Accepts multiple name stanzas" do
-      cask = Hbc::Cask.new("multi-name-cask") do
+      cask = Cask::Cask.new("multi-name-cask") do
         name "Proper Name"
         name "Alternate Name"
       end
@@ -109,7 +109,7 @@ describe Hbc::DSL, :cask do
 
   describe "sha256 stanza" do
     it "lets you set checksum via sha256" do
-      cask = Hbc::Cask.new("checksum-cask") do
+      cask = Cask::Cask.new("checksum-cask") do
         sha256 "imasha2"
       end
 
@@ -120,7 +120,7 @@ describe Hbc::DSL, :cask do
   describe "language stanza" do
     it "allows multilingual casks" do
       cask = lambda do
-        Hbc::Cask.new("cask-with-apps") do
+        Cask::Cask.new("cask-with-apps") do
           language "zh" do
             sha256 "abc123"
             "zh-CN"
@@ -168,7 +168,7 @@ describe Hbc::DSL, :cask do
 
     it "returns an empty array if no languages are specified" do
       cask = lambda do
-        Hbc::Cask.new("cask-with-apps") do
+        Cask::Cask.new("cask-with-apps") do
           url "https://example.org/file.zip"
         end
       end
@@ -178,7 +178,7 @@ describe Hbc::DSL, :cask do
 
     it "returns an array of available languages" do
       cask = lambda do
-        Hbc::Cask.new("cask-with-apps") do
+        Cask::Cask.new("cask-with-apps") do
           language "zh" do
             sha256 "abc123"
             "zh-CN"
@@ -199,7 +199,7 @@ describe Hbc::DSL, :cask do
 
   describe "app stanza" do
     it "allows you to specify app stanzas" do
-      cask = Hbc::Cask.new("cask-with-apps") do
+      cask = Cask::Cask.new("cask-with-apps") do
         app "Foo.app"
         app "Bar.app"
       end
@@ -208,18 +208,18 @@ describe Hbc::DSL, :cask do
     end
 
     it "allow app stanzas to be empty" do
-      cask = Hbc::Cask.new("cask-with-no-apps")
+      cask = Cask::Cask.new("cask-with-no-apps")
       expect(cask.artifacts).to be_empty
     end
   end
 
   describe "caveats stanza" do
     it "allows caveats to be specified via a method define" do
-      cask = Hbc::Cask.new("plain-cask")
+      cask = Cask::Cask.new("plain-cask")
 
       expect(cask.caveats).to be_empty
 
-      cask = Hbc::Cask.new("cask-with-caveats") do
+      cask = Cask::Cask.new("cask-with-caveats") do
         def caveats
           <<~EOS
             When you install this Cask, you probably want to know this.
@@ -233,7 +233,7 @@ describe Hbc::DSL, :cask do
 
   describe "pkg stanza" do
     it "allows installable pkgs to be specified" do
-      cask = Hbc::Cask.new("cask-with-pkgs") do
+      cask = Cask::Cask.new("cask-with-pkgs") do
         pkg "Foo.pkg"
         pkg "Bar.pkg"
       end
@@ -246,7 +246,7 @@ describe Hbc::DSL, :cask do
     let(:token) { "invalid/invalid-two-url" }
 
     it "prevents defining multiple urls" do
-      expect { cask }.to raise_error(Hbc::CaskInvalidError, /'url' stanza may only appear once/)
+      expect { cask }.to raise_error(Cask::CaskInvalidError, /'url' stanza may only appear once/)
     end
   end
 
@@ -254,7 +254,7 @@ describe Hbc::DSL, :cask do
     let(:token) { "invalid/invalid-two-homepage" }
 
     it "prevents defining multiple homepages" do
-      expect { cask }.to raise_error(Hbc::CaskInvalidError, /'homepage' stanza may only appear once/)
+      expect { cask }.to raise_error(Cask::CaskInvalidError, /'homepage' stanza may only appear once/)
     end
   end
 
@@ -262,7 +262,7 @@ describe Hbc::DSL, :cask do
     let(:token) { "invalid/invalid-two-version" }
 
     it "prevents defining multiple versions" do
-      expect { cask }.to raise_error(Hbc::CaskInvalidError, /'version' stanza may only appear once/)
+      expect { cask }.to raise_error(Cask::CaskInvalidError, /'version' stanza may only appear once/)
     end
   end
 
@@ -277,7 +277,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-appcast-multiple" }
 
       it "raises an error" do
-        expect { cask }.to raise_error(Hbc::CaskInvalidError, /'appcast' stanza may only appear once/)
+        expect { cask }.to raise_error(Cask::CaskInvalidError, /'appcast' stanza may only appear once/)
       end
     end
 
@@ -285,7 +285,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-appcast-url" }
 
       it "refuses to load" do
-        expect { cask }.to raise_error(Hbc::CaskInvalidError)
+        expect { cask }.to raise_error(Cask::CaskInvalidError)
       end
     end
   end
@@ -294,7 +294,7 @@ describe Hbc::DSL, :cask do
     let(:token) { "invalid/invalid-depends-on-key" }
 
     it "refuses to load with an invalid depends_on key" do
-      expect { cask }.to raise_error(Hbc::CaskInvalidError)
+      expect { cask }.to raise_error(Cask::CaskInvalidError)
     end
   end
 
@@ -347,7 +347,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-depends-on-macos-bad-release" }
 
       it "refuses to load" do
-        expect { cask }.to raise_error(Hbc::CaskInvalidError)
+        expect { cask }.to raise_error(Cask::CaskInvalidError)
       end
     end
 
@@ -355,7 +355,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-depends-on-macos-conflicting-forms" }
 
       it "refuses to load" do
-        expect { cask }.to raise_error(Hbc::CaskInvalidError)
+        expect { cask }.to raise_error(Cask::CaskInvalidError)
       end
     end
   end
@@ -373,7 +373,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-depends-on-arch-value" }
 
       it "refuses to load" do
-        expect { cask }.to raise_error(Hbc::CaskInvalidError)
+        expect { cask }.to raise_error(Cask::CaskInvalidError)
       end
     end
   end
@@ -391,7 +391,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-depends-on-x11-value" }
 
       it "refuses to load" do
-        expect { cask }.to raise_error(Hbc::CaskInvalidError)
+        expect { cask }.to raise_error(Cask::CaskInvalidError)
       end
     end
   end
@@ -409,7 +409,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-conflicts-with-key" }
 
       it "refuses to load invalid conflicts_with key" do
-        expect { cask }.to raise_error(Hbc::CaskInvalidError)
+        expect { cask }.to raise_error(Cask::CaskInvalidError)
       end
     end
   end
@@ -431,7 +431,7 @@ describe Hbc::DSL, :cask do
 
       it "allows installer manual to be specified" do
         installer = cask.artifacts.first
-        expect(installer).to be_a(Hbc::Artifact::Installer::ManualInstaller)
+        expect(installer).to be_a(Cask::Artifact::Installer::ManualInstaller)
         expect(installer.path).to eq(Pathname("Caffeine.app"))
       end
     end
@@ -442,7 +442,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "stage-only" }
 
       it "allows stage_only stanza to be specified" do
-        expect(cask.artifacts).to contain_exactly a_kind_of Hbc::Artifact::StageOnly
+        expect(cask.artifacts).to contain_exactly a_kind_of Cask::Artifact::StageOnly
       end
     end
 
@@ -450,7 +450,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-stage-only-conflict" }
 
       it "prevents specifying stage_only" do
-        expect { cask }.to raise_error(Hbc::CaskInvalidError, /'stage_only' must be the only activatable artifact/)
+        expect { cask }.to raise_error(Cask::CaskInvalidError, /'stage_only' must be the only activatable artifact/)
       end
     end
   end
@@ -468,29 +468,29 @@ describe Hbc::DSL, :cask do
       let(:token) { "appdir-interpolation" }
 
       it "is allowed" do
-        expect(cask.artifacts.first.source).to eq(Hbc::Config.global.appdir/"some/path")
+        expect(cask.artifacts.first.source).to eq(Cask::Config.global.appdir/"some/path")
       end
     end
 
     it "does not include a trailing slash" do
       begin
-        original_appdir = Hbc::Config.global.appdir
-        Hbc::Config.global.appdir = "#{original_appdir}/"
+        original_appdir = Cask::Config.global.appdir
+        Cask::Config.global.appdir = "#{original_appdir}/"
 
-        cask = Hbc::Cask.new("appdir-trailing-slash") do
+        cask = Cask::Cask.new("appdir-trailing-slash") do
           binary "#{appdir}/some/path"
         end
 
         expect(cask.artifacts.first.source).to eq(original_appdir/"some/path")
       ensure
-        Hbc::Config.global.appdir = original_appdir
+        Cask::Config.global.appdir = original_appdir
       end
     end
   end
 
   describe "#artifacts" do
     it "sorts artifacts according to the preferable installation order" do
-      cask = Hbc::Cask.new("appdir-trailing-slash") do
+      cask = Cask::Cask.new("appdir-trailing-slash") do
         postflight do
           next
         end

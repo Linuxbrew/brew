@@ -1,6 +1,6 @@
 require "cask/artifact/abstract_uninstall"
 
-module Hbc
+module Cask
   module Artifact
     class Uninstall < AbstractUninstall
       def uninstall_phase(**options)

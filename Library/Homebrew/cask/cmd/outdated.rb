@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Cmd
     class Outdated < AbstractCommand
       option "--greedy", :greedy, false

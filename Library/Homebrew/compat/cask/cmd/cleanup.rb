@@ -3,7 +3,7 @@ require "cleanup"
 
 using CleanupRefinement
 
-module Hbc
+module Cask
   class Cmd
     class Cleanup < AbstractCommand
       OUTDATED_DAYS = 10

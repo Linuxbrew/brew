@@ -4,7 +4,7 @@ require "stringio"
 
 BUG_REPORTS_URL = "https://github.com/Homebrew/homebrew-cask#reporting-bugs".freeze
 
-module Hbc
+module Cask
   module Utils
     def self.gain_permissions_remove(path, command: SystemCommand)
       if path.respond_to?(:rmtree) && path.exist?

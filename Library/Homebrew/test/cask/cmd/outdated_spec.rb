@@ -1,13 +1,13 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::Cmd::Outdated, :cask do
+describe Cask::Cmd::Outdated, :cask do
   let(:installed) do
     [
-      Hbc::CaskLoader.load(cask_path("basic-cask")),
-      Hbc::CaskLoader.load(cask_path("outdated/local-caffeine")),
-      Hbc::CaskLoader.load(cask_path("outdated/local-transmission")),
-      Hbc::CaskLoader.load(cask_path("version-latest-string")),
-      Hbc::CaskLoader.load(cask_path("outdated/auto-updates")),
+      Cask::CaskLoader.load(cask_path("basic-cask")),
+      Cask::CaskLoader.load(cask_path("outdated/local-caffeine")),
+      Cask::CaskLoader.load(cask_path("outdated/local-transmission")),
+      Cask::CaskLoader.load(cask_path("version-latest-string")),
+      Cask::CaskLoader.load(cask_path("outdated/auto-updates")),
     ]
   end
 
@@ -74,7 +74,7 @@ describe Hbc::Cmd::Outdated, :cask do
     end
 
     it 'does not include the Casks with "auto_updates true" when the version did not change' do
-      cask = Hbc::CaskLoader.load(cask_path("auto-updates"))
+      cask = Cask::CaskLoader.load(cask_path("auto-updates"))
       InstallHelper.install_with_caskfile(cask)
 
       expect {

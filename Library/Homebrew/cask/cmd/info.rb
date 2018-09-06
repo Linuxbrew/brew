@@ -1,6 +1,6 @@
 require "json"
 
-module Hbc
+module Cask
   class Cmd
     class Info < AbstractCommand
       option "--json=VERSION", :json

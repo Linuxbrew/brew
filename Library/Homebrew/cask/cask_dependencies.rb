@@ -2,7 +2,7 @@ require "delegate"
 
 require "cask/topological_hash"
 
-module Hbc
+module Cask
   class CaskDependencies < DelegateClass(Array)
     attr_reader :cask, :graph
 

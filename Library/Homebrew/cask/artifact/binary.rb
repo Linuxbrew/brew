@@ -1,6 +1,6 @@
 require "cask/artifact/symlinked"
 
-module Hbc
+module Cask
   module Artifact
     class Binary < Symlinked
       def link(command: nil, **options)

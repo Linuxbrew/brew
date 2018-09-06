@@ -1,6 +1,6 @@
 require "cmd/cask"
 
-describe Hbc::DSL::Appcast do
+describe Cask::DSL::Appcast do
   subject { described_class.new(url, params) }
 
   let(:url) { "https://example.com" }

@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Cmd
     class List < AbstractCommand
       option "-1", :one, false

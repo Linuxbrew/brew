@@ -10,9 +10,9 @@ module Homebrew
         puts
 
         ohai "Casks"
-        Hbc::Cask.to_a.extend(Searchable)
-                 .search(string_or_regex, &:name)
-                 .each do |cask|
+        Cask::Cask.to_a.extend(Searchable)
+                  .search(string_or_regex, &:name)
+                  .each do |cask|
           puts "#{Tty.bold}#{cask.token}:#{Tty.reset} #{cask.name.join(", ")}"
         end
       end
@@ -20,13 +20,13 @@ module Homebrew
       def search_casks(string_or_regex)
         if string_or_regex.is_a?(String) && string_or_regex.match?(HOMEBREW_TAP_CASK_REGEX)
           return begin
-            [Hbc::CaskLoader.load(string_or_regex).token]
-          rescue Hbc::CaskUnavailableError
+            [Cask::CaskLoader.load(string_or_regex).token]
+          rescue Cask::CaskUnavailableError
             []
           end
         end
 
-        results = Hbc::Cask.search(string_or_regex, &:token).sort_by(&:token)
+        results = Cask::Cask.search(string_or_regex, &:token).sort_by(&:token)
 
         results.map do |cask|
           if cask.installed?

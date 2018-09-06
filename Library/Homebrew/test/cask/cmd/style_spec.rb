@@ -3,7 +3,7 @@ require "rubygems"
 
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::Cmd::Style, :cask do
+describe Cask::Cmd::Style, :cask do
   let(:args) { [] }
   let(:cli) { described_class.new(*args) }
 
@@ -32,7 +32,7 @@ describe Hbc::Cmd::Style, :cask do
       let(:success) { false }
 
       it "raises an error" do
-        expect { subject }.to raise_error(Hbc::CaskError)
+        expect { subject }.to raise_error(Cask::CaskError)
       end
     end
   end
@@ -56,7 +56,7 @@ describe Hbc::Cmd::Style, :cask do
       end
 
       it "raises an error" do
-        expect { subject }.to raise_error(Hbc::CaskError)
+        expect { subject }.to raise_error(Cask::CaskError)
       end
     end
 
@@ -118,7 +118,7 @@ describe Hbc::Cmd::Style, :cask do
       end
 
       it "tries to find paths for all tokens" do
-        expect(Hbc::CaskLoader).to receive(:load).twice.and_return(double("cask", sourcefile_path: nil))
+        expect(Cask::CaskLoader).to receive(:load).twice.and_return(double("cask", sourcefile_path: nil))
         subject
       end
     end

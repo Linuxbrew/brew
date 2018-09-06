@@ -1,13 +1,13 @@
 require_relative "shared_examples/requires_cask_token"
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::Cmd::Create, :cask do
+describe Cask::Cmd::Create, :cask do
   around do |example|
     begin
       example.run
     ensure
       %w[new-cask additional-cask another-cask yet-another-cask local-caff].each do |cask|
-        FileUtils.rm_f Hbc::CaskLoader.path(cask)
+        FileUtils.rm_f Cask::CaskLoader.path(cask)
       end
     end
   end
@@ -21,13 +21,13 @@ describe Hbc::Cmd::Create, :cask do
 
   it "opens the editor for the specified Cask" do
     command = described_class.new("new-cask")
-    expect(command).to receive(:exec_editor).with(Hbc::CaskLoader.path("new-cask"))
+    expect(command).to receive(:exec_editor).with(Cask::CaskLoader.path("new-cask"))
     command.run
   end
 
   it "drops a template down for the specified Cask" do
     described_class.run("new-cask")
-    template = File.read(Hbc::CaskLoader.path("new-cask"))
+    template = File.read(Cask::CaskLoader.path("new-cask"))
     expect(template).to eq <<~RUBY
       cask 'new-cask' do
         version ''
@@ -51,12 +51,12 @@ describe Hbc::Cmd::Create, :cask do
   it "raises an exception when the Cask already exists" do
     expect {
       described_class.run("basic-cask")
-    }.to raise_error(Hbc::CaskAlreadyCreatedError)
+    }.to raise_error(Cask::CaskAlreadyCreatedError)
   end
 
   it "allows creating Casks that are substrings of existing Casks" do
     command = described_class.new("local-caff")
-    expect(command).to receive(:exec_editor).with(Hbc::CaskLoader.path("local-caff"))
+    expect(command).to receive(:exec_editor).with(Cask::CaskLoader.path("local-caff"))
     command.run
   end
 end

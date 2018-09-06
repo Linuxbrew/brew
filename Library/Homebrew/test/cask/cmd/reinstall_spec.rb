@@ -1,12 +1,12 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::Cmd::Reinstall, :cask do
+describe Cask::Cmd::Reinstall, :cask do
   it_behaves_like "a command that handles invalid options"
 
   it "displays the reinstallation progress" do
-    caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
+    caffeine = Cask::CaskLoader.load(cask_path("local-caffeine"))
 
-    Hbc::Installer.new(caffeine).install
+    Cask::Installer.new(caffeine).install
 
     output = Regexp.new <<~EOS
       ==> Downloading file:.*caffeine.zip
@@ -22,23 +22,23 @@ describe Hbc::Cmd::Reinstall, :cask do
     EOS
 
     expect {
-      Hbc::Cmd::Reinstall.run("local-caffeine")
+      Cask::Cmd::Reinstall.run("local-caffeine")
     }.to output(output).to_stdout
   end
 
   it "allows reinstalling a Cask" do
-    Hbc::Cmd::Install.run("local-transmission")
+    Cask::Cmd::Install.run("local-transmission")
 
-    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
+    expect(Cask::CaskLoader.load(cask_path("local-transmission"))).to be_installed
 
-    Hbc::Cmd::Reinstall.run("local-transmission")
-    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
+    Cask::Cmd::Reinstall.run("local-transmission")
+    expect(Cask::CaskLoader.load(cask_path("local-transmission"))).to be_installed
   end
 
   it "allows reinstalling a non installed Cask" do
-    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).not_to be_installed
+    expect(Cask::CaskLoader.load(cask_path("local-transmission"))).not_to be_installed
 
-    Hbc::Cmd::Reinstall.run("local-transmission")
-    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
+    Cask::Cmd::Reinstall.run("local-transmission")
+    expect(Cask::CaskLoader.load(cask_path("local-transmission"))).to be_installed
   end
 end

@@ -29,7 +29,7 @@ require "cask/cmd/abstract_internal_command"
 require "cask/cmd/internal_help"
 require "cask/cmd/internal_stanza"
 
-module Hbc
+module Cask
   class Cmd
     ALIASES = {
       "ls"       => "list",

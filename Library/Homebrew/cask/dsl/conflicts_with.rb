@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class DSL
     class ConflictsWith
       VALID_KEYS = Set.new [

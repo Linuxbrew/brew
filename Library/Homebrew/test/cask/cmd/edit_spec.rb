@@ -1,7 +1,7 @@
 require_relative "shared_examples/requires_cask_token"
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::Cmd::Edit, :cask do
+describe Cask::Cmd::Edit, :cask do
   before do
     allow_any_instance_of(described_class).to receive(:exec_editor)
   end
@@ -11,7 +11,7 @@ describe Hbc::Cmd::Edit, :cask do
 
   it "opens the editor for the specified Cask" do
     command = described_class.new("local-caffeine")
-    expect(command).to receive(:exec_editor).with(Hbc::CaskLoader.path("local-caffeine"))
+    expect(command).to receive(:exec_editor).with(Cask::CaskLoader.path("local-caffeine"))
     command.run
   end
 
@@ -24,6 +24,6 @@ describe Hbc::Cmd::Edit, :cask do
   it "raises an exception when the Cask doesnt exist" do
     expect {
       described_class.run("notacask")
-    }.to raise_error(Hbc::CaskUnavailableError)
+    }.to raise_error(Cask::CaskUnavailableError)
   end
 end

@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   describe Verify, :cask do
     describe "::all" do
       subject(:verification) { described_class.all(cask, downloaded_path) }

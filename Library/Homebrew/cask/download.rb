@@ -3,7 +3,7 @@ require "cask/cache"
 require "cask/quarantine"
 require "cask/verify"
 
-module Hbc
+module Cask
   class Download
     attr_reader :cask
 

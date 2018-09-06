@@ -1,4 +1,4 @@
-describe Hbc::Audit, :cask do
+describe Cask::Audit, :cask do
   def include_msg?(messages, msg)
     if msg.is_a?(Regexp)
       Array(messages).any? { |m| m =~ msg }
@@ -35,14 +35,14 @@ describe Hbc::Audit, :cask do
     end
   end
 
-  let(:cask) { instance_double(Hbc::Cask) }
+  let(:cask) { instance_double(Cask::Cask) }
   let(:download) { false }
   let(:check_token_conflicts) { false }
   let(:fake_system_command) { class_double(SystemCommand) }
   let(:audit) {
-    Hbc::Audit.new(cask, download:              download,
-                         check_token_conflicts: check_token_conflicts,
-                         command:               fake_system_command)
+    Cask::Audit.new(cask, download:              download,
+                          check_token_conflicts: check_token_conflicts,
+                          command:               fake_system_command)
   }
 
   describe "#result" do
@@ -81,7 +81,7 @@ describe Hbc::Audit, :cask do
   describe "#run!" do
     subject { audit.run! }
 
-    let(:cask) { Hbc::CaskLoader.load(cask_token) }
+    let(:cask) { Cask::CaskLoader.load(cask_token) }
 
     describe "required stanzas" do
       %w[version sha256 url name homepage].each do |stanza|
@@ -530,9 +530,9 @@ describe Hbc::Audit, :cask do
 
     describe "audit of downloads" do
       let(:cask_token) { "with-binary" }
-      let(:cask) { Hbc::CaskLoader.load(cask_token) }
-      let(:download) { instance_double(Hbc::Download) }
-      let(:verify) { class_double(Hbc::Verify).as_stubbed_const }
+      let(:cask) { Cask::CaskLoader.load(cask_token) }
+      let(:download) { instance_double(Cask::Download) }
+      let(:verify) { class_double(Cask::Verify).as_stubbed_const }
       let(:error_msg) { "Download Failed" }
 
       context "when download and verification succeed" do
@@ -563,7 +563,7 @@ describe Hbc::Audit, :cask do
     end
 
     context "when an exception is raised" do
-      let(:cask) { instance_double(Hbc::Cask) }
+      let(:cask) { instance_double(Cask::Cask) }
 
       before do
         expect(cask).to receive(:version).and_raise(StandardError.new)

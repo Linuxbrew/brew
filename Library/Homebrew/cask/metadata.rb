@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   module Metadata
     METADATA_SUBDIR = ".metadata".freeze
 
