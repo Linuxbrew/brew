@@ -22,6 +22,7 @@ module Hbc
 
       def run
         check_software_versions
+        check_quarantine_support
         check_install_location
         check_staging_location
         check_taps
@@ -114,6 +115,23 @@ module Hbc
         locale_variables = ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).sort
 
         (locale_variables + environment_variables).sort.each(&method(:render_env_var))
+      end
+
+      def check_quarantine_support
+        ohai "Gatekeeper support"
+
+        status = Quarantine.check_quarantine_support
+
+        case status
+        when :quarantine_available
+          puts "Enabled"
+        when :no_swift
+          add_error "Swift is not available on this system."
+        when :no_quarantine
+          add_error "This feature requires the macOS 10.10 SDK or higher."
+        else
+          onoe "Unknown support status"
+        end
       end
 
       def user_tilde(path)
