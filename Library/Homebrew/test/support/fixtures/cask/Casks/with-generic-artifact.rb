@@ -5,5 +5,5 @@ cask 'with-generic-artifact' do
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
   homepage 'https://example.com/with-generic-artifact'
 
-  artifact 'Caffeine.app', target: "#{Hbc::Config.global.appdir}/Caffeine.app"
+  artifact 'Caffeine.app', target: "#{appdir}/Caffeine.app"
 end
