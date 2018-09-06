@@ -36,13 +36,15 @@ module OS
 
     def latest_stable_version
       # TODO: bump version when new macOS is released and also update
-      # references in docs/Installation.md
+      # references in docs/Installation.md and
+      # https://github.com/Homebrew/install/blob/master/install
       Version.new "10.13"
     end
 
     def outdated_release?
       # TODO: bump version when new macOS is released and also update
-      # references in docs/Installation.md
+      # references in docs/Installation.md and
+      # https://github.com/Homebrew/install/blob/master/install
       version < "10.11"
     end
 
