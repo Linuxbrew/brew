@@ -18,7 +18,7 @@ fi
 ```
 
 ## Configuring Completions in `zsh`
-To make Homebrew's completions available in `zsh`, you must get the Homebrew-managed zsh site-functions on your `$FPATH` before initializing `zsh`'s completion facility. Add the following to your `~/.zshrc` file:
+To make Homebrew's completions available in `zsh`, you must get the Homebrew-managed zsh site-functions on your `$FPATH` before initialising `zsh`'s completion facility. Add the following to your `~/.zshrc` file:
 
 ```sh
 if type brew &>/dev/null; then

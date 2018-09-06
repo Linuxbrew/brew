@@ -160,6 +160,8 @@ A Hash (e.g. `=>`) specifies a formula dependency with some additional informati
       depends_on "foo" => :optional # Generated description is "Build with foo support"
       ```
 
+We frown on [`option`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#option-class_method)s in Homebrew/homebrew-core as they are not tested by CI.
+
 ### Specifying conflicts with other formulae
 
 Sometimes there’s hard conflict between formulae, and it can’t be avoided or circumvented with [`keg_only`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#keg_only-class_method).
@@ -662,6 +664,8 @@ end
 [`option`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#option-class_method) names should be prefixed with the words `with` or `without`. For example, an option to run a test suite should be named `--with-test` or `--with-check` rather than `--test`, and an option to enable a shared library `--with-shared` rather than `--shared` or `--enable-shared`.
 
 Note that [`option`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#option-class_method)s that aren’t `build.with? ` or `build.without?` should be deprecated with [`deprecated_option`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#deprecated_option-class_method). See [wget](https://github.com/Homebrew/homebrew-core/blob/master/Formula/wget.rb#L27-L31) for an example.
+
+We frown on [`option`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#option-class_method)s in Homebrew/homebrew-core as they are not tested by CI.
 
 ### File level operations
 

@@ -27,8 +27,6 @@ The current schema version is `v1`. Note that fields may be added to the schema 
 
 The schema itself is not currently documented outside of the code that generates it: [Formula#to_hash](https://github.com/Homebrew/brew/blob/master/Library/Homebrew/formula.rb)
 
-(**TODO**: add a manpage for the schema)
-
 ## Examples
 
 _The top-level element of the JSON output is always an array, so the `map` operator is used to act on the data._

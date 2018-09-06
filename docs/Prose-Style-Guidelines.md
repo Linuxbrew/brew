@@ -42,10 +42,10 @@ We prefer:
 * Sentence case in section headings, not Title Case
 * Periods at the ends of list items where most items in that list are complete sentences
 * More generally, parallel list item structure
-* Capitalize all list items if you want, even if they're not complete sentences; just be consistent within each list, and preferably, throughout the whole page
+* Capitalise all list items if you want, even if they're not complete sentences; just be consistent within each list, and preferably, throughout the whole page
 * Use a subordinate list item instead of dropping a multi-sentence paragraph-long item into a list of sentence fragments
 * Prefer Markdown over other markup formats unless their specific features are needed
-  * GitHub Flavored Markdown. GitHub's implementation is the standard, period.
+  * GitHub Flavoured Markdown. GitHub's implementation is the standard, period.
 
 ### Typographical conventions
 
@@ -56,12 +56,12 @@ We prefer:
 * No "$" with environment variables mentioned outside code snippets
   * e.g. "Set `BLAH` to 5", not "Set `$BLAH` to 5"
 * One space after periods, not two
-* Capitalized proper nouns
-* We do not defer to extensive nonstandard capitalization, typesetting, or other styling of brand names, aside from the normal capitalization of proper nouns and simple internal capitalization
+* Capitalised proper nouns
+* We do not defer to extensive nonstandard capitalisation, typesetting, or other styling of brand names, aside from the normal capitalisation of proper nouns and simple internal capitalisation
 * No "TM", &trade;, <sup>SM</sup>, &copy;, &reg;, or other explicit indicators of rights ownership or trademarks; we take these as understood when the brand name is mentioned
 * Tap names like `homebrew/core` are styled in `fixed width font`. Repository names may be styled in either fixed width font like "`Homebrew/homebrew-core`", as links like "[Homebrew/homebrew-core](https://github.com/homebrew/homebrew-core)", or regular text like "Homebrew/homebrew-core", based on which looks best for a given use.
   * But be consistent within a single document
-  * Capitalize repository names to match the user and repository names on GitHub. Keep tap names in lower case.
+  * Capitalise repository names to match the user and repository names on GitHub. Keep tap names in lower case.
 * Commas
   * No Oxford commas
   * Prefer a "loose" comma style: "when in doubt, leave it out" unless needed for clarity

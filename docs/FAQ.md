@@ -110,10 +110,6 @@ hub pull someone_else
 
 Or:
 
-    brew install https://raw.github.com/user/repo/branch/formula.rb
-
-Or:
-
     brew pull https://github.com/Homebrew/homebrew-core/pull/1234
 
 ## Why does Homebrew prefer I install to `/usr/local`?
@@ -142,7 +138,7 @@ anyway.
 Homebrew refuses to work using sudo.
 
 You should only ever sudo a tool you trust. Of course, you can trust Homebrew
-;) But do you trust the multi-megabyte Makefile that Homebrew runs? Developers
+😉 But do you trust the multi-megabyte Makefile that Homebrew runs? Developers
 often understand C++ far better than they understand make syntax. It’s too high
 a risk to sudo such stuff. It could modify (or upload) any files on your
 system.And indeed, we’ve seen some build scripts try to modify `/usr` even when
@@ -205,7 +201,7 @@ our analytics identified it was not widely used.
 
 ## Homebrew is a poor name, it's too generic, why was it chosen?
 @mxcl was too concerned with the beer theme and didn’t consider that the
-project may actually prove popular. By the time he realized it was, it was too
+project may actually prove popular. By the time he realised it was, it was too
 late. However, today, the first Google hit for “homebrew” is not beer
 related ;-)
 
