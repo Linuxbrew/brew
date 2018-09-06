@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class Cmd
     class InternalHelp < AbstractInternalCommand
       def initialize(*)

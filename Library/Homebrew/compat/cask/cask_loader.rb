@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   module CaskLoader
     class FromContentLoader; end
 

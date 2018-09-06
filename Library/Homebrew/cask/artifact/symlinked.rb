@@ -1,6 +1,6 @@
 require "cask/artifact/relocated"
 
-module Hbc
+module Cask
   module Artifact
     class Symlinked < Relocated
       def self.link_type_english_name

@@ -1,8 +1,8 @@
 require "test/support/helper/spec/shared_examples/cask_dsl_base"
 
-describe Hbc::DSL::UninstallPostflight, :cask do
-  let(:cask) { Hbc::CaskLoader.load(cask_path("basic-cask")) }
-  let(:dsl) { Hbc::DSL::UninstallPostflight.new(cask, FakeSystemCommand) }
+describe Cask::DSL::UninstallPostflight, :cask do
+  let(:cask) { Cask::CaskLoader.load(cask_path("basic-cask")) }
+  let(:dsl) { Cask::DSL::UninstallPostflight.new(cask, FakeSystemCommand) }
 
-  it_behaves_like Hbc::DSL::Base
+  it_behaves_like Cask::DSL::Base
 end

@@ -1,6 +1,6 @@
 require "cask/artifact/abstract_artifact"
 
-module Hbc
+module Cask
   module Artifact
     class AbstractFlightBlock < AbstractArtifact
       def self.dsl_key

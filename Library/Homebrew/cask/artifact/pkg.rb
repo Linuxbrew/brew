@@ -5,7 +5,7 @@ require "cask/artifact/abstract_artifact"
 require "extend/hash_validator"
 using HashValidator
 
-module Hbc
+module Cask
   module Artifact
     class Pkg < AbstractArtifact
       attr_reader :pkg_relative_path

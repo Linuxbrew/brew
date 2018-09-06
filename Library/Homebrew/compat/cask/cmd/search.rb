@@ -1,7 +1,7 @@
 require "cask/cmd/abstract_command"
 require "cmd/search"
 
-module Hbc
+module Cask
   class Cmd
     module Compat
       class Search < AbstractCommand

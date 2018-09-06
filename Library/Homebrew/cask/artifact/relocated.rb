@@ -3,7 +3,7 @@ require "cask/artifact/abstract_artifact"
 require "extend/hash_validator"
 using HashValidator
 
-module Hbc
+module Cask
   module Artifact
     class Relocated < AbstractArtifact
       def self.from_args(cask, *args)

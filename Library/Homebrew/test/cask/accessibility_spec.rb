@@ -1,9 +1,9 @@
 # TODO: this test should be named after the corresponding class, once
 #       that class is abstracted from installer.rb.
 describe "Accessibility Access", :cask do
-  let(:cask) { Hbc::CaskLoader.load(cask_path("with-accessibility-access")) }
+  let(:cask) { Cask::CaskLoader.load(cask_path("with-accessibility-access")) }
   let(:fake_system_command) { class_double(SystemCommand) }
-  let(:installer) { Hbc::Installer.new(cask, command: fake_system_command) }
+  let(:installer) { Cask::Installer.new(cask, command: fake_system_command) }
 
   before do
     allow(MacOS).to receive(:version).and_return(MacOS::Version.new(macos_version))

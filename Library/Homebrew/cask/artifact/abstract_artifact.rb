@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   module Artifact
     class AbstractArtifact
       include Comparable

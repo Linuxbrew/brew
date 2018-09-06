@@ -1,6 +1,6 @@
 require "cask/download"
 
-module Hbc
+module Cask
   class Auditor
     def self.audit(cask, audit_download: false, check_token_conflicts: false, quarantine: true, commit_range: nil)
       new(cask, audit_download, check_token_conflicts, quarantine, commit_range).audit

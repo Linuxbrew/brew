@@ -22,7 +22,7 @@ require "cask/artifact/suite"
 require "cask/artifact/uninstall"
 require "cask/artifact/zap"
 
-module Hbc
+module Cask
   module Artifact
   end
 end

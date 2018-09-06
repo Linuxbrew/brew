@@ -1,6 +1,6 @@
 require "cask/artifact/relocated"
 
-module Hbc
+module Cask
   module Artifact
     class Moved < Relocated
       def self.english_description

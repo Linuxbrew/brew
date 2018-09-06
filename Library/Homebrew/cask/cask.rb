@@ -4,7 +4,7 @@ require "cask/dsl"
 require "cask/metadata"
 require "searchable"
 
-module Hbc
+module Cask
   class Cask
     extend Enumerable
     extend Forwardable

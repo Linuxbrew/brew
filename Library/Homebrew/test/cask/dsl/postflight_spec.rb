@@ -1,13 +1,13 @@
 require "test/support/helper/spec/shared_examples/cask_dsl_base"
 require "test/support/helper/spec/shared_examples/cask_staged"
 
-describe Hbc::DSL::Postflight, :cask do
-  let(:cask) { Hbc::CaskLoader.load(cask_path("basic-cask")) }
-  let(:dsl) { Hbc::DSL::Postflight.new(cask, FakeSystemCommand) }
+describe Cask::DSL::Postflight, :cask do
+  let(:cask) { Cask::CaskLoader.load(cask_path("basic-cask")) }
+  let(:dsl) { Cask::DSL::Postflight.new(cask, FakeSystemCommand) }
 
-  it_behaves_like Hbc::DSL::Base
+  it_behaves_like Cask::DSL::Base
 
-  it_behaves_like Hbc::Staged do
+  it_behaves_like Cask::Staged do
     let(:staged) { dsl }
   end
 end

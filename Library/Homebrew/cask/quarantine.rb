@@ -1,5 +1,5 @@
 require "development_tools"
-module Hbc
+module Cask
   module Quarantine
     module_function
 

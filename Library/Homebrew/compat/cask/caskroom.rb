@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   module Caskroom
     class << self
       module Compat

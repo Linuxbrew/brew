@@ -1,7 +1,7 @@
 require "cask/cmd/abstract_command"
 require "cmd/--version"
 
-module Hbc
+module Cask
   class Cmd
     class Version < AbstractCommand
       def self.command_name

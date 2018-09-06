@@ -20,7 +20,7 @@ require "cask/dsl/version"
 
 require "cask/url"
 
-module Hbc
+module Cask
   class DSL
     ORDINARY_ARTIFACT_CLASSES = [
       Artifact::Installer,

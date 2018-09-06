@@ -1,6 +1,6 @@
-describe Hbc::Artifact::App, :cask do
+describe Cask::Artifact::App, :cask do
   describe "multiple apps" do
-    let(:cask) { Hbc::CaskLoader.load(cask_path("with-two-apps-correct")) }
+    let(:cask) { Cask::CaskLoader.load(cask_path("with-two-apps-correct")) }
 
     let(:install_phase) {
       lambda do
@@ -11,10 +11,10 @@ describe Hbc::Artifact::App, :cask do
     }
 
     let(:source_path_mini) { cask.staged_path.join("Caffeine Mini.app") }
-    let(:target_path_mini) { Hbc::Config.global.appdir.join("Caffeine Mini.app") }
+    let(:target_path_mini) { Cask::Config.global.appdir.join("Caffeine Mini.app") }
 
     let(:source_path_pro) { cask.staged_path.join("Caffeine Pro.app") }
-    let(:target_path_pro) { Hbc::Config.global.appdir.join("Caffeine Pro.app") }
+    let(:target_path_pro) { Cask::Config.global.appdir.join("Caffeine Pro.app") }
 
     before do
       InstallHelper.install_without_artifacts(cask)
@@ -31,7 +31,7 @@ describe Hbc::Artifact::App, :cask do
     end
 
     describe "when apps are in a subdirectory" do
-      let(:cask) { Hbc::CaskLoader.load(cask_path("with-two-apps-subdir")) }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-two-apps-subdir")) }
 
       it "installs both apps using the proper target directory" do
         install_phase.call
@@ -52,7 +52,7 @@ describe Hbc::Artifact::App, :cask do
       expect(target_path_mini).to be_a_directory
       expect(source_path_mini).not_to exist
 
-      expect(Hbc::Config.global.appdir.join("Caffeine Deluxe.app")).not_to exist
+      expect(Cask::Config.global.appdir.join("Caffeine Deluxe.app")).not_to exist
       expect(cask.staged_path.join("Caffeine Deluxe.app")).to exist
     end
 
@@ -64,7 +64,7 @@ describe Hbc::Artifact::App, :cask do
           expect(install_phase).to output(<<~EOS).to_stdout
             ==> Moving App 'Caffeine Pro.app' to '#{target_path_pro}'
           EOS
-        }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path_mini}'.")
+        }.to raise_error(Cask::CaskError, "It seems there is already an App at '#{target_path_mini}'.")
 
         expect(source_path_mini).to be_a_directory
         expect(target_path_mini).to be_a_directory
@@ -78,7 +78,7 @@ describe Hbc::Artifact::App, :cask do
           expect(install_phase).to output(<<~EOS).to_stdout
             ==> Moving App 'Caffeine Mini.app' to '#{target_path_mini}'
           EOS
-        }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path_pro}'.")
+        }.to raise_error(Cask::CaskError, "It seems there is already an App at '#{target_path_pro}'.")
 
         expect(source_path_pro).to be_a_directory
         expect(target_path_pro).to be_a_directory

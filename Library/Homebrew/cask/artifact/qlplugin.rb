@@ -1,6 +1,6 @@
 require "cask/artifact/moved"
 
-module Hbc
+module Cask
   module Artifact
     class Qlplugin < Moved
       def self.english_name

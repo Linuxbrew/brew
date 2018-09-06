@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   module Staged
     def info_plist_file(index = 0)
       index =  0 if index == :first

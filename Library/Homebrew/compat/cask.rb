@@ -6,7 +6,7 @@ require "compat/cask/cache"
 require "compat/cask/caskroom"
 require "compat/cask/dsl"
 
-module Hbc
+module Cask
   class << self
     module Compat
       def init

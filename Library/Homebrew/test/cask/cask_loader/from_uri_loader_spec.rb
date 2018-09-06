@@ -1,4 +1,4 @@
-describe Hbc::CaskLoader::FromURILoader do
+describe Cask::CaskLoader::FromURILoader do
   alias_matcher :be_able_to_load, :be_can_load
 
   describe "::can_load?" do

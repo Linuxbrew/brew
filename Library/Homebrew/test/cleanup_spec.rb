@@ -138,14 +138,14 @@ describe Homebrew::Cleanup do
 
   describe "#cleanup_cask", :cask do
     before(:each) do
-      Hbc::Cache.path.mkpath
+      Cask::Cache.path.mkpath
     end
 
     context "when given a versioned cask" do
-      let(:cask) { Hbc::CaskLoader.load("local-transmission") }
+      let(:cask) { Cask::CaskLoader.load("local-transmission") }
 
       it "removes the download if it is not for the latest version" do
-        download = Hbc::Cache.path/"#{cask.token}--7.8.9"
+        download = Cask::Cache.path/"#{cask.token}--7.8.9"
 
         FileUtils.touch download
 
@@ -155,7 +155,7 @@ describe Homebrew::Cleanup do
       end
 
       it "does not remove downloads for the latest version" do
-        download = Hbc::Cache.path/"#{cask.token}--#{cask.version}"
+        download = Cask::Cache.path/"#{cask.token}--#{cask.version}"
 
         FileUtils.touch download
 
@@ -166,10 +166,10 @@ describe Homebrew::Cleanup do
     end
 
     context "when given a `:latest` cask" do
-      let(:cask) { Hbc::CaskLoader.load("latest-with-appcast") }
+      let(:cask) { Cask::CaskLoader.load("latest-with-appcast") }
 
       it "does not remove the download for the latest version" do
-        download = Hbc::Cache.path/"#{cask.token}--#{cask.version}"
+        download = Cask::Cache.path/"#{cask.token}--#{cask.version}"
 
         FileUtils.touch download
 
@@ -179,7 +179,7 @@ describe Homebrew::Cleanup do
       end
 
       it "removes the download for the latest version after a week" do
-        download = Hbc::Cache.path/"#{cask.token}--#{cask.version}"
+        download = Cask::Cache.path/"#{cask.token}--#{cask.version}"
 
         FileUtils.touch download, mtime: Time.now - 7 * 60 * 60 * 24
 

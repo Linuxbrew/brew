@@ -1,6 +1,6 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::Cmd::Home, :cask do
+describe Cask::Cmd::Home, :cask do
   before do
     allow(described_class).to receive(:open_url)
   end

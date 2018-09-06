@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class DSL
     class Base
       extend Forwardable

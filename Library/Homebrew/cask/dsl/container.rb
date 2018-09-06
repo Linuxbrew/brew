@@ -1,6 +1,6 @@
 require "unpack_strategy"
 
-module Hbc
+module Cask
   class DSL
     class Container
       VALID_KEYS = Set.new [

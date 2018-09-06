@@ -3,7 +3,7 @@ require "cask/artifact/moved"
 require "extend/hash_validator"
 using HashValidator
 
-module Hbc
+module Cask
   module Artifact
     class Artifact < Moved
       def self.english_name

@@ -1,4 +1,4 @@
-describe Hbc::Cmd, :cask do
+describe Cask::Cmd, :cask do
   it "lists the taps for Casks that show up in two taps" do
     listing = described_class.nice_listing(%w[
                                              homebrew/cask/adium
@@ -28,7 +28,7 @@ describe Hbc::Cmd, :cask do
 
   context "when no option is specified" do
     it "--binaries is true by default" do
-      command = Hbc::Cmd::Install.new("some-cask")
+      command = Cask::Cmd::Install.new("some-cask")
       expect(command.binaries?).to be true
     end
   end
@@ -58,15 +58,15 @@ describe Hbc::Cmd, :cask do
     it "respects the env variable when choosing what appdir to create" do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with("HOMEBREW_CASK_OPTS").and_return("--appdir=/custom/appdir")
-      allow(Hbc::Config.global).to receive(:appdir).and_call_original
+      allow(Cask::Config.global).to receive(:appdir).and_call_original
 
       described_class.run("noop")
 
-      expect(Hbc::Config.global.appdir).to eq(Pathname.new("/custom/appdir"))
+      expect(Cask::Config.global.appdir).to eq(Pathname.new("/custom/appdir"))
     end
 
     it "exits with a status of 1 when something goes wrong" do
-      allow(described_class).to receive(:lookup_command).and_raise(Hbc::CaskError)
+      allow(described_class).to receive(:lookup_command).and_raise(Cask::CaskError)
       command = described_class.new("noop")
       expect(command).to receive(:exit).with(1)
       command.run

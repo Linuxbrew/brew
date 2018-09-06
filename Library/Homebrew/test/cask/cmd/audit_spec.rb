@@ -1,24 +1,24 @@
 require_relative "shared_examples/invalid_option"
 
-describe Hbc::Cmd::Audit, :cask do
-  let(:cask) { Hbc::Cask.new(nil) }
+describe Cask::Cmd::Audit, :cask do
+  let(:cask) { Cask::Cask.new(nil) }
 
   it_behaves_like "a command that handles invalid options"
 
   describe "selection of Casks to audit" do
     it "audits all Casks if no tokens are given" do
-      allow(Hbc::Cask).to receive(:to_a).and_return([cask, cask])
+      allow(Cask::Cask).to receive(:to_a).and_return([cask, cask])
 
-      expect(Hbc::Auditor).to receive(:audit).twice.and_return(true)
+      expect(Cask::Auditor).to receive(:audit).twice.and_return(true)
 
       described_class.run
     end
 
     it "audits specified Casks if tokens are given" do
       cask_token = "nice-app"
-      expect(Hbc::CaskLoader).to receive(:load).with(cask_token).and_return(cask)
+      expect(Cask::CaskLoader).to receive(:load).with(cask_token).and_return(cask)
 
-      expect(Hbc::Auditor).to receive(:audit)
+      expect(Cask::Auditor).to receive(:audit)
         .with(cask, audit_download: false, check_token_conflicts: false, quarantine: true)
         .and_return(true)
 
@@ -28,8 +28,8 @@ describe Hbc::Cmd::Audit, :cask do
 
   describe "rules for downloading a Cask" do
     it "does not download the Cask per default" do
-      allow(Hbc::CaskLoader).to receive(:load).and_return(cask)
-      expect(Hbc::Auditor).to receive(:audit)
+      allow(Cask::CaskLoader).to receive(:load).and_return(cask)
+      expect(Cask::Auditor).to receive(:audit)
         .with(cask, audit_download: false, check_token_conflicts: false, quarantine: true)
         .and_return(true)
 
@@ -37,8 +37,8 @@ describe Hbc::Cmd::Audit, :cask do
     end
 
     it "download a Cask if --download flag is set" do
-      allow(Hbc::CaskLoader).to receive(:load).and_return(cask)
-      expect(Hbc::Auditor).to receive(:audit)
+      allow(Cask::CaskLoader).to receive(:load).and_return(cask)
+      expect(Cask::Auditor).to receive(:audit)
         .with(cask, audit_download: true, check_token_conflicts: false, quarantine: true)
         .and_return(true)
 
@@ -48,8 +48,8 @@ describe Hbc::Cmd::Audit, :cask do
 
   describe "rules for checking token conflicts" do
     it "does not check for token conflicts per default" do
-      allow(Hbc::CaskLoader).to receive(:load).and_return(cask)
-      expect(Hbc::Auditor).to receive(:audit)
+      allow(Cask::CaskLoader).to receive(:load).and_return(cask)
+      expect(Cask::Auditor).to receive(:audit)
         .with(cask, audit_download: false, check_token_conflicts: false, quarantine: true)
         .and_return(true)
 
@@ -57,8 +57,8 @@ describe Hbc::Cmd::Audit, :cask do
     end
 
     it "checks for token conflicts if --token-conflicts flag is set" do
-      allow(Hbc::CaskLoader).to receive(:load).and_return(cask)
-      expect(Hbc::Auditor).to receive(:audit)
+      allow(Cask::CaskLoader).to receive(:load).and_return(cask)
+      expect(Cask::Auditor).to receive(:audit)
         .with(cask, audit_download: false, check_token_conflicts: true, quarantine: true)
         .and_return(true)
 

@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class DSL
     module Compat
       def gpg(*)

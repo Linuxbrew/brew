@@ -3,7 +3,7 @@ require "cask/download"
 require "digest"
 require "utils/git"
 
-module Hbc
+module Cask
   class Audit
     include Checkable
 

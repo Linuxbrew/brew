@@ -1,6 +1,6 @@
 require "cask/artifact/moved"
 
-module Hbc
+module Cask
   module Artifact
     class VstPlugin < Moved
     end

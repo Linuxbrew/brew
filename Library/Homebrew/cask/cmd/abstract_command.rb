@@ -1,7 +1,7 @@
 require_relative "options"
 require "search"
 
-module Hbc
+module Cask
   class Cmd
     class AbstractCommand
       include Options

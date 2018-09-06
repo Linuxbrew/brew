@@ -1,4 +1,4 @@
-module Hbc
+module Cask
   class CaskError < RuntimeError; end
 
   class AbstractCaskErrorWithToken < CaskError
