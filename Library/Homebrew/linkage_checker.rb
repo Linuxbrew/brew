@@ -19,6 +19,7 @@ class LinkageChecker
     @indirect_deps    = []
     @undeclared_deps  = []
     @unnecessary_deps = []
+    @unwanted_system_dylibs = []
     @version_conflict_deps = []
 
     check_dylibs(rebuild_cache: rebuild_cache)
@@ -33,6 +34,7 @@ class LinkageChecker
     display_items "Broken dependencies", @broken_deps
     display_items "Undeclared dependencies with linkage", @undeclared_deps
     display_items "Dependencies with no linkage", @unnecessary_deps
+    display_items "Unwanted system libraries", @unwanted_system_dylibs
   end
 
   def display_reverse_output
@@ -51,6 +53,7 @@ class LinkageChecker
   def display_test_output(puts_output: true)
     display_items "Missing libraries", @broken_dylibs, puts_output: puts_output
     display_items "Broken dependencies", @broken_deps, puts_output: puts_output
+    display_items "Unwanted system libraries", @unwanted_system_dylibs, puts_output: puts_output
     display_items "Conflicting libraries", @version_conflict_deps, puts_output: puts_output
     puts "No broken library linkage" unless broken_library_linkage?
   end
@@ -58,6 +61,7 @@ class LinkageChecker
   def broken_library_linkage?
     !@broken_dylibs.empty? ||
       !@broken_deps.empty? ||
+      !@unwanted_system_dylibs.empty? ||
       !@version_conflict_deps.empty?
   end
 
@@ -139,6 +143,7 @@ class LinkageChecker
 
     store&.update!(keg_files_dylibs: keg_files_dylibs)
   end
+  alias generic_check_dylibs check_dylibs
 
   def check_formula_deps
     filter_out = proc do |dep|
@@ -244,3 +249,5 @@ class LinkageChecker
     opoo "Formula unavailable: #{keg.name}"
   end
 end
+
+require "extend/os/linkage_checker"
