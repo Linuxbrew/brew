@@ -641,7 +641,7 @@ module Homebrew
         # We're in the cache; make sure to force re-download
         loop do
           begin
-            curl_download url, continue_at: 0, to: filename
+            curl_download url, to: filename
             break
           rescue
             if retry_count >= max_curl_retries
