@@ -71,6 +71,10 @@ To find the names of normal (not keg-only) formulae that are installed, but not 
 brew info --json=v1 --installed | jq "map(select(.keg_only == false and .linked_keg == null) | .name)"
 ```
 
+## formulae.brew.sh
+
+formulae.brew.sh has a [documented JSON API](https://formulae.brew.sh/docs/api/) which provides access to the `brew info --json=v1` output without needing access to Homebrew.
+
 ## Concluding remarks
 
 Using the JSON output, queries can be made against Homebrew with less risk of being broken due to Homebrew code changes, and without needing to understand Homebrew's Ruby internals.

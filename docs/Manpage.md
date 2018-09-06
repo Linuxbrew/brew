@@ -199,8 +199,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `info`:
     Display brief statistics for your Homebrew installation.
 
-  * `info` `formula`:
-    Display information about `formula`.
+  * `info` `formula`  (`--verbose`):
+    Display information about `formula` and analytics data (provided neither
+    `HOMEBREW_NO_ANALYTICS` or `HOMEBREW_NO_GITHUB_API` are set)
+
+    Pass `--verbose` to see more detailed analytics data.
 
   * `info` `--github` `formula`:
     Open a browser to the GitHub History page for `formula`.
