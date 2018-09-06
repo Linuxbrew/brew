@@ -7,7 +7,8 @@ module Stdenv
 
   # @private
   SAFE_CFLAGS_FLAGS = "-w -pipe".freeze
-  DEFAULT_FLAGS = "-march=core2 -msse4".freeze
+  HOMEBREW_ARCH = (ENV["HOMEBREW_ARCH"] || "native").freeze
+  DEFAULT_FLAGS = (OS.mac? ? "-march=core2 -msse4" : "-march=#{HOMEBREW_ARCH}").freeze
 
   # @private
   def setup_build_environment(formula = nil)
