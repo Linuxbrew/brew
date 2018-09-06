@@ -9,12 +9,12 @@ brew mycommand --option1 --option3 formula
 without modifying Homebrew's internals.
 
 ## Command types
-External commands come in two flavors: Ruby commands and shell scripts.
+External commands come in two flavours: Ruby commands and shell scripts.
 
 In both cases, the command file should be executable (`chmod +x`) and live somewhere in `PATH`.
 
 ### Ruby commands
-An external command `extcmd` implemented as a Ruby command should be named `brew-extcmd.rb`. The command is executed by doing a `require` on the full pathname. As the command is `require`d, it has full access to the Homebrew "environment", i.e. all global variables and modules that any internal command has access to.
+An external command `extcmd` implemented as a Ruby command should be named `brew-extcmd.rb`. The command is executed by doing a `require` on the full pathname. As the command is `require`d, it has full access to the Homebrew "environment", i.e. all global variables and modules that any internal command has access to. Be wary of using Homebrew internals; they may change at any time without warning.
 
 The command may `Kernel.exit` with a status code if it needs to; if it doesn't explicitly exit then Homebrew will return `0`.
 
@@ -37,12 +37,9 @@ All internal and external Homebrew commands can provide styled `--help` output b
 
 For example, see the [header of `brew services`](https://github.com/Homebrew/homebrew-services/blob/a5115e47b05e8d2a632ba7775599e698b240e5a2/cmd/brew-services.rb#L1-L31) which is output with `brew services --help`.
 
-## User-submitted commands
-These commands have been contributed by Homebrew users but are not included in the main Homebrew repository, nor are they installed by the installer script. You can install them manually, as outlined above.
+## Homebrew organisation external commands
 
-Note they are largely untested, and as always, be careful about running untested code on your machine.
-
-### brew-livecheck
+### homebrew-livecheck
 Check if there is a new upstream version of a formula.
 See the [`README`](https://github.com/Homebrew/homebrew-livecheck/blob/master/README.md) for more info and usage.
 
@@ -52,19 +49,32 @@ Install using:
 brew tap homebrew/livecheck
 ```
 
-### brew-gem
-Install any `gem` package into a self-contained Homebrew Cellar location: <https://github.com/sportngin/brew-gem>
-
-Note this can also be installed with `brew install brew-gem`.
-
-### brew-growl
-Get Growl notifications for Homebrew: <https://github.com/secondplanet/homebrew-growl>
-
-### brew-services
-Simple support for starting formulae using launchctl, has out of the box support for any formula which defines `startup_plist` (e.g. mysql, postgres, redis u.v.m.): <https://github.com/Homebrew/homebrew-services>
+### homebrew-command-not-found
+Ubuntu's `command-not-found equivalent` for Homebrew.
+See the [`README`](https://github.com/Homebrew/homebrew-command-not-found/blob/master/README.md) for more info and usage.
 
 Install using:
 
 ```sh
-brew tap homebrew/services
+brew tap homebrew/command-not-found
 ```
+
+### homebrew-aliases
+Allows you to alias your Homebrew commands.
+See the [`README`](https://github.com/Homebrew/homebrew-aliases/blob/master/README.md) for more info and usage.
+
+Install using:
+
+```sh
+brew tap homebrew/aliases
+```
+
+## Unofficial external commands
+These commands have been contributed by Homebrew users but are not included in the main Homebrew organisation, nor are they installed by the installer script. You can install them manually, as outlined above.
+
+Note they are largely untested, and as always, be careful about running untested code on your machine.
+
+### brew-gem
+Install any `gem` package into a self-contained Homebrew Cellar location: <https://github.com/sportngin/brew-gem>
+
+Note this can also be installed with `brew install brew-gem`.
