@@ -271,8 +271,8 @@ module Homebrew
     def cleanup_lockfiles(*lockfiles)
       return if dry_run?
 
-      if lockfiles.empty? && HOMEBREW_LOCK_DIR.directory?
-        lockfiles = HOMEBREW_LOCK_DIR.children.select(&:file?)
+      if lockfiles.empty? && HOMEBREW_LOCKS.directory?
+        lockfiles = HOMEBREW_LOCKS.children.select(&:file?)
       end
 
       lockfiles.each do |file|
@@ -288,11 +288,16 @@ module Homebrew
     end
 
     def rm_ds_store(dirs = nil)
-      dirs ||= %w[Caskroom Cellar Frameworks Library bin etc include lib opt sbin share var]
-               .map { |path| HOMEBREW_PREFIX/path }
-
+      dirs ||= begin
+        Keg::MUST_EXIST_DIRECTORIES + [
+          HOMEBREW_CELLAR,
+          HOMEBREW_PREFIX/"Caskroom",
+        ]
+      end
       dirs.select(&:directory?).each.parallel do |dir|
-        system_command "find", args: [dir, "-name", ".DS_Store", "-delete"], print_stderr: false
+        system_command "find",
+          args: [dir, "-name", ".DS_Store", "-delete"],
+          print_stderr: false
       end
     end
   end

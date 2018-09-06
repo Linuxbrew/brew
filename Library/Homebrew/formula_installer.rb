@@ -205,7 +205,7 @@ class FormulaInstaller
   def install
     start_time = Time.now
     if !formula.bottle_unneeded? && !pour_bottle? && DevelopmentTools.installed?
-      Homebrew::Install.check_development_tools
+      Homebrew::Install.perform_development_tools_checks
     end
 
     # not in initialize so upgrade can unlink the active keg before calling this
@@ -893,7 +893,7 @@ class FormulaInstaller
         sandbox.allow_write_xcode
         sandbox.deny_write_homebrew_repository
         sandbox.allow_write_cellar(formula)
-        Keg::TOP_LEVEL_DIRECTORIES.each do |dir|
+        Keg::KEG_LINK_DIRECTORIES.each do |dir|
           sandbox.allow_write_path "#{HOMEBREW_PREFIX}/#{dir}"
         end
         sandbox.exec(*args)

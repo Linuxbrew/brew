@@ -32,7 +32,7 @@ TEST_DIRECTORIES = [
   HOMEBREW_CACHE,
   HOMEBREW_CACHE_FORMULA,
   HOMEBREW_CELLAR,
-  HOMEBREW_LOCK_DIR,
+  HOMEBREW_LOCKS,
   HOMEBREW_LOGS,
   HOMEBREW_TEMP,
 ].freeze
@@ -134,13 +134,9 @@ RSpec.configure do |config|
 
       FileUtils.rm_rf [
         TEST_DIRECTORIES.map(&:children),
+        *Keg::MUST_EXIST_DIRECTORIES,
         HOMEBREW_LINKED_KEGS,
         HOMEBREW_PINNED_KEGS,
-        HOMEBREW_PREFIX/".git",
-        HOMEBREW_PREFIX/"bin",
-        HOMEBREW_PREFIX/"etc",
-        HOMEBREW_PREFIX/"share",
-        HOMEBREW_PREFIX/"opt",
         HOMEBREW_PREFIX/"Caskroom",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-cask",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bar",

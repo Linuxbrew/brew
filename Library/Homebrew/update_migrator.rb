@@ -341,9 +341,7 @@ module UpdateMigrator
         EOS
       end
 
-      (Keg::ALL_TOP_LEVEL_DIRECTORIES + ["Cellar"]).each do |dir|
-        FileUtils.mkdir_p "#{HOMEBREW_PREFIX}/#{dir}"
-      end
+      Keg::MUST_EXIST_DIRECTORIES.each { |dir| FileUtils.mkdir_p dir }
 
       src = Pathname.new("#{new_homebrew_repository}/bin/brew")
       dst = Pathname.new("#{HOMEBREW_PREFIX}/bin/brew")

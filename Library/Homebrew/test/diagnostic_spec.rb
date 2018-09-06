@@ -29,64 +29,25 @@ describe Homebrew::Diagnostic::Checks do
     end
   end
 
-  specify "#check_access_homebrew_repository" do
+  specify "#check_access_directories" do
     begin
-      mode = HOMEBREW_REPOSITORY.stat.mode & 0777
-      HOMEBREW_REPOSITORY.chmod 0555
-
-      expect(subject.check_access_homebrew_repository)
-        .to match("#{HOMEBREW_REPOSITORY} is not writable.")
+      dirs = [
+        HOMEBREW_CACHE,
+        HOMEBREW_CELLAR,
+        HOMEBREW_REPOSITORY,
+        HOMEBREW_LOGS,
+        HOMEBREW_LOCKS,
+      ]
+      modes = {}
+      dirs.each do |dir|
+        modes[dir] = dir.stat.mode & 0777
+        dir.chmod 0555
+        expect(subject.check_access_directories).to match(dir.to_s)
+      end
     ensure
-      HOMEBREW_REPOSITORY.chmod mode
-    end
-  end
-
-  specify "#check_access_lock_dir" do
-    begin
-      prev_mode = HOMEBREW_LOCK_DIR.stat.mode
-      mode = HOMEBREW_LOCK_DIR.stat.mode & 0777
-      HOMEBREW_LOCK_DIR.chmod 0555
-      expect(HOMEBREW_LOCK_DIR.stat.mode).not_to eq(prev_mode)
-
-      expect(subject.check_access_lock_dir)
-        .to match("#{HOMEBREW_LOCK_DIR} isn't writable.")
-    ensure
-      HOMEBREW_LOCK_DIR.chmod mode
-    end
-  end
-
-  specify "#check_access_logs" do
-    begin
-      mode = HOMEBREW_LOGS.stat.mode & 0777
-      HOMEBREW_LOGS.chmod 0555
-
-      expect(subject.check_access_logs)
-        .to match("#{HOMEBREW_LOGS} isn't writable.")
-    ensure
-      HOMEBREW_LOGS.chmod mode
-    end
-  end
-
-  specify "#check_access_cache" do
-    begin
-      mode = HOMEBREW_CACHE.stat.mode & 0777
-      HOMEBREW_CACHE.chmod 0555
-      expect(subject.check_access_cache)
-        .to match("#{HOMEBREW_CACHE} isn't writable.")
-    ensure
-      HOMEBREW_CACHE.chmod mode
-    end
-  end
-
-  specify "#check_access_cellar" do
-    begin
-      mode = HOMEBREW_CELLAR.stat.mode & 0777
-      HOMEBREW_CELLAR.chmod 0555
-
-      expect(subject.check_access_cellar)
-        .to match("#{HOMEBREW_CELLAR} isn't writable.")
-    ensure
-      HOMEBREW_CELLAR.chmod mode
+      modes.each do |dir, mode|
+        dir.chmod mode
+      end
     end
   end
 

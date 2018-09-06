@@ -27,8 +27,8 @@ describe CleanupRefinement do
 end
 
 describe Homebrew::Cleanup do
-  let(:ds_store) { Pathname.new("#{HOMEBREW_PREFIX}/Library/.DS_Store") }
-  let(:lock_file) { Pathname.new("#{HOMEBREW_LOCK_DIR}/foo") }
+  let(:ds_store) { Pathname.new("#{HOMEBREW_CELLAR}/.DS_Store") }
+  let(:lock_file) { Pathname.new("#{HOMEBREW_LOCKS}/foo") }
 
   around do |example|
     begin
