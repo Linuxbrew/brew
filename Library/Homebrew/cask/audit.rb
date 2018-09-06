@@ -64,27 +64,27 @@ module Hbc
       return if tap.nil?
       return if tap.user != "Homebrew"
 
-      return unless cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
+      return unless cask.artifacts.any? { |k| k.is_a?(Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
       add_warning "allow_untrusted is not permitted in official Homebrew Cask taps"
     end
 
     def check_stanza_requires_uninstall
       odebug "Auditing stanzas which require an uninstall"
 
-      return if cask.artifacts.none? { |k| k.is_a?(Hbc::Artifact::Pkg) || k.is_a?(Hbc::Artifact::Installer) }
-      return if cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Uninstall) }
+      return if cask.artifacts.none? { |k| k.is_a?(Artifact::Pkg) || k.is_a?(Artifact::Installer) }
+      return if cask.artifacts.any? { |k| k.is_a?(Artifact::Uninstall) }
       add_warning "installer and pkg stanzas require an uninstall stanza"
     end
 
     def check_single_pre_postflight
       odebug "Auditing preflight and postflight stanzas"
 
-      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PreflightBlock) && k.directives.key?(:preflight) } > 1
+      if cask.artifacts.count { |k| k.is_a?(Artifact::PreflightBlock) && k.directives.key?(:preflight) } > 1
         add_warning "only a single preflight stanza is allowed"
       end
 
       count = cask.artifacts.count do |k|
-        k.is_a?(Hbc::Artifact::PostflightBlock) &&
+        k.is_a?(Artifact::PostflightBlock) &&
           k.directives.key?(:postflight)
       end
       return unless count > 1
@@ -95,12 +95,12 @@ module Hbc
     def check_single_uninstall_zap
       odebug "Auditing single uninstall_* and zap stanzas"
 
-      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Uninstall) } > 1
+      if cask.artifacts.count { |k| k.is_a?(Artifact::Uninstall) } > 1
         add_warning "only a single uninstall stanza is allowed"
       end
 
       count = cask.artifacts.count do |k|
-        k.is_a?(Hbc::Artifact::PreflightBlock) &&
+        k.is_a?(Artifact::PreflightBlock) &&
           k.directives.key?(:uninstall_preflight)
       end
 
@@ -109,7 +109,7 @@ module Hbc
       end
 
       count = cask.artifacts.count do |k|
-        k.is_a?(Hbc::Artifact::PostflightBlock) &&
+        k.is_a?(Artifact::PostflightBlock) &&
           k.directives.key?(:uninstall_postflight)
       end
 
@@ -117,7 +117,7 @@ module Hbc
         add_warning "only a single uninstall_postflight stanza is allowed"
       end
 
-      return unless cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Zap) } > 1
+      return unless cask.artifacts.count { |k| k.is_a?(Artifact::Zap) } > 1
       add_warning "only a single zap stanza is allowed"
     end
 
@@ -276,7 +276,7 @@ module Hbc
     end
 
     def check_generic_artifacts
-      cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Artifact) }.each do |artifact|
+      cask.artifacts.select { |a| a.is_a?(Artifact::Artifact) }.each do |artifact|
         unless artifact.target.absolute?
           add_error "target must be absolute path for #{artifact.class.english_name} #{artifact.source}"
         end
