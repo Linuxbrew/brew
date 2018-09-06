@@ -98,7 +98,7 @@ describe CacheStoreDatabase do
   describe "#close_if_open!" do
     context "database open" do
       before(:each) do
-        subject.instance_variable_set(:@db, instance_double("db", close: nil))
+        subject.instance_variable_set(:@db, instance_double(DBM, close: nil))
       end
 
       it "does not raise an error when `close` is called on the database" do
