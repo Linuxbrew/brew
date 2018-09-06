@@ -1,4 +1,4 @@
-require_relative "../../rubocops/text_cop"
+require "rubocops/text_cop"
 
 describe RuboCop::Cop::FormulaAudit::Text do
   subject(:cop) { described_class.new }
