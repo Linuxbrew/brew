@@ -218,7 +218,7 @@ module Hbc
       def uninstall_pkgutil(*pkgs, command: nil, **_)
         ohai "Uninstalling packages:"
         pkgs.each do |regex|
-          Hbc::Pkg.all_matching(regex, command).each do |pkg|
+          ::Hbc::Pkg.all_matching(regex, command).each do |pkg|
             puts pkg.package_id
             pkg.uninstall
           end
