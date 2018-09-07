@@ -55,26 +55,58 @@ module Cask
                      print_stderr: false).stdout.rstrip
     end
 
-    def cask(cask: nil, download_path: nil)
+    def disable_translocation!(xattr)
+      fields = xattr.split(";")
+
+      # Fields: status, epoch, download agent, event ID
+      # Let's toggle the app translocation bit, bit 8
+      # http://openradar.me/radar?id=5022734169931776
+
+      fields[0] = (fields[0].to_i(16) | 0x0100).to_s(16).rjust(4, "0")
+
+      fields.join(";")
+    end
+
+    def cask!(cask: nil, download_path: nil, action: true)
       return if cask.nil? || download_path.nil?
 
-      odebug "Quarantining #{download_path}"
+      if action
+        return if detect(download_path)
 
-      quarantiner = system_command(swift,
-                                   args: [
-                                     QUARANTINE_SCRIPT,
-                                     download_path,
-                                     cask.url.to_s,
-                                     cask.homepage.to_s,
-                                   ])
+        odebug "Quarantining #{download_path}"
 
-      return if quarantiner.success?
+        quarantiner = system_command(swift,
+                                    args: [
+                                      QUARANTINE_SCRIPT,
+                                      download_path,
+                                      cask.url.to_s,
+                                      cask.homepage.to_s,
+                                    ])
 
-      case quarantiner.exit_status
-      when 2
-        raise CaskQuarantineError.new(download_path, "Insufficient parameters")
+        return if quarantiner.success?
+
+        case quarantiner.exit_status
+        when 2
+          raise CaskQuarantineError.new(download_path, "Insufficient parameters")
+        else
+          raise CaskQuarantineError.new(download_path, quarantiner.stderr)
+        end
       else
-        raise CaskQuarantineError.new(download_path, quarantiner.stderr)
+        return unless detect(download_path)
+
+        odebug "Releasing #{download_path} from quarantine"
+
+        quarantiner = system_command("/usr/bin/xattr",
+                                    args: [
+                                      "-d",
+                                      QUARANTINE_ATTRIBUTE,
+                                      download_path,
+                                    ],
+                                    print_stderr: false)
+
+        return if quarantiner.success?
+
+        raise CaskQuarantineReleaseError.new(download_path, quarantiner.stderr)
       end
     end
 
@@ -85,9 +117,11 @@ module Cask
 
       odebug "Propagating quarantine from #{from} to #{to}"
 
-      quarantine_status = status(from)
+      quarantine_status = disable_translocation!(status(from))
 
       resolved_paths = Pathname.glob(to/"**/*", File::FNM_DOTMATCH)
+
+      FileUtils.chmod "u+w", resolved_paths
 
       quarantiner = system_command("/usr/bin/xargs",
                                    args: [

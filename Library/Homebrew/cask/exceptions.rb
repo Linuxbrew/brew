@@ -184,4 +184,18 @@ module Cask
       s
     end
   end
+
+  class CaskQuarantineReleaseError < CaskQuarantineError
+    def to_s
+      s = "Failed to release #{path} from quarantine."
+
+      unless reason.empty?
+        s << " Here's the reason:\n"
+        s << Formatter.error(reason)
+        s << "\n" unless reason.end_with?("\n")
+      end
+
+      s
+    end
+  end
 end
