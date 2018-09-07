@@ -24,7 +24,7 @@ HOMEBREW_LINKED_KEGS = HOMEBREW_PREFIX/"var/homebrew/linked"
 HOMEBREW_PINNED_KEGS = HOMEBREW_PREFIX/"var/homebrew/pinned"
 
 # Where we store lock files
-HOMEBREW_LOCK_DIR = HOMEBREW_PREFIX/"var/homebrew/locks"
+HOMEBREW_LOCKS = HOMEBREW_PREFIX/"var/homebrew/locks"
 
 # Where we store built products
 HOMEBREW_CELLAR = Pathname.new(ENV["HOMEBREW_CELLAR"])

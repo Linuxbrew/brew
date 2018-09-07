@@ -71,6 +71,12 @@ module Homebrew
       end
       ############# END HELPERS
 
+      def fatal_install_checks
+        %w[
+          check_access_directories
+        ].freeze
+      end
+
       def development_tools_checks
         %w[
           check_for_installed_developer_tools
@@ -293,112 +299,32 @@ module Homebrew
         EOS
       end
 
-      def check_access_homebrew_repository
-        return if HOMEBREW_REPOSITORY.writable_real?
+      def check_exist_directories
+        not_exist_dirs = Keg::MUST_EXIST_DIRECTORIES.reject(&:exist?)
+        return if not_exist_dirs.empty?
 
         <<~EOS
-          #{HOMEBREW_REPOSITORY} is not writable.
+          The following directories do not exist:
+          #{not_exist_dirs.join("\n")}
 
-          You should change the ownership and permissions of #{HOMEBREW_REPOSITORY}
-          back to your user account.
-            sudo chown -R $(whoami) #{HOMEBREW_REPOSITORY}
+          You should create these directories and change their ownership to your account.
+            sudo mkdir -p #{not_exist_dirs.join(" ")}
+            sudo chown -R $(whoami) #{not_exist_dirs.join(" ")}
         EOS
       end
 
-      def check_access_prefix_directories
-        not_writable_dirs = []
-
-        Keg::ALL_TOP_LEVEL_DIRECTORIES.each do |dir|
-          path = HOMEBREW_PREFIX/dir
-          next unless path.exist?
-          next if path.writable_real?
-          not_writable_dirs << path
-        end
-
+      def check_access_directories
+        not_writable_dirs =
+          Keg::MUST_BE_WRITABLE_DIRECTORIES.select(&:exist?)
+                                           .reject(&:writable_real?)
         return if not_writable_dirs.empty?
 
         <<~EOS
-          The following directories are not writable:
+          The following directories are not writable by your user:
           #{not_writable_dirs.join("\n")}
 
-          This can happen if you "sudo make install" software that isn't managed
-          by Homebrew. If a formula tries to write a file to this directory, the
-          install will fail during the link step.
-
-          You should change the ownership of these directories to your account.
+          You should change the ownership of these directories to your user.
             sudo chown -R $(whoami) #{not_writable_dirs.join(" ")}
-        EOS
-      end
-
-      def check_access_site_packages
-        return unless Language::Python.homebrew_site_packages.exist?
-        return if Language::Python.homebrew_site_packages.writable_real?
-
-        <<~EOS
-          #{Language::Python.homebrew_site_packages} isn't writable.
-          This can happen if you "sudo pip install" software that isn't managed
-          by Homebrew. If you install a formula with Python modules, the install
-          will fail during the link step.
-
-          You should change the ownership and permissions of #{Language::Python.homebrew_site_packages}
-          back to your user account.
-            sudo chown -R $(whoami) #{Language::Python.homebrew_site_packages}
-        EOS
-      end
-
-      def check_access_lock_dir
-        return unless HOMEBREW_LOCK_DIR.exist?
-        return if HOMEBREW_LOCK_DIR.writable_real?
-
-        <<~EOS
-          #{HOMEBREW_LOCK_DIR} isn't writable.
-          Homebrew writes lock files to this location.
-
-          You should change the ownership and permissions of #{HOMEBREW_LOCK_DIR}
-          back to your user account.
-            sudo chown -R $(whoami) #{HOMEBREW_LOCK_DIR}
-        EOS
-      end
-
-      def check_access_logs
-        return unless HOMEBREW_LOGS.exist?
-        return if HOMEBREW_LOGS.writable_real?
-
-        <<~EOS
-          #{HOMEBREW_LOGS} isn't writable.
-          Homebrew writes debugging logs to this location.
-
-          You should change the ownership and permissions of #{HOMEBREW_LOGS}
-          back to your user account.
-            sudo chown -R $(whoami) #{HOMEBREW_LOGS}
-        EOS
-      end
-
-      def check_access_cache
-        return unless HOMEBREW_CACHE.exist?
-        return if HOMEBREW_CACHE.writable_real?
-
-        <<~EOS
-          #{HOMEBREW_CACHE} isn't writable.
-          This can happen if you run `brew install` or `brew fetch` as another user.
-          Homebrew caches downloaded files to this location.
-
-          You should change the ownership and permissions of #{HOMEBREW_CACHE}
-          back to your user account.
-            sudo chown -R $(whoami) #{HOMEBREW_CACHE}
-        EOS
-      end
-
-      def check_access_cellar
-        return unless HOMEBREW_CELLAR.exist?
-        return if HOMEBREW_CELLAR.writable_real?
-
-        <<~EOS
-          #{HOMEBREW_CELLAR} isn't writable.
-
-          You should change the ownership and permissions of #{HOMEBREW_CELLAR}
-          back to your user account.
-            sudo chown -R $(whoami) #{HOMEBREW_CELLAR}
         EOS
       end
 

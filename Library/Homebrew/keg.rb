@@ -1,4 +1,5 @@
 require "keg_relocate"
+require "language/python"
 require "lock_file"
 require "ostruct"
 
@@ -64,18 +65,41 @@ class Keg
   # locale-specific directories have the form language[_territory][.codeset][@modifier]
   LOCALEDIR_RX = %r{(locale|man)/([a-z]{2}|C|POSIX)(_[A-Z]{2})?(\.[a-zA-Z\-0-9]+(@.+)?)?}
   INFOFILE_RX = %r{info/([^.].*?\.info|dir)$}
-  TOP_LEVEL_DIRECTORIES = %w[bin etc include lib sbin share var Frameworks].freeze
-  ALL_TOP_LEVEL_DIRECTORIES = (TOP_LEVEL_DIRECTORIES + %w[lib/pkgconfig share/locale share/man opt]).freeze
-  PRUNEABLE_DIRECTORIES = %w[
-    bin etc include lib sbin share opt Frameworks LinkedKegs var/homebrew/linked
-  ].map do |dir|
-    case dir
-    when "LinkedKegs"
-      HOMEBREW_LIBRARY/dir
-    else
-      HOMEBREW_PREFIX/dir
-    end
-  end
+  KEG_LINK_DIRECTORIES = %w[
+    bin etc include lib sbin share var Frameworks
+  ].freeze
+  # TODO: remove when brew-test-bot no longer uses this
+  TOP_LEVEL_DIRECTORIES = KEG_LINK_DIRECTORIES
+  PRUNEABLE_DIRECTORIES = (
+    KEG_LINK_DIRECTORIES - %w[var] + %w[var/homebrew/linked]
+  ).map { |dir| HOMEBREW_PREFIX/dir }
+
+  # Keep relatively in sync with
+  # https://github.com/Homebrew/install/blob/master/install
+  MUST_EXIST_DIRECTORIES = (
+    (KEG_LINK_DIRECTORIES + %w[
+      opt
+    ]).map { |dir| HOMEBREW_PREFIX/dir }
+  ).freeze
+  MUST_BE_WRITABLE_DIRECTORIES = (
+    (KEG_LINK_DIRECTORIES + %w[
+      opt
+      etc/bash_completion.d lib/pkgconfig
+      share/aclocal share/doc share/info share/locale share/man
+      share/man/man1 share/man/man2 share/man/man3 share/man/man4
+      share/man/man5 share/man/man6 share/man/man7 share/man/man8
+      share/zsh share/zsh/site-functions
+      var/log
+      Caskroom
+    ]).map { |dir| HOMEBREW_PREFIX/dir } + [
+      HOMEBREW_CACHE,
+      HOMEBREW_CELLAR,
+      HOMEBREW_LOCKS,
+      HOMEBREW_LOGS,
+      HOMEBREW_REPOSITORY,
+      Language::Python.homebrew_site_packages,
+    ]
+  ).freeze
 
   # These paths relative to the keg's share directory should always be real
   # directories in the prefix, never symlinks.
@@ -291,7 +315,7 @@ class Keg
 
     dirs = []
 
-    TOP_LEVEL_DIRECTORIES.map { |d| path/d }.each do |dir|
+    KEG_LINK_DIRECTORIES.map { |d| path/d }.each do |dir|
       next unless dir.exist?
       dir.find do |src|
         dst = HOMEBREW_PREFIX + src.relative_path_from(path)

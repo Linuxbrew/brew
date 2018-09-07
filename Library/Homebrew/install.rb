@@ -17,39 +17,36 @@ module Homebrew
       end
     end
 
-    def check_writable_install_location
-      if HOMEBREW_CELLAR.exist? && !HOMEBREW_CELLAR.writable_real?
-        raise "Cannot write to #{HOMEBREW_CELLAR}"
+    def attempt_directory_creation
+      Keg::MUST_BE_WRITABLE_DIRECTORIES.each do |dir|
+        begin
+          FileUtils.mkdir_p(dir) unless dir.exist?
+        rescue
+          nil
+        end
       end
-      prefix_writable = HOMEBREW_PREFIX.writable_real? || HOMEBREW_PREFIX.to_s == "/usr/local"
-      raise "Cannot write to #{HOMEBREW_PREFIX}" unless prefix_writable
     end
 
-    def check_development_tools
-      checks = Diagnostic::Checks.new
+    def perform_development_tools_checks
+      fatal_checks(:fatal_development_tools_checks)
+    end
+
+    def perform_preinstall_checks
+      check_ppc
+      attempt_directory_creation
+      fatal_checks(:fatal_install_checks)
+    end
+
+    def fatal_checks(type)
+      @checks ||= Diagnostic::Checks.new
       failed = false
-      checks.fatal_development_tools_checks.each do |check|
-        out = checks.send(check)
+      @checks.public_send(type).each do |check|
+        out = @checks.public_send(check)
         next if out.nil?
         failed ||= true
         ofail out
       end
       exit 1 if failed
-    end
-
-    def check_cellar
-      FileUtils.mkdir_p HOMEBREW_CELLAR unless File.exist? HOMEBREW_CELLAR
-    rescue
-      raise <<~EOS
-        Could not create #{HOMEBREW_CELLAR}
-        Check you have permission to write to #{HOMEBREW_CELLAR.parent}
-      EOS
-    end
-
-    def perform_preinstall_checks
-      check_ppc
-      check_writable_install_location
-      check_cellar
     end
   end
 end
