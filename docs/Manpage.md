@@ -441,6 +441,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--env=std` is passed, use the standard `PATH` instead of superenv's.
 
+  * `shellenv`:
+    Prints export statements - run them in a shell and this installation of
+    Homebrew will be included into your PATH, MANPATH, and INFOPATH.
+    Tip: have your dotfiles eval the output of this command
+
   * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=``cops`|`--except-cops=``cops`] [`files`|`taps`|`formulae`]:
     Check formulae or files for conformance to Homebrew style guidelines.
 
