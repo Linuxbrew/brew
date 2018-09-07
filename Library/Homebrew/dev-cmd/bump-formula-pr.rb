@@ -325,7 +325,11 @@ module Homebrew
           odie "Unable to fork: #{e.message}!"
         end
 
-        remote_url = response.fetch("clone_url")
+        if system("git", "config", "--local", "--get-regexp", "remote\..*\.url", "git@github.com:.*")
+          remote_url = response.fetch("ssh_url")
+        else
+          remote_url = response.fetch("clone_url")
+        end
         username = response.fetch("owner").fetch("login")
 
         safe_system "git", "fetch", "--unshallow", "origin" if shallow
