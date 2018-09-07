@@ -90,7 +90,6 @@ class Keg
       share/man/man5 share/man/man6 share/man/man7 share/man/man8
       share/zsh share/zsh/site-functions
       var/log
-      Caskroom
     ]).map { |dir| HOMEBREW_PREFIX/dir } + [
       HOMEBREW_CACHE,
       HOMEBREW_CELLAR,
