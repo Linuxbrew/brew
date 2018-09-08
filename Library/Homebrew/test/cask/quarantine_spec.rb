@@ -23,7 +23,7 @@ describe Cask::Quarantine, :cask do
     it "quarantines Cask fetches" do
       Cask::Cmd::Fetch.run("local-transmission")
       local_transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
-      cached_location = Cask::Download.new(local_transmission, force: false, quarantine: false).perform
+      cached_location = Cask::Download.new(local_transmission).perform
 
       expect(cached_location).to be_quarantined
     end
@@ -32,9 +32,21 @@ describe Cask::Quarantine, :cask do
       Cask::Cmd::Audit.run("local-transmission", "--download")
 
       local_transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
-      cached_location = Cask::Download.new(local_transmission, force: false, quarantine: false).perform
+      cached_location = Cask::Download.new(local_transmission).perform
 
       expect(cached_location).to be_quarantined
+    end
+
+    it "quarantines Cask installs even if the fetch was not" do
+      Cask::Cmd::Fetch.run("local-transmission", "--no-quarantine")
+
+      Cask::Cmd::Install.run("local-transmission")
+
+      expect(
+        Cask::CaskLoader.load(cask_path("local-transmission")),
+      ).to be_installed
+
+      expect(Cask::Config.global.appdir.join("Transmission.app")).to be_quarantined
     end
 
     it "quarantines dmg-based Casks" do
@@ -124,9 +136,30 @@ describe Cask::Quarantine, :cask do
     it "does not quarantine Cask fetches" do
       Cask::Cmd::Fetch.run("local-transmission", "--no-quarantine")
       local_transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
-      cached_location = Cask::Download.new(local_transmission, force: false, quarantine: false).perform
+      cached_location = Cask::Download.new(local_transmission).perform
 
       expect(cached_location).to_not be_quarantined
+    end
+
+    it "does not quarantine Cask audits" do
+      Cask::Cmd::Audit.run("local-transmission", "--download", "--no-quarantine")
+
+      local_transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
+      cached_location = Cask::Download.new(local_transmission).perform
+
+      expect(cached_location).to_not be_quarantined
+    end
+
+    it "does not quarantine Cask installs even if the fetch was" do
+      Cask::Cmd::Fetch.run("local-transmission")
+
+      Cask::Cmd::Install.run("local-transmission", "--no-quarantine")
+
+      expect(
+        Cask::CaskLoader.load(cask_path("local-transmission")),
+      ).to be_installed
+
+      expect(Cask::Config.global.appdir.join("Transmission.app")).to_not be_quarantined
     end
 
     it "does not quarantine dmg-based Casks" do
@@ -199,15 +232,6 @@ describe Cask::Quarantine, :cask do
       ).to be_installed
 
       expect(Cask::Config.global.appdir.join("MyNestedApp.app")).to_not be_quarantined
-    end
-
-    it "does not quarantine Cask audits" do
-      Cask::Cmd::Audit.run("local-transmission", "--download", "--no-quarantine")
-
-      local_transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
-      cached_location = Cask::Download.new(local_transmission, force: false, quarantine: false).perform
-
-      expect(cached_location).to_not be_quarantined
     end
   end
 end

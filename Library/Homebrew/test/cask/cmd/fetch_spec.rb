@@ -37,7 +37,7 @@ describe Cask::Cmd::Fetch, :cask do
 
     old_ctime = File.stat(cached_location).ctime
 
-    described_class.run("local-transmission")
+    described_class.run("local-transmission", "--no-quarantine")
     new_ctime = File.stat(cached_location).ctime
 
     expect(old_ctime.to_i).to eq(new_ctime.to_i)
@@ -49,7 +49,7 @@ describe Cask::Cmd::Fetch, :cask do
     old_ctime = File.stat(cached_location).ctime
     sleep(1)
 
-    described_class.run("local-transmission", "--force")
+    described_class.run("local-transmission", "--force", "--no-quarantine")
     new_ctime = File.stat(cached_location).ctime
 
     expect(new_ctime.to_i).to be > old_ctime.to_i

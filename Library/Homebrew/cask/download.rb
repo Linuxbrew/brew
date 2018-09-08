@@ -7,7 +7,7 @@ module Cask
   class Download
     attr_reader :cask
 
-    def initialize(cask, force: false, quarantine: true)
+    def initialize(cask, force: false, quarantine: nil)
       @cask = cask
       @force = force
       @quarantine = quarantine
@@ -46,11 +46,14 @@ module Cask
     end
 
     def quarantine
-      return unless @quarantine
+      return if @quarantine.nil?
       return unless Quarantine.available?
-      return if Quarantine.detect(@downloaded_path)
 
-      Quarantine.cask(cask: @cask, download_path: @downloaded_path)
+      if @quarantine
+        Quarantine.cask!(cask: @cask, download_path: @downloaded_path)
+      else
+        Quarantine.release!(download_path: @downloaded_path)
+      end
     end
   end
 end
