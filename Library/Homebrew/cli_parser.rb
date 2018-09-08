@@ -5,6 +5,8 @@ require "set"
 module Homebrew
   module CLI
     class Parser
+      attr_reader :processed_options
+
       def self.parse(args = ARGV, &block)
         new(&block).parse(args)
       end
@@ -16,32 +18,31 @@ module Homebrew
         Homebrew.args.instance_eval { undef tap }
         @constraints = []
         @conflicts = []
+        @processed_options = []
+        @desc_line_length = 48
         instance_eval(&block)
         post_initialize
       end
 
       def post_initialize
         @parser.on_tail("-h", "--help", "Show this message") do
-          puts @parser
-          xyz = @parser.summarize([], 8, 44, " "*8).map do |r|
-            if r.match?(/^\s{12}\S/)
-              "\n" + r.gsub(" "*12, " "*8)
-            elsif r.start_with?(" "*17)
-              r.gsub(" "*17, " "*11)
-            else
-              "\n" + r
-            end
-          end
-          puts xyz
-          exit
+          puts @parser.to_s.sub(/^/, "#{Tty.bold}Usage: brew#{Tty.reset} ")
+                      .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
+                      .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
+                      .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
         end
+      end
+
+      def wrap_option_desc(desc)
+        Formatter.wrap(desc, @desc_line_length).split("\n")
       end
 
       def switch(*names, description: nil, env: nil, required_for: nil, depends_on: nil)
         global_switch = names.first.is_a?(Symbol)
         names, env, description = common_switch(*names) if global_switch
         description = option_to_description(*names) if description.nil?
-        @parser.on(*names, *description.split("\n")) do
+        process_option(*names, description)
+        @parser.on(*names, *wrap_option_desc(description)) do
           enable_switch(*names)
         end
 
@@ -52,13 +53,18 @@ module Homebrew
         enable_switch(*names) if !env.nil? && !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
       end
 
-      def banner(text)
+      def usage_banner(text)
         @parser.banner = text
+      end
+
+      def usage_banner_text
+        @parser.banner
       end
 
       def comma_array(name, description: nil)
         description = option_to_description(name) if description.nil?
-        @parser.on(name, OptionParser::REQUIRED_ARGUMENT, Array, *description.split("\n")) do |list|
+        process_option(name, description)
+        @parser.on(name, OptionParser::REQUIRED_ARGUMENT, Array, *wrap_option_desc(description)) do |list|
           Homebrew.args[option_to_name(name)] = list
         end
       end
@@ -71,7 +77,8 @@ module Homebrew
           required = OptionParser::OPTIONAL_ARGUMENT
         end
         description = option_to_description(name) if description.nil?
-        @parser.on(name, *description.split("\n"), required) do |option_value|
+        process_option(name, description)
+        @parser.on(name, *wrap_option_desc(description), required) do |option_value|
           Homebrew.args[option_to_name(name)] = option_value
         end
 
@@ -122,10 +129,10 @@ module Homebrew
       # These are common/global switches accessible throughout Homebrew
       def common_switch(name)
         case name
-        when :quiet   then [["-q", "--quiet"], :quiet, "Suppress warnings."]
-        when :verbose then [["-v", "--verbose"], :verbose, "Verbose mode."]
-        when :debug   then [["-d", "--debug"], :debug, "Display debug info."]
-        when :force   then [["-f", "--force"], :force, "Override any warnings/validations."]
+        when :quiet   then [["-q", "--quiet"], :quiet, "Suppress any warnings."]
+        when :verbose then [["-v", "--verbose"], :verbose, "Make some output more verbose."]
+        when :debug   then [["-d", "--debug"], :debug, "Display any debugging information."]
+        when :force   then [["-f", "--force"], :force, "Override warnings and enable potentially unsafe operations."]
         else name
         end
       end
@@ -186,6 +193,11 @@ module Homebrew
         check_invalid_constraints
         check_conflicts
         check_constraints
+      end
+
+      def process_option(*args)
+        option, = @parser.make_switch(args)
+        @processed_options << [option.short.first, option.long.first, option.arg, option.desc.first]
       end
     end
 

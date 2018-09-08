@@ -69,7 +69,7 @@ module Homebrew
     variables = OpenStruct.new
 
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
-    variables[:developer_commands] = [Homebrew.send(:audit_args).summary] + path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
+    variables[:developer_commands] = generate_cmd_manpage(Homebrew.send(:audit_args)) + path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
     readme = HOMEBREW_REPOSITORY/"README.md"
     variables[:lead_maintainer] =
       readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
@@ -149,5 +149,25 @@ module Homebrew
     else
       odie "Failed to infer output format from '#{target.basename}'."
     end
+  end
+
+  def generate_cmd_manpage(cmd_parser)
+    lines = [cmd_parser.usage_banner_text]
+    lines += cmd_parser.processed_options.map do |short, long, _, desc|
+      generate_option_doc(short, long, desc)
+    end
+    lines
+  end
+
+  def generate_option_doc(short, long, desc)
+    "* #{format_short_opt(short)} #{format_long_opt(long)}:" + "\n" + desc + "\n"
+  end
+
+  def format_short_opt(opt)
+    "`#{opt}`, " unless opt.nil?
+  end
+
+  def format_long_opt(opt)
+    "`#{opt}`".ljust(30)
   end
 end

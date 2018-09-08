@@ -33,6 +33,7 @@ module Homebrew
       flag   "--seed="
     end
   end
+
   def tests
     tests_args.parse
 

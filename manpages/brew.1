@@ -601,7 +601,7 @@ If the command\'s output is sent through a pipe and no shell is specified, the l
 .IP "" 0
 .
 .SH "DEVELOPER COMMANDS"
-Usage: brew audit [options] [\fIformulae\fR]
+\fBaudit\fR [\fIoptions\fR] [\fIformulae\fR]:
 .
 .P
 Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\.
@@ -609,38 +609,57 @@ Check \fIformulae\fR for Homebrew coding style violations\. This should be run b
 .P
 If no \fIformulae\fR are provided, all of them are checked\.
 .
-.IP "" 4
+.TP
+\fB\-\-strict\fR
+Run additional style checks, including Rubocop style checks\.
 .
-.nf
-
-    \-\-strict                     Run additional style checks, including Rubocop style checks\.
-    \-\-online                     Run additional slower style checks that require a
-                                 network connection\.
-    \-\-new\-formula                Run various additional style checks to determine if a new formula
-                                 is eligible for Homebrew\. This should be used when creating
-                                 new formula and implies \-\-strict and \-\-online\.
-    \-\-fix                        Fix style violations automatically using
-                                 RuboCop\'s auto\-correct feature\.
-    \-\-display\-cop\-names          Include the RuboCop cop name for each violation
-                                 in the output\.
-    \-\-display\-filename           Prefix everyline of output with name of the file or
-                                 formula being audited, to make output easy to grep\.
-\-D, \-\-audit\-debug                Activates debugging and profiling
-    \-\-only                       Passing \-\-only=method will run only the methods named audit_method,
-                                 `method` should be a comma\-separated list\.
-    \-\-except                     Passing \-\-except=method will run only the methods named audit_method,
-                                 `method` should be a comma\-separated list\.
-    \-\-only\-cops                  Passing \-\-only\-cops=cops will check for violations of only the listed
-                                 RuboCop cops\. `cops` should be a comma\-separated list of cop names\.
-    \-\-except\-cops                Passing \-\-except\-cops=cops will skip checking the listed
-                                 RuboCop cops violations\. `cops` should be a comma\-separated list of cop names\.
-\-v, \-\-verbose                    Verbose mode\.
-\-d, \-\-debug                      Display debug info\.
-\-h, \-\-help                       Show this message
+.TP
+\fB\-\-online\fR
+Run additional slower style checks that require a network connection\.
 .
-.fi
+.TP
+\fB\-\-new\-formula\fR
+Run various additional style checks to determine if a new formula is eligible for Homebrew\. This should be used when creating new formula and implies \fB\-\-strict\fR and \fB\-\-online\fR\.
 .
-.IP "" 0
+.TP
+\fB\-\-fix\fR
+Fix style violations automatically using RuboCop\'s auto\-correct feature\.
+.
+.TP
+\fB\-\-display\-cop\-names\fR
+Include the RuboCop cop name for each violation in the output\.
+.
+.TP
+\fB\-\-display\-filename\fR
+Prefix everyline of output with name of the file or formula being audited, to make output easy to grep\.
+.
+.TP
+\fB\-D\fR, \fB\-\-audit\-debug\fR
+Activates debugging and profiling
+.
+.TP
+\fB\-\-only\fR
+Passing \fB\-\-only\fR=\fImethod\fR will run only themethods named audit_method, \fBmethod\fR should be a comma\-separated list\.
+.
+.TP
+\fB\-\-except\fR
+Passing \fB\-\-except\fR=\fImethod\fR will run only the methods named audit_method, \fBmethod\fR should be a comma\-separated list\.
+.
+.TP
+\fB\-\-only\-cops\fR
+Passing \fB\-\-only\-cops\fR=\fIcops\fR will check for violations of only the listed RuboCop cops\.\fBcops\fR should be a comma\-separated list of cop names\.
+.
+.TP
+\fB\-\-except\-cops\fR
+Passing \fB\-\-except\-cops\fR=\fIcops\fR will skip checking the listed RuboCop cops violations\. \fBcops\fR should be a comma\-separated list of cop names\.
+.
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Make some output more verbose\.
+.
+.TP
+\fB\-d\fR, \fB\-\-debug\fR
+Display any debugging information\.
 .
 .TP
 \fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-fix\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fB\-\-only=\fR\fImethod\fR|\fB\-\-except=\fR\fImethod\fR] [\fB\-\-only\-cops=\fR\fIcops\fR|\fB\-\-except\-cops=\fR\fIcops\fR] [\fIformulae\fR]
@@ -945,6 +964,7 @@ If \fB\-\-to\-tag\fR is passed, set \fBHOMEBREW_UPDATE_TO_TAG\fR to test updatin
 .
 .IP
 If \fB\-\-keep\-tmp\fR is passed, retain the temporary directory containing the new repository clone\.
+
 .
 .SH "OFFICIAL EXTERNAL COMMANDS"
 .

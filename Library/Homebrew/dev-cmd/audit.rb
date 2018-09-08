@@ -54,8 +54,8 @@ module Homebrew
 
   def audit_args
     Homebrew::CLI::Parser.new do
-      banner <<~EOS
-        Usage: brew audit [options] [<formulae>]
+      usage_banner <<~EOS
+        `audit` [<options>] [<formulae>]:
 
         Check <formulae> for Homebrew coding style violations. This should be
         run before submitting a new formula.
@@ -63,17 +63,37 @@ module Homebrew
         If no <formulae> are provided, all of them are checked.
 
       EOS
-      switch      "--strict", description: "Run additional style checks, including Rubocop style checks."
-      switch      "--online", description: "Run additional slower style checks that require a\nnetwork connection."
-      switch      "--new-formula", description: "Run various additional style checks to determine if a new formula \nis eligible for Homebrew. This should be used when creating \nnew formula and implies --strict and --online."
-      switch      "--fix", description: "Fix style violations automatically using\nRuboCop's auto-correct feature."
-      switch      "--display-cop-names", description: "Include the RuboCop cop name for each violation\nin the output."
-      switch      "--display-filename", description: "Prefix everyline of output with name of the file or\nformula being audited, to make output easy to grep."
+      switch      "--strict",            description: "Run additional style checks, "\
+                                                      "including Rubocop style checks."
+      switch      "--online",            description: "Run additional slower style checks "\
+                                                      "that require a network connection."
+      switch      "--new-formula",       description: "Run various additional style checks "\
+                                                      "to determine if a new formula is eligible "\
+                                                      "for Homebrew. This should be used when "\
+                                                      "creating new formula and implies "\
+                                                      "`--strict` and `--online`."
+      switch      "--fix",               description: "Fix style violations automatically using "\
+                                                      "RuboCop's auto-correct feature."
+      switch      "--display-cop-names", description: "Include the RuboCop cop name for each "\
+                                                      "violation in the output."
+      switch      "--display-filename",  description: "Prefix everyline of output with name of "\
+                                                      "the file or formula being audited, to "\
+                                                      "make output easy to grep."
       switch      "-D", "--audit-debug", description: "Activates debugging and profiling"
-      comma_array "--only", description: "Passing --only=method will run only the methods named audit_method,\n`method` should be a comma-separated list."
-      comma_array "--except", description: "Passing --except=method will run only the methods named audit_method,\n`method` should be a comma-separated list."
-      comma_array "--only-cops", description: "Passing --only-cops=cops will check for violations of only the listed\nRuboCop cops. `cops` should be a comma-separated list of cop names."
-      comma_array "--except-cops", description: "Passing --except-cops=cops will skip checking the listed\nRuboCop cops violations. `cops` should be a comma-separated list of cop names."
+      comma_array "--only",              description: "Passing `--only`=<method> will run only the"\
+                                                      "methods named audit_method, `method` should "\
+                                                      "be a comma-separated list."
+      comma_array "--except",            description: "Passing `--except`=<method> will run only the "\
+                                                      "methods named audit_method, `method` should "\
+                                                      "be a comma-separated list."
+      comma_array "--only-cops",         description: "Passing `--only-cops`=<cops> will check for "\
+                                                      "violations of only the listed RuboCop cops."\
+                                                      "`cops` should be a comma-separated list of "\
+                                                      "cop names."
+      comma_array "--except-cops",       description: "Passing `--except-cops`=<cops> will "\
+                                                      "skip checking the listed RuboCop cops "\
+                                                      "violations. `cops` should be a "\
+                                                      "comma-separated list of cop names."
       switch      :verbose
       switch      :debug
     end

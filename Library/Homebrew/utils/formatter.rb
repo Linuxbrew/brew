@@ -31,6 +31,10 @@ module Formatter
     label(label, string, :red)
   end
 
+  def wrap(s, width = 172)
+    s.gsub(/(.{1,#{width}})(\s+|\Z)/, "\\1\n")
+  end
+
   def url(string)
     "#{Tty.underline}#{string}#{Tty.no_underline}"
   end

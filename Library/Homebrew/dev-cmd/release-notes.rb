@@ -15,6 +15,7 @@ module Homebrew
       switch "--markdown"
     end
   end
+
   def release_notes
     release_notes_args.parse
 
