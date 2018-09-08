@@ -107,7 +107,7 @@ is a good opportunity to do it) provided the line itself has some kind
 of modification that is not whitespace in it. But be careful about
 making changes to inline patches—make sure they still apply.
 
-### Adding or update formulae
+### Adding or updating formulae
 Only one maintainer is necessary to approve and merge the addition of a new or updated formula which passes CI. However, if the formula addition or update is controversial the maintainer who adds it will be expected to fix issues that arise with it in future.
 
 ### Removing formulae
@@ -122,7 +122,7 @@ Formulae that:
 should not be removed from Homebrew. The exception to this rule are [versioned formulae](Versions.md) for which there are higher standards of usage and a maximum number of versions for a given formula.
 
 ### Closing issues/PRs
-Maintainers (including the lead maintainer) should not close issues or pull requests opened by other maintainers unless they are stale (i.e. have seen no updates for 28 days) in which case they can be closed by any maintainer. Any maintainer is encouraged to reopen a closed issue when they wish to do additional work on the issue.
+Maintainers (including the lead maintainer) should not close issues or pull requests (note a merge is not considered a close in this case) opened by other maintainers unless they are stale (i.e. have seen no updates for 28 days) in which case they can be closed by any maintainer. Any maintainer is encouraged to reopen a closed issue when they wish to do additional work on the issue.
 
 Any maintainer can merge any PR they have carefully reviewed and is passing CI that has been opened by any other maintainer. If you do not wish to have other maintainers merge your PRs: please use the `do not merge` label to indicate that until you're ready to merge it yourself.
 
