@@ -55,7 +55,7 @@ module Cask
                      print_stderr: false).stdout.rstrip
     end
 
-    def disable_translocation!(xattr)
+    def toggle_no_translocation_bit(xattr)
       fields = xattr.split(";")
 
       # Fields: status, epoch, download agent, event ID
@@ -117,7 +117,7 @@ module Cask
 
       odebug "Propagating quarantine from #{from} to #{to}"
 
-      quarantine_status = disable_translocation!(status(from))
+      quarantine_status = toggle_no_translocation_bit(status(from))
 
       resolved_paths = Pathname.glob(to/"**/*", File::FNM_DOTMATCH)
 
