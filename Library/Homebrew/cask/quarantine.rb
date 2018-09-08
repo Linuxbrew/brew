@@ -67,46 +67,46 @@ module Cask
       fields.join(";")
     end
 
+    def release!(download_path: nil)
+      return unless detect(download_path)
+
+      odebug "Releasing #{download_path} from quarantine"
+
+      quarantiner = system_command("/usr/bin/xattr",
+                                  args: [
+                                    "-d",
+                                    QUARANTINE_ATTRIBUTE,
+                                    download_path,
+                                  ],
+                                  print_stderr: false)
+
+      return if quarantiner.success?
+
+      raise CaskQuarantineReleaseError.new(download_path, quarantiner.stderr)
+    end
+
     def cask!(cask: nil, download_path: nil, action: true)
       return if cask.nil? || download_path.nil?
 
-      if action
-        return if detect(download_path)
+      return if detect(download_path)
 
-        odebug "Quarantining #{download_path}"
+      odebug "Quarantining #{download_path}"
 
-        quarantiner = system_command(swift,
-                                    args: [
-                                      QUARANTINE_SCRIPT,
-                                      download_path,
-                                      cask.url.to_s,
-                                      cask.homepage.to_s,
-                                    ])
+      quarantiner = system_command(swift,
+                                  args: [
+                                    QUARANTINE_SCRIPT,
+                                    download_path,
+                                    cask.url.to_s,
+                                    cask.homepage.to_s,
+                                  ])
 
-        return if quarantiner.success?
+      return if quarantiner.success?
 
-        case quarantiner.exit_status
-        when 2
-          raise CaskQuarantineError.new(download_path, "Insufficient parameters")
-        else
-          raise CaskQuarantineError.new(download_path, quarantiner.stderr)
-        end
+      case quarantiner.exit_status
+      when 2
+        raise CaskQuarantineError.new(download_path, "Insufficient parameters")
       else
-        return unless detect(download_path)
-
-        odebug "Releasing #{download_path} from quarantine"
-
-        quarantiner = system_command("/usr/bin/xattr",
-                                    args: [
-                                      "-d",
-                                      QUARANTINE_ATTRIBUTE,
-                                      download_path,
-                                    ],
-                                    print_stderr: false)
-
-        return if quarantiner.success?
-
-        raise CaskQuarantineReleaseError.new(download_path, quarantiner.stderr)
+        raise CaskQuarantineError.new(download_path, quarantiner.stderr)
       end
     end
 

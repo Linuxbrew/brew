@@ -49,7 +49,11 @@ module Cask
       return if @quarantine.nil?
       return unless Quarantine.available?
 
-      Quarantine.cask!(cask: @cask, download_path: @downloaded_path, action: @quarantine)
+      if @quarantine
+        Quarantine.cask!(cask: @cask, download_path: @downloaded_path)
+      else
+        Quarantine.release!(download_path: @downloaded_path)
+      end
     end
   end
 end
