@@ -28,7 +28,14 @@ module Cask
 
         ohai "Casks with `auto_updates` or `version :latest` will not be upgraded" if args.empty? && !greedy?
         oh1 "Upgrading #{Formatter.pluralize(outdated_casks.length, "outdated package")}, with result:"
-        puts outdated_casks.map { |f| "#{f.full_name} #{f.version}" } * ", "
+        cask_upgrades = outdated_casks.map do |cask|
+          if cask.installed_caskfile.nil?
+            "#{cask.full_name} #{cask.version}"
+          else
+            "#{cask.full_name} #{CaskLoader.load(cask.installed_caskfile).version} -> #{cask.version}"
+          end
+        end
+        puts cask_upgrades.join(", ")
 
         outdated_casks.each do |old_cask|
           odebug "Started upgrade process for Cask #{old_cask}"
