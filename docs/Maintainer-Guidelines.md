@@ -7,7 +7,7 @@ definitely not a beginner’s guide.
 
 Maybe you were looking for the [Formula Cookbook](Formula-Cookbook.md)?
 
-This document is a work in progress. If you wish to change or discuss any of the below: open a PR to suggest a change.
+This document is current practice. If you wish to change or discuss any of the below: open a PR to suggest a change.
 
 ## Quick checklist
 
@@ -108,14 +108,14 @@ of modification that is not whitespace in it. But be careful about
 making changes to inline patches—make sure they still apply.
 
 ### Adding or updating formulae
-Only one maintainer is necessary to approve and merge the addition of a new or updated formula which passes CI. However, if the formula addition or update is controversial the maintainer who adds it will be expected to fix issues that arise with it in future.
+Any one maintainer is necessary to approve and merge the addition of a new or updated formula which passes CI. However, if the formula addition or update proves controversial the maintainer who adds it will be expected to answer requests and fix problems that arise with it in future.
 
 ### Removing formulae
 Formulae that:
 
 - work on at least 2/3 of our supported macOS versions in the default Homebrew prefix
 - do not require patches rejected by upstream to work
-- do not have known security vulnerabilities/CVEs for the version we package
+- do not have known security vulnerabilities or CVEs for the version we package
 - are shown to be still installed by users in our analytics with a `BuildError` rate of <25%
 
 
@@ -151,4 +151,4 @@ In the same way that Homebrew maintainers are expected to be spending more of th
 
 Individual Homebrew repositories should not have formal lead maintainers (although those who do the most work will have the loudest voices).
 
-Maintainers should feel even more free to pleasantly disagree with the work and decisions of the lead maintainer. With greater authority comes greater responsibility to handle and moderate technical disagreements.
+Maintainers should feel even more free to pleasantly disagree with the work and decisions of the lead maintainer: with greater authority comes greater responsibility to handle and moderate technical disagreements.
