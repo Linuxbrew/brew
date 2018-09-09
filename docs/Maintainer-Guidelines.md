@@ -7,6 +7,8 @@ definitely not a beginner’s guide.
 
 Maybe you were looking for the [Formula Cookbook](Formula-Cookbook.md)?
 
+This document is current practice. If you wish to change or discuss any of the below: open a PR to suggest a change.
+
 ## Quick checklist
 
 This is all that really matters:
@@ -105,6 +107,28 @@ is a good opportunity to do it) provided the line itself has some kind
 of modification that is not whitespace in it. But be careful about
 making changes to inline patches—make sure they still apply.
 
+### Adding or updating formulae
+Any one maintainer is necessary to approve and merge the addition of a new or updated formula which passes CI. However, if the formula addition or update proves controversial the maintainer who adds it will be expected to answer requests and fix problems that arise with it in future.
+
+### Removing formulae
+Formulae that:
+
+- work on at least 2/3 of our supported macOS versions in the default Homebrew prefix
+- do not require patches rejected by upstream to work
+- do not have known security vulnerabilities or CVEs for the version we package
+- are shown to be still installed by users in our analytics with a `BuildError` rate of <25%
+
+
+should not be removed from Homebrew. The exception to this rule are [versioned formulae](Versions.md) for which there are higher standards of usage and a maximum number of versions for a given formula.
+
+### Closing issues/PRs
+Maintainers (including the lead maintainer) should not close issues or pull requests (note a merge is not considered a close in this case) opened by other maintainers unless they are stale (i.e. have seen no updates for 28 days) in which case they can be closed by any maintainer. Any maintainer is encouraged to reopen a closed issue when they wish to do additional work on the issue.
+
+Any maintainer can merge any PR they have carefully reviewed and is passing CI that has been opened by any other maintainer. If you do not wish to have other maintainers merge your PRs: please use the `do not merge` label to indicate that until you're ready to merge it yourself.
+
+## Reverting PRs
+Any maintainer can revert a PR created by another maintainer after a user submitted issue or CI failure that results. The maintainer who created the original PR should be given no less than an hour to fix the issue themselves or decide to revert the PR themselves if they would rather.
+
 ## Communication
 Maintainers have a variety of ways to communicate with each other:
 
@@ -118,9 +142,13 @@ This makes it easier for other maintainers, contributors and users to follow alo
 
 All maintainers (and lead maintainer) communication through any medium is bound by [Homebrew's Code of Conduct](CODE_OF_CONDUCT.md#code-of-conduct). Abusive behaviour towards other maintainers, contributors or users will not be tolerated; the maintainer will be given a warning and if their behaviour continues they will be removed as a maintainer.
 
+Maintainers should feel free to pleasantly disagree with the work and decisions of other maintainers. Healthy, friendly, technical disagreement between maintainers is actively encouraged and should occur in public on the issue tracker to make the project better. Interpersonal issues should be handled privately in Slack, ideally with moderation. If work or decisions are insufficiently documented or explained any maintainer or contributor should feel free to ask for clarification. No maintainer may ever justify a decision with e.g. "because I say so" or "it was I who did X" alone. Off-topic discussions on the issue tracker, [bike-shedding](https://en.wikipedia.org/wiki/Law_of_triviality) and personal attacks are forbidden.
+
 ## Lead maintainer guidelines
 There should be one lead maintainer for Homebrew. Decisions are determined by a consensus of the maintainers. When a consensus is not reached, the lead maintainer has the final say in determining the outcome of any decision (though this power should be used sparingly). They should also be seen as the product manager for Homebrew itself and ensuring that changes made to the entire Homebrew ecosystem are consistent and providing an increasingly positive experience for Homebrew's users.
 
 In the same way that Homebrew maintainers are expected to be spending more of their time reviewing and merging contributions from non-maintainer contributors than making their own contributions, the lead maintainer should be spending most of their time reviewing work from and mentoring other maintainers.
 
 Individual Homebrew repositories should not have formal lead maintainers (although those who do the most work will have the loudest voices).
+
+Maintainers should feel even more free to pleasantly disagree with the work and decisions of the lead maintainer: with greater authority comes greater responsibility to handle and moderate technical disagreements.
