@@ -49,6 +49,8 @@ module Homebrew
   extend FileUtils
 
   DEFAULT_PREFIX ||= "/usr/local".freeze
+  DEFAULT_CELLAR = "#{DEFAULT_PREFIX}/Cellar".freeze
+  DEFAULT_REPOSITORY = "#{DEFAULT_PREFIX}/Homebrew".freeze
 
   class << self
     attr_writer :failed, :raise_deprecation_exceptions, :auditing, :args
