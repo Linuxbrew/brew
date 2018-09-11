@@ -55,7 +55,7 @@ describe JavaRequirement do
       def setup_java_with_version(version)
         IO.write java, <<~SH
           #!/bin/sh
-          echo 'java version "#{version}"'
+          echo 'java version "#{version}"' 1>&2
         SH
         FileUtils.chmod "+x", java
       end

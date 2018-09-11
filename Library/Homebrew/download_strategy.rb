@@ -292,6 +292,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
           raise CurlDownloadStrategyError, url
         end
         ignore_interrupts do
+          cached_location.dirname.mkpath
           temporary_path.rename(cached_location)
           symlink_location.dirname.mkpath
         end
@@ -338,7 +339,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       end
     end
 
-    filenames = lines.map { |line| line[/^Content\-Disposition:\s*attachment;\s*filename=(["']?)(.+)\1$/i, 2] }
+    filenames = lines.map { |line| line[/^Content\-Disposition:\s*attachment;\s*filename=(["']?)([^;]+)\1/i, 2] }
                      .compact
 
     basename = filenames.last || parse_basename(redirect_url)
@@ -347,8 +348,6 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
   end
 
   def _fetch(url:, resolved_url:)
-    temporary_path.dirname.mkpath
-
     ohai "Downloading from #{resolved_url}" if url != resolved_url
 
     if ENV["HOMEBREW_NO_INSECURE_REDIRECT"] &&

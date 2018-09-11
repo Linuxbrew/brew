@@ -1,4 +1,4 @@
-describe Hbc::CaskLoader::FromPathLoader do
+describe Cask::CaskLoader::FromPathLoader do
   describe "#load" do
     context "when the file does not contain a cask" do
       let(:path) {
@@ -12,7 +12,7 @@ describe Hbc::CaskLoader::FromPathLoader do
       it "raises an error" do
         expect {
           described_class.new(path).load
-        }.to raise_error(Hbc::CaskUnreadableError, /does not contain a cask/)
+        }.to raise_error(Cask::CaskUnreadableError, /does not contain a cask/)
       end
     end
 
@@ -28,7 +28,7 @@ describe Hbc::CaskLoader::FromPathLoader do
       it "raises an error" do
         expect {
           described_class.new(path).load
-        }.to raise_error(Hbc::CaskUnreadableError, /undefined local variable or method/)
+        }.to raise_error(Cask::CaskUnreadableError, /undefined local variable or method/)
       end
     end
   end

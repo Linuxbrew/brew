@@ -15,12 +15,12 @@ you should also decide not to be a maintainer and find other things to work on.
 ## 2. No Guilt About Leaving
 
 All maintainers can stop working on Homebrew at any time without any guilt or
-explanation (like a job). We may still ask for your help with questions after
-you leave but you are under no obligation to answer them. Like a job, if you
-create a big mess and then leave you still have no obligations but we may think
-less of you (or, realistically, probably just revert the problematic work).
-Like a job, you should probably take a break from Homebrew at least a few times
-a year.
+explanation (like leaving a job). We may still ask for your help with questions
+after you leave but you are under no obligation to answer them. Like a job, if
+you create a big mess and then leave you still have no obligations but we may
+think less of you (or, realistically, probably just revert the problematic
+work). Like a job, you should probably take a break from Homebrew at least a few
+times a year.
 
 This also means contributors should be consumers. If an owner finds they are
 not using a project in the real world, they should reconsider their involvement

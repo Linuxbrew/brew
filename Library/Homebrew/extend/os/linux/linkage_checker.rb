@@ -1,5 +1,5 @@
 class LinkageChecker
-  # Host libraries provided by glibc and gcc may be used.
+  # Libraries provided by glibc and gcc.
   SYSTEM_LIBRARY_WHITELIST = %w[
     ld-linux-x86-64.so.2
     libanl.so.1
@@ -22,11 +22,11 @@ class LinkageChecker
   def check_dylibs(rebuild_cache:)
     generic_check_dylibs(rebuild_cache: rebuild_cache)
 
+    # glibc and gcc are implicit dependencies.
+    # No other linkage to system libraries is expected or desired.
     @unwanted_system_dylibs = @system_dylibs.reject do |s|
       SYSTEM_LIBRARY_WHITELIST.include? File.basename(s)
     end
-
-    # glibc and gcc are implicit dependencies of every formula.
     @undeclared_deps -= ["gcc", "glibc"]
   end
 end

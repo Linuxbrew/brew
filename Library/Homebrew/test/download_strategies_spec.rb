@@ -262,7 +262,7 @@ describe CurlDownloadStrategy do
       expect(subject).to receive(:curl).with(
         "--location",
         "--remote-time",
-        "--continue-at", "-",
+        "--continue-at", "0",
         "--output", an_instance_of(Pathname),
         url,
         an_instance_of(Hash)

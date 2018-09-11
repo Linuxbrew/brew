@@ -1,5 +1,5 @@
-describe Hbc::Artifact::Suite, :cask do
-  let(:cask) { Hbc::CaskLoader.load(cask_path("with-suite")) }
+describe Cask::Artifact::Suite, :cask do
+  let(:cask) { Cask::CaskLoader.load(cask_path("with-suite")) }
 
   let(:install_phase) {
     lambda do
@@ -9,7 +9,7 @@ describe Hbc::Artifact::Suite, :cask do
     end
   }
 
-  let(:target_path) { Hbc::Config.global.appdir.join("Caffeine") }
+  let(:target_path) { Cask::Config.global.appdir.join("Caffeine") }
   let(:source_path) { cask.staged_path.join("Caffeine") }
 
   before do
@@ -27,7 +27,7 @@ describe Hbc::Artifact::Suite, :cask do
 
     expect {
       install_phase.call
-    }.to raise_error(Hbc::CaskError)
+    }.to raise_error(Cask::CaskError)
 
     expect(source_path).to be_a_directory
     expect(target_path).to be_a_directory

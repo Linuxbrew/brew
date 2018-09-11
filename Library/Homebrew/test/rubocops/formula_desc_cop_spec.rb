@@ -1,4 +1,4 @@
-require_relative "../../rubocops/formula_desc_cop"
+require "rubocops/formula_desc_cop"
 
 describe RuboCop::Cop::FormulaAudit::DescLength do
   subject(:cop) { described_class.new }

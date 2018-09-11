@@ -85,10 +85,16 @@ fi
 
 case "$(lowercase "$SCM_FILE")" in
   git)
-    [[ -n "$HOMEBREW_GIT" ]] && safe_exec "$(type -P "$HOMEBREW_GIT")" "$@"
+    if [[ -n "$HOMEBREW_GIT" && "$HOMEBREW_GIT" != git ]]
+    then
+      safe_exec "$(type -P "$HOMEBREW_GIT")" "$@"
+    fi
     ;;
   svn)
-    [[ -n "$HOMEBREW_SVN" ]] && safe_exec "$(type -P "$HOMEBREW_SVN")" "$@"
+    if [[ -n "$HOMEBREW_SVN" && "$HOMEBREW_SVN" != svn ]]
+    then
+      safe_exec "$(type -P "$HOMEBREW_SVN")" "$@"
+    fi
     ;;
 esac
 

@@ -25,8 +25,6 @@ Your taps are Git repositories located at `$(brew --repository)/Library/Taps`.
 
 *   [brewsci/bio](https://github.com/brewsci/homebrew-bio): Bioinformatics formulae.
 
-*   [brewsci/science](https://github.com/brewsci/homebrew-science): Software tailored to scientific endeavours.
-
 *   [davidchall/hep](https://github.com/davidchall/homebrew-hep): High energy physics formulae.
 
 *   [lifepillar/appleii](https://github.com/lifepillar/homebrew-appleii): Formulae for vintage Apple emulation.

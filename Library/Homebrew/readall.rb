@@ -73,21 +73,20 @@ module Readall
     private
 
     def syntax_errors_or_warnings?(rb)
-      # Retrieve messages about syntax errors/warnings printed to `$stderr`, but
-      # discard a `Syntax OK` printed to `$stdout` (in absence of syntax errors).
-      messages = Utils.popen_read("#{RUBY_PATH} -c -w #{rb} 2>&1 >/dev/null")
+      # Retrieve messages about syntax errors/warnings printed to `$stderr`.
+      _, err, status = system_command(RUBY_PATH, args: ["-c", "-w", rb], print_stderr: false)
 
       # Ignore unnecessary warning about named capture conflicts.
       # See https://bugs.ruby-lang.org/issues/12359.
-      messages = messages.lines
-                         .grep_v(/named capture conflicts a local variable/)
-                         .join
+      messages = err.lines
+                    .grep_v(/named capture conflicts a local variable/)
+                    .join
 
       $stderr.print messages
 
       # Only syntax errors result in a non-zero status code. To detect syntax
       # warnings we also need to inspect the output to `$stderr`.
-      !$CHILD_STATUS.success? || !messages.chomp.empty?
+      !status.success? || !messages.chomp.empty?
     end
   end
 end

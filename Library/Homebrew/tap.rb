@@ -3,9 +3,9 @@ require "readall"
 
 # a {Tap} is used to extend the formulae provided by Homebrew core.
 # Usually, it's synced with a remote git repository. And it's likely
-# a Github repository with the name of `user/homebrew-repo`. In such
+# a GitHub repository with the name of `user/homebrew-repo`. In such
 # case, `user/repo` will be used as the {#name} of this {Tap}, where
-# {#user} represents Github username and {#repo} represents repository
+# {#user} represents GitHub username and {#repo} represents repository
 # name without leading `homebrew-`.
 class Tap
   extend Cachable
@@ -52,7 +52,7 @@ class Tap
 
   extend Enumerable
 
-  # The user name of this {Tap}. Usually, it's the Github username of
+  # The user name of this {Tap}. Usually, it's the GitHub username of
   # this #{Tap}'s remote repository.
   attr_reader :user
 
@@ -289,7 +289,7 @@ class Tap
           raise "Cannot tap #{name}: invalid syntax in tap!"
         end
       end
-    rescue Interrupt, ErrorDuringExecution, RuntimeError
+    rescue Interrupt, RuntimeError
       ignore_interrupts do
         # wait for git to possibly cleanup the top directory when interrupt happens.
         sleep 0.1

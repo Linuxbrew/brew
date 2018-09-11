@@ -1,4 +1,4 @@
-describe Hbc::Cask, :cask do
+describe Cask::Cask, :cask do
   let(:cask) { described_class.new("versioned-cask") }
 
   context "when multiple versions are installed" do
@@ -27,20 +27,20 @@ describe Hbc::Cask, :cask do
     let(:relative_tap_path) { tap_path.relative_path_from(file_dirname) }
 
     it "returns an instance of the Cask for the given token" do
-      c = Hbc::CaskLoader.load("local-caffeine")
-      expect(c).to be_kind_of(Hbc::Cask)
+      c = Cask::CaskLoader.load("local-caffeine")
+      expect(c).to be_kind_of(Cask::Cask)
       expect(c.token).to eq("local-caffeine")
     end
 
     it "returns an instance of the Cask from a specific file location" do
-      c = Hbc::CaskLoader.load("#{tap_path}/Casks/local-caffeine.rb")
-      expect(c).to be_kind_of(Hbc::Cask)
+      c = Cask::CaskLoader.load("#{tap_path}/Casks/local-caffeine.rb")
+      expect(c).to be_kind_of(Cask::Cask)
       expect(c.token).to eq("local-caffeine")
     end
 
     it "returns an instance of the Cask from a url" do
-      c = Hbc::CaskLoader.load("file://#{tap_path}/Casks/local-caffeine.rb")
-      expect(c).to be_kind_of(Hbc::Cask)
+      c = Cask::CaskLoader.load("file://#{tap_path}/Casks/local-caffeine.rb")
+      expect(c).to be_kind_of(Cask::Cask)
       expect(c.token).to eq("local-caffeine")
     end
 
@@ -48,46 +48,46 @@ describe Hbc::Cask, :cask do
       expect {
         url = "file://#{tap_path}/Casks/notacask.rb"
 
-        Hbc::CaskLoader.load(url)
-      }.to raise_error(Hbc::CaskUnavailableError)
+        Cask::CaskLoader.load(url)
+      }.to raise_error(Cask::CaskUnavailableError)
     end
 
     it "returns an instance of the Cask from a relative file location" do
-      c = Hbc::CaskLoader.load(relative_tap_path/"Casks/local-caffeine.rb")
-      expect(c).to be_kind_of(Hbc::Cask)
+      c = Cask::CaskLoader.load(relative_tap_path/"Casks/local-caffeine.rb")
+      expect(c).to be_kind_of(Cask::Cask)
       expect(c.token).to eq("local-caffeine")
     end
 
     it "uses exact match when loading by token" do
-      expect(Hbc::CaskLoader.load("test-opera").token).to eq("test-opera")
-      expect(Hbc::CaskLoader.load("test-opera-mail").token).to eq("test-opera-mail")
+      expect(Cask::CaskLoader.load("test-opera").token).to eq("test-opera")
+      expect(Cask::CaskLoader.load("test-opera-mail").token).to eq("test-opera-mail")
     end
 
     it "raises an error when attempting to load a Cask that doesn't exist" do
       expect {
-        Hbc::CaskLoader.load("notacask")
-      }.to raise_error(Hbc::CaskUnavailableError)
+        Cask::CaskLoader.load("notacask")
+      }.to raise_error(Cask::CaskUnavailableError)
     end
   end
 
   describe "metadata" do
     it "proposes a versioned metadata directory name for each instance" do
       cask_token = "local-caffeine"
-      c = Hbc::CaskLoader.load(cask_token)
-      metadata_timestamped_path = Hbc::Caskroom.path.join(cask_token, ".metadata", c.version)
+      c = Cask::CaskLoader.load(cask_token)
+      metadata_timestamped_path = Cask::Caskroom.path.join(cask_token, ".metadata", c.version)
       expect(c.metadata_versioned_path.to_s).to eq(metadata_timestamped_path.to_s)
     end
   end
 
   describe "outdated" do
     it "ignores the Casks that have auto_updates true (without --greedy)" do
-      c = Hbc::CaskLoader.load("auto-updates")
+      c = Cask::CaskLoader.load("auto-updates")
       expect(c).not_to be_outdated
       expect(c.outdated_versions).to be_empty
     end
 
     it "ignores the Casks that have version :latest (without --greedy)" do
-      c = Hbc::CaskLoader.load("version-latest-string")
+      c = Cask::CaskLoader.load("version-latest-string")
       expect(c).not_to be_outdated
       expect(c.outdated_versions).to be_empty
     end
@@ -102,7 +102,7 @@ describe Hbc::Cask, :cask do
           context "when versions #{installed_versions.inspect} are installed and the tap version is #{tap_version}" do
             it {
               allow(cask).to receive(:versions).and_return(installed_versions)
-              allow(cask).to receive(:version).and_return(Hbc::DSL::Version.new(tap_version))
+              allow(cask).to receive(:version).and_return(Cask::DSL::Version.new(tap_version))
               expect(cask).to receive(:outdated_versions).and_call_original
               is_expected.to eq expected_output
             }
@@ -136,7 +136,7 @@ describe Hbc::Cask, :cask do
 
             it {
               allow(cask).to receive(:versions).and_return(installed_version)
-              allow(cask).to receive(:version).and_return(Hbc::DSL::Version.new(tap_version))
+              allow(cask).to receive(:version).and_return(Cask::DSL::Version.new(tap_version))
               expect(cask).to receive(:outdated_versions).and_call_original
               is_expected.to eq expected_output
             }
@@ -170,14 +170,14 @@ describe Hbc::Cask, :cask do
   describe "full_name" do
     context "when it is a core cask" do
       it "is the cask token" do
-        c = Hbc::CaskLoader.load("local-caffeine")
+        c = Cask::CaskLoader.load("local-caffeine")
         expect(c.full_name).to eq("local-caffeine")
       end
     end
 
     context "when it is from a non-core tap" do
       it "returns the fully-qualified name of the cask" do
-        c = Hbc::CaskLoader.load("third-party/tap/third-party-cask")
+        c = Cask::CaskLoader.load("third-party/tap/third-party-cask")
         expect(c.full_name).to eq("third-party/tap/third-party-cask")
       end
     end
@@ -191,7 +191,7 @@ describe Hbc::Cask, :cask do
           file.write "cask '#{cask_name}'"
           file.close
 
-          c = Hbc::CaskLoader.load(file.path)
+          c = Cask::CaskLoader.load(file.path)
           expect(c.full_name).to eq(cask_name)
         ensure
           file.close

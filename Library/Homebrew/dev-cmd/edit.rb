@@ -26,36 +26,15 @@ module Homebrew
     end
 
     # If no brews are listed, open the project root in an editor.
-    if ARGV.named.empty?
-      editor = File.basename which_editor
-      if ["atom", "subl", "mate"].include?(editor)
-        # If the user is using Atom, Sublime Text or TextMate
-        # give a nice project view instead.
-        exec_editor HOMEBREW_REPOSITORY/"bin/brew",
-                    HOMEBREW_REPOSITORY/"README.md",
-                    HOMEBREW_REPOSITORY/".gitignore",
-                    *library_folders
-      else
-        exec_editor HOMEBREW_REPOSITORY
-      end
-    else
-      # Don't use ARGV.formulae as that will throw if the file doesn't parse
-      paths = ARGV.named.map do |name|
-        path = Formulary.path(name)
+    paths = [HOMEBREW_REPOSITORY] if ARGV.named.empty?
 
-        raise FormulaUnavailableError, name unless path.file? || args.force?
-
-        path
-      end
-      exec_editor(*paths)
+    # Don't use ARGV.formulae as that will throw if the file doesn't parse
+    paths ||= ARGV.named.map do |name|
+      path = Formulary.path(name)
+      raise FormulaUnavailableError, name if !path.file? && !args.force?
+      path
     end
-  end
 
-  def library_folders
-    Dir["#{HOMEBREW_LIBRARY}/*"].reject do |d|
-      case File.basename(d)
-      when "LinkedKegs", "Aliases" then true
-      end
-    end
+    exec_editor(*paths)
   end
 end
