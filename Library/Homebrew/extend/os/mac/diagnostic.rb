@@ -232,7 +232,7 @@ module Homebrew
         <<~EOS
           Your XQuartz (#{MacOS::XQuartz.version}) is outdated.
           Please install XQuartz #{MacOS::XQuartz.latest_version} (or delete the current version).
-          XQuartz can be updated using Homebrew-Cask by running
+          XQuartz can be updated using Homebrew Cask by running
             brew cask reinstall xquartz
         EOS
       end

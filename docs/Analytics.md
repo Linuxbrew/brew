@@ -42,9 +42,7 @@ As far as we can tell it would be impossible for Google to match the randomly ge
 Homebrew's analytics are sent throughout Homebrew's execution to Google Analytics over HTTPS.
 
 ## Who?
-Homebrew's detailed analytics are accessible to Homebrew's current maintainers. Contact @MikeMcQuaid if you are a maintainer and need access.
-
-Summaries of installation and error analytics are publicly available [here](https://brew.sh/analytics/).
+Summaries of installation and error analytics are publicly available [here](https://brew.sh/analytics/). A JSON API is also available.
 
 ## How?
 The code is viewable in [analytics.rb](https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.rb) and [analytics.sh](https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.sh). They are done in a separate background process and fail fast to avoid delaying any execution. They will fail immediately and silently if you have no network connection.

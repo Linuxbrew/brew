@@ -16,7 +16,7 @@ Software that can upgrade itself does not integrate well with Homebrew's own
 upgrade functionality. The self-update functionality should be disabled (if possible without complicating the formula).
 
 ### We don’t like install-scripts that download unversioned things
-We don't like install scripts that are pulling from the `master` branch of Git repositories or unversioned, unchecksummed tarballs. These should use `resource` blocks with specific revisions or checksummed tarballs instead. Note that we now allow tools like `cargo`, `gem` and `pip` to download things during installation.
+We don't like install scripts that are pulling from the `master` branch of Git repositories or unversioned, unchecksummed tarballs. These should use `resource` blocks with specific revisions or checksummed tarballs instead. Note that we now allow tools like `cargo`, `gem` and `pip` to download specifically versioned libraries during installation.
 
 ### We don’t like binary formulae
 Our policy is that formulae in the core tap

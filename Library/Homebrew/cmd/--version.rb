@@ -9,5 +9,6 @@ module Homebrew
 
     puts "Homebrew #{HOMEBREW_VERSION}"
     puts "#{CoreTap.instance.slug} #{CoreTap.instance.version_string}"
+    puts "#{Tap.default_cask_tap.full_name} #{Tap.default_cask_tap.version_string}" if Tap.default_cask_tap.installed?
   end
 end

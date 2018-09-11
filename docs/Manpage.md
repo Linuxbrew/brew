@@ -204,8 +204,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `info`:
     Display brief statistics for your Homebrew installation.
 
-  * `info` `formula`:
-    Display information about `formula`.
+  * `info` `formula`  (`--verbose`):
+    Display information about `formula` and analytics data (provided neither
+    `HOMEBREW_NO_ANALYTICS` or `HOMEBREW_NO_GITHUB_API` are set)
+
+    Pass `--verbose` to see more detailed analytics data.
 
   * `info` `--github` `formula`:
     Open a browser to the GitHub History page for `formula`.
@@ -442,6 +445,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     which otherwise build systems would not find.
 
     If `--env=std` is passed, use the standard `PATH` instead of superenv's.
+
+  * `shellenv`:
+    Prints export statements - run them in a shell and this installation of
+    Homebrew will be included into your PATH, MANPATH, and INFOPATH.
+    Tip: have your dotfiles eval the output of this command
 
   * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=``cops`|`--except-cops=``cops`] [`files`|`taps`|`formulae`]:
     Check formulae or files for conformance to Homebrew style guidelines.
@@ -1345,13 +1353,13 @@ Former Linuxbrew maintainers with significant contributions include Bob W. Hogg.
 
 Homebrew's lead maintainer is Mike McQuaid.
 
-Homebrew's project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter.
+Homebrew's project leadership committee is Mike McQuaid, Dominyk Tiller, JCount, Misty De Meo and Markus Reiter.
 
-Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Jonathan Chang and William Woodruff.
+Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff.
 
 Homebrew/brew's Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman.
 
-Homebrew/homebrew-core's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, JCount, Misty De Meo and Tom Schoonjans.
+Homebrew/homebrew-core's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, Steven Peters, JCount, Misty De Meo and Tom Schoonjans.
 
 Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
 

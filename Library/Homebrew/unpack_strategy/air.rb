@@ -16,7 +16,7 @@ module UnpackStrategy
     end
 
     def dependencies
-      @dependencies ||= [Hbc::CaskLoader.load("adobe-air")]
+      @dependencies ||= [Cask::CaskLoader.load("adobe-air")]
     end
 
     AIR_APPLICATION_INSTALLER =

@@ -1,5 +1,5 @@
-require "hbc/cask_loader"
-require "hbc/download"
+require "cask/cask_loader"
+require "cask/download"
 
 module UpdateMigrator
   class << self
@@ -110,8 +110,8 @@ module UpdateMigrator
 
       load_cask = lambda do |cask|
         begin
-          Hbc::CaskLoader.load(cask)
-        rescue Hbc::CaskUnavailableError
+          Cask::CaskLoader.load(cask)
+        rescue Cask::CaskUnavailableError
           nil
         end
       end
@@ -127,7 +127,7 @@ module UpdateMigrator
         cache_entries.call(HOMEBREW_CACHE/"Cask")
                      .map(&load_cask)
                      .compact
-                     .map { |cask| [Hbc::Download.new(cask).downloader, cask.token, cask.version] }
+                     .map { |cask| [Cask::Download.new(cask).downloader, cask.token, cask.version] }
 
       downloaders = formula_downloaders + cask_downloaders
 
@@ -341,9 +341,7 @@ module UpdateMigrator
         EOS
       end
 
-      (Keg::ALL_TOP_LEVEL_DIRECTORIES + ["Cellar"]).each do |dir|
-        FileUtils.mkdir_p "#{HOMEBREW_PREFIX}/#{dir}"
-      end
+      Keg::MUST_EXIST_DIRECTORIES.each { |dir| FileUtils.mkdir_p dir }
 
       src = Pathname.new("#{new_homebrew_repository}/bin/brew")
       dst = Pathname.new("#{HOMEBREW_PREFIX}/bin/brew")

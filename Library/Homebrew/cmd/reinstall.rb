@@ -14,6 +14,8 @@ module Homebrew
   def reinstall
     FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
+    Install.perform_preinstall_checks
+
     ARGV.resolved_formulae.each do |f|
       if f.pinned?
         onoe "#{f.full_name} is pinned. You must unpin it to reinstall."

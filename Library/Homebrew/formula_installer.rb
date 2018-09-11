@@ -206,7 +206,7 @@ class FormulaInstaller
   def install
     start_time = Time.now
     if !formula.bottle_unneeded? && !pour_bottle? && DevelopmentTools.installed?
-      Homebrew::Install.check_development_tools
+      Homebrew::Install.perform_development_tools_checks
     end
 
     # not in initialize so upgrade can unlink the active keg before calling this
@@ -766,14 +766,18 @@ class FormulaInstaller
       raise "Empty installation"
     end
   rescue Exception => e # rubocop:disable Lint/RescueException
-    e.options = display_options(formula) if e.is_a?(BuildError)
+    if e.is_a? BuildError
+      e.formula = formula
+      e.options = options
+    end
+
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
       formula.update_head_version
       formula.prefix.rmtree if formula.prefix.directory?
       formula.rack.rmdir_if_possible
     end
-    raise
+    raise e
   end
 
   def link(keg)
@@ -911,7 +915,7 @@ class FormulaInstaller
         sandbox.allow_write_xcode
         sandbox.deny_write_homebrew_repository
         sandbox.allow_write_cellar(formula)
-        Keg::TOP_LEVEL_DIRECTORIES.each do |dir|
+        Keg::KEG_LINK_DIRECTORIES.each do |dir|
           sandbox.allow_write_path "#{HOMEBREW_PREFIX}/#{dir}"
         end
         sandbox.exec(*args)

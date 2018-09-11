@@ -2,7 +2,7 @@
 
 ## History
 
-Originally Homebrew was a build-from-source package manager and all user environment variables and non-Homebrew-installed software were available to builds. Since then Homebrew added `Requirement`s to specify dependencies on non-Homebrew software (such as those provided by `brew cask` like X11/XQuartz), the `superenv` build system to strip out unspecified dependencies, environment filtering to stop the user environment leaking into Homebrew builds and `default_formula` to specify that a `Requirement` can be satisifed by a particular formula.
+Originally Homebrew was a build-from-source package manager and all user environment variables and non-Homebrew-installed software were available to builds. Since then Homebrew added `Requirement`s to specify dependencies on non-Homebrew software (such as those provided by `brew cask` like X11/XQuartz), the `superenv` build system to strip out unspecified dependencies, environment filtering to stop the user environment leaking into Homebrew builds and `default_formula` to specify that a `Requirement` can be satisfied by a particular formula.
 
 As Homebrew became primarily a binary package manager, most users were fulfilling `Requirement`s with the `default_formula`, not with arbitrary alternatives. To improve quality and reduce variation, Homebrew now exclusively supports using the default formula, as an ordinary dependency, and no longer supports using arbitrary alternatives.
 

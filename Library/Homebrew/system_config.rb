@@ -79,9 +79,9 @@ class SystemConfig
 
     def describe_java
       return "N/A" unless which "java"
-      java_version = Utils.popen_read("java", "-version")
-      return "N/A" unless $CHILD_STATUS.success?
-      java_version[/java version "([\d\._]+)"/, 1] || "N/A"
+      _, err, status = system_command("java", args: ["-version"], print_stderr: false)
+      return "N/A" unless status.success?
+      err[/java version "([\d\._]+)"/, 1] || "N/A"
     end
 
     def describe_git
@@ -90,12 +90,13 @@ class SystemConfig
     end
 
     def describe_curl
-      curl_version_output = Utils.popen_read("#{curl_executable} --version", err: :close)
-      curl_version_output =~ /^curl ([\d\.]+)/
-      curl_version = Regexp.last_match(1)
-      "#{curl_version} => #{curl_executable}"
-    rescue
-      "N/A"
+      out, = system_command(curl_executable, args: ["--version"])
+
+      if /^curl (?<curl_version>[\d\.]+)/ =~ out
+        "#{curl_version} => #{curl_executable}"
+      else
+        "N/A"
+      end
     end
 
     def dump_verbose_config(f = $stdout)

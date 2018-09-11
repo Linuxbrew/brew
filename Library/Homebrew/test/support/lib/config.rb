@@ -8,7 +8,11 @@ HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
 
 TEST_TMPDIR = ENV.fetch("HOMEBREW_TEST_TMPDIR") do |k|
   dir = Dir.mktmpdir("homebrew-tests-", ENV["HOMEBREW_TEMP"] || "/tmp")
-  at_exit { FileUtils.remove_entry(dir) }
+  at_exit do
+    # Child processes inherit this at_exit handler, but we don't want them
+    # to clean TEST_TMPDIR up prematurely (i.e., when they exit early for a test).
+    FileUtils.remove_entry(dir) unless ENV["HOMEBREW_TEST_NO_EXIT_CLEANUP"]
+  end
   ENV[k] = dir
 end
 
@@ -23,7 +27,7 @@ HOMEBREW_CACHE         = HOMEBREW_PREFIX.parent/"cache"
 HOMEBREW_CACHE_FORMULA = HOMEBREW_PREFIX.parent/"formula_cache"
 HOMEBREW_LINKED_KEGS   = HOMEBREW_PREFIX.parent/"linked"
 HOMEBREW_PINNED_KEGS   = HOMEBREW_PREFIX.parent/"pinned"
-HOMEBREW_LOCK_DIR      = HOMEBREW_PREFIX.parent/"locks"
+HOMEBREW_LOCKS         = HOMEBREW_PREFIX.parent/"locks"
 HOMEBREW_CELLAR        = HOMEBREW_PREFIX.parent/"cellar"
 HOMEBREW_LOGS          = HOMEBREW_PREFIX.parent/"logs"
 HOMEBREW_TEMP          = HOMEBREW_PREFIX.parent/"temp"

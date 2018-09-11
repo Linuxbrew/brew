@@ -1,11 +1,11 @@
-describe Hbc::Artifact::App, :cask do
-  let(:cask) { Hbc::CaskLoader.load(cask_path("local-caffeine")) }
+describe Cask::Artifact::App, :cask do
+  let(:cask) { Cask::CaskLoader.load(cask_path("local-caffeine")) }
   let(:command) { SystemCommand }
   let(:force) { false }
   let(:app) { cask.artifacts.find { |a| a.is_a?(described_class) } }
 
   let(:source_path) { cask.staged_path.join("Caffeine.app") }
-  let(:target_path) { Hbc::Config.global.appdir.join("Caffeine.app") }
+  let(:target_path) { Cask::Config.global.appdir.join("Caffeine.app") }
 
   let(:install_phase) { app.install_phase(command: command, force: force) }
   let(:uninstall_phase) { app.uninstall_phase(command: command, force: force) }
@@ -24,7 +24,7 @@ describe Hbc::Artifact::App, :cask do
 
     describe "when app is in a subdirectory" do
       let(:cask) {
-        Hbc::Cask.new("subdir") do
+        Cask::Cask.new("subdir") do
           url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
           homepage "https://example.com/local-caffeine"
           version "1.2.3"
@@ -53,7 +53,7 @@ describe Hbc::Artifact::App, :cask do
       expect(target_path).to be_a_directory
       expect(source_path).not_to exist
 
-      expect(Hbc::Config.global.appdir.join("Caffeine Deluxe.app")).not_to exist
+      expect(Cask::Config.global.appdir.join("Caffeine Deluxe.app")).not_to exist
       expect(cask.staged_path.join("Caffeine Deluxe.app")).to exist
     end
 
@@ -64,7 +64,7 @@ describe Hbc::Artifact::App, :cask do
 
       it "avoids clobbering an existing app" do
         expect { install_phase }.to raise_error(
-          Hbc::CaskError,
+          Cask::CaskError,
           "It seems there is already an App at '#{target_path}'.",
         )
 
@@ -80,7 +80,7 @@ describe Hbc::Artifact::App, :cask do
         let(:force) { true }
 
         before do
-          allow(Hbc::Utils).to receive(:current_user).and_return("fake_user")
+          allow(Cask::Utils).to receive(:current_user).and_return("fake_user")
         end
 
         describe "target is both writable and user-owned" do
@@ -167,7 +167,7 @@ describe Hbc::Artifact::App, :cask do
 
       it "leaves the target alone" do
         expect { install_phase }.to raise_error(
-          Hbc::CaskError, "It seems there is already an App at '#{target_path}'."
+          Cask::CaskError, "It seems there is already an App at '#{target_path}'."
         )
         expect(target_path).to be_a_symlink
       end
@@ -203,7 +203,7 @@ describe Hbc::Artifact::App, :cask do
 
       message = "It seems the App source '#{source_path}' is not there."
 
-      expect { install_phase }.to raise_error(Hbc::CaskError, message)
+      expect { install_phase }.to raise_error(Cask::CaskError, message)
     end
   end
 

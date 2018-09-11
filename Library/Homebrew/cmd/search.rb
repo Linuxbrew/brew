@@ -64,7 +64,7 @@ module Homebrew
 
     if args.remaining.empty?
       if args.casks?
-        puts Formatter.columns(Hbc::Cask.to_a.map(&:full_name).sort)
+        puts Formatter.columns(Cask::Cask.to_a.map(&:full_name).sort)
       else
         puts Formatter.columns(Formula.full_names.sort)
       end
