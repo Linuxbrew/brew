@@ -54,35 +54,7 @@ module HomebrewArgvExtension
   def resolved_formulae
     require "formula"
     @resolved_formulae ||= (downcased_unique_named - casks).map do |name|
-      if name.include?("/") || File.exist?(name)
-        f = Formulary.factory(name, spec)
-        if f.any_version_installed?
-          tab = Tab.for_formula(f)
-          resolved_spec = spec(nil) || tab.spec
-          f.active_spec = resolved_spec if f.send(resolved_spec)
-          f.build = tab
-          if f.head? && tab.tabfile
-            k = Keg.new(tab.tabfile.parent)
-            f.version.update_commit(k.version.version.commit) if k.version.head?
-          end
-        end
-      else
-        rack = Formulary.to_rack(name)
-        alias_path = Formulary.factory(name).alias_path
-        f = Formulary.from_rack(rack, spec(nil), alias_path: alias_path)
-      end
-
-      # If this formula was installed with an alias that has since changed,
-      # then it was specified explicitly in ARGV. (Using the alias would
-      # instead have found the new formula.)
-      #
-      # Because of this, the user is referring to this specific formula,
-      # not any formula targetted by the same alias, so in this context
-      # the formula shouldn't be considered outdated if the alias used to
-      # install it has changed.
-      f.follow_installed_alias = false
-
-      f
+      Formulary.resolve(name, spec: spec(nil))
     end.uniq(&:name)
   end
 

@@ -166,7 +166,7 @@ module Homebrew
       else
         args.each do |arg|
           formula = begin
-            Formula[arg]
+            Formulary.resolve(arg)
           rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
             nil
           end

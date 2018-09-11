@@ -47,6 +47,38 @@ module Formulary
     cache[path] = klass
   end
 
+  def self.resolve(name, spec: nil)
+    if name.include?("/") || File.exist?(name)
+      f = factory(name, *spec)
+      if f.any_version_installed?
+        tab = Tab.for_formula(f)
+        resolved_spec = spec || tab.spec
+        f.active_spec = resolved_spec if f.send(resolved_spec)
+        f.build = tab
+        if f.head? && tab.tabfile
+          k = Keg.new(tab.tabfile.parent)
+          f.version.update_commit(k.version.version.commit) if k.version.head?
+        end
+      end
+    else
+      rack = to_rack(name)
+      alias_path = factory(name).alias_path
+      f = from_rack(rack, *spec, alias_path: alias_path)
+    end
+
+    # If this formula was installed with an alias that has since changed,
+    # then it was specified explicitly in ARGV. (Using the alias would
+    # instead have found the new formula.)
+    #
+    # Because of this, the user is referring to this specific formula,
+    # not any formula targetted by the same alias, so in this context
+    # the formula shouldn't be considered outdated if the alias used to
+    # install it has changed.
+    f.follow_installed_alias = false
+
+    f
+  end
+
   def self.ensure_utf8_encoding(io)
     io.set_encoding(Encoding::UTF_8)
   end
