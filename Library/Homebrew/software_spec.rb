@@ -327,7 +327,6 @@ end
 
 class BottleSpecification
   DEFAULT_PREFIX = Homebrew::DEFAULT_PREFIX
-  DEFAULT_CELLAR = "#{DEFAULT_PREFIX}/Cellar".freeze
 
   attr_rw :prefix, :cellar, :rebuild
   attr_accessor :tap
@@ -335,8 +334,8 @@ class BottleSpecification
 
   def initialize
     @rebuild = 0
-    @prefix = DEFAULT_PREFIX
-    @cellar = DEFAULT_CELLAR
+    @prefix = Homebrew::DEFAULT_PREFIX
+    @cellar = Homebrew::DEFAULT_CELLAR
     @collector = Utils::Bottles::Collector.new
     @root_url_specs = {}
   end
