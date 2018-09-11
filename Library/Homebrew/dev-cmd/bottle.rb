@@ -285,7 +285,7 @@ module Homebrew
           ohai "Detecting if #{filename} is relocatable..."
         end
 
-        if prefix == "/usr/local"
+        if Homebrew.default_prefix?(prefix)
           prefix_check = File.join(prefix, "opt")
         else
           prefix_check = prefix

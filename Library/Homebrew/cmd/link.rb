@@ -52,7 +52,7 @@ module Homebrew
       end
 
       if keg_only
-        if HOMEBREW_PREFIX.to_s == "/usr/local"
+        if Homebrew.default_prefix?
           f = keg.to_formula
           caveats = Caveats.new(f)
 

@@ -7,6 +7,7 @@ require "dependency_collector"
 require "utils/bottles"
 require "patch"
 require "compilers"
+require "global"
 require "os/mac/version"
 
 class SoftwareSpec
@@ -325,8 +326,8 @@ class Bottle
 end
 
 class BottleSpecification
-  DEFAULT_PREFIX = "/usr/local".freeze
-  DEFAULT_CELLAR = "/usr/local/Cellar".freeze
+  DEFAULT_PREFIX = Homebrew::DEFAULT_PREFIX
+  DEFAULT_CELLAR = "#{DEFAULT_PREFIX}/Cellar".freeze
 
   attr_rw :prefix, :cellar, :rebuild
   attr_accessor :tap
