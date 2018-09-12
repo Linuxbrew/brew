@@ -216,7 +216,7 @@ module Homebrew
 
     json["analytics"].each do |category, value|
       analytics = value.map do |range, results|
-        "#{results.values.inject("+")} (#{range})"
+        "#{number_readable(results.values.inject("+"))} (#{range})"
       end
       puts "#{category}: #{analytics.join(", ")}"
     end
