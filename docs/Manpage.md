@@ -1338,15 +1338,15 @@ Homebrew Documentation: <https://docs.brew.sh>
 
 Homebrew's lead maintainer is Mike McQuaid.
 
-Homebrew's project leadership committee is Mike McQuaid, Dominyk Tiller, JCount, Misty De Meo and Markus Reiter.
+Homebrew's project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter.
 
-Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff.
+Homebrew/brew's other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff.
 
 Homebrew/brew's Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman.
 
-Homebrew/homebrew-core's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, Steven Peters, JCount, Misty De Meo and Tom Schoonjans.
+Homebrew/homebrew-core's other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, Steven Peters, JCount, Misty De Meo and Tom Schoonjans.
 
-Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
+Former maintainers with significant contributions include Dominyk Tiller, Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
 
 ## BUGS
 
