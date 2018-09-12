@@ -152,3 +152,22 @@ In the same way that Homebrew maintainers are expected to be spending more of th
 Individual Homebrew repositories should not have formal lead maintainers (although those who do the most work will have the loudest voices).
 
 Maintainers should feel even more free to pleasantly disagree with the work and decisions of the lead maintainer: with greater authority comes greater responsibility to handle and moderate technical disagreements.
+
+Homebrew's last lead maintainer will be Mike McQuaid. On February 1st, Mike will step down as lead maintainer of Homebrew and his responsibilities will be passed on to the project leadership committee and/or a new, technical steering committee and/or something else.
+
+Some food for thought and discussion before those dates:
+
+- [How the Apache Software Foundation Works](https://www.apache.org/foundation/how-it-works.html)
+- [Debian Project Leader documentation]()
+- [Debian Technical Committee documentation](https://www.debian.org/devel/tech-ctte)
+- [Debian's Organizational Structure](https://www.debian.org/intro/organization)
+- [QEMU SFC PLC documentation](https://wiki.qemu.org/Conservancy)
+- [libgit2 SFC PLC creation discussion](https://github.com/libgit2/discussions/issues/9)
+
+Some essential TODO before these dates:
+
+- Decide how to spend more of Homebrew's money to be useful for the project
+- Decide how technical and non-technical decisions are reached and conflicts resolved
+- Move Homebrew to a new CI system which does not require ideally any manual system administration
+- Onboard as many new maintainers as possible
+- Generally hand off and document any other responsibilities that are (and always have been) done by Mike McQuaid alone onto other groups of people
