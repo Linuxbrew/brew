@@ -41,7 +41,7 @@ require "erb"
 
 BOTTLE_ERB = <<-EOS.freeze
   bottle do
-    <% if !root_url.start_with?(HOMEBREW_BOTTLE_DEFAULT_DOMAIN) %>
+    <% if !["#{HOMEBREW_BOTTLE_DEFAULT_DOMAIN}/bottles", "https://homebrew.bintray.com/bottles"].include?(root_url) %>
     root_url "<%= root_url %>"
     <% end %>
     <% if ![Homebrew::DEFAULT_PREFIX, "/usr/local"].include?(prefix) %>
