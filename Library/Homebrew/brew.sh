@@ -86,6 +86,7 @@ then
   HOMEBREW_OS_VERSION="macOS $HOMEBREW_MACOS_VERSION"
   # Don't change this from Mac OS X to match what macOS itself does in Safari on 10.12
   HOMEBREW_OS_USER_AGENT_VERSION="Mac OS X $HOMEBREW_MACOS_VERSION"
+  HOMEBREW_BOTTLE_DEFAULT_DOMAIN="https://homebrew.bintray.com"
 
   # The system Curl is too old for some modern HTTPS certificates on
   # older macOS versions.
@@ -110,6 +111,7 @@ else
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
+  HOMEBREW_BOTTLE_DEFAULT_DOMAIN="https://linuxbrew.bintray.com"
 
   CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
   HOMEBREW_CACHE="${HOMEBREW_CACHE:-${CACHE_HOME}/Homebrew}"
@@ -274,7 +276,6 @@ then
   export HOMEBREW_RUBY_WARNINGS="-W0"
 fi
 
-export HOMEBREW_BOTTLE_DEFAULT_DOMAIN="https://homebrew.bintray.com"
 if [[ -z "$HOMEBREW_BOTTLE_DOMAIN" ]]
 then
   export HOMEBREW_BOTTLE_DOMAIN="$HOMEBREW_BOTTLE_DEFAULT_DOMAIN"
