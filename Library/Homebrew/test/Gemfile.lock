@@ -45,7 +45,7 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
-    ruby-progressbar (1.9.0)
+    ruby-progressbar (1.10.0)
     simplecov (0.16.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
