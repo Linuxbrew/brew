@@ -448,7 +448,8 @@ module Homebrew
                 valid_key = %w[root_url prefix cellar rebuild sha1 sha256].include? key
                 next unless valid_key
 
-                old_value = old_value_original.to_s.delete ":'\""
+                old_value = old_value_original.to_s.delete "'\""
+                old_value = old_value.to_s.delete ":" if key != "root_url"
                 tag = tag.to_s.delete ":"
 
                 unless tag.empty?
