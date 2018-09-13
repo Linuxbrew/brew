@@ -207,7 +207,7 @@ module Homebrew
         value.each do |range, results|
           oh1 "#{category} (#{range})"
           results.each do |name_with_options, count|
-            puts "#{name_with_options}: #{count}"
+            puts "#{name_with_options}: #{number_readable(count)}"
           end
         end
       end
@@ -216,7 +216,7 @@ module Homebrew
 
     json["analytics"].each do |category, value|
       analytics = value.map do |range, results|
-        "#{results.values.inject("+")} (#{range})"
+        "#{number_readable(results.values.inject("+"))} (#{range})"
       end
       puts "#{category}: #{analytics.join(", ")}"
     end
