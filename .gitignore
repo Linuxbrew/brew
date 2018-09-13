@@ -23,6 +23,15 @@
 **/.bundle/cache
 **/vendor/bundle
 **/vendor/ruby
+**/vendor/bundle-standalone/ruby/*/cache
+**/vendor/bundle-standalone/ruby/*/gems/*/*
+**/vendor/bundle-standalone/ruby/*/specifications
+
+# Unignore vendored gems
+!**/vendor/bundle-standalone/ruby/*/gems/*/lib
+
+# Ignore backports gem (we don't need all files)
+**/vendor/bundle-standalone/ruby/*/gems/backports-*/lib
 
 # Ignore `bin` contents (again).
 /bin

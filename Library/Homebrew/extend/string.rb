@@ -1,5 +1,5 @@
 # Contains backports from newer versions of Ruby
-require_relative "../vendor/backports/string"
+require "backports/2.4.0/string/match"
 
 class String
   # String.chomp, but if result is empty: returns nil instead.
