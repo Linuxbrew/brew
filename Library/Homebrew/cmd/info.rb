@@ -207,7 +207,7 @@ module Homebrew
         value.each do |range, results|
           oh1 "#{category} (#{range})"
           results.each do |name_with_options, count|
-            puts "#{name_with_options}: #{count}"
+            puts "#{name_with_options}: #{number_readable(count)}"
           end
         end
       end
