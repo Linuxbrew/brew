@@ -2,49 +2,109 @@ require "messages"
 require "spec_helper"
 
 describe Messages do
-  before do
-    @m = Messages.new
-    f_foo = formula("foo") do
-      url "https://example.com/foo-0.1.tgz"
+  let(:messages) { Messages.new }
+  let(:test_formula) { formula("foo") { url("https://example.com/foo-0.1.tgz") } }
+  let(:elapsed_time) { 1.1 }
+
+  describe "#record_caveats" do
+    it "adds a caveat" do
+      expect {
+        messages.record_caveats(test_formula, "Zsh completions were installed")
+      }.to change { messages.caveats.count }.by(1)
     end
-    f_bar = formula("bar") do
-      url "https://example.com/bar-0.1.tgz"
+  end
+
+  describe "#formula_installed" do
+    it "increases the formula count" do
+      expect {
+        messages.formula_installed(test_formula, elapsed_time)
+      }.to change { messages.formula_count }.by(1)
     end
-    f_baz = formula("baz") do
-      url "https://example.com/baz-0.1.tgz"
+
+    it "adds to install_times" do
+      expect {
+        messages.formula_installed(test_formula, elapsed_time)
+      }.to change { messages.install_times.count }.by(1)
     end
-    @m.formula_installed(f_foo, 1.1)
-    @m.record_caveats(f_foo, "Zsh completions were installed")
-    @m.formula_installed(f_bar, 2.2)
-    @m.record_caveats(f_bar, "Keg-only formula")
-    @m.formula_installed(f_baz, 3.3)
-    @m.record_caveats(f_baz, "A valid GOPATH is required to use the go command")
   end
 
-  it "has the right installed-formula count" do
-    expect(@m.formula_count).to equal(3)
-  end
+  describe "#display_messages" do
+    context "when formula_count is less than two" do
+      before do
+        messages.record_caveats(test_formula, "Zsh completions were installed")
+        messages.formula_installed(test_formula, elapsed_time)
+      end
 
-  it "has recorded caveats" do
-    expect(@m.caveats).to_not be_empty
-  end
+      it "doesn't print caveat details" do
+        expect { messages.display_messages }.not_to output.to_stdout
+      end
+    end
 
-  it "maintained the order of recorded caveats" do
-    caveats_formula_order = @m.caveats.map { |x| x[:formula] }
-    expect(caveats_formula_order).to eq(["foo", "bar", "baz"])
-  end
+    context "when caveats is empty" do
+      before do
+        messages.formula_installed(test_formula, elapsed_time)
+      end
 
-  it "has recorded installation times" do
-    expect(@m.install_times).to_not be_empty
-  end
+      it "doesn't print caveat details" do
+        expect { messages.display_messages }.not_to output.to_stdout
+      end
+    end
 
-  it "maintained the order of install times" do
-    formula_order = @m.install_times.map { |x| x[:formula] }
-    expect(formula_order).to eq(["foo", "bar", "baz"])
-  end
+    context "when formula_count is greater than one and caveats are present" do
+      let(:test_formula2) { formula("bar") { url("https://example.com/bar-0.1.tgz") } }
 
-  it "recorded the right install times" do
-    times = @m.install_times.map { |x| x[:time] }
-    expect(times).to eq([1.1, 2.2, 3.3])
+      before do
+        messages.record_caveats(test_formula, "Zsh completions were installed")
+        messages.formula_installed(test_formula, elapsed_time)
+        messages.formula_installed(test_formula2, elapsed_time)
+      end
+
+      it "prints caveat details" do
+        expect { messages.display_messages }.to output(
+          <<~EOS
+            ==> Caveats
+            ==> foo
+            Zsh completions were installed
+          EOS
+        ).to_stdout
+      end
+    end
+
+    context "when the --display-times argument is present" do
+      before do
+        allow(ARGV).to receive(:include?).with("--display-times").and_return(true)
+      end
+
+      context "when install_times is empty" do
+        it "doesn't print any output" do
+          expect { messages.display_messages }.not_to output.to_stdout
+        end
+      end
+
+      context "when install_times is present" do
+        before do
+          messages.formula_installed(test_formula, elapsed_time)
+        end
+
+        it "prints installation times" do
+          expect { messages.display_messages }.to output(
+            <<~EOS
+              ==> Installation times
+              foo                       1.100 s
+            EOS
+          ).to_stdout
+        end
+      end
+    end
+
+    context "when the --display-times argument isn't present" do
+      before do
+        allow(ARGV).to receive(:include?).with("--display-times").and_return(false)
+      end
+
+      it "doesn't print installation times" do
+        expect { messages.display_messages }.not_to output.to_stdout
+      end
+    end
   end
 end
