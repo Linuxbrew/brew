@@ -39,7 +39,7 @@ before_install:
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
     fi
-  - travis_retry git clone --depth=1 https://github.com/Linuxbrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
+  - travis_retry git clone --depth=1 https://github.com/Linuxbrew/homebrew-test-bot Library/Taps/linuxbrew/homebrew-test-bot
 
 script:
   - brew test-bot
