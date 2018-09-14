@@ -16,6 +16,3 @@ require 'stringio'
 require 'plist/generator'
 require 'plist/parser'
 require 'plist/version'
-
-module Plist
-end
