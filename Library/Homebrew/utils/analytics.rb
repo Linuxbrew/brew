@@ -24,7 +24,12 @@ module Utils
       def report(type, metadata = {})
         return if ENV["HOMEBREW_NO_ANALYTICS"] || ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"]
 
-        args = %W[
+        args = []
+
+        # do not load .curlrc unless requested (must be the first argument)
+        args << "-q" unless ENV["HOMEBREW_CURLRC"]
+
+        args += %W[
           --max-time 3
           --user-agent #{HOMEBREW_USER_AGENT_CURL}
           --data v=1
@@ -49,14 +54,14 @@ module Utils
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         if ENV["HOMEBREW_ANALYTICS_DEBUG"]
           url = "https://www.google-analytics.com/debug/collect"
-          puts "#{ENV["HOMEBREW_CURL"]} #{url} #{args.join(" ")}"
-          puts Utils.popen_read ENV["HOMEBREW_CURL"], url, *args
+          puts "#{ENV["HOMEBREW_CURL"]} #{args.join(" ")} #{url}"
+          puts Utils.popen_read ENV["HOMEBREW_CURL"], *args, url
         else
           pid = fork do
             exec ENV["HOMEBREW_CURL"],
-              "https://www.google-analytics.com/collect",
+              *args,
               "--silent", "--output", "/dev/null",
-              *args
+              "https://www.google-analytics.com/collect"
           end
           Process.detach pid
         end
