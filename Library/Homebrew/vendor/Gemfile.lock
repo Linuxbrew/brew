@@ -1,8 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    backports (3.8.0)
-    plist (3.3.0)
+    backports (3.11.4)
+    plist (3.4.0)
     ruby-macho (2.0.0)
 
 PLATFORMS
