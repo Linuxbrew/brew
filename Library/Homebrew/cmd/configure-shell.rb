@@ -14,6 +14,20 @@ module Homebrew
     brew_env = <<~EOS
       # Homebrew environment
       # Created by running brew configure-shell
+      pathremove () {
+        local IFS=':' NEWPATH="" DIR="" PATHVARIABLE=${2:-PATH}
+        for DIR in ${!PATHVARIABLE} ; do
+          if [ "$DIR" != "$1" ] ; then
+            NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
+          fi
+        done
+        export $PATHVARIABLE="$NEWPATH"
+      }
+      pathremove "#{HOMEBREW_PREFIX}/bin"
+      pathremove "#{HOMEBREW_PREFIX}/sbin"
+      pathremove "#{HOMEBREW_PREFIX}/share/man" MANPATH
+      pathremove "#{HOMEBREW_PREFIX}/share/info" INFOPATH
+
       export PATH="#{HOMEBREW_PREFIX}/bin:#{HOMEBREW_PREFIX}/sbin:$PATH"
       export MANPATH="#{HOMEBREW_PREFIX}/share/man:$MANPATH"
       export INFOPATH="#{HOMEBREW_PREFIX}/share/info:$INFOPATH"
