@@ -30,8 +30,14 @@
 # Unignore vendored gems
 !**/vendor/bundle-standalone/ruby/*/gems/*/lib
 
-# Ignore backports gem (we don't need all files)
+# Ignore partially included gems where we don't need all files
+**/vendor/bundle-standalone/ruby/*/gems/activesupport-*/lib
+**/vendor/bundle-standalone/ruby/*/gems/concurrent-ruby-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/backports-*/lib
+**/vendor/bundle-standalone/ruby/*/gems/i18n-*/lib
+**/vendor/bundle-standalone/ruby/*/gems/minitest-*/lib
+**/vendor/bundle-standalone/ruby/*/gems/thread_safe-*/lib
+**/vendor/bundle-standalone/ruby/*/gems/tzinfo-*/lib
 
 # Ignore `bin` contents (again).
 /bin
