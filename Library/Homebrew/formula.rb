@@ -18,6 +18,7 @@ require "extend/ENV"
 require "language/python"
 require "tab"
 require "mktemp"
+require "requirements/skip_linux_requirement"
 
 # A formula provides instructions and metadata for Homebrew to install a piece
 # of software. Every Homebrew formula is a {Formula}.
@@ -2502,6 +2503,7 @@ class Formula
     # end</pre>
     def fails_with(compiler, &block)
       odisabled "fails_with :llvm" if compiler == :llvm
+      return depends_on SkipLinuxRequirement.new if compiler == :linux
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
 

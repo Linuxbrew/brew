@@ -1,4 +1,5 @@
 require "requirement"
+require "requirements/skip_linux_requirement"
 require "requirements/linux_requirement"
 require "requirements/macos_requirement"
 require "requirements/maximum_macos_requirement"
