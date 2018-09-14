@@ -75,7 +75,7 @@ module Cask
 
         ohai "Homebrew Cask Taps:"
         [default_tap, *alt_taps].each do |tap|
-          if tap.path.nil? || tap.path.to_s.empty?
+          if tap.path.blank?
             puts none_string
           else
             puts "#{tap.path} (#{cask_count_for_tap(tap)})"
