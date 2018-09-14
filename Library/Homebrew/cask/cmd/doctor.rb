@@ -120,9 +120,7 @@ module Cask
       def check_quarantine_support
         ohai "Gatekeeper support"
 
-        status = Quarantine.check_quarantine_support
-
-        case status
+        case Quarantine.check_quarantine_support
         when :quarantine_available
           puts "Enabled"
         when :no_swift
