@@ -84,6 +84,10 @@ RSpec.configure do |config|
     skip "Requires network connection." unless ENV["HOMEBREW_TEST_ONLINE"]
   end
 
+  config.around(:each, :needs_network) do |example|
+    example.run_with_retry retry: 3, retry_wait: 1
+  end
+
   config.before(:each, :needs_svn) do
     skip "subversion not installed." unless which "svn"
   end
