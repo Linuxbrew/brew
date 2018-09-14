@@ -118,7 +118,7 @@ module HomebrewArgvExtension
   def value(name)
     arg_prefix = "--#{name}="
     flag_with_value = find { |arg| arg.start_with?(arg_prefix) }
-    flag_with_value&.strip_prefix(arg_prefix)
+    flag_with_value&.delete_prefix(arg_prefix)
   end
 
   # Returns an array of values that were given as a comma-separated list.
