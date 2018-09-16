@@ -1,5 +1,6 @@
 # Contains backports from newer versions of Ruby
 require "backports/2.4.0/string/match"
+require "backports/2.5.0/string/delete_prefix"
 
 class String
   # String.chomp, but if result is empty: returns nil instead.
@@ -7,10 +8,6 @@ class String
   def chuzzle
     s = chomp
     s unless s.empty?
-  end
-
-  def strip_prefix(prefix)
-    start_with?(prefix) ? self[prefix.length..-1] : self
   end
 end
 

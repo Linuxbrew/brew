@@ -382,7 +382,7 @@ module Homebrew
       f.full_name => {
         "formula" => {
           "pkg_version" => f.pkg_version.to_s,
-          "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
+          "path" => f.path.to_s.delete_prefix("#{HOMEBREW_REPOSITORY}/"),
         },
         "bottle" => {
           "root_url" => bottle.root_url,

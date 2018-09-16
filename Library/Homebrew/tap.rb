@@ -27,7 +27,7 @@ class Tap
 
     # We special case homebrew and linuxbrew so that users don't have to shift in a terminal.
     user = user.capitalize if ["homebrew", "linuxbrew"].include? user
-    repo = repo.strip_prefix "homebrew-"
+    repo = repo.delete_prefix "homebrew-"
 
     if ["Homebrew", "Linuxbrew"].include?(user) && ["core", "homebrew"].include?(repo)
       return CoreTap.instance
@@ -119,7 +119,7 @@ class Tap
 
   def repo_var
     @repo_var ||= path.to_s
-                      .strip_prefix(TAP_DIRECTORY.to_s)
+                      .delete_prefix(TAP_DIRECTORY.to_s)
                       .tr("^A-Za-z0-9", "_")
                       .upcase
   end
