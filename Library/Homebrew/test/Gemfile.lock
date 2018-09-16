@@ -37,10 +37,10 @@ GEM
     rspec-support (3.8.0)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
-    rubocop (0.57.2)
+    rubocop (0.58.2)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
-      parser (>= 2.5)
+      parser (>= 2.5, != 2.5.1.1)
       powerpack (~> 0.1)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
@@ -64,8 +64,8 @@ DEPENDENCIES
   rspec-its
   rspec-retry
   rspec-wait
-  rubocop (= 0.57.2)
+  rubocop (= 0.58.2)
   simplecov
 
 BUNDLED WITH
-   1.16.2
+   1.16.4
