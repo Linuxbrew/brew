@@ -1109,7 +1109,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   def source_modified_time
     out, = system_command("bzr", args: ["log", "-l", "1", "--timezone=utc", cached_location])
     timestamp = out.chomp
-    raise "Could not get any timestamps from bzr!" if timestamp.to_s.empty?
+    raise "Could not get any timestamps from bzr!" if timestamp.blank?
     Time.parse(timestamp)
   end
 

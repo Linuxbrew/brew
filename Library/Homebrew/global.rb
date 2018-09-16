@@ -130,6 +130,7 @@ require "extend/pathname"
 require "extend/module"
 require "extend/predicable"
 require "extend/string"
+require "active_support/core_ext/object/blank"
 
 require "constants"
 require "exceptions"
