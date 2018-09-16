@@ -8,6 +8,11 @@ describe "brew info", :integration_test do
       .to output(/testball: stable 0.1/).to_stdout
       .and not_to_output.to_stderr
       .and be_a_success
+
+    expect { brew "info", "testball", "--json=v1" }
+      .to output(/\{.+testball.+\}/).to_stdout
+      .and not_to_output.to_stderr
+      .and be_a_success
   end
 end
 
