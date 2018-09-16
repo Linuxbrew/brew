@@ -6,6 +6,12 @@ describe "brew commands", :integration_test do
   it "prints a list of all available commands" do
     expect { brew "commands" }
       .to output(/Built-in commands/).to_stdout
+      .and not_to_output.to_stderr
+      .and be_a_success
+
+    expect { brew "commands", "--quiet" }
+      .to output.to_stdout
+      .and not_to_output.to_stderr
       .and be_a_success
   end
 end
