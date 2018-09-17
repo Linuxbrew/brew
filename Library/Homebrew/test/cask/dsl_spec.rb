@@ -419,10 +419,10 @@ describe Cask::DSL, :cask do
       let(:token) { "with-installer-script" }
 
       it "allows installer script to be specified" do
-        expect(cask.artifacts.to_a[0].path).to eq(Pathname("/usr/bin/true"))
-        expect(cask.artifacts.to_a[0].args[:args]).to eq(["--flag"])
-        expect(cask.artifacts.to_a[1].path).to eq(Pathname("/usr/bin/false"))
-        expect(cask.artifacts.to_a[1].args[:args]).to eq(["--flag"])
+        expect(cask.artifacts.to_a.first.path).to eq(Pathname("/usr/bin/true"))
+        expect(cask.artifacts.to_a.first.args[:args]).to eq(["--flag"])
+        expect(cask.artifacts.to_a.second.path).to eq(Pathname("/usr/bin/false"))
+        expect(cask.artifacts.to_a.second.args[:args]).to eq(["--flag"])
       end
     end
 

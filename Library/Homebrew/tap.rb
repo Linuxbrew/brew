@@ -17,8 +17,8 @@ class Tap
     when 1
       user, repo = args.first.split("/", 2)
     when 2
-      user = args[0]
-      repo = args[1]
+      user = args.first
+      repo = args.second
     end
 
     if [user, repo].any? { |part| part.nil? || part.include?("/") }

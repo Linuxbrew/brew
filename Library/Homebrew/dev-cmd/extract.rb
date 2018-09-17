@@ -120,7 +120,7 @@ module Homebrew
     # Expect exactly two named arguments: formula and tap
     raise UsageError if ARGV.named.length != 2
 
-    destination_tap = Tap.fetch(ARGV.named[1])
+    destination_tap = Tap.fetch(ARGV.named.second)
     odie "Cannot extract formula to homebrew/core!" if destination_tap.core_tap?
     destination_tap.install unless destination_tap.installed?
 

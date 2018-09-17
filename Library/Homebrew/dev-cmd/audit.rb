@@ -512,7 +512,7 @@ module Homebrew
       # Formulae names can legitimately be uppercase/lowercase/both.
       name = Regexp.new(formula.name, Regexp::IGNORECASE)
       reason.sub!(name, "")
-      first_word = reason.split[0]
+      first_word = reason.split.first
 
       if reason =~ /\A[A-Z]/ && !reason.start_with?(*whitelist)
         problem <<~EOS
@@ -724,7 +724,7 @@ module Homebrew
 
         version = Version.parse(stable.url)
         if version >= Version.create("1.0")
-          minor_version = version.to_s.split(".", 3)[1].to_i
+          _, minor_version, = version.to_s.split(".", 3).map(&:to_i)
           if minor_version.odd?
             problem "#{stable.version} is a development release"
           end

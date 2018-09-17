@@ -105,7 +105,7 @@ module FormulaClassUnavailableErrorModule
   end
 
   def format_list(class_list)
-    class_list.map { |klass| klass.name.split("::")[-1] }.join(", ")
+    class_list.map { |klass| klass.name.split("::").last }.join(", ")
   end
 end
 
