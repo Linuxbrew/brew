@@ -49,7 +49,7 @@ module Homebrew
     if ARGV.named.empty?
       if HOMEBREW_CELLAR.exist?
         count = Formula.racks.length
-        puts "#{Formatter.pluralize(count, "keg")}, #{HOMEBREW_CELLAR.abv}"
+        puts "#{count} #{"keg".pluralize(count)}, #{HOMEBREW_CELLAR.abv}"
       end
     else
       ARGV.named.each_with_index do |f, i|

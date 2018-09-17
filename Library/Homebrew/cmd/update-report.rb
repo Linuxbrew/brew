@@ -107,8 +107,7 @@ module Homebrew
 
     unless updated_taps.empty?
       update_preinstall_header
-      puts "Updated #{Formatter.pluralize(updated_taps.size, "tap")} " \
-           "(#{updated_taps.join(", ")})."
+      puts "Updated #{updated_taps.count} #{"tap".pluralize(updated_taps.count)} (#{updated_taps.to_sentence})."
       updated = true
     end
 

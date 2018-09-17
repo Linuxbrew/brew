@@ -66,8 +66,7 @@ module Homebrew
 
             if rack.directory?
               versions = rack.subdirs.map(&:basename)
-              verb = Formatter.pluralize(versions.length, "is", "are")
-              puts "#{keg.name} #{versions.join(", ")} #{verb} still installed."
+              puts "#{keg.name} #{versions.to_sentence} #{"is".pluralize(versions.count)} still installed."
               puts "Remove all versions with `brew uninstall --force #{keg.name}`."
             end
           end
@@ -119,31 +118,20 @@ module Homebrew
 
     protected
 
-    def are(items)
-      Formatter.pluralize(items.count, "is", "are", show_count: false)
-    end
-
-    def they(items)
-      Formatter.pluralize(items.count, "it", "they", show_count: false)
-    end
-
-    def list(items)
-      items.join(", ")
-    end
-
     def sample_command
       "brew uninstall --ignore-dependencies #{ARGV.named.join(" ")}"
     end
 
     def are_required_by_deps
-      "#{are reqs} required by #{list deps}, which #{are deps} currently installed"
+      "#{"is".pluralize(reqs.count)} required by #{deps.to_sentence}, " \
+      "which #{"is".pluralize(deps.count)} currently installed"
     end
   end
 
   class DeveloperDependentsMessage < DependentsMessage
     def output
       opoo <<~EOS
-        #{list reqs} #{are_required_by_deps}.
+        #{reqs.to_sentence} #{are_required_by_deps}.
         You can silence this warning with:
           #{sample_command}
       EOS
@@ -153,8 +141,8 @@ module Homebrew
   class NondeveloperDependentsMessage < DependentsMessage
     def output
       ofail <<~EOS
-        Refusing to uninstall #{list reqs}
-        because #{they reqs} #{are_required_by_deps}.
+        Refusing to uninstall #{reqs.to_sentence}
+        because #{"it".pluralize(reqs.count)} #{are_required_by_deps}.
         You can override this and force removal with:
           #{sample_command}
       EOS

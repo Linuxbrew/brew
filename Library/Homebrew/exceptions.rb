@@ -441,18 +441,10 @@ end
 # and are being installed on a system without necessary build tools
 class BuildToolsError < RuntimeError
   def initialize(formulae)
-    if formulae.length > 1
-      formula_text = "formulae"
-      package_text = "binary packages"
-    else
-      formula_text = "formula"
-      package_text = "a binary package"
-    end
-
     super <<~EOS
-      The following #{formula_text}:
-        #{formulae.join(", ")}
-      cannot be installed as #{package_text} and must be built from source.
+      The following #{"formula".pluralize(formulae.count)}
+        #{formulae.to_sentence}
+      cannot be installed as #{"binary package".pluralize(formulae.count)} and must be built from source.
       #{DevelopmentTools.installation_instructions}
     EOS
   end

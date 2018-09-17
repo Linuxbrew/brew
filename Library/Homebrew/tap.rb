@@ -297,7 +297,7 @@ class Tap
 
     link_completions_and_manpages
 
-    formatted_contents = Formatter.comma_and(*contents)&.prepend(" ")
+    formatted_contents = contents.presence&.to_sentence&.dup&.prepend(" ")
     puts "Tapped#{formatted_contents} (#{path.abv})." unless quiet
     Descriptions.cache_formulae(formula_names)
 
@@ -328,7 +328,7 @@ class Tap
     puts "Untapping #{name}..."
 
     abv = path.abv
-    formatted_contents = Formatter.comma_and(*contents)&.prepend(" ")
+    formatted_contents = contents.presence&.to_sentence&.dup&.prepend(" ")
 
     unpin if pinned?
     Descriptions.uncache_formulae(formula_names)
@@ -365,15 +365,15 @@ class Tap
     contents = []
 
     if (command_count = command_files.count).positive?
-      contents << Formatter.pluralize(command_count, "command")
+      contents << "#{command_count} #{"command".pluralize(command_count)}"
     end
 
     if (cask_count = cask_files.count).positive?
-      contents << Formatter.pluralize(cask_count, "cask")
+      contents << "#{cask_count} #{"cask".pluralize(cask_count)}"
     end
 
     if (formula_count = formula_files.count).positive?
-      contents << Formatter.pluralize(formula_count, "formula")
+      contents << "#{formula_count} #{"formula".pluralize(formula_count)}"
     end
 
     contents

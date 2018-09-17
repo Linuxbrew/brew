@@ -48,7 +48,7 @@ module Cask
     end
 
     def audit_languages(languages)
-      ohai "Auditing language: #{languages.map { |lang| "'#{lang}'" }.join(", ")}"
+      ohai "Auditing language: #{languages.map { |lang| "'#{lang}'" }.to_sentence}"
       MacOS.instance_variable_set(:@languages, languages)
       audit_cask_instance(CaskLoader.load(cask.sourcefile_path))
     ensure

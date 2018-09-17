@@ -186,9 +186,9 @@ module Homebrew
     end
 
     total_problems_count = problem_count + new_formula_problem_count
-    problem_plural = Formatter.pluralize(total_problems_count, "problem")
-    formula_plural = Formatter.pluralize(formula_count, "formula")
-    corrected_problem_plural = Formatter.pluralize(corrected_problem_count, "problem")
+    problem_plural = "#{total_problems_count} #{"problem".pluralize(total_problems_count)}"
+    formula_plural = "#{formula_count} #{"formula".pluralize(formula_count)}"
+    corrected_problem_plural = "#{corrected_problem_count} #{"problem".pluralize(corrected_problem_count)}"
     errors_summary = "#{problem_plural} in #{formula_plural} detected"
     if corrected_problem_count.positive?
       errors_summary += ", #{corrected_problem_plural} corrected"
