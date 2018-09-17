@@ -7,6 +7,7 @@ require "pp"
 
 require_relative "load_path"
 
+require "active_support/core_ext/numeric/time"
 require "config"
 require "os"
 require "extend/ARGV"
