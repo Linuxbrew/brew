@@ -14,7 +14,7 @@ describe "brew info", :integration_test do
 
   it "prints as json with the --json=v1 flag" do
     expect { brew "info", "testball", "--json=v1" }
-      .to output(/\{.+testball.+\}/).to_stdout
+      .to output(a_json_string).to_stdout
       .and not_to_output.to_stderr
       .and be_a_success
   end
