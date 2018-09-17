@@ -35,6 +35,7 @@ module Cask
 
       def abstract_phase(dsl_key)
         return if (block = directives[dsl_key]).nil?
+
         class_for_dsl_key(dsl_key).new(cask).instance_eval(&block)
       end
 

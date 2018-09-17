@@ -20,6 +20,7 @@ module Cask
       rescue CaskInvalidError
         path = CaskLoader.path(args.first)
         return path if path.file?
+
         raise
       end
 

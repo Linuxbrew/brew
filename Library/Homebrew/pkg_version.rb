@@ -33,6 +33,7 @@ class PkgVersion
 
   def <=>(other)
     return unless other.is_a?(PkgVersion)
+
     (version <=> other.version).nonzero? || revision <=> other.revision
   end
   alias eql? ==

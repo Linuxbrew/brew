@@ -117,12 +117,14 @@ module Homebrew
 
     return unless $stdout.tty?
     return if args.remaining.empty?
+
     metacharacters = %w[\\ | ( ) [ ] { } ^ $ * + ?].freeze
     return unless metacharacters.any? do |char|
       args.remaining.any? do |arg|
         arg.include?(char) && !arg.start_with?("/")
       end
     end
+
     ohai <<~EOS
       Did you mean to perform a regular expression search?
       Surround your query with /slashes/ to search locally by regex.

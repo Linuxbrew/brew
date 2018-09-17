@@ -125,6 +125,7 @@ module HomebrewArgvExtension
   # @see value
   def values(name)
     return unless val = value(name)
+
     val.split(",")
   end
 
@@ -226,6 +227,7 @@ module HomebrewArgvExtension
   def build_formula_from_source?(f)
     return true if build_all_from_source?
     return false unless build_from_source? || build_bottle?
+
     formulae.any? { |argv_f| argv_f.full_name == f.full_name }
   end
 
@@ -244,6 +246,7 @@ module HomebrewArgvExtension
   # eg. `foo -ns -i --bar` has three switches, n, s and i
   def switch?(char)
     return false if char.length > 1
+
     options_only.any? { |arg| arg.scan("-").size == 1 && arg.include?(char) }
   end
 

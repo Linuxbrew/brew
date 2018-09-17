@@ -78,6 +78,7 @@ module Utils
       # ruby's implementation of shell_escape
       str = str.to_s
       return "''" if str.empty?
+
       str = str.dup
       # anything that isn't a known safe character is padded
       str.gsub!(UNSAFE_SHELL_CHAR, "\\\\" + "\\1")
@@ -90,6 +91,7 @@ module Utils
       # ruby's implementation of shell_escape
       str = str.to_s
       return "''" if str.empty?
+
       str = str.dup
       # anything that isn't a known safe character is padded
       str.gsub!(UNSAFE_SHELL_CHAR, "\\\\" + "\\1")

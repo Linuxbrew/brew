@@ -17,6 +17,7 @@ module Homebrew
 
     Keg::PRUNEABLE_DIRECTORIES.each do |dir|
       next unless dir.directory?
+
       dir.find do |path|
         path.extend(ObserverPathnameExtension)
         if path.symlink?

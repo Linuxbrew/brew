@@ -46,6 +46,7 @@ class Keg
 
     mach_o_files.each do |file|
       next if file.mach_o_executable? && skip_executables
+
       dylibs = file.dynamically_linked_libraries
       results << :libcxx unless dylibs.grep(/libc\+\+.+\.dylib/).empty?
       results << :libstdcxx unless dylibs.grep(/libstdc\+\+.+\.dylib/).empty?
@@ -122,6 +123,7 @@ class Keg
 
   def find_dylib(bad_name)
     return unless lib.directory?
+
     suffix = "/#{find_dylib_suffix_from(bad_name)}"
     lib.find { |pn| break pn if pn.to_s.end_with?(suffix) }
   end
@@ -135,6 +137,7 @@ class Keg
       # if we've already processed a file, ignore its hardlinks (which have the same dev ID and inode)
       # this prevents relocations from being performed on a binary more than once
       next unless hardlinks.add? [pn.stat.dev, pn.stat.ino]
+
       mach_o_files << pn
     end
 

@@ -30,6 +30,7 @@ module EnvActivation
   def clear_sensitive_environment!
     each_key do |key|
       next unless /(cookie|key|token|password)/i =~ key
+
       delete key
     end
   end

@@ -16,16 +16,19 @@ class MacOSRequirement < Requirement
     next MacOS.version >= @version if minimum_version_specified?
     next true if OS.mac?
     next true if @version
+
     false
   end
 
   def message
     return "macOS is required." unless minimum_version_specified?
+
     "macOS #{@version.pretty_name} or newer is required."
   end
 
   def display_s
     return "macOS is required" unless minimum_version_specified?
+
     "macOS >= #{@version}"
   end
 end

@@ -106,6 +106,7 @@ module Homebrew
       end
     end
     raise "No logs." if logs.empty?
+
     logs
   end
 

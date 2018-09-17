@@ -45,6 +45,7 @@ module Cask
 
       def casks(alternative: -> { [] })
         return @casks if defined?(@casks)
+
         casks = args.empty? ? alternative.call : args
         @casks = casks.map { |cask| CaskLoader.load(cask) }
       rescue CaskUnavailableError => e

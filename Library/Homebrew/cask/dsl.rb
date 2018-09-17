@@ -87,6 +87,7 @@ module Cask
     def name(*args)
       @name ||= []
       return @name if args.empty?
+
       @name.concat(args.flatten)
     end
 
@@ -188,6 +189,7 @@ module Cask
         if !arg.is_a?(String) && arg != :latest
           raise CaskInvalidError.new(cask, "invalid 'version' value: '#{arg.inspect}'")
         end
+
         DSL::Version.new(arg)
       end
     end
@@ -197,6 +199,7 @@ module Cask
         if !arg.is_a?(String) && arg != :no_check
           raise CaskInvalidError.new(cask, "invalid 'sha256' value: '#{arg.inspect}'")
         end
+
         arg
       end
     end
@@ -205,6 +208,7 @@ module Cask
     def depends_on(*args)
       @depends_on ||= DSL::DependsOn.new
       return @depends_on if args.empty?
+
       begin
         @depends_on.load(*args)
       rescue RuntimeError => e
@@ -228,6 +232,7 @@ module Cask
 
     def staged_path
       return @staged_path if @staged_path
+
       cask_version = version || :unknown
       @staged_path = caskroom_path.join(cask_version.to_s)
     end

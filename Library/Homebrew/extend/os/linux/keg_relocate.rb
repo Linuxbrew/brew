@@ -45,6 +45,7 @@ class Keg
     end
 
     return if old_rpath == new_rpath && old_interpreter == new_interpreter
+
     safe_system(*cmd, file)
   end
 
@@ -54,6 +55,7 @@ class Keg
     elf_files.each do |file|
       next unless file.dynamic_elf?
       next if file.binary_executable? && skip_executables
+
       dylibs = file.dynamically_linked_libraries
       results << :libcxx if dylibs.any? { |s| s.include? "libc++.so" }
       results << :libstdcxx if dylibs.any? { |s| s.include? "libstdc++.so" }
@@ -72,6 +74,7 @@ class Keg
       # same dev ID and inode). This prevents relocations from being performed
       # on a binary more than once.
       next unless hardlinks.add? [pn.stat.dev, pn.stat.ino]
+
       elf_files << pn
     end
     elf_files

@@ -4,6 +4,7 @@ module Cask
       def initialize(*)
         super
         return if args.empty?
+
         raise ArgumentError, "#{self.class.command_name} does not take arguments."
       end
 
@@ -12,6 +13,7 @@ module Cask
         puts "Unstable Internal-use Commands:\n\n"
         Cmd.command_classes.each do |klass|
           next if klass.visible
+
           puts "    #{klass.command_name.ljust(max_command_len)}  #{self.class.help_for(klass)}"
         end
         puts "\n"

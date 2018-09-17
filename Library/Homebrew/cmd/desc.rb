@@ -24,6 +24,7 @@ module Homebrew
 
     if search_type.empty?
       raise FormulaUnspecifiedError if ARGV.named.empty?
+
       desc = {}
       ARGV.formulae.each { |f| desc[f.full_name] = f.desc }
       results = Descriptions.new(desc)

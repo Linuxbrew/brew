@@ -121,6 +121,7 @@ class Tab < OpenStruct
     deprecated_options.each do |deprecated_option|
       option = options.find { |o| o.name == deprecated_option.old }
       next unless option
+
       options -= [option]
       options << Option.new(deprecated_option.current, option.description)
     end
@@ -265,6 +266,7 @@ class Tab < OpenStruct
 
   def parsed_homebrew_version
     return Version::NULL if homebrew_version.nil?
+
     Version.new(homebrew_version)
   end
 

@@ -54,6 +54,7 @@ module Homebrew
           raise
         rescue => e
           raise if ARGV.homebrew_developer?
+
           fetched_bottle = false
           onoe e.message
           opoo "Bottle fetch failed: fetching the source."
@@ -63,6 +64,7 @@ module Homebrew
       end
 
       next if fetched_bottle
+
       fetch_formula(f)
 
       f.resources.each do |r|

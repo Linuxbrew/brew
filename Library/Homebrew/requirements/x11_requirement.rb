@@ -46,6 +46,7 @@ class X11Requirement < Requirement
 
   def <=>(other)
     return unless other.is_a? X11Requirement
+
     0
   end
 

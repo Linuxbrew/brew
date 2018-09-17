@@ -124,6 +124,7 @@ module Formulary
     def load_file
       $stderr.puts "#{$PROGRAM_NAME} (#{self.class.name}): loading #{path}" if ARGV.debug?
       raise FormulaUnavailableError, name unless path.file?
+
       Formulary.load_formula_from_path(name, path)
     end
   end
@@ -304,6 +305,7 @@ module Formulary
   # * a local bottle reference
   def self.factory(ref, spec = :stable, alias_path: nil, from: nil)
     raise ArgumentError, "Formulae must have a ref!" unless ref
+
     loader_for(ref, from: from).get_formula(spec, alias_path: alias_path)
   end
 

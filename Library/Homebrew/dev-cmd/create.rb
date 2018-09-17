@@ -58,6 +58,7 @@ module Homebrew
     fc.version = version
     fc.tap = Tap.fetch(tap || "homebrew/core")
     raise TapUnavailableError, tap unless fc.tap.installed?
+
     fc.url = url
 
     fc.mode = if args.cmake?

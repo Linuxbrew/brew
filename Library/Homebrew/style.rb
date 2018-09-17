@@ -103,6 +103,7 @@ module Homebrew
         if !(0..1).cover?(status.exitstatus) || json.to_s.length < 2
           raise "Error running `rubocop --format json #{args.join " "}`\n#{err}"
         end
+
         RubocopResults.new(JSON.parse(json))
       else
         raise "Invalid output_type for check_style_impl: #{output_type}"
@@ -115,6 +116,7 @@ module Homebrew
         @file_offenses = {}
         json["files"].each do |f|
           next if f["offenses"].empty?
+
           file = File.realpath(f["path"])
           @file_offenses[file] = f["offenses"].map { |x| RubocopOffense.new(x) }
         end

@@ -76,6 +76,7 @@ module Homebrew
     end
 
     return if uses.empty?
+
     puts Formatter.columns(uses.map(&:full_name).sort)
     odie "Missing formulae should not have dependents!" if used_formulae_missing
   end

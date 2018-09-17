@@ -55,6 +55,7 @@ module Stdenv
     # Leopard's ld needs some convincing that it's building 64-bit
     # See: https://github.com/mistydemeo/tigerbrew/issues/59
     return unless MacOS.version == :leopard && MacOS.prefer_64_bit?
+
     append "LDFLAGS", "-arch #{Hardware::CPU.arch_64_bit}"
 
     # Many, many builds are broken thanks to Leopard's buggy ld.
@@ -94,6 +95,7 @@ module Stdenv
     remove "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
 
     return unless (sdk = MacOS.sdk_path_if_needed(version))
+
     delete("SDKROOT")
     remove_from_cflags "-isysroot #{sdk}"
     remove "CPPFLAGS", "-isysroot #{sdk}"
@@ -116,6 +118,7 @@ module Stdenv
     prepend "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
 
     return unless (sdk = MacOS.sdk_path_if_needed(version))
+
     # Extra setup to support Xcode 4.3+ without CLT.
     self["SDKROOT"] = sdk
     # Tell clang/gcc where system include's are:

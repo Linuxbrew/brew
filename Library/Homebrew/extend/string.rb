@@ -44,6 +44,7 @@ module StringInreplaceExtension
   # value with "new_value", or removes the definition entirely.
   def change_make_var!(flag, new_value)
     return if gsub!(/^#{Regexp.escape(flag)}[ \t]*=[ \t]*(.*)$/, "#{flag}=#{new_value}", false)
+
     errors << "expected to change #{flag.inspect} to #{new_value.inspect}"
   end
 

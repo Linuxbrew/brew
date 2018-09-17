@@ -130,6 +130,7 @@ module Homebrew
       end
 
       return if $CHILD_STATUS.success?
+
       Homebrew.failed = true
     end
   end

@@ -236,6 +236,7 @@ module Cask
         puts "Commands:\n\n"
         Cmd.command_classes.each do |klass|
           next unless klass.visible
+
           puts "    #{klass.command_name.ljust(max_command_len)}  #{_help_for(klass)}"
         end
         puts %Q(\nSee also "man brew-cask")

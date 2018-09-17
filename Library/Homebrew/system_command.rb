@@ -92,12 +92,14 @@ class SystemCommand
 
   def sudo_prefix
     return [] unless sudo?
+
     askpass_flags = ENV.key?("SUDO_ASKPASS") ? ["-A"] : []
     ["/usr/bin/sudo", *askpass_flags, "-E", "--"]
   end
 
   def assert_success
     return if @status.success?
+
     raise ErrorDuringExecution.new(command,
                                    status: @status,
                                    output: @output)
@@ -212,6 +214,7 @@ class SystemCommand
     def warn_plist_garbage(garbage)
       return unless ARGV.verbose?
       return unless garbage =~ /\S/
+
       opoo "Received non-XML output from #{Formatter.identifier(command.first)}:"
       $stderr.puts garbage.strip
     end

@@ -11,6 +11,7 @@ module Cask
       def initialize(*)
         super
         return if args.empty?
+
         raise ArgumentError, "#{self.class.command_name} does not take arguments."
       end
 

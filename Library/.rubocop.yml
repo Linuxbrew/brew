@@ -47,10 +47,13 @@ Layout/SpaceAroundOperators:
 Layout/Tab:
   Enabled: true
 
+# Auto-correct is broken (https://github.com/rubocop-hq/rubocop/issues/6300).
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
 # favour parens-less DSL-style arguments
 Lint/AmbiguousBlockAssociation:
   Enabled: false
-
 
 # so many of these in formulae and can't be autocorrected
 # TODO: fix these as `ruby -w` complains about them.

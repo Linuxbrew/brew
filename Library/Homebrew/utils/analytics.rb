@@ -9,6 +9,7 @@ module Utils
 
       def clear_os_prefix_ci
         return unless instance_variable_defined?(:@os_prefix_ci)
+
         remove_instance_variable(:@os_prefix_ci)
       end
 
@@ -43,6 +44,7 @@ module Utils
         metadata.each do |key, value|
           next unless key
           next unless value
+
           key = ERB::Util.url_encode key
           value = ERB::Util.url_encode value
           args << "--data" << "#{key}=#{value}"
@@ -79,6 +81,7 @@ module Utils
         return unless exception.formula.tap
         return unless exception.formula.tap.installed?
         return if exception.formula.tap.private?
+
         action = exception.formula.full_name
         if (options = exception.options)
           action = "#{action} #{options}".strip

@@ -45,6 +45,7 @@ module MachOShim
       # ... but complain about other (parse) errors for further investigation.
       onoe "Failed to read Mach-O binary: #{self}"
       raise if ARGV.homebrew_developer?
+
       []
     end
   end

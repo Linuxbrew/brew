@@ -352,6 +352,7 @@ module Homebrew
 
       def check_for_multiple_volumes
         return unless HOMEBREW_CELLAR.exist?
+
         volumes = Volumes.new
 
         # Find the volumes for the TMP folder & HOMEBREW_CELLAR

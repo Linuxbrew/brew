@@ -13,12 +13,14 @@ module RuboCop
           [:devel, :head, :stable].each do |block_name|
             block = find_block(body_node, block_name)
             next unless block
+
             check_dependency_nodes_order(block.body)
           end
         end
 
         def check_dependency_nodes_order(parent_node)
           return if parent_node.nil?
+
           dependency_nodes = fetch_depends_on_nodes(parent_node)
           ordered = dependency_nodes.sort_by { |node| dependency_name(node).downcase }
           ordered = sort_dependencies_by_type(ordered)
@@ -59,9 +61,11 @@ module RuboCop
               idx = pos+1
               match_nodes = build_with_dependency_name(dep)
               next if !match_nodes || match_nodes.empty?
+
               idx1 = pos
               ordered.drop(idx1+1).each_with_index do |dep2, pos2|
                 next unless match_nodes.index(dependency_name(dep2))
+
                 idx2 = pos2 if idx2.nil? || pos2 > idx2
               end
               break if idx2
@@ -82,6 +86,7 @@ module RuboCop
               dependency_node_2 = node2 if l2 < l1
             end
             next unless dependency_node_2
+
             @offensive_nodes = [dependency_node_1, dependency_node_2]
             component_problem dependency_node_1, dependency_node_2
           end

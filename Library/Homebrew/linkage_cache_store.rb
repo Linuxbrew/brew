@@ -67,6 +67,7 @@ class LinkageCacheStore < CacheStore
   def fetch_hash_values(type)
     keg_cache = database.get(@keg_path)
     return {} unless keg_cache
+
     json_string_to_ruby_hash(keg_cache)[type.to_s]
   end
 end

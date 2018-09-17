@@ -47,6 +47,7 @@ class SystemConfig
 
     def describe_path(path)
       return "N/A" if path.nil?
+
       realpath = path.realpath
       if realpath == path
         path
@@ -70,6 +71,7 @@ class SystemConfig
 
     def hardware
       return if Hardware::CPU.type == :dunno
+
       "CPU: #{Hardware.cores_as_words}-core #{Hardware::CPU.bits}-bit #{Hardware::CPU.family}"
     end
 
@@ -79,13 +81,16 @@ class SystemConfig
 
     def describe_java
       return "N/A" unless which "java"
+
       _, err, status = system_command("java", args: ["-version"], print_stderr: false)
       return "N/A" unless status.success?
+
       err[/java version "([\d\._]+)"/, 1] || "N/A"
     end
 
     def describe_git
       return "N/A" unless Utils.git_available?
+
       "#{Utils.git_version} => #{Utils.git_path}"
     end
 
@@ -166,6 +171,7 @@ class SystemConfig
           next unless key.start_with?("HOMEBREW_")
           next if boring_keys.include?(key)
           next if defaults_hash[key.to_sym]
+
           value = "set" if key =~ /(cookie|key|token|password)/i
           f.puts "#{key}: #{value}"
         end

@@ -14,12 +14,14 @@ module Language
       if !$CHILD_STATUS.exitstatus.zero? || output.lines.empty?
         raise "npm failed to pack #{Dir.pwd}"
       end
+
       output.lines.last.chomp
     end
 
     def self.setup_npm_environment
       # guard that this is only run once
       return if @env_set
+
       @env_set = true
       # explicitly use our npm and node-gyp executables instead of the user
       # managed ones in HOMEBREW_PREFIX/lib/node_modules which might be broken

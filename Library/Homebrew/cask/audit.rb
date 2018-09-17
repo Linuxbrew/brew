@@ -65,6 +65,7 @@ module Cask
       return if tap.user != "Homebrew"
 
       return unless cask.artifacts.any? { |k| k.is_a?(Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
+
       add_warning "allow_untrusted is not permitted in official Homebrew Cask taps"
     end
 
@@ -73,6 +74,7 @@ module Cask
 
       return if cask.artifacts.none? { |k| k.is_a?(Artifact::Pkg) || k.is_a?(Artifact::Installer) }
       return if cask.artifacts.any? { |k| k.is_a?(Artifact::Uninstall) }
+
       add_warning "installer and pkg stanzas require an uninstall stanza"
     end
 
@@ -118,6 +120,7 @@ module Cask
       end
 
       return unless cask.artifacts.count { |k| k.is_a?(Artifact::Zap) } > 1
+
       add_warning "only a single zap stanza is allowed"
     end
 
@@ -141,6 +144,7 @@ module Cask
       return if tap.nil?
 
       return if commit_range.nil?
+
       previous_cask_contents = Git.last_revision_of_file(tap.path, @cask.sourcefile_path, before_commit: commit_range)
       return if previous_cask_contents.empty?
 
@@ -158,6 +162,7 @@ module Cask
 
     def check_version
       return unless cask.version
+
       check_no_string_version_latest
       check_no_file_separator_in_version
     end
@@ -165,6 +170,7 @@ module Cask
     def check_no_string_version_latest
       odebug "Verifying version :latest does not appear as a string ('latest')"
       return unless cask.version.raw_version == "latest"
+
       add_error "you should use version :latest instead of version 'latest'"
     end
 
@@ -172,11 +178,13 @@ module Cask
       odebug "Verifying version does not contain '#{File::SEPARATOR}'"
       return unless cask.version.raw_version.is_a?(String)
       return unless cask.version.raw_version.include?(File::SEPARATOR)
+
       add_error "version should not contain '#{File::SEPARATOR}'"
     end
 
     def check_sha256
       return unless cask.sha256
+
       check_sha256_no_check_if_latest
       check_sha256_actually_256
       check_sha256_invalid
@@ -186,6 +194,7 @@ module Cask
       odebug "Verifying sha256 :no_check with version :latest"
       return unless cask.version.latest?
       return if cask.sha256 == :no_check
+
       add_error "you should use sha256 :no_check when version is :latest"
     end
 
@@ -193,6 +202,7 @@ module Cask
       odebug "Verifying #{stanza} string is a legal SHA-256 digest"
       return unless sha256.is_a?(String)
       return if sha256.length == 64 && sha256[/^[0-9a-f]+$/i]
+
       add_error "#{stanza} string must be of 64 hexadecimal characters"
     end
 
@@ -200,6 +210,7 @@ module Cask
       odebug "Verifying #{stanza} is not a known invalid value"
       empty_sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       return unless sha256 == empty_sha256
+
       add_error "cannot use the sha256 for an empty string in #{stanza}: #{empty_sha256}"
     end
 
@@ -232,9 +243,11 @@ module Cask
       case cask.url.to_s
       when %r{github.com/([^/]+)/([^/]+)/releases/download/(\S+)}
         return if cask.version.latest?
+
         add_warning "Download uses GitHub releases, #{add_appcast}"
       when %r{sourceforge.net/(\S+)}
         return if cask.version.latest?
+
         add_warning "Download is hosted on SourceForge, #{add_appcast}"
       when %r{dl.devmate.com/(\S+)}
         add_warning "Download is hosted on DevMate, #{add_appcast}"
@@ -245,6 +258,7 @@ module Cask
 
     def check_url
       return unless cask.url
+
       check_download_url_format
     end
 
@@ -259,6 +273,7 @@ module Cask
 
     def bad_url_format?(regex, valid_formats_array)
       return false unless cask.url.to_s =~ regex
+
       valid_formats_array.none? { |format| cask.url.to_s =~ format }
     end
 
@@ -289,6 +304,7 @@ module Cask
     def check_token_conflicts
       return unless check_token_conflicts?
       return unless core_formula_names.include?(cask.token)
+
       add_warning "possible duplicate, cask token conflicts with Homebrew core formula: #{core_formula_url}"
     end
 
@@ -306,6 +322,7 @@ module Cask
 
     def check_download
       return unless download && cask.url
+
       odebug "Auditing download"
       downloaded_path = download.perform
       Verify.all(cask, downloaded_path)

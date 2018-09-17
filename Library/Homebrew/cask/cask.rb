@@ -27,6 +27,7 @@ module Cask
 
     def tap
       return super if block_given? # Object#tap
+
       @tap
     end
 
@@ -37,6 +38,7 @@ module Cask
       @config = config
       @dsl = DSL.new(self)
       return unless block_given?
+
       @dsl.instance_eval(&block)
       @dsl.language_eval
     end
@@ -62,6 +64,7 @@ module Cask
     def full_name
       return token if tap.nil?
       return token if tap.user == "Homebrew"
+
       "#{tap.name}/#{token}"
     end
 

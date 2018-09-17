@@ -25,6 +25,7 @@ module Homebrew
 
     [previous_tag, end_ref].each do |ref|
       next if quiet_system "git", "-C", HOMEBREW_REPOSITORY, "rev-parse", "--verify", "--quiet", ref
+
       odie "Ref #{ref} does not exist!"
     end
 

@@ -36,6 +36,7 @@ module Superenv
   def determine_dynamic_linker_path
     path = "#{HOMEBREW_PREFIX}/lib/ld.so"
     return unless File.readable? path
+
     path
   end
 end

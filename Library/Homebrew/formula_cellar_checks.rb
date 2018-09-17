@@ -42,6 +42,7 @@ module FormulaCellarChecks
 
   def check_jars
     return unless formula.lib.directory?
+
     jars = formula.lib.children.select { |g| g.extname == ".jar" }
     return if jars.empty?
 
@@ -68,6 +69,7 @@ module FormulaCellarChecks
 
     non_libraries = formula.lib.children.reject do |g|
       next true if g.directory?
+
       valid_library_extension? g
     end
     return if non_libraries.empty?
@@ -95,6 +97,7 @@ module FormulaCellarChecks
 
   def check_generic_executables(bin)
     return unless bin.directory?
+
     generic_names = %w[run service start stop]
     generics = bin.children.select { |g| generic_names.include? g.basename.to_s }
     return if generics.empty?
@@ -133,6 +136,7 @@ module FormulaCellarChecks
     end
 
     return unless bad_dir_name
+
     <<~EOS
       Emacs Lisp files were installed into the wrong site-lisp subdirectory.
       They should be installed into:
@@ -147,6 +151,7 @@ module FormulaCellarChecks
 
     elisps = (share/"emacs/site-lisp").children.select { |file| %w[.el .elc].include? file.extname }
     return if elisps.empty?
+
     <<~EOS
       Emacs Lisp files were linked directly to #{HOMEBREW_PREFIX}/share/emacs/site-lisp
       This may cause conflicts with other packages.

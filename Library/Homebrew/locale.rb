@@ -42,6 +42,7 @@ class Locale
 
       regex = self.class.const_get("#{key.upcase}_REGEX")
       raise ParserError, "'#{value}' does not match #{regex}" unless value =~ regex
+
       instance_variable_set(:"@#{key}", value)
     end
   end

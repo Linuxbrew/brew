@@ -12,6 +12,7 @@ module Homebrew
       ff.each do |f|
         missing_dependencies = f.missing_dependencies(hide: hide)
         next if missing_dependencies.empty?
+
         yield f.full_name, missing_dependencies if block_given?
         missing[f.full_name] = missing_dependencies
       end
@@ -32,6 +33,7 @@ module Homebrew
         vol_index = @volumes.index(vols[0])
         # volume not found in volume list
         return -1 if vol_index.nil?
+
         vol_index
       end
 
@@ -276,6 +278,7 @@ module Homebrew
 
         Keg::PRUNEABLE_DIRECTORIES.each do |d|
           next unless d.directory?
+
           d.find do |path|
             if path.symlink? && !path.resolved_path_exists?
               broken_symlinks << path
@@ -408,6 +411,7 @@ module Homebrew
 
       def check_for_config_scripts
         return unless HOMEBREW_CELLAR.exist?
+
         real_cellar = HOMEBREW_CELLAR.realpath
 
         scripts = []
@@ -604,6 +608,7 @@ module Homebrew
         f.installed_prefixes.each do |prefix|
           prefix.find do |src|
             next if src == prefix
+
             dst = HOMEBREW_PREFIX + src.relative_path_from(prefix)
             return true if dst.symlink? && src == dst.resolved_path
           end
@@ -642,6 +647,7 @@ module Homebrew
 
       def check_missing_deps
         return unless HOMEBREW_CELLAR.exist?
+
         missing = Set.new
         Homebrew::Diagnostic.missing_deps(Formula.installed).each_value do |deps|
           missing.merge(deps)
@@ -659,6 +665,7 @@ module Homebrew
 
       def check_git_status
         return unless Utils.git_available?
+
         HOMEBREW_REPOSITORY.cd do
           return if `git status --untracked-files=all --porcelain -- Library/Homebrew/ 2>/dev/null`.chomp.empty?
         end
@@ -674,6 +681,7 @@ module Homebrew
 
       def check_for_bad_python_symlink
         return unless which "python"
+
         `python -V 2>&1` =~ /Python (\d+)\./
         # This won't be the right warning if we matched nothing at all
         return if Regexp.last_match(1).nil?
@@ -764,14 +772,17 @@ module Homebrew
           unused_formula_dirs = tap.potential_formula_dirs - [tap.formula_dir]
           unused_formula_dirs.each do |dir|
             next unless dir.exist?
+
             dir.children.each do |path|
               next unless path.extname == ".rb"
+
               bad_tap_files[tap] ||= []
               bad_tap_files[tap] << path
             end
           end
         end
         return if bad_tap_files.empty?
+
         bad_tap_files.keys.map do |tap|
           <<~EOS
             Found Ruby file outside #{tap} tap formula directory

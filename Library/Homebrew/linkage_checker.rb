@@ -39,6 +39,7 @@ class LinkageChecker
 
   def display_reverse_output
     return if @reverse_links.empty?
+
     sorted = @reverse_links.sort
     sorted.each do |dylib, files|
       puts dylib
@@ -90,6 +91,7 @@ class LinkageChecker
       @keg.find do |file|
         next if file.symlink? || file.directory?
         next if !file.dylib? && !file.binary_executable? && !file.mach_o_bundle?
+
         # weakly loaded dylibs may not actually exist on disk, so skip them
         # when checking for broken linkage
         keg_files_dylibs[file] =
@@ -104,6 +106,7 @@ class LinkageChecker
         @reverse_links[dylib] << file
 
         next if checked_dylibs.include? dylib
+
         checked_dylibs << dylib
 
         if dylib.start_with? "@"
@@ -117,6 +120,7 @@ class LinkageChecker
           @system_dylibs << dylib
         rescue Errno::ENOENT
           next if harmless_broken_link?(dylib)
+
           if (dep = dylib_to_dep(dylib))
             @broken_deps[dep] |= [dylib]
           else
@@ -149,6 +153,7 @@ class LinkageChecker
     filter_out = proc do |dep|
       next true if dep.build?
       next false unless dep.optional? || dep.recommended?
+
       formula.build.without?(dep)
     end
 
@@ -166,6 +171,7 @@ class LinkageChecker
     @brewed_dylibs.each_key do |full_name|
       name = full_name.split("/").last
       next if name == formula.name
+
       if recursive_deps.include?(name)
         indirect_deps << full_name unless declared_deps_names.include?(name)
       else
@@ -178,6 +184,7 @@ class LinkageChecker
 
     unnecessary_deps = declared_deps_full_names.reject do |full_name|
       next true if Formula[full_name].bin.directory?
+
       name = full_name.split("/").last
       @brewed_dylibs.keys.map { |l| l.split("/").last }.include?(name)
     end
@@ -193,6 +200,7 @@ class LinkageChecker
       version_hash[unversioned_name] ||= Set.new
       version_hash[unversioned_name] << name
       next if version_hash[unversioned_name].length < 2
+
       version_conflict_deps += version_hash[unversioned_name]
     end
 
@@ -227,6 +235,7 @@ class LinkageChecker
   # Things may either be an array, or a hash of (label -> array)
   def display_items(label, things, puts_output: true)
     return if things.empty?
+
     output = "#{label}:"
     if things.is_a? Hash
       things.keys.sort.each do |list_label|

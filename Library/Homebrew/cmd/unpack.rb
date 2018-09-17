@@ -33,6 +33,7 @@ module Homebrew
 
       if stage_dir.exist?
         raise "Destination #{stage_dir} already exists!" unless ARGV.force?
+
         rm_rf stage_dir
       end
 
@@ -46,6 +47,7 @@ module Homebrew
       ENV["VERBOSE"] = nil
 
       next unless ARGV.git?
+
       ohai "Setting up git repository"
       cd stage_dir
       system "git", "init", "-q"

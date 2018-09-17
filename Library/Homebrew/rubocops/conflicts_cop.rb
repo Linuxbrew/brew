@@ -15,6 +15,7 @@ module RuboCop
 
         def audit_formula(_node, _class_node, _parent_class_node, body)
           return unless versioned_formula?
+
           problem MSG if !@formula_name.start_with?(*WHITELIST) &&
                          method_called_ever?(body, :conflicts_with)
         end

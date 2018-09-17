@@ -9,6 +9,7 @@ module Hardware
         return :arm if arm?
         return :ppc if ppc?
         return :dunno unless intel?
+
         # See https://software.intel.com/en-us/articles/intel-architecture-and-processor-identification-with-cpuid-model-and-family-numbers
         cpu_family = cpuinfo[/^cpu family\s*: ([0-9]+)/, 1].to_i
         cpu_model = cpuinfo[/^model\s*: ([0-9]+)/, 1].to_i
