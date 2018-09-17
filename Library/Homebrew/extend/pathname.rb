@@ -162,44 +162,12 @@ class Pathname
 
   # NOTE always overwrites
   def atomic_write(content)
-    require "tempfile"
-    tf = Tempfile.new(basename.to_s, dirname)
-    begin
-      tf.binmode
-      tf.write(content)
-
-      begin
-        old_stat = stat
-      rescue Errno::ENOENT
-        old_stat = default_stat
+    Dir.mktmpdir(".d", dirname) do |tmpdir|
+      File.atomic_write(self, tmpdir) do |file|
+        file.write(content)
       end
-
-      uid = Process.uid
-      gid = Process.groups.delete(old_stat.gid) { Process.gid }
-
-      begin
-        tf.chown(uid, gid)
-        tf.chmod(old_stat.mode)
-      rescue Errno::EPERM # rubocop:disable Lint/HandleExceptions
-      end
-
-      # Close the file before renaming to prevent the error: Device or resource busy
-      # Affects primarily NFS.
-      tf.close
-      File.rename(tf.path, self)
-    ensure
-      tf.close!
     end
   end
-
-  def default_stat
-    sentinel = parent.join(".brew.#{Process.pid}.#{rand(Time.now.to_i)}")
-    sentinel.open("w") {}
-    sentinel.stat
-  ensure
-    sentinel.unlink
-  end
-  private :default_stat
 
   # @private
   def cp_path_sub(pattern, replacement)
