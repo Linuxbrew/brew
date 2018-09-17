@@ -18,17 +18,17 @@ module Homebrew
 
     case ARGV.named.first
     when nil, "state"
-      analyticsdisabled = \
-        Utils.popen_read("git config --file=#{config_file} --get homebrew.analyticsdisabled").chuzzle
-      uuid = \
-        Utils.popen_read("git config --file=#{config_file} --get homebrew.analyticsuuid").chuzzle
+      analyticsdisabled =
+        Utils.popen_read("git config --file=#{config_file} --get homebrew.analyticsdisabled").chomp
+      uuid =
+        Utils.popen_read("git config --file=#{config_file} --get homebrew.analyticsuuid").chomp
       if ENV["HOMEBREW_NO_ANALYTICS"]
         puts "Analytics is disabled (by HOMEBREW_NO_ANALYTICS)."
       elsif analyticsdisabled == "true"
         puts "Analytics is disabled."
       else
         puts "Analytics is enabled."
-        puts "UUID: #{uuid}" if uuid
+        puts "UUID: #{uuid}" if uuid.present?
       end
     when "on"
       safe_system "git", "config", "--file=#{config_file}",

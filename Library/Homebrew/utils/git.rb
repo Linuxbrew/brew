@@ -36,7 +36,7 @@ module Utils
 
     @git_path ||= Utils.popen_read(
       HOMEBREW_SHIMS_PATH/"scm/git", "--homebrew=print-path"
-    ).chuzzle
+    ).chomp.presence
   end
 
   def self.git_version

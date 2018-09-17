@@ -722,7 +722,7 @@ class TapConfig
     return unless Utils.git_available?
 
     tap.path.cd do
-      Utils.popen_read("git", "config", "--local", "--get", "homebrew.#{key}").chuzzle
+      Utils.popen_read("git", "config", "--local", "--get", "homebrew.#{key}").chomp.presence
     end
   end
 
