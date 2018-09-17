@@ -86,6 +86,7 @@ module Homebrew
     end
 
     return merge if args.merge?
+
     ensure_relocation_formulae_installed!
     ARGV.resolved_formulae.each do |f|
       bottle_formula f
@@ -95,6 +96,7 @@ module Homebrew
   def ensure_relocation_formulae_installed!
     Keg.relocation_formulae.each do |f|
       next if Formula[f].installed?
+
       ohai "Installing #{f}..."
       safe_system HOMEBREW_BREW_FILE, "install", f
     end
@@ -140,6 +142,7 @@ module Homebrew
           str = io.readline.chomp
           next if ignores.any? { |i| i =~ str }
           next unless str.include? string
+
           offset, match = str.split(" ", 2)
           next if linked_libraries.include? match # Don't bother reporting a string if it was found by otool
 
@@ -149,6 +152,7 @@ module Homebrew
       end
 
       next unless args.verbose? && !text_matches.empty?
+
       print_filename.call(string, file)
       text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
         puts " #{Tty.bold}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
@@ -166,6 +170,7 @@ module Homebrew
     absolute_symlinks_start_with_string = []
     keg.find do |pn|
       next unless pn.symlink? && (link = pn.readlink).absolute?
+
       absolute_symlinks_start_with_string << pn if link.to_s.start_with?(string)
     end
 
@@ -376,6 +381,7 @@ module Homebrew
     puts output
 
     return unless args.json?
+
     tag = Utils::Bottles.tag.to_s
     tag += "_or_later" if args.or_later?
     json = {
@@ -444,6 +450,7 @@ module Homebrew
               bottle_block_contents.lines.each do |line|
                 line = line.strip
                 next if line.empty?
+
                 key, old_value_original, _, tag = line.split " ", 4
                 valid_key = %w[root_url prefix cellar rebuild sha1 sha256].include? key
                 next unless valid_key
@@ -465,6 +472,7 @@ module Homebrew
                 value = value_original.to_s
                 next if key == "cellar" && old_value == "any" && value == "any_skip_relocation"
                 next unless old_value.empty? || value != old_value
+
                 old_value = old_value_original.inspect
                 value = value_original.inspect
                 mismatches << "#{key}: old: #{old_value}, new: #{value}"

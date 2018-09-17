@@ -6,6 +6,7 @@ module Cask
       def link(command: nil, **options)
         super(command: command, **options)
         return if source.executable?
+
         if source.writable?
           FileUtils.chmod "+x", source
         else

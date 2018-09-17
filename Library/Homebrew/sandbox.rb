@@ -10,11 +10,13 @@ class Sandbox
 
   def self.formula?(_formula)
     return false unless available?
+
     !ARGV.no_sandbox?
   end
 
   def self.test?
     return false unless available?
+
     !ARGV.no_sandbox?
   end
 
@@ -135,6 +137,7 @@ class Sandbox
 
   def expand_realpath(path)
     raise unless path.absolute?
+
     path.exist? ? path.realpath : expand_realpath(path.parent)/path.basename
   end
 

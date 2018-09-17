@@ -53,11 +53,13 @@ class DependencyCollector
 
   def git_dep_if_needed(tags)
     return if Utils.git_available?
+
     Dependency.new("git", tags)
   end
 
   def subversion_dep_if_needed(tags)
     return if Utils.svn_available?
+
     Dependency.new("subversion", tags)
   end
 

@@ -65,12 +65,14 @@ module Test
         def as_tty
           @tty = true
           return self if [:stdout, :stderr].include?(@output)
+
           raise "`as_tty` can only be chained to `stdout` or `stderr`."
         end
 
         def with_color
           @colors = true
           return self if @tty
+
           raise "`with_color` can only be chained to `as_tty`."
         end
       end

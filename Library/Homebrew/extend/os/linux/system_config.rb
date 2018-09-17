@@ -18,17 +18,20 @@ class SystemConfig
     def host_glibc_version
       version = OS::Linux::Glibc.system_version
       return "N/A" if version.null?
+
       version
     end
 
     def host_gcc_version
       gcc = Pathname.new "/usr/bin/gcc"
       return "N/A" unless gcc.executable?
+
       `#{gcc} --version 2>/dev/null`[/ (\d+\.\d+\.\d+)/, 1]
     end
 
     def formula_linked_version(formula)
       return "N/A" unless CoreTap.instance.installed?
+
       Formulary.factory(formula).linked_version || "N/A"
     rescue FormulaUnavailableError
       "N/A"

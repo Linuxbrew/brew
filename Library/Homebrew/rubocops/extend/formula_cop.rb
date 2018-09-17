@@ -23,6 +23,7 @@ module RuboCop
         return unless file_path_allowed?
         return unless formula_class?(node)
         return unless respond_to?(:audit_formula)
+
         class_node, parent_class_node, @body = *node
         @formula_name = Pathname.new(@file_path).basename(".rb").to_s
         audit_formula(node, class_node, parent_class_node, @body)
@@ -34,6 +35,7 @@ module RuboCop
         string_repr = string_content(node)
         match_object = string_repr.match(pattern)
         return unless match_object
+
         node_begin_pos = start_column(node)
         line_begin_pos = line_start_column(node)
         if node_begin_pos == line_begin_pos
@@ -58,6 +60,7 @@ module RuboCop
           url_string = string_content(url_string_node)
           match_object = regex_match_group(url_string_node, regex)
           next unless match_object
+
           offending_node(url_string_node.parent)
           yield match_object, url_string
         end
@@ -67,14 +70,17 @@ module RuboCop
       def find_strings(node)
         return [] if node.nil?
         return [node] if node.str_type?
+
         node.each_descendant(:str)
       end
 
       # Returns method_node matching method_name
       def find_node_method_by_name(node, method_name)
         return if node.nil?
+
         node.each_child_node(:send) do |method_node|
           next unless method_node.method_name == method_name
+
           @offensive_node = method_node
           @offense_source_range = method_node.source_range
           return method_node
@@ -94,6 +100,7 @@ module RuboCop
       # Returns an array of method call nodes matching method_name inside node with depth first order (Children nodes)
       def find_method_calls_by_name(node, method_name)
         return if node.nil?
+
         node.each_child_node(:send).select { |method_node| method_name == method_node.method_name }
       end
 
@@ -101,6 +108,7 @@ module RuboCop
       # Returns every method call if no method_name is passed
       def find_every_method_call_by_name(node, method_name = nil)
         return if node.nil?
+
         node.each_descendant(:send).select do |method_node|
           method_name.nil? ||
             method_name == method_node.method_name
@@ -113,6 +121,7 @@ module RuboCop
       # Returns every function calls if no func_name is passed
       def find_every_func_call_by_name(node, func_name = nil)
         return if node.nil?
+
         node.each_descendant(:send).select do |func_node|
           func_node.receiver.nil? && (func_name.nil? || func_name == func_node.method_name)
         end
@@ -125,6 +134,7 @@ module RuboCop
         methods.each do |method|
           next unless parameters_passed?(method, *args)
           return true unless block_given?
+
           yield method
         end
       end
@@ -140,10 +150,12 @@ module RuboCop
         methods.each do |method|
           next if method.receiver.nil?
           next if method.receiver.const_name != instance &&
-                  method.receiver.method_name != instance
+                  !(method.receiver.send_type? && method.receiver.method_name == instance)
+
           @offense_source_range = method.source_range
           @offensive_node = method
           return true unless block_given?
+
           yield method
         end
       end
@@ -156,10 +168,12 @@ module RuboCop
         node.each_descendant(:send) do |method_node|
           next if method_node.receiver.nil?
           next if method_node.receiver.const_name != name &&
-                  method_node.receiver.method_name != name
+                  !(method_node.receiver.send_type? && method_node.receiver.method_name == name)
+
           @offense_source_range = method_node.receiver.source_range
           @offensive_node = method_node.receiver
           return true unless block_given?
+
           yield method_node
         end
       end
@@ -173,6 +187,7 @@ module RuboCop
           types.any? { |type| depends_on_name_type?(n, dependency_name, type) }
         end
         return if idx.nil?
+
         @offense_source_range = dependency_nodes[idx].source_range
         @offensive_node = dependency_nodes[idx]
       end
@@ -212,8 +227,10 @@ module RuboCop
       # if block given, yield matching nodes
       def find_const(node, const_name)
         return if node.nil?
+
         node.each_descendant(:const) do |const_node|
           next unless const_node.const_name == const_name
+
           @offensive_node = const_node
           @offense_source_range = const_node.source_range
           yield const_node if block_given?
@@ -246,8 +263,10 @@ module RuboCop
       # Returns a block named block_name inside node
       def find_block(node, block_name)
         return if node.nil?
+
         node.each_child_node(:block) do |block_node|
           next if block_node.method_name != block_name
+
           @offensive_node = block_node
           @offense_source_range = block_node.source_range
           return block_node
@@ -261,6 +280,7 @@ module RuboCop
       # Returns an array of block nodes named block_name inside node
       def find_blocks(node, block_name)
         return if node.nil?
+
         node.each_child_node(:block).select { |block_node| block_name == block_node.method_name }
       end
 
@@ -268,8 +288,10 @@ module RuboCop
       # If a block is given then yields matching block node to the block!
       def find_all_blocks(node, block_name)
         return if node.nil?
+
         blocks = node.each_descendant(:block).select { |block_node| block_name == block_node.method_name }
         return blocks unless block_given?
+
         blocks.each do |block_node|
           offending_node(block_node)
           yield block_node
@@ -280,14 +302,17 @@ module RuboCop
       # Returns first method def if method_name is nil
       def find_method_def(node, method_name = nil)
         return if node.nil?
+
         node.each_child_node(:def) do |def_node|
           def_method_name = method_name(def_node)
           next unless method_name == def_method_name || method_name.nil?
+
           @offensive_node = def_node
           @offense_source_range = def_node.source_range
           return def_node
         end
         return if node.parent.nil?
+
         # If not found then, parent node becomes the offensive node
         @offensive_node = node.parent
         @offense_source_range = node.parent.source_range
@@ -299,6 +324,7 @@ module RuboCop
         block_body = node.children[2]
         block_body.each_child_node(:send) do |call_node|
           next unless call_node.method_name == method_name
+
           @offensive_node = call_node
           @offense_source_range = call_node.source_range
           return true
@@ -315,6 +341,7 @@ module RuboCop
         end
         node.each_child_node(:send) do |call_node|
           next unless call_node.method_name == method_name
+
           offending_node(call_node)
           return true
         end
@@ -325,6 +352,7 @@ module RuboCop
       def method_called_ever?(node, method_name)
         node.each_descendant(:send) do |call_node|
           next unless call_node.method_name == method_name
+
           @offensive_node = call_node
           @offense_source_range = call_node.source_range
           return true
@@ -347,6 +375,7 @@ module RuboCop
       # If first node does not precede next_node, sets appropriate instance variables for reporting
       def component_precedes?(first_node, next_node)
         return false if line_number(first_node) < line_number(next_node)
+
         @offense_source_range = first_node.source_range
         @offensive_node = first_node
         true
@@ -354,8 +383,9 @@ module RuboCop
 
       # Check if negation is present in the given node
       def expression_negated?(node)
-        return false if node.parent.nil?
+        return false unless node.parent&.send_type?
         return false unless node.parent.method_name.equal?(:!)
+
         offending_node(node.parent)
       end
 
@@ -390,6 +420,7 @@ module RuboCop
       # Returns the sha256 str node given a sha256 call node
       def get_checksum_node(call)
         return if parameters(call).empty? || parameters(call).nil?
+
         if parameters(call).first.str_type?
           parameters(call).first
         # sha256 is passed as a key-value pair in bottle blocks
@@ -478,12 +509,14 @@ module RuboCop
       # Returns printable component name
       def format_component(component_node)
         return component_node.method_name if component_node.send_type? || component_node.block_type?
+
         method_name(component_node) if component_node.def_type?
       end
 
       # Returns the formula tap
       def formula_tap
         return unless match_obj = @file_path.match(%r{/(homebrew-\w+)/})
+
         match_obj[1]
       end
 
@@ -509,6 +542,7 @@ module RuboCop
         paths_to_exclude = [%r{/Library/Homebrew/compat/},
                             %r{/Library/Homebrew/test/}]
         return true if @file_path.nil? # file_path is nil when source is directly passed to the cop eg., in specs
+
         @file_path !~ Regexp.union(paths_to_exclude)
       end
     end

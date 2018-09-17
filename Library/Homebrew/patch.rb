@@ -144,6 +144,7 @@ class ExternalPatch
             the "apply" method was used one or more times in the patch-do block.
           EOS
         end
+
         patch_files << children.first.basename
       end
       dir.cd do

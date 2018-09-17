@@ -54,6 +54,7 @@ module Cask
 
         ORDERED_DIRECTIVES.each do |directive_sym|
           next unless directives.key?(directive_sym)
+
           args = directives[directive_sym]
           send("uninstall_#{directive_sym}", *(args.is_a?(Hash) ? [args] : args), **options)
         end
@@ -66,6 +67,7 @@ module Cask
       def warn_for_unknown_directives(directives)
         unknown_keys = directives.keys - ORDERED_DIRECTIVES
         return if unknown_keys.empty?
+
         opoo "Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. " \
              "Running \"brew update; brew cleanup\" will likely fix it."
       end
@@ -100,6 +102,7 @@ module Cask
             end
             # undocumented and untested: pass a path to uninstall :launchctl
             next unless Pathname(service).exist?
+
             command.run!("/bin/launchctl", args: ["unload", "-w", "--", service], sudo: with_sudo)
             command.run!("/bin/rm",        args: ["-f", "--", service], sudo: with_sudo)
             sleep 1
@@ -113,6 +116,7 @@ module Cask
                .map { |pid, state, id| [pid.to_i, state.to_i, id] }
                .select do |fields|
                  next if fields[0].zero?
+
                  fields[2] =~ /^#{Regexp.escape(bundle_id)}($|\.\d+)/
                end
       end
@@ -122,6 +126,7 @@ module Cask
         bundle_ids.each do |bundle_id|
           ohai "Quitting application ID #{bundle_id}"
           next if running_processes(bundle_id, command: command).empty?
+
           command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{bundle_id}" to quit)], sudo: true)
 
           begin
@@ -147,6 +152,7 @@ module Cask
           ohai "Signalling '#{signal}' to application ID '#{bundle_id}'"
           pids = running_processes(bundle_id, command: command).map(&:first)
           next unless pids.any?
+
           # Note that unlike :quit, signals are sent from the current user (not
           # upgraded to the superuser). This is a todo item for the future, but
           # there should be some additional thought/safety checks about that, as a
@@ -201,11 +207,13 @@ module Cask
 
         ohai "Running uninstall script #{executable}"
         raise CaskInvalidError.new(cask, "#{stanza} :#{directive_name} without :executable.") if executable.nil?
+
         executable_path = cask.staged_path.join(executable)
 
         unless executable_path.exist?
           message = "uninstall script #{executable} does not exist"
           raise CaskError, "#{message}." unless force
+
           opoo "#{message}, skipping."
           return
         end

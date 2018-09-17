@@ -57,6 +57,7 @@ module CleanupRefinement
 
     def stale?(scrub = false)
       return false unless resolved_path.file?
+
       stale_formula?(scrub) || stale_cask?(scrub)
     end
 
@@ -162,6 +163,7 @@ module Homebrew
         cleanup_cache
         cleanup_logs
         return if dry_run?
+
         rm_ds_store
       else
         args.each do |arg|
@@ -211,6 +213,7 @@ module Homebrew
 
     def cleanup_logs
       return unless HOMEBREW_LOGS.directory?
+
       HOMEBREW_LOGS.subdirs.each do |dir|
         cleanup_path(dir) { dir.rmtree } if dir.prune?(days || DEFAULT_LOG_DAYS)
       end

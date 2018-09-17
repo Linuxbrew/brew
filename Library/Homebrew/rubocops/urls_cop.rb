@@ -26,6 +26,7 @@ module RuboCop
             urls.each do |url|
               url_string = string_content(parameters(url).first)
               next unless url_string.eql?(mirror)
+
               problem "URL should not be duplicated as a mirror: #{url_string}"
             end
           end
@@ -163,6 +164,7 @@ module RuboCop
           archive_gh_pattern = %r{https://.*github.*/(?:tar|zip)ball/}
           audit_urls(urls, archive_gh_pattern) do |_, url|
             next unless url !~ /\.git$/
+
             problem "Use /archive/ URLs for GitHub tarballs (url is #{url})."
           end
 
@@ -170,6 +172,7 @@ module RuboCop
           zip_gh_pattern = %r{https://.*github.*/(archive|releases)/.*\.zip$}
           audit_urls(urls, zip_gh_pattern) do |_, url|
             next unless url !~ %r{releases/download}
+
             problem "Use GitHub tarballs rather than zipballs (url is #{url})."
           end
 

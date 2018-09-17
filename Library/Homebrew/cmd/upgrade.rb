@@ -109,6 +109,7 @@ module Homebrew
         upgrade_formula(f)
         next if !ARGV.include?("--cleanup") && !ENV["HOMEBREW_UPGRADE_CLEANUP"]
         next unless f.installed?
+
         Cleanup.new.cleanup_formula(f)
       rescue UnsatisfiedRequirements => e
         Homebrew.failed = true

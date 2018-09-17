@@ -26,6 +26,7 @@ class Messages
   def display_caveats
     return if @formula_count <= 1
     return if @caveats.empty?
+
     oh1 "Caveats"
     @caveats.each do |c|
       ohai c[:formula], c[:caveats]
@@ -34,6 +35,7 @@ class Messages
 
   def display_install_times
     return if install_times.empty?
+
     oh1 "Installation times"
     install_times.each do |t|
       puts format("%-20s %10.3f s", t[:formula], t[:time])

@@ -22,6 +22,7 @@ module Homebrew
       Hash[ARGV.named.map do |name|
         rack = Formulary.to_rack(name)
         next unless rack.directory?
+
         [rack, rack.subdirs.map { |d| Keg.new(d) }]
       end]
     else

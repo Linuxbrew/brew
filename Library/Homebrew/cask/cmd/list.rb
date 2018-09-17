@@ -32,6 +32,7 @@ module Cask
       def self.list_artifacts(cask)
         cask.artifacts.group_by(&:class).each do |klass, artifacts|
           next unless klass.respond_to?(:english_description)
+
           ohai klass.english_description, artifacts.map(&:summarize_installed)
         end
       end

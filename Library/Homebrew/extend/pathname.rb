@@ -4,12 +4,14 @@ require "metafiles"
 module DiskUsageExtension
   def disk_usage
     return @disk_usage if @disk_usage
+
     compute_disk_usage
     @disk_usage
   end
 
   def file_count
     return @file_count if @file_count
+
     compute_disk_usage
     @file_count
   end
@@ -146,6 +148,7 @@ class Pathname
   # we assume this pathname object is a file obviously
   def write(content, *open_args)
     raise "Will not overwrite #{self}" if exist?
+
     dirname.mkpath
     open("w", *open_args) { |f| f.write(content) }
   end
@@ -153,6 +156,7 @@ class Pathname
   # Only appends to a file that is already created.
   def append_lines(content, *open_args)
     raise "Cannot append file that doesn't exist: #{self}" unless exist?
+
     open("a", *open_args) { |f| f.puts(content) }
   end
 
@@ -274,6 +278,7 @@ class Pathname
 
   def verify_checksum(expected)
     raise ChecksumMissingError if expected.nil? || expected.empty?
+
     actual = Checksum.new(expected.hash_type, send(expected.hash_type).downcase)
     raise ChecksumMismatchError.new(self, expected, actual) unless expected == actual
   end
@@ -364,6 +369,7 @@ class Pathname
     dst.mkpath
     Pathname.glob("#{self}/*") do |file|
       next if file.directory?
+
       dst.install(file)
       new_file = dst.join(file.basename)
       file.write_env_script(new_file, env)
@@ -386,11 +392,13 @@ class Pathname
     Pathname(from).children.each do |p|
       next if p.directory?
       next unless Metafiles.copy?(p.basename.to_s)
+
       # Some software symlinks these files (see help2man.rb)
       filename = p.resolved_path
       # Some software links metafiles together, so by the time we iterate to one of them
       # we may have already moved it. libxml2's COPYING and Copyright are affected by this.
       next unless filename.exist?
+
       filename.chmod 0644
       install(filename)
     end

@@ -16,6 +16,7 @@ module RuboCop
 
           patches_node = find_method_def(body, :patches)
           return if patches_node.nil?
+
           legacy_patches = find_strings(patches_node)
           problem "Use the patch DSL instead of defining a 'patches' method"
           legacy_patches.each { |p| patch_problems(p) }
@@ -74,6 +75,7 @@ module RuboCop
           end
 
           return unless regex_match_group(patch, %r{^http://bugs\.debian\.org})
+
           problem <<~EOS.chomp
             Patches from Debian should be https://, not http:
             #{patch_url}

@@ -29,6 +29,7 @@ module FormulaCellarChecks
 
   def check_openssl_links
     return unless formula.prefix.directory?
+
     keg = Keg.new(formula.prefix)
     system_openssl = keg.mach_o_files.select do |obj|
       dlls = obj.dynamically_linked_libraries
@@ -64,6 +65,7 @@ module FormulaCellarChecks
 
   def check_linkage
     return unless formula.prefix.directory?
+
     keg = Keg.new(formula.prefix)
 
     CacheStoreDatabase.use(:linkage) do |db|

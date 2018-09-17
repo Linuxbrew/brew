@@ -46,6 +46,7 @@ class FakeSystemCommand
     unless responses.key?(command)
       raise("no response faked for #{command.inspect}, faked responses are: #{responses.inspect}")
     end
+
     system_calls[command] += 1
 
     response = responses[command]

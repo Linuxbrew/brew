@@ -16,9 +16,11 @@ class Keg
       link = file.readlink
       # Don't fix relative symlinks
       next unless link.absolute?
+
       link_starts_cellar = link.to_s.start_with?(HOMEBREW_CELLAR.to_s)
       link_starts_prefix = link.to_s.start_with?(HOMEBREW_PREFIX.to_s)
       next if !link_starts_cellar && !link_starts_prefix
+
       new_src = link.relative_path_from(file.parent)
       file.unlink
       FileUtils.ln_s(new_src, file)
@@ -70,6 +72,7 @@ class Keg
       }
       changed = s.gsub!(Regexp.union(replacements.keys.sort_by(&:length).reverse), replacements)
       next unless changed
+
       changed_files += [first, *rest].map { |file| file.relative_path_from(path) }
 
       begin
@@ -102,6 +105,7 @@ class Keg
       until io.eof?
         file = Pathname.new(io.readline.chomp)
         next if file.symlink?
+
         yield file if hardlinks.add? file.stat.ino
       end
     end
@@ -126,6 +130,7 @@ class Keg
         next false if pn.basename.to_s == "orig-prefix.txt" # for python virtualenvs
         next true if pn == self/".brew/#{name}.rb"
         next true if Metafiles::EXTENSIONS.include?(pn.extname)
+
         if pn.text_executable?
           text_files << pn
           next true
@@ -144,8 +149,10 @@ class Keg
         # will be `nil` for those lines
         next unless info
         next unless info.include?("text")
+
         path = Pathname.new(path)
         next unless files.include?(path)
+
         text_files << path
       end
     end
@@ -158,6 +165,7 @@ class Keg
 
     path.find do |pn|
       next if pn.symlink? || pn.directory? || ![".la", ".lai"].include?(pn.extname)
+
       libtool_files << pn
     end
     libtool_files

@@ -21,6 +21,7 @@ module Homebrew
       puts_options Formula.installed.sort
     else
       raise FormulaUnspecifiedError if ARGV.named.empty?
+
       puts_options ARGV.formulae
     end
   end
@@ -28,6 +29,7 @@ module Homebrew
   def puts_options(formulae)
     formulae.each do |f|
       next if f.options.empty?
+
       if ARGV.include? "--compact"
         puts f.options.as_flags.sort * " "
       else

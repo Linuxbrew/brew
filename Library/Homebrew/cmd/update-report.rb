@@ -92,6 +92,7 @@ module Homebrew
     updated_taps = []
     Tap.each do |tap|
       next unless tap.git?
+
       begin
         reporter = Reporter.new(tap)
       rescue Reporter::ReporterRevisionUnsetError => e
@@ -150,8 +151,10 @@ module Homebrew
 
   def install_core_tap_if_necessary
     return if ENV["HOMEBREW_UPDATE_TEST"]
+
     core_tap = CoreTap.instance
     return if core_tap.installed?
+
     CoreTap.ensure_installed!
     revision = core_tap.git_head
     ENV["HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE"] = revision
@@ -236,6 +239,7 @@ class Reporter
         dst_full_name = tap.formula_file_to_name(dst)
         # Don't report formulae that are moved within a tap but not renamed
         next if src_full_name == dst_full_name
+
         @report[:D] << src_full_name
         @report[:A] << dst_full_name
       end
@@ -302,6 +306,7 @@ class Reporter
       # This means it is a Cask
       if report[:DC].include? full_name
         next unless (HOMEBREW_PREFIX/"Caskroom"/new_name).exist?
+
         new_tap = Tap.fetch(new_tap_name)
         new_tap.install unless new_tap.installed?
         ohai "#{name} has been moved to Homebrew.", <<~EOS
@@ -309,6 +314,7 @@ class Reporter
             brew cask uninstall --force #{name}
         EOS
         next if (HOMEBREW_CELLAR/new_name.split("/").last).directory?
+
         ohai "Installing #{new_name}..."
         system HOMEBREW_BREW_FILE, "install", new_full_name
         begin
@@ -322,8 +328,10 @@ class Reporter
       end
 
       next unless (dir = HOMEBREW_CELLAR/name).exist? # skip if formula is not installed.
+
       tabs = dir.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
       next unless tabs.first.tap == tap # skip if installed formula is not from this tap.
+
       new_tap = Tap.fetch(new_tap_name)
       # For formulae migrated to cask: Auto-install cask or provide install instructions.
       if new_tap_name.start_with?("homebrew/cask")
@@ -445,6 +453,7 @@ class ReporterHub
     end.compact
 
     return if formulae.empty?
+
     # Dump formula list.
     ohai title
     puts Formatter.columns(formulae.sort)

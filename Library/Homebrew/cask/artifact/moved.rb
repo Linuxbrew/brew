@@ -30,6 +30,7 @@ module Cask
           message = "It seems there is already #{self.class.english_article} " \
                     "#{self.class.english_name} at '#{target}'"
           raise CaskError, "#{message}." unless force
+
           opoo "#{message}; overwriting."
           delete(target, force: force, command: command, **options)
         end
@@ -55,12 +56,14 @@ module Cask
           message = "It seems there is already #{self.class.english_article} " \
                     "#{self.class.english_name} at '#{source}'"
           raise CaskError, "#{message}." unless force
+
           opoo "#{message}; overwriting."
           delete(source, force: force, command: command, **options)
         end
 
         unless target.exist?
           return if skip || force
+
           raise CaskError, "It seems the #{self.class.english_name} source '#{target}' is not there."
         end
 

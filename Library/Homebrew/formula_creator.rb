@@ -34,6 +34,7 @@ module Homebrew
 
     def update_path
       return if @name.nil? || @tap.nil?
+
       @path = Formulary.path "#{@tap}/#{@name}"
     end
 

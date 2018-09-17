@@ -82,6 +82,7 @@ class FormulaInstaller
 
   def build_bottle?
     return false unless @build_bottle
+
     !formula.bottle_disabled?
   end
 
@@ -94,6 +95,7 @@ class FormulaInstaller
     return false if ARGV.cc
     return false unless options.empty?
     return false if formula.bottle_disabled?
+
     unless formula.pour_bottle?
       if install_bottle_options[:warn] && formula.pour_bottle_check_unsatisfied_reason
         opoo <<~EOS
@@ -124,6 +126,7 @@ class FormulaInstaller
     return false unless dep.bottle && dep.pour_bottle?
     return false unless build.used_options.empty?
     return false unless dep.bottle.compatible_cellar?
+
     true
   end
 
@@ -185,6 +188,7 @@ class FormulaInstaller
     end
 
     return if pinned_unsatisfied_deps.empty?
+
     raise CannotInstallFormulaError,
       "You must `brew unpin #{pinned_unsatisfied_deps * " "}` as installing " \
       "#{formula.full_name} requires the latest version of pinned dependencies"
@@ -293,10 +297,12 @@ class FormulaInstaller
           formula.rack.rmdir_if_possible
         end
         raise if ARGV.homebrew_developer? || e.is_a?(Interrupt)
+
         @pour_failed = true
         onoe e.message
         opoo "Bottle installation failed: building from source."
         raise BuildToolsError, [formula] unless DevelopmentTools.installed?
+
         compute_and_install_dependencies unless ignore_deps?
       else
         @poured_bottle = true
@@ -401,6 +407,7 @@ class FormulaInstaller
     req_map.each_pair do |dependent, reqs|
       reqs.each do |req|
         next if dependent.installed? && req.name == "maximummacos"
+
         @requirement_messages << "#{dependent}: #{req.message}"
         fatals << req if req.fatal?
       end
@@ -512,6 +519,7 @@ class FormulaInstaller
     end
     options += effective_build_options_for(formula).used_options.to_a
     return if options.empty?
+
     options.join(" ")
   end
 
@@ -589,6 +597,7 @@ class FormulaInstaller
     caveats = Caveats.new(formula)
 
     return if caveats.empty?
+
     @show_summary_heading = true
     ohai "Caveats", caveats.to_s
     Homebrew.messages.record_caveats(formula, caveats)
@@ -618,6 +627,7 @@ class FormulaInstaller
     # Updates the cache for a particular formula after doing an install
     CacheStoreDatabase.use(:linkage) do |db|
       break unless db.created?
+
       LinkageChecker.new(keg, formula, cache_db: db, rebuild_cache: true)
     end
 
@@ -826,6 +836,7 @@ class FormulaInstaller
     end
 
     return if link_overwrite_backup.empty?
+
     opoo "These files were overwritten during `brew link` step:"
     puts link_overwrite_backup.keys
     puts
@@ -835,6 +846,7 @@ class FormulaInstaller
 
   def install_plist
     return unless formula.plist
+
     formula.plist_path.atomic_write(formula.plist)
     formula.plist_path.chmod 0644
     log = formula.var/"log"
@@ -947,6 +959,7 @@ class FormulaInstaller
 
   def problem_if_output(output)
     return unless output
+
     opoo output
     @show_summary_heading = true
   end
@@ -969,6 +982,7 @@ class FormulaInstaller
 
   def lock
     return unless self.class.locked.empty?
+
     unless ignore_deps?
       formula.recursive_dependencies.each do |dep|
         self.class.locked << dep.to_formula
@@ -982,6 +996,7 @@ class FormulaInstaller
 
   def unlock
     return unless hold_locks?
+
     self.class.locked.each(&:unlock)
     self.class.locked.clear
     @hold_locks = false
@@ -990,6 +1005,7 @@ class FormulaInstaller
   def puts_requirement_messages
     return unless @requirement_messages
     return if @requirement_messages.empty?
+
     $stderr.puts @requirement_messages
   end
 end

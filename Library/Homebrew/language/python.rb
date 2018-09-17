@@ -5,6 +5,7 @@ module Language
     def self.major_minor_version(python)
       version = /\d\.\d/.match `#{python} --version 2>&1`
       return unless version
+
       Version.create(version.to_s)
     end
 
@@ -17,6 +18,7 @@ module Language
       { "python@3" => "python3", "python@2" => "python2.7" }.each do |python_formula, python|
         python_formula = Formulary.factory(python_formula)
         next if build.without? python_formula.to_s
+
         version = major_minor_version python
         ENV["PYTHONPATH"] = if python_formula.installed?
           nil
@@ -32,6 +34,7 @@ module Language
       version = major_minor_version python
       return unless homebrew_site_packages(version).directory?
       return unless homebrew_site_packages(version).writable_real?
+
       probe_file = homebrew_site_packages(version)/"homebrew-pth-probe.pth"
       begin
         probe_file.atomic_write("import site; site.homebrew_was_here = True")
@@ -101,8 +104,10 @@ module Language
         xy = Language::Python.major_minor_version python
         pth_contents = formula_deps.map do |d|
           next if d.build?
+
           dep_site_packages = Formula[d.name].opt_lib/"python#{xy}/site-packages"
           next unless dep_site_packages.exist?
+
           "import site; site.addsitedir('#{dep_site_packages}')\n"
         end.compact
         unless pth_contents.empty?
@@ -121,6 +126,7 @@ module Language
       # @api private
       def needs_python?(python)
         return true if build.with?(python)
+
         (requirements.to_a | deps).any? { |r| r.name == python && r.required? }
       end
 
@@ -136,6 +142,7 @@ module Language
         if python.nil?
           wanted = %w[python python@2 python2 python3 python@3].select { |py| needs_python?(py) }
           raise FormulaAmbiguousPythonError, self if wanted.size > 1
+
           python = wanted.first || "python2.7"
           python = "python3" if python == "python"
         end
@@ -184,6 +191,7 @@ module Language
           @venv_root.find do |f|
             next unless f.symlink?
             next unless (rp = f.realpath.to_s).start_with? HOMEBREW_CELLAR
+
             python = rp.include?("python@2") ? "python@2" : "python"
             new_target = rp.sub %r{#{HOMEBREW_CELLAR}/#{python}/[^/]+}, Formula[python].opt_prefix
             f.unlink
@@ -212,6 +220,7 @@ module Language
           targets.each do |t|
             if t.respond_to? :stage
               next if t.name == "homebrew-virtualenv"
+
               t.stage { do_install Pathname.pwd }
             else
               t = t.lines.map(&:strip) if t.respond_to?(:lines) && t =~ /\n/

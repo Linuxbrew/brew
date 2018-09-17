@@ -9,6 +9,7 @@ module Cask
       def initialize(*)
         super
         return if args.empty?
+
         raise ArgumentError, "#{self.class.command_name} does not take arguments."
       end
 
@@ -151,6 +152,7 @@ module Cask
       def self.check_sip
         csrutil = "/usr/bin/csrutil"
         return "N/A" unless File.executable?(csrutil)
+
         Open3.capture2(csrutil, "status")
              .first
              .gsub("This is an unsupported configuration, likely to break in " \
@@ -186,6 +188,7 @@ module Cask
 
       def self.render_env_var(var)
         return unless ENV.key?(var)
+
         var = %Q(#{var}="#{ENV[var]}")
         puts user_tilde(var)
       end

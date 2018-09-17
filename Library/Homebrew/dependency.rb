@@ -93,11 +93,13 @@ class Dependency
           next
         when :skip
           next if @expand_stack.include? dep.name
+
           expanded_deps.concat(expand(dep.to_formula, &block))
         when :keep_but_prune_recursive_deps
           expanded_deps << dep
         else
           next if @expand_stack.include? dep.name
+
           expanded_deps.concat(expand(dep.to_formula, &block))
           expanded_deps << dep
         end
@@ -167,6 +169,7 @@ class Dependency
     def merge_temporality(deps)
       # Means both build and runtime dependency.
       return [] unless deps.all?(&:build?)
+
       [:build]
     end
   end

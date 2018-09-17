@@ -33,6 +33,7 @@ module Utils
 
   def self.git_path
     return unless git_available?
+
     @git_path ||= Utils.popen_read(
       HOMEBREW_SHIMS_PATH/"scm/git", "--homebrew=print-path"
     ).chuzzle
@@ -40,6 +41,7 @@ module Utils
 
   def self.git_version
     return unless git_available?
+
     @git_version ||= Utils.popen_read(
       HOMEBREW_SHIMS_PATH/"scm/git", "--version"
     ).chomp[/git version (\d+(?:\.\d+)*)/, 1]
@@ -69,6 +71,7 @@ module Utils
 
   def self.git_remote_exists?(url)
     return true unless git_available?
+
     quiet_system "git", "ls-remote", url
   end
 end

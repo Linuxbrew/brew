@@ -90,6 +90,7 @@ module Cask
         cask.artifacts.each do |artifact|
           next unless artifact.respond_to?(:install_phase)
           next unless DSL::ORDINARY_ARTIFACT_CLASSES.include?(artifact.class)
+
           puts artifact.to_s
         end
       end

@@ -13,6 +13,7 @@ module Cask
                        .reject { |cask| audit(cask) }
 
         return if failed_casks.empty?
+
         raise CaskError, "audit failed for casks: #{failed_casks.join(" ")}"
       end
 

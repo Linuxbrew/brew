@@ -37,6 +37,7 @@ module RuboCop
 
             next unless option =~ /^with(out)?-(?:checks?|tests)$/
             next if depends_on?("check", :optional, :recommended)
+
             problem "Use '--with#{Regexp.last_match(1)}-test' instead of '--#{option}'."\
                     " Migrate '--#{option}' with `deprecated_option`."
           end
@@ -52,6 +53,7 @@ module RuboCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
           problem DEP_OPTION if method_called_ever?(body_node, :deprecated_option)
           return unless formula_tap == "homebrew-core"
+
           problem OPTION if method_called_ever?(body_node, :option)
         end
       end

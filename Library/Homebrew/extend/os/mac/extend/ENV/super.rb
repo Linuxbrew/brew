@@ -5,6 +5,7 @@ module Superenv
     # @private
     def bin
       return unless DevelopmentTools.installed?
+
       (HOMEBREW_SHIMS_PATH/"mac/super").realpath
     end
   end

@@ -30,6 +30,7 @@ module Cask
       def load(**pairs)
         pairs.each do |key, value|
           raise "invalid depends_on key: '#{key.inspect}'" unless VALID_KEYS.include?(key)
+
           self[key] = send(:"#{key}=", *value)
         end
       end
@@ -65,11 +66,13 @@ module Cask
         @macos ||= []
         macos = if args.count == 1 && args.first =~ /^\s*(<|>|[=<>]=)\s*(\S+)\s*$/
           raise "'depends_on macos' comparison expressions cannot be combined" unless @macos.empty?
+
           operator = Regexp.last_match[1].to_sym
           release = self.class.coerce_os_release(Regexp.last_match[2])
           [[operator, release]]
         else
           raise "'depends_on macos' comparison expressions cannot be combined" if @macos.first.is_a?(Symbol)
+
           args.map(&self.class.method(:coerce_os_release)).sort
         end
         @macos.concat(macos)
@@ -82,11 +85,13 @@ module Cask
         end
         invalid_arches = arches - VALID_ARCHES.keys
         raise "invalid 'depends_on arch' values: #{invalid_arches.inspect}" unless invalid_arches.empty?
+
         @arch.concat(arches.map { |arch| VALID_ARCHES[arch] })
       end
 
       def x11=(arg)
         raise "invalid 'depends_on x11' value: #{arg.inspect}" unless [true, false].include?(arg)
+
         @x11 = arg
       end
     end

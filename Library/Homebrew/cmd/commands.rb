@@ -48,8 +48,10 @@ module Homebrew
     cmd_paths.each_with_object([]) do |path, cmds|
       Dir["#{path}/brew-*"].each do |file|
         next unless File.executable?(file)
+
         cmd = File.basename(file, ".rb")[5..-1]
         next if cmd.include?(".")
+
         cmds << cmd
       end
     end.sort

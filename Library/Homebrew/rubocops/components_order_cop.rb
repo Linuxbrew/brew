@@ -55,8 +55,10 @@ module RuboCop
           # Check if each present_components is above rest of the present_components
           @present_components.take(@present_components.size - 1).each_with_index do |preceding_component, p_idx|
             next if preceding_component.empty?
+
             @present_components.drop(p_idx + 1).each do |succeeding_component|
               next if succeeding_component.empty?
+
               @offensive_nodes = check_precedence(preceding_component, succeeding_component)
               component_problem @offensive_nodes[0], @offensive_nodes[1] if @offensive_nodes
             end
@@ -71,6 +73,7 @@ module RuboCop
         # Method to format message for reporting component precedence violations
         def component_problem(c1, c2)
           return if WHITELIST.include?(@formula_name)
+
           problem "`#{format_component(c1)}` (line #{line_number(c1)}) " \
                   "should be put before `#{format_component(c2)}` " \
                   "(line #{line_number(c2)})"

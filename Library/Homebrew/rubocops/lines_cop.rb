@@ -9,12 +9,14 @@ module RuboCop
           [:automake, :ant, :autoconf, :emacs, :expat, :libtool, :mysql, :perl,
            :postgresql, :python, :python3, :rbenv, :ruby].each do |dependency|
             next unless depends_on?(dependency)
+
             problem ":#{dependency} is deprecated. Usage should be \"#{dependency}\"."
           end
 
           { apr: "apr-util", fortran: "gcc", gpg: "gnupg", hg: "mercurial",
             mpi: "open-mpi", python2: "python" }.each do |requirement, dependency|
             next unless depends_on?(requirement)
+
             problem ":#{requirement} is deprecated. Usage should be \"#{dependency}\"."
           end
 
@@ -27,6 +29,7 @@ module RuboCop
           begin_pos = start_column(parent_class_node)
           end_pos = end_column(class_node)
           return unless begin_pos-end_pos != 3
+
           problem "Use a space in class inheritance: " \
                   "class #{@formula_name.capitalize} < #{class_name(parent_class_node)}"
         end
@@ -47,6 +50,7 @@ module RuboCop
               '# system "cmake',
             ].each do |template_comment|
               next unless comment.include?(template_comment)
+
               problem "Please remove default template comments"
               break
             end
@@ -55,6 +59,7 @@ module RuboCop
           audit_comments do |comment|
             # Commented-out depends_on
             next unless comment =~ /#\s*depends_on\s+(.+)\s*$/
+
             problem "Commented-out dependency #{Regexp.last_match(1)}"
           end
         end
@@ -90,29 +95,34 @@ module RuboCop
 
           find_instance_method_call(body_node, :build, :without?) do |method|
             next unless unless_modifier?(method.parent)
+
             correct = method.source.gsub("out?", "?")
             problem "Use if #{correct} instead of unless #{method.source}"
           end
 
           find_instance_method_call(body_node, :build, :with?) do |method|
             next unless unless_modifier?(method.parent)
+
             correct = method.source.gsub("?", "out?")
             problem "Use if #{correct} instead of unless #{method.source}"
           end
 
           find_instance_method_call(body_node, :build, :with?) do |method|
             next unless expression_negated?(method)
+
             problem "Don't negate 'build.with?': use 'build.without?'"
           end
 
           find_instance_method_call(body_node, :build, :without?) do |method|
             next unless expression_negated?(method)
+
             problem "Don't negate 'build.without?': use 'build.with?'"
           end
 
           find_instance_method_call(body_node, :build, :without?) do |method|
             arg = parameters(method).first
             next unless match = regex_match_group(arg, /^-?-?without-(.*)/)
+
             problem "Don't duplicate 'without': " \
                     "Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
           end
@@ -120,12 +130,14 @@ module RuboCop
           find_instance_method_call(body_node, :build, :with?) do |method|
             arg = parameters(method).first
             next unless match = regex_match_group(arg, /^-?-?with-(.*)/)
+
             problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
           end
 
           find_instance_method_call(body_node, :build, :include?) do |method|
             arg = parameters(method).first
             next unless match = regex_match_group(arg, /^with(out)?-(.*)/)
+
             problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of " \
                     "build.include? 'with#{match[1]}-#{match[2]}'"
           end
@@ -133,12 +145,14 @@ module RuboCop
           find_instance_method_call(body_node, :build, :include?) do |method|
             arg = parameters(method).first
             next unless match = regex_match_group(arg, /^\-\-(.*)$/)
+
             problem "Reference '#{match[1]}' without dashes"
           end
         end
 
         def unless_modifier?(node)
           return false unless node.if_type?
+
           node.modifier_form? && node.unless?
         end
       end
@@ -155,6 +169,7 @@ module RuboCop
           find_all_blocks(body_node, :inreplace) do |node|
             block_arg = node.arguments.children.first
             next unless block_arg.source.size > 1
+
             problem "\"inreplace <filenames> do |s|\" is preferred over \"|#{block_arg.source}|\"."
           end
 
@@ -166,6 +181,7 @@ module RuboCop
 
           [:mac?, :linux?].each do |method_name|
             next unless formula_tap == "homebrew-core"
+
             find_instance_method_call(body_node, "OS", method_name) do |check|
               problem "Don't use #{check.source}; Homebrew/core only supports macOS"
             end
@@ -173,11 +189,13 @@ module RuboCop
 
           find_instance_call(body_node, "ARGV") do |method_node|
             next if [:debug?, :verbose?, :value].index(method_node.method_name)
+
             problem "Use build instead of ARGV to check options"
           end
 
           find_instance_method_call(body_node, :man, :+) do |method|
             next unless match = regex_match_group(parameters(method).first, /^man[1-8]$/)
+
             problem "\"#{method.source}\" should be \"#{match[0]}\""
           end
 
@@ -203,6 +221,7 @@ module RuboCop
           # Prefer formula path shortcuts in strings
           formula_path_strings(body_node, :share) do |p|
             next unless match = regex_match_group(p, %r{^(/(man))/?})
+
             problem "\"\#{share}#{match[1]}\" should be \"\#{#{match[2]}}\""
           end
 
@@ -222,11 +241,13 @@ module RuboCop
             key, value = destructure_hash(parameters(method).first)
             next if key.nil? || value.nil?
             next unless match = regex_match_group(value, /^(lua|perl|python|ruby)(\d*)/)
+
             problem "#{match[1]} modules should be vendored rather than use deprecated #{method.source}`"
           end
 
           find_every_method_call_by_name(body_node, :system).each do |method|
             next unless match = regex_match_group(parameters(method).first, /^(env|export)(\s+)?/)
+
             problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
           end
 
@@ -234,9 +255,11 @@ module RuboCop
             param = parameters(method).first
             dep, option_child_nodes = hash_dep(param)
             next if dep.nil? || option_child_nodes.empty?
+
             option_child_nodes.each do |option|
               find_strings(option).each do |dependency|
                 next unless match = regex_match_group(dependency, /(with(out)?-\w+|c\+\+11)/)
+
                 problem "Dependency #{string_content(dep)} should not use option #{match[0]}"
               end
             end
@@ -244,12 +267,14 @@ module RuboCop
 
           find_instance_method_call(body_node, :version, :==) do |method|
             next unless parameters_passed?(method, "HEAD")
+
             problem "Use 'build.head?' instead of inspecting 'version'"
           end
 
           find_instance_method_call(body_node, "ARGV", :include?) do |method|
             param = parameters(method).first
             next unless match = regex_match_group(param, /^--(HEAD|devel)/)
+
             problem "Use \"if build.#{match[1].downcase}?\" instead"
           end
 
@@ -288,15 +313,18 @@ module RuboCop
 
           find_method_with_args(body_node, :system, /^(otool|install_name_tool|lipo)/) do
             next if @formula_name == "cctools"
+
             problem "Use ruby-macho instead of calling #{@offensive_node.source}"
           end
 
           find_every_method_call_by_name(body_node, :system).each do |method_node|
             # Skip Kibana: npm cache edge (see formula for more details)
             next if @formula_name =~ /^kibana(@\d[\d.]*)?$/
+
             first_param, second_param = parameters(method_node)
             next if !node_equals?(first_param, "npm") ||
                     !node_equals?(second_param, "install")
+
             offending_node(method_node)
             problem "Use Language::Node for npm install args" unless languageNodeModule?(method_node)
           end
@@ -316,11 +344,13 @@ module RuboCop
 
           find_instance_method_call(body_node, :build, :universal?) do
             next if @formula_name == "wine"
+
             problem "macOS has been 64-bit only since 10.6 so build.universal? is deprecated."
           end
 
           find_instance_method_call(body_node, "ENV", :universal_binary) do
             next if @formula_name == "wine"
+
             problem "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated."
           end
 
@@ -330,6 +360,7 @@ module RuboCop
 
           find_every_method_call_by_name(body_node, :depends_on).each do |method|
             next unless method_called?(method, :new)
+
             problem "`depends_on` can take requirement classes instead of instances"
           end
 
@@ -342,9 +373,11 @@ module RuboCop
 
           find_instance_method_call(body_node, "Dir", :[]) do |method|
             next unless parameters(method).size == 1
+
             path = parameters(method).first
             next unless path.str_type?
             next unless match = regex_match_group(path, /^[^\*{},]+$/)
+
             problem "Dir([\"#{string_content(path)}\"]) is unnecessary; just use \"#{match[0]}\""
           end
 
@@ -356,12 +389,14 @@ module RuboCop
           find_every_method_call_by_name(body_node, :system).each do |method|
             param = parameters(method).first
             next unless match = regex_match_group(param, fileutils_methods)
+
             problem "Use the `#{match}` Ruby method instead of `#{method.source}`"
           end
         end
 
         def modifier?(node)
           return false unless node.if_type?
+
           node.modifier_form?
         end
 

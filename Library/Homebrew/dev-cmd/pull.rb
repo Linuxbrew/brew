@@ -64,6 +64,7 @@ module GitHub
   def test_bot_user(user, test_bot)
     return test_bot if test_bot
     return "BrewTestBot" if user.casecmp("homebrew").zero?
+
     "#{user.capitalize}TestBot"
   end
 end
@@ -194,6 +195,7 @@ module Homebrew
           "--diff-filter=AM", orig_revision, "HEAD", "--", tap.formula_dir.to_s
         ).each_line do |line|
           next unless line.end_with? ".rb\n"
+
           name = "#{tap.name}/#{File.basename(line.chomp, ".rb")}"
           changed_formulae_names << name
         end
@@ -227,6 +229,7 @@ module Homebrew
           end
         else
           next unless f.bottle_defined?
+
           opoo "#{f.full_name} has a bottle: do you need to update it with --bottle?"
         end
       end
@@ -320,8 +323,10 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
+
         bintray_org = args.bintray_org || tap.user.downcase
         next unless publish_bottle_file_on_bintray(f, bintray_org, bintray_creds)
+
         published << f.full_name
       end
     else
@@ -481,6 +486,7 @@ module Homebrew
     if info.nil?
       raise "Failed publishing bottle: failed reading formula info for #{f.full_name}"
     end
+
     unless info.bottle_info_any
       opoo "No bottle defined in formula #{package}"
       return false
@@ -495,6 +501,7 @@ module Homebrew
     true
   rescue => e
     raise unless @args.warn_on_publish_failure?
+
     onoe e
     false
   end
@@ -521,14 +528,17 @@ module Homebrew
 
     def bottle_tags
       return [] unless info["bottle"]["stable"]
+
       info["bottle"]["stable"]["files"].keys
     end
 
     def bottle_info(my_bottle_tag = Utils::Bottles.tag)
       tag_s = my_bottle_tag.to_s
       return unless info["bottle"]["stable"]
+
       btl_info = info["bottle"]["stable"]["files"][tag_s]
       return unless btl_info
+
       BottleInfo.new(btl_info["url"], btl_info["sha256"])
     end
 
@@ -623,6 +633,7 @@ module Homebrew
             if retry_count >= max_retries
               raise "Failed to find published #{f} bottle at #{url}!"
             end
+
             print(wrote_dots ? "." : "Waiting on Bintray.")
             wrote_dots = true
             sleep poll_retry_delay_seconds
@@ -647,6 +658,7 @@ module Homebrew
             if retry_count >= max_curl_retries
               raise "Failed to download #{f} bottle from #{url}!"
             end
+
             puts "curl download failed; retrying in #{curl_retry_delay_seconds} sec"
             sleep curl_retry_delay_seconds
             curl_retry_delay_seconds *= 2
@@ -663,6 +675,7 @@ module Homebrew
     headers, = curl_output("--connect-timeout", "15", "--location", "--head", url)
     status_code = headers.scan(%r{^HTTP\/.* (\d+)}).last.first
     return if status_code.start_with?("2")
+
     opoo "The Bintray mirror #{url} is not reachable (HTTP status code #{status_code})."
     opoo "Do you need to upload it with `brew mirror #{name}`?"
   end

@@ -9,6 +9,7 @@ module Cask
         def options
           @options ||= {}
           return @options unless superclass.respond_to?(:options)
+
           superclass.options.merge(@options)
         end
 
@@ -25,11 +26,13 @@ module Cask
           if [true, false].include?(default_value)
             define_method(:"#{method}?") do
               return default_value unless instance_variable_defined?(:"@#{method}")
+
               instance_variable_get(:"@#{method}") == true
             end
           else
             define_method(:"#{method}") do
               return default_value unless instance_variable_defined?(:"@#{method}")
+
               instance_variable_get(:"@#{method}")
             end
           end

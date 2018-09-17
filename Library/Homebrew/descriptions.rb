@@ -39,10 +39,12 @@ class Descriptions
   # repos were updated more recently than it was.
   def self.cache_fresh?
     return false unless CACHE_FILE.exist?
+
     cache_mtime = File.mtime(CACHE_FILE)
 
     Tap.each do |tap|
       next unless tap.git?
+
       repo_mtime = File.mtime(tap.path/".git/refs/heads/master")
       return false if repo_mtime > cache_mtime
     end
@@ -93,6 +95,7 @@ class Descriptions
   # the cache. Save the updated cache to disk, unless explicitly told not to.
   def self.uncache_formulae(formula_names, options = { save: true })
     return unless cache
+
     formula_names.each { |name| @cache.delete(name) }
     save_cache if options[:save]
   end

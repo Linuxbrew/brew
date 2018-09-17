@@ -87,14 +87,17 @@ class Migrator
   def self.needs_migration?(formula)
     oldname = formula.oldname
     return false unless oldname
+
     oldname_rack = HOMEBREW_CELLAR/oldname
     return false if oldname_rack.symlink?
     return false unless oldname_rack.directory?
+
     true
   end
 
   def self.migrate_if_needed(formula)
     return unless Migrator.needs_migration?(formula)
+
     begin
       migrator = Migrator.new(formula)
       migrator.migrate
@@ -193,6 +196,7 @@ class Migrator
     link_newname unless old_linked_keg.nil?
     update_tabs
     return unless formula.outdated?
+
     opoo <<~EOS
       #{Formatter.identifier(newname)} is outdated!
       To avoid broken installations, as soon as possible please run:
@@ -220,6 +224,7 @@ class Migrator
       conflicted = false
       old_cellar.each_child do |c|
         next unless (new_cellar/c.basename).exist?
+
         begin
           FileUtils.rm_rf c
         rescue Errno::EACCES
@@ -243,6 +248,7 @@ class Migrator
 
   def repin
     return unless pinned?
+
     # old_pin_record is a relative symlink and when we try to to read it
     # from <dir> we actually try to find file
     # <dir>/../<...>/../Cellar/name/version.
@@ -323,6 +329,7 @@ class Migrator
   # Link keg to opt if it was linked before migrating.
   def link_oldname_opt
     return unless old_opt_record
+
     old_opt_record.delete if old_opt_record.symlink?
     old_opt_record.make_relative_symlink(new_linked_keg_record)
   end
@@ -340,6 +347,7 @@ class Migrator
   # Remove opt/oldname link if it belongs to newname.
   def unlink_oldname_opt
     return unless old_opt_record
+
     if old_opt_record.symlink? && old_opt_record.exist? \
         && new_linked_keg_record.exist? \
         && new_linked_keg_record.realpath == old_opt_record.realpath
@@ -384,6 +392,7 @@ class Migrator
     end
 
     return if old_linked_keg.nil?
+
     # The keg used to be linked and when we backup everything we restore
     # Cellar/oldname, the target also gets restored, so we are able to
     # create a keg using its old path

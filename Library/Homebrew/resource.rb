@@ -49,6 +49,7 @@ class Resource
   def download_name
     return owner.name if name.nil?
     return escaped_name if owner.nil?
+
     "#{owner.name}--#{escaped_name}"
   end
 
@@ -84,6 +85,7 @@ class Resource
 
   def apply_patches
     return if patches.empty?
+
     ohai "Patching #{name}"
     patches.each(&:apply)
   end
@@ -141,6 +143,7 @@ class Resource
 
   def url(val = nil, **specs)
     return @url if val.nil?
+
     @url = val
     @specs.merge!(specs)
     @using = @specs.delete(:using)

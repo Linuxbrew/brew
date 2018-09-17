@@ -7,6 +7,7 @@ def curl_executable
     "/usr/bin/curl",
   ].compact.map { |c| Pathname(c) }.find(&:executable?)
   raise "no executable curl was found" unless @curl
+
   @curl
 end
 
@@ -83,6 +84,7 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
   unless details[:status]
     # Hack around https://github.com/Homebrew/brew/issues/3199
     return if MacOS.version == :el_capitan
+
     return "The URL #{url} is not reachable"
   end
 
@@ -133,6 +135,7 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
 
   lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
   return unless (90..110).cover?(lenratio)
+
   "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
 end
 

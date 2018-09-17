@@ -115,6 +115,7 @@ module Homebrew
         end
 
         return if depends_on.nil?
+
         primary = option_to_name(depends_on)
         @constraints << [primary, secondary, :optional]
       end
@@ -139,6 +140,7 @@ module Homebrew
           end
 
           next if violations.count < 2
+
           raise OptionConflictError, violations.map(&method(:name_to_option))
         end
       end
@@ -147,6 +149,7 @@ module Homebrew
         @conflicts.each do |mutually_exclusive_options_group|
           @constraints.each do |p, s|
             next unless Set[p, s].subset?(Set[*mutually_exclusive_options_group])
+
             raise InvalidConstraintError.new(p, s)
           end
         end

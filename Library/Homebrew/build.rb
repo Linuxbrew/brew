@@ -32,6 +32,7 @@ class Build
     # Only allow Homebrew-approved directories into the PATH, unless
     # a formula opts-in to allowing the user's path.
     return unless formula.env.userpaths? || reqs.any? { |rq| rq.env.userpaths? }
+
     ENV.userpaths!
   end
 

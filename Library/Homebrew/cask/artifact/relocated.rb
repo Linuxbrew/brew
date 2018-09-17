@@ -11,6 +11,7 @@ module Cask
 
         if target_hash
           raise CaskInvalidError unless target_hash.respond_to?(:keys)
+
           target_hash.assert_valid_keys!(:target)
         end
 
@@ -56,6 +57,7 @@ module Cask
       # bundles. Alfred 2.2 respects it even for App bundles.
       def add_altname_metadata(file, altname, command: nil)
         return if altname.to_s.casecmp(file.basename.to_s).zero?
+
         odebug "Adding #{ALT_NAME_ATTRIBUTE} metadata"
         altnames = command.run("/usr/bin/xattr",
                                 args:         ["-p", ALT_NAME_ATTRIBUTE, file],

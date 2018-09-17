@@ -13,11 +13,13 @@ class LockFile
     @path.parent.mkpath
     create_lockfile
     return if @lockfile.flock(File::LOCK_EX | File::LOCK_NB)
+
     raise OperationInProgressError, @name
   end
 
   def unlock
     return if @lockfile.nil? || @lockfile.closed?
+
     @lockfile.flock(File::LOCK_UN)
     @lockfile.close
   end
@@ -33,6 +35,7 @@ class LockFile
 
   def create_lockfile
     return unless @lockfile.nil? || @lockfile.closed?
+
     @lockfile = @path.open(File::RDWR | File::CREAT)
     @lockfile.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
   end

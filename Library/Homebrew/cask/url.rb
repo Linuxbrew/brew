@@ -18,6 +18,7 @@ class URL
 
     ATTRIBUTES.each do |attribute|
       next unless options.key?(attribute)
+
       instance_variable_set("@#{attribute}", options[attribute])
     end
 

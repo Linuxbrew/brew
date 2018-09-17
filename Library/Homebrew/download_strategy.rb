@@ -139,6 +139,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     return unless @ref_type == :tag
     return unless @revision && current_revision
     return if current_revision == @revision
+
     raise <<~EOS
       #{@ref} tag should be #{@revision}
       but is actually #{current_revision}
@@ -194,6 +195,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
 
   def symlink_location
     return @symlink_location if defined?(@symlink_location)
+
     ext = Pathname(parse_basename(url)).extname
     @symlink_location = @cache/"#{name}--#{version}#{ext}"
   end
@@ -230,6 +232,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
 
   def resolved_url_and_basename
     return @resolved_url_and_basename if defined?(@resolved_url_and_basename)
+
     @resolved_url_and_basename = [url, parse_basename(url)]
   end
 
@@ -301,6 +304,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       FileUtils.ln_s cached_location.relative_path_from(symlink_location.dirname), symlink_location, force: true
     rescue CurlDownloadStrategyError
       raise if urls.empty?
+
       puts "Trying a mirror..."
       retry
     end
@@ -315,6 +319,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   def resolved_url_and_basename
     return @resolved_url_and_basename if defined?(@resolved_url_and_basename)
+
     @resolved_url_and_basename = resolve_url_and_basename(url)
   end
 
@@ -378,6 +383,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   def _curl_opts
     return { user_agent: meta.fetch(:user_agent) } if meta.key?(:user_agent)
+
     {}
   end
 
@@ -417,6 +423,7 @@ class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
 
   def apache_mirrors
     return @apache_mirrors if defined?(@apache_mirrors)
+
     json, = curl_output("--silent", "--location", "#{url}&asjson=1")
     @apache_mirrors = JSON.parse(json)
   rescue JSON::ParserError
@@ -472,6 +479,7 @@ class S3DownloadStrategy < CurlDownloadStrategy
        url !~ %r{^s3://([^.].*?)/(.+)$}
       raise "Bad S3 URL: " + url
     end
+
     bucket = Regexp.last_match(1)
     key = Regexp.last_match(2)
 
@@ -531,6 +539,7 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
     unless @github_token
       raise CurlDownloadStrategyError, "Environmental variable HOMEBREW_GITHUB_API_TOKEN is required."
     end
+
     validate_github_repository_access!
   end
 
@@ -933,6 +942,7 @@ class GitHubGitDownloadStrategy < GitDownloadStrategy
     super
 
     return unless %r{^https?://github\.com/(?<user>[^/]+)/(?<repo>[^/]+)\.git$} =~ @url
+
     @user = user
     @repo = repo
   end
@@ -972,6 +982,7 @@ class GitHubGitDownloadStrategy < GitDownloadStrategy
     else
       return true unless commit
       return true unless @last_commit.start_with?(commit)
+
       if multiple_short_commits_exist?(commit)
         true
       else
@@ -1003,6 +1014,7 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     cached_location.find do |f|
       Find.prune if f.directory? && f.basename.to_s == "CVS"
       next unless f.file?
+
       mtime = f.mtime
       max_mtime = mtime if mtime > max_mtime
     end
@@ -1110,6 +1122,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
     out, = system_command("bzr", args: ["log", "-l", "1", "--timezone=utc", cached_location])
     timestamp = out.chomp
     raise "Could not get any timestamps from bzr!" if timestamp.blank?
+
     Time.parse(timestamp)
   end
 

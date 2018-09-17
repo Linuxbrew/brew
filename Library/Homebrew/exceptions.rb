@@ -429,6 +429,7 @@ class BuildError < RuntimeError
     checks.build_error_checks.each do |check|
       out = checks.send(check)
       next if out.nil?
+
       puts
       ofail out
     end

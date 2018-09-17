@@ -112,6 +112,7 @@ module Cask
 
       def version
         return self if empty? || latest?
+
         self.class.new(yield)
       end
     end

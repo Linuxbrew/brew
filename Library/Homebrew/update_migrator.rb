@@ -176,6 +176,7 @@ module UpdateMigrator
       return if migration_attempted_file.exist?
 
       return unless legacy_cache.writable_real?
+
       FileUtils.touch migration_attempted_file
 
       # This directory could have been compromised if it's world-writable/
@@ -190,6 +191,7 @@ module UpdateMigrator
       legacy_cache.cd do
         legacy_cache.entries.each do |f|
           next if [".", "..", ".migration_attempted"].include? f.to_s
+
           begin
             FileUtils.cp_r f, HOMEBREW_CACHE
           rescue
