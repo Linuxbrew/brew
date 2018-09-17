@@ -65,7 +65,7 @@ If \fB\-\-prune=\fR\fIdays\fR is specified, remove all cache files older than \f
 If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do not actually remove anything\.
 .
 .IP
-If \fB\-s\fR is passed, scrub the cache, including downloads for even the latest versions\. Note downloads for any installed formula or cask will still not be deleted\. If you want to delete those too: \fBrm \-rf $(brew \-\-cache)\fR
+If \fB\-s\fR is passed, scrub the cache, including downloads for even the latest versions\. Note downloads for any installed formula or cask will still not be deleted\. If you want to delete those too: \fBrm \-rf "$(brew \-\-cache)"\fR
 .
 .IP "\(bu" 4
 \fBcommand\fR \fIcmd\fR: Display the path to the file which is used when invoking \fBbrew\fR \fIcmd\fR\.
