@@ -11,7 +11,6 @@ describe "brew commands", :integration_test do
   end
 
   it "prints a list without headers with the --quiet flag" do
-
     expect { brew "commands", "--quiet" }
       .to be_a_success
       .and not_to_output.to_stderr
