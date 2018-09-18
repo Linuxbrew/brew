@@ -105,14 +105,14 @@ describe Pathname do
     it "preserves permissions" do
       File.open(file, "w", 0100777) {}
       file.atomic_write("CONTENT")
-      expect(file.stat.mode).to eq(0100777 & ~File.umask)
+      expect(file.stat.mode.to_s(8)).to eq((0100777 & ~File.umask).to_s(8))
     end
 
     it "preserves default permissions" do
       file.atomic_write("CONTENT")
-      sentinel = file.parent.join("sentinel")
+      sentinel = file.dirname.join("sentinel")
       touch sentinel
-      expect(file.stat.mode).to eq(sentinel.stat.mode)
+      expect(file.stat.mode.to_s(8)).to eq(sentinel.stat.mode.to_s(8))
     end
   end
 
