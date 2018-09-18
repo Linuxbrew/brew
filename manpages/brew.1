@@ -527,7 +527,7 @@ If \fB\-\-merge\fR is specified then \fBgit merge\fR is used to include updates 
 If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full update check even if unnecessary\.
 .
 .IP "\(bu" 4
-\fBupdate\-reset\fR: Fetches and resets Homebrew and all tap repositories using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
+\fBupdate\-reset\fR [\fIrepositories\fR]: Fetches and resets Homebrew and all tap repositories (or the specified \fBrepositories\fR) using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
 .
 .IP "\(bu" 4
 \fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fB\-\-display\-times\fR] [\fIformulae\fR]: Upgrade outdated, unpinned brews (with existing install options)\.
