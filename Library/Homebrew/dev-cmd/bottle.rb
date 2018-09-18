@@ -474,7 +474,7 @@ module Homebrew
                 next unless old_value.empty? || value != old_value
 
                 if key == "cellar" &&
-                   (old_value == "any" || old_value == "any_skip_relocation") &&
+                   ["any", "any_skip_relocation"].include?(old_value) &&
                    value == "/home/linuxbrew/.linuxbrew/Cellar"
                   opoo "#{formula_name}: #{key}: old: #{old_value}, new: #{value}"
                   bottle.cellar old_value.to_sym
