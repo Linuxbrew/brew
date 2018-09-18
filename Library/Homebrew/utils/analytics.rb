@@ -4,7 +4,7 @@ module Utils
   module Analytics
     class << self
       def custom_prefix_label
-        "generic-prefix".freeze
+        "custom-prefix".freeze
       end
 
       def clear_os_prefix_ci
