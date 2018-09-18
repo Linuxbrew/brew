@@ -62,7 +62,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `-s` is passed, scrub the cache, including downloads for even the latest
     versions. Note downloads for any installed formula or cask will still not
-    be deleted. If you want to delete those too: `rm -rf $(brew --cache)`
+    be deleted. If you want to delete those too: `rm -rf "$(brew --cache)"`
 
   * `command` `cmd`:
     Display the path to the file which is used when invoking `brew` `cmd`.
@@ -449,7 +449,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `shellenv`:
     Prints export statements - run them in a shell and this installation of
     Homebrew will be included into your PATH, MANPATH, and INFOPATH.
-    Tip: have your dotfiles eval the output of this command
+
+    HOMEBREW_PREFIX, HOMEBREW_CELLAR and HOMEBREW_REPOSITORY are also exported
+    to save multiple queries of those variables.
+
+    Consider adding evaluating the output in your dotfiles (e.g. `~/.profile`)
+    with `eval $(brew shellenv)`
 
   * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=``cops`|`--except-cops=``cops`] [`files`|`taps`|`formulae`]:
     Check formulae or files for conformance to Homebrew style guidelines.
@@ -649,7 +654,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     the list is formatted for export to `bash`(1) unless `--plain` is passed.
 
   * `--prefix`:
-    Display Homebrew's install path. *Default:* `/usr/local`
+    Display Homebrew's install path. *Default:* `/usr/local` on macOS and `/home/linuxbrew/.linuxbrew` on Linux
 
   * `--prefix` `formula`:
     Display the location in the cellar where `formula` is or would be installed.
@@ -1353,15 +1358,15 @@ Former Linuxbrew maintainers with significant contributions include Bob W. Hogg.
 
 Homebrew's lead maintainer is Mike McQuaid.
 
-Homebrew's project leadership committee is Mike McQuaid, Dominyk Tiller, JCount, Misty De Meo and Markus Reiter.
+Homebrew's project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter.
 
-Homebrew/brew's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff.
+Homebrew/brew's other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff.
 
 Homebrew/brew's Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman.
 
-Homebrew/homebrew-core's other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, Steven Peters, JCount, Misty De Meo and Tom Schoonjans.
+Homebrew/homebrew-core's other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, Steven Peters, JCount, Misty De Meo and Tom Schoonjans.
 
-Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
+Former maintainers with significant contributions include Dominyk Tiller, Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
 
 ## BUGS
 

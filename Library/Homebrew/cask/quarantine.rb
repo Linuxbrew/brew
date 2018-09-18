@@ -17,18 +17,24 @@ module Cask
 
       if swift.nil?
         odebug "Swift is not available on this system."
-        return :no_swift
+        :no_swift
+      else
+        api_check = system_command(swift,
+                                   args: [QUARANTINE_SCRIPT],
+                                   print_stderr: false)
+
+        case api_check.exit_status
+        when 5
+          odebug "This feature requires the macOS 10.10 SDK or higher."
+          :no_quarantine
+        when 2
+          odebug "Quarantine is available."
+          :quarantine_available
+        else
+          odebug "Unknown support status"
+          :unknown
+        end
       end
-
-      api_check = system_command(swift, args: [QUARANTINE_SCRIPT])
-
-      if api_check.exit_status == 5
-        odebug "This feature requires the macOS 10.10 SDK or higher."
-        return :no_quarantine
-      end
-
-      odebug "Quarantine is available."
-      :quarantine_available
     end
 
     def available?
@@ -73,12 +79,12 @@ module Cask
       odebug "Releasing #{download_path} from quarantine"
 
       quarantiner = system_command("/usr/bin/xattr",
-                                  args: [
-                                    "-d",
-                                    QUARANTINE_ATTRIBUTE,
-                                    download_path,
-                                  ],
-                                  print_stderr: false)
+                                   args: [
+                                     "-d",
+                                     QUARANTINE_ATTRIBUTE,
+                                     download_path,
+                                   ],
+                                   print_stderr: false)
 
       return if quarantiner.success?
 
@@ -93,12 +99,13 @@ module Cask
       odebug "Quarantining #{download_path}"
 
       quarantiner = system_command(swift,
-                                  args: [
-                                    QUARANTINE_SCRIPT,
-                                    download_path,
-                                    cask.url.to_s,
-                                    cask.homepage.to_s,
-                                  ])
+                                   args: [
+                                     QUARANTINE_SCRIPT,
+                                     download_path,
+                                     cask.url.to_s,
+                                     cask.homepage.to_s,
+                                   ],
+                                   print_stderr: false)
 
       return if quarantiner.success?
 

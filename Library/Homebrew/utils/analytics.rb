@@ -3,6 +3,10 @@ require "erb"
 module Utils
   module Analytics
     class << self
+      def custom_prefix_label
+        "custom-prefix".freeze
+      end
+
       def clear_os_prefix_ci
         return unless instance_variable_defined?(:@os_prefix_ci)
         remove_instance_variable(:@os_prefix_ci)
@@ -11,9 +15,7 @@ module Utils
       def os_prefix_ci
         @os_prefix_ci ||= begin
           os = OS_VERSION
-          if HOMEBREW_PREFIX.to_s != HOMEBREW_DEFAULT_PREFIX
-            prefix = OS.mac? ? ", non-/usr/local" : ", custom-prefix"
-          end
+          prefix = ", #{custom_prefix_label}" if HOMEBREW_PREFIX.to_s != Homebrew::DEFAULT_PREFIX
           ci = ", CI" if ENV["CI"]
           "#{os}#{prefix}#{ci}"
         end
@@ -22,7 +24,12 @@ module Utils
       def report(type, metadata = {})
         return if ENV["HOMEBREW_NO_ANALYTICS"] || ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"]
 
-        args = %W[
+        args = []
+
+        # do not load .curlrc unless requested (must be the first argument)
+        args << "-q" unless ENV["HOMEBREW_CURLRC"]
+
+        args += %W[
           --max-time 3
           --user-agent #{HOMEBREW_USER_AGENT_CURL}
           --data v=1
@@ -47,14 +54,14 @@ module Utils
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         if ENV["HOMEBREW_ANALYTICS_DEBUG"]
           url = "https://www.google-analytics.com/debug/collect"
-          puts "#{ENV["HOMEBREW_CURL"]} #{url} #{args.join(" ")}"
-          puts Utils.popen_read ENV["HOMEBREW_CURL"], url, *args
+          puts "#{ENV["HOMEBREW_CURL"]} #{args.join(" ")} #{url}"
+          puts Utils.popen_read ENV["HOMEBREW_CURL"], *args, url
         else
           pid = fork do
             exec ENV["HOMEBREW_CURL"],
-              "https://www.google-analytics.com/collect",
+              *args,
               "--silent", "--output", "/dev/null",
-              *args
+              "https://www.google-analytics.com/collect"
           end
           Process.detach pid
         end
@@ -81,3 +88,5 @@ module Utils
     end
   end
 end
+
+require "extend/os/analytics"

@@ -1,0 +1,21 @@
+jobs:
+- job: macOS
+  pool:
+    vmImage: xcode9-macos10.13
+  steps:
+    - bash: |
+        rm -rf /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask*
+        brew update-reset
+        brew test-bot
+      displayName: brew test-bot
+      env:
+        HOMEBREW_GITHUB_API_TOKEN: $(github.publicApiToken)
+- job: Linux
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+    - bash: |
+        "$PWD/bin/brew" test-bot
+      displayName: brew test-bot
+      env:
+        HOMEBREW_GITHUB_API_TOKEN: $(github.publicApiToken)

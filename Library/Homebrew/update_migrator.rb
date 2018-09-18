@@ -256,8 +256,8 @@ module UpdateMigrator
     end
 
     def migrate_legacy_repository_if_necessary
-      return unless HOMEBREW_PREFIX.to_s == "/usr/local"
-      return unless HOMEBREW_REPOSITORY.to_s == "/usr/local"
+      return unless Homebrew.default_prefix?
+      return unless Homebrew.default_prefix?(HOMEBREW_REPOSITORY)
 
       ohai "Migrating HOMEBREW_REPOSITORY (please wait)..."
 
@@ -273,7 +273,7 @@ module UpdateMigrator
         return
       end
 
-      new_homebrew_repository = Pathname.new "/usr/local/Homebrew"
+      new_homebrew_repository = Pathname.new "#{HOMEBREW_PREFIX}/Homebrew"
       new_homebrew_repository.rmdir_if_possible
       if new_homebrew_repository.exist?
         ofail <<~EOS
@@ -359,11 +359,13 @@ module UpdateMigrator
       link_completions_manpages_and_docs(new_homebrew_repository)
 
       ohai "Migrated HOMEBREW_REPOSITORY to #{new_homebrew_repository}!"
-      puts <<~EOS
-        Homebrew no longer needs to have ownership of /usr/local. If you wish you can
-        return /usr/local to its default ownership with:
-          sudo chown root:wheel #{HOMEBREW_PREFIX}
-      EOS
+      if HOMEBREW_PREFIX == "/usr/local"
+        puts <<~EOS
+          Homebrew no longer needs to have ownership of #{HOMEBREW_PREFIX}. If you wish you can
+          return #{HOMEBREW_PREFIX} to its default ownership with:
+            sudo chown root:wheel #{HOMEBREW_PREFIX}
+        EOS
+      end
     rescue => e
       ofail <<~EOS
         #{Tty.bold}Failed to migrate HOMEBREW_REPOSITORY to #{new_homebrew_repository}!#{Tty.reset}

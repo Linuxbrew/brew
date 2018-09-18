@@ -128,7 +128,7 @@ module Homebrew
       if (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
         tap = @args[:tap]
         tap = if tap&.start_with?("homebrew/")
-          Tap.fetch("homebrew", tap.strip_prefix("homebrew/"))
+          Tap.fetch("homebrew", tap.delete_prefix("homebrew/"))
         elsif tap
           odie "Tap option did not start with \"homebrew/\": #{tap}"
         else
@@ -635,13 +635,12 @@ module Homebrew
           opoo "Cannot publish bottle: Failed reading info for formula #{f.full_name}"
           next
         end
-        bottle_info = jinfo.bottle_info(
-          if (ARGV.include?("--linux") || f.tap.linux?) && jinfo.bottle_tags.include?("x86_64_linux")
-            "x86_64_linux"
-          else
-            jinfo.bottle_tags.first
-          end,
-        )
+        bottle_tag = if (ARGV.include?("--linux") || f.tap.linux?) && jinfo.bottle_tags.include?("x86_64_linux")
+          "x86_64_linux"
+        else
+          jinfo.bottle_tags.first
+        end
+        bottle_info = jinfo.bottle_info(bottle_tag)
         unless bottle_info
           opoo "No bottle defined in formula #{f.full_name}"
           next

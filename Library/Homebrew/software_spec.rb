@@ -7,6 +7,7 @@ require "dependency_collector"
 require "utils/bottles"
 require "patch"
 require "compilers"
+require "global"
 require "os/mac/version"
 
 class SoftwareSpec
@@ -326,8 +327,7 @@ class Bottle
 end
 
 class BottleSpecification
-  DEFAULT_PREFIX = HOMEBREW_DEFAULT_PREFIX
-  DEFAULT_CELLAR = "#{DEFAULT_PREFIX}/Cellar".freeze
+  DEFAULT_PREFIX = Homebrew::DEFAULT_PREFIX
 
   attr_rw :prefix, :cellar, :rebuild
   attr_accessor :tap
@@ -335,8 +335,8 @@ class BottleSpecification
 
   def initialize
     @rebuild = 0
-    @prefix = DEFAULT_PREFIX
-    @cellar = DEFAULT_CELLAR
+    @prefix = Homebrew::DEFAULT_PREFIX
+    @cellar = Homebrew::DEFAULT_CELLAR
     @collector = Utils::Bottles::Collector.new
     @root_url_specs = {}
   end

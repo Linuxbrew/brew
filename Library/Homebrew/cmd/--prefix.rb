@@ -1,5 +1,5 @@
 #:  * `--prefix`:
-#:    Display Homebrew's install path. *Default:* `/usr/local`
+#:    Display Homebrew's install path. *Default:* `/usr/local` on macOS and `/home/linuxbrew/.linuxbrew` on Linux
 #:
 #:  * `--prefix` <formula>:
 #:    Display the location in the cellar where <formula> is or would be installed.

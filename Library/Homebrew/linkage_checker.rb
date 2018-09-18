@@ -43,7 +43,7 @@ class LinkageChecker
     sorted.each do |dylib, files|
       puts dylib
       files.each do |f|
-        unprefixed = f.to_s.strip_prefix "#{keg}/"
+        unprefixed = f.to_s.delete_prefix "#{keg}/"
         puts "  #{unprefixed}"
       end
       puts if dylib != sorted.last.first

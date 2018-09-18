@@ -16,10 +16,14 @@ module UnpackStrategy
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
       quiet_flags = verbose ? [] : ["-qq"]
-      system_command! "unzip",
-                      args: [*quiet_flags, path, "-d", unpack_dir],
-                      verbose: verbose,
-                      print_stderr: false
+      result = system_command! "unzip",
+                               args: [*quiet_flags, path, "-d", unpack_dir],
+                               verbose: verbose,
+                               print_stderr: false
+
+      FileUtils.rm_rf unpack_dir/"__MACOSX"
+
+      result
     end
   end
 end
