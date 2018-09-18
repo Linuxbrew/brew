@@ -9,6 +9,10 @@ gem "rspec-retry", require: false
 gem "rspec-wait", require: false
 gem "rubocop", HOMEBREW_RUBOCOP_VERSION
 
+group :development do
+  gem "ronn", require: false
+end
+
 group :coverage do
   gem "codecov", require: false
   gem "simplecov", require: false
