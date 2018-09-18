@@ -418,7 +418,7 @@ module Homebrew
     write = args.write?
 
     bottles_hash = ARGV.named.reduce({}) do |hash, json_file|
-      deep_merge_hashes hash, JSON.parse(IO.read(json_file))
+      hash.deep_merge(JSON.parse(IO.read(json_file)))
     end
 
     bottles_hash.each do |formula_name, bottle_hash|
