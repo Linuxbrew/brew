@@ -578,10 +578,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--force` (or `-f`) is specified then always do a slower, full update check even
     if unnecessary.
 
-  * `update-reset`:
-    Fetches and resets Homebrew and all tap repositories using `git`(1) to
-    their latest `origin/master`. Note this will destroy all your uncommitted
-    or committed changes.
+  * `update-reset` [`repositories`]:
+    Fetches and resets Homebrew and all tap repositories (or the specified
+    `repositories`) using `git`(1) to their latest `origin/master`. Note this
+    will destroy all your uncommitted or committed changes.
 
   * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`--display-times`] [`formulae`]:
     Upgrade outdated, unpinned brews (with existing install options).
