@@ -128,7 +128,7 @@ module Homebrew
       if (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
         tap = @args[:tap]
         tap = if tap&.start_with?("homebrew/")
-          Tap.fetch("homebrew", tap.strip_prefix("homebrew/"))
+          Tap.fetch("homebrew", tap.delete_prefix("homebrew/"))
         elsif tap
           odie "Tap option did not start with \"homebrew/\": #{tap}"
         else

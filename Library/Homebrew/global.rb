@@ -9,6 +9,7 @@ require_relative "load_path"
 
 require "os"
 require "config"
+require "os"
 require "extend/ARGV"
 require "messages"
 require "system_command"
@@ -41,18 +42,34 @@ HOMEBREW_BOTTLE_DEFAULT_DOMAIN_MACOS = ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN_MACOS
 HOMEBREW_BOTTLE_DEFAULT_DOMAIN_LINUX = ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN_LINUX"]
 # Bintray fallback is here for people auto-updating from a version where
 # HOMEBREW_BOTTLE_DEFAULT_DOMAIN isn't set.
-HOMEBREW_BOTTLE_DEFAULT_DOMAIN = ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"] ||
-                                 "https://#{OS.mac? ? "homebrew" : "linuxbrew"}.bintray.com"
+HOMEBREW_BOTTLE_DEFAULT_DOMAIN = if ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"]
+  ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"]
+elsif OS.mac?
+  "https://homebrew.bintray.com".freeze
+else
+  "https://linuxbrew.bintray.com".freeze
+end
+
 HOMEBREW_BOTTLE_DOMAIN = ENV["HOMEBREW_BOTTLE_DOMAIN"] ||
                          HOMEBREW_BOTTLE_DEFAULT_DOMAIN
 
 require "fileutils"
+require "os"
+require "os/global"
 
 module Homebrew
   extend FileUtils
 
+  DEFAULT_PREFIX ||= "/usr/local".freeze
+  DEFAULT_CELLAR = "#{DEFAULT_PREFIX}/Cellar".freeze
+  DEFAULT_REPOSITORY = "#{DEFAULT_PREFIX}/Homebrew".freeze
+
   class << self
     attr_writer :failed, :raise_deprecation_exceptions, :auditing, :args
+
+    def Homebrew.default_prefix?(prefix = HOMEBREW_PREFIX)
+      prefix.to_s == DEFAULT_PREFIX
+    end
 
     def failed?
       @failed ||= false
@@ -118,6 +135,7 @@ require "extend/pathname"
 require "extend/module"
 require "extend/predicable"
 require "extend/string"
+require "active_support/core_ext/object/blank"
 
 require "constants"
 require "exceptions"

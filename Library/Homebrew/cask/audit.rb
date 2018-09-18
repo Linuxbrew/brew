@@ -133,6 +133,8 @@ module Cask
     end
 
     def check_version_and_checksum
+      return if cask.sha256 == :no_check
+
       return if @cask.sourcefile_path.nil?
 
       tap = @cask.tap
@@ -182,7 +184,8 @@ module Cask
 
     def check_sha256_no_check_if_latest
       odebug "Verifying sha256 :no_check with version :latest"
-      return unless cask.version.latest? && cask.sha256 != :no_check
+      return unless cask.version.latest?
+      return if cask.sha256 == :no_check
       add_error "you should use sha256 :no_check when version is :latest"
     end
 

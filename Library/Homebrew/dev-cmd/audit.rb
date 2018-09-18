@@ -961,7 +961,7 @@ module Homebrew
     def audit_version
       if version.nil?
         problem "missing version"
-      elsif version.to_s.empty?
+      elsif version.blank?
         problem "version is set to an empty string"
       elsif !version.detected_from_url?
         version_text = version

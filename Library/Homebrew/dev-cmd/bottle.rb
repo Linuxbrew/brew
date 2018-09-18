@@ -41,15 +41,15 @@ require "erb"
 
 BOTTLE_ERB = <<-EOS.freeze
   bottle do
-    <% if root_url != "#{HOMEBREW_BOTTLE_DEFAULT_DOMAIN}/bottles" %>
+    <% if !["#{HOMEBREW_BOTTLE_DEFAULT_DOMAIN}/bottles", "https://homebrew.bintray.com/bottles"].include?(root_url) %>
     root_url "<%= root_url %>"
     <% end %>
-    <% if prefix != BottleSpecification::DEFAULT_PREFIX %>
+    <% if ![Homebrew::DEFAULT_PREFIX, "/usr/local"].include?(prefix) %>
     prefix "<%= prefix %>"
     <% end %>
     <% if cellar.is_a? Symbol %>
     cellar :<%= cellar %>
-    <% elsif cellar != BottleSpecification::DEFAULT_CELLAR %>
+    <% elsif ![Homebrew::DEFAULT_CELLAR, "/usr/local/Cellar"].include?(cellar) %>
     cellar "<%= cellar %>"
     <% end %>
     <% if rebuild.positive? %>
@@ -285,7 +285,7 @@ module Homebrew
           ohai "Detecting if #{filename} is relocatable..."
         end
 
-        if prefix == "/usr/local"
+        if Homebrew.default_prefix?(prefix)
           prefix_check = File.join(prefix, "opt")
         else
           prefix_check = prefix
@@ -389,7 +389,7 @@ module Homebrew
       f.full_name => {
         "formula" => {
           "pkg_version" => f.pkg_version.to_s,
-          "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
+          "path" => f.path.to_s.delete_prefix("#{HOMEBREW_REPOSITORY}/"),
         },
         "bottle" => {
           "root_url" => bottle.root_url,
@@ -455,11 +455,12 @@ module Homebrew
                 valid_key = %w[root_url prefix cellar rebuild sha1 sha256].include? key
                 next unless valid_key
 
-                old_value = old_value_original.to_s.delete ":'\""
+                old_value = old_value_original.to_s.delete "'\""
+                old_value = old_value.to_s.delete ":" if key != "root_url"
                 tag = tag.to_s.delete ":"
 
                 unless tag.empty?
-                  if !bottle_hash["bottle"]["tags"][tag].to_s.empty?
+                  if bottle_hash["bottle"]["tags"][tag].present?
                     mismatches << "#{key} => #{tag}"
                   else
                     bottle.send(key, old_value => tag.to_sym)

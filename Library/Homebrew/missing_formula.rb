@@ -142,8 +142,7 @@ module Homebrew
           hash, short_hash, *commit_message, relative_path =
             Utils.popen_read(log_command).gsub("\\n", "\n").lines.map(&:chomp)
 
-          if hash.to_s.empty? || short_hash.to_s.empty? ||
-             relative_path.to_s.empty?
+          if hash.blank? || short_hash.blank? || relative_path.blank?
             ofail "No previously deleted formula found." unless silent
             return
           end

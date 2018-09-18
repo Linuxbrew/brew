@@ -65,7 +65,7 @@ If \fB\-\-prune=\fR\fIdays\fR is specified, remove all cache files older than \f
 If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do not actually remove anything\.
 .
 .IP
-If \fB\-s\fR is passed, scrub the cache, including downloads for even the latest versions\. Note downloads for any installed formula or cask will still not be deleted\. If you want to delete those too: \fBrm \-rf $(brew \-\-cache)\fR
+If \fB\-s\fR is passed, scrub the cache, including downloads for even the latest versions\. Note downloads for any installed formula or cask will still not be deleted\. If you want to delete those too: \fBrm \-rf "$(brew \-\-cache)"\fR
 .
 .IP "\(bu" 4
 \fBcommand\fR \fIcmd\fR: Display the path to the file which is used when invoking \fBbrew\fR \fIcmd\fR\.
@@ -407,7 +407,13 @@ If \fB\-\-desc\fR is passed, search formulae with a description matching \fItext
 If \fB\-\-env=std\fR is passed, use the standard \fBPATH\fR instead of superenv\'s\.
 .
 .IP "\(bu" 4
-\fBshellenv\fR: Prints export statements \- run them in a shell and this installation of Homebrew will be included into your PATH, MANPATH, and INFOPATH\. Tip: have your dotfiles eval the output of this command
+\fBshellenv\fR: Prints export statements \- run them in a shell and this installation of Homebrew will be included into your PATH, MANPATH, and INFOPATH\.
+.
+.IP
+HOMEBREW_PREFIX, HOMEBREW_CELLAR and HOMEBREW_REPOSITORY are also exported to save multiple queries of those variables\.
+.
+.IP
+Consider adding evaluating the output in your dotfiles (e\.g\. \fB~/\.profile\fR) with \fBeval $(brew shellenv)\fR
 .
 .IP "\(bu" 4
 \fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-only\-cops=\fR\fIcops\fR|\fB\-\-except\-cops=\fR\fIcops\fR] [\fIfiles\fR|\fItaps\fR|\fIformulae\fR]: Check formulae or files for conformance to Homebrew style guidelines\.
@@ -584,7 +590,7 @@ Pass \fB\-\-shell=\fR\fIshell\fR to generate a list of environment variables for
 If the command\'s output is sent through a pipe and no shell is specified, the list is formatted for export to \fBbash\fR(1) unless \fB\-\-plain\fR is passed\.
 .
 .IP "\(bu" 4
-\fB\-\-prefix\fR: Display Homebrew\'s install path\. \fIDefault:\fR \fB/usr/local\fR
+\fB\-\-prefix\fR: Display Homebrew\'s install path\. \fIDefault:\fR \fB/usr/local\fR on macOS and \fB/home/linuxbrew/\.linuxbrew\fR on Linux
 .
 .IP "\(bu" 4
 \fB\-\-prefix\fR \fIformula\fR: Display the location in the cellar where \fIformula\fR is or would be installed\.
@@ -1306,19 +1312,19 @@ Former Linuxbrew maintainers with significant contributions include Bob W\. Hogg
 Homebrew\'s lead maintainer is Mike McQuaid\.
 .
 .P
-Homebrew\'s project leadership committee is Mike McQuaid, Dominyk Tiller, JCount, Misty De Meo and Markus Reiter\.
+Homebrew\'s project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter\.
 .
 .P
-Homebrew/brew\'s other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff\.
+Homebrew/brew\'s other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff\.
 .
 .P
 Homebrew/brew\'s Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman\.
 .
 .P
-Homebrew/homebrew\-core\'s other current maintainers are Dominyk Tiller, Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, Steven Peters, JCount, Misty De Meo and Tom Schoonjans\.
+Homebrew/homebrew\-core\'s other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, Steven Peters, JCount, Misty De Meo and Tom Schoonjans\.
 .
 .P
-Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew\'s creator: Max Howell\.
+Former maintainers with significant contributions include Dominyk Tiller, Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew\'s creator: Max Howell\.
 .
 .SH "BUGS"
 See our issues on GitHub:

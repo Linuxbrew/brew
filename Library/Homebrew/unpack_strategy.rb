@@ -30,6 +30,7 @@ module UnpackStrategy
   def self.strategies
     @strategies ||= [
       Tar, # needs to be before Bzip2/Gzip/Xz/Lzma
+      Pax,
       Gzip,
       Lzma,
       Xz,
@@ -78,7 +79,7 @@ module UnpackStrategy
   end
 
   def self.from_extension(extension)
-    strategies.sort_by { |s| s.extensions.map(&:length).max(0) }
+    strategies.sort_by { |s| s.extensions.map(&:length).max || 0 }
               .reverse
               .find { |s| s.extensions.any? { |ext| extension.end_with?(ext) } }
   end
@@ -165,6 +166,7 @@ require "unpack_strategy/mercurial"
 require "unpack_strategy/microsoft_office_xml"
 require "unpack_strategy/otf"
 require "unpack_strategy/p7zip"
+require "unpack_strategy/pax"
 require "unpack_strategy/pkg"
 require "unpack_strategy/rar"
 require "unpack_strategy/self_extracting_executable"

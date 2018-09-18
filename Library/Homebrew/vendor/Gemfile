@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+gem "activesupport"
+gem "concurrent-ruby"
+gem "backports"
+gem "plist"
+gem "ruby-macho"

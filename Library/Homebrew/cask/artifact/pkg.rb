@@ -1,4 +1,4 @@
-require "vendor/plist/plist"
+require "plist"
 
 require "cask/artifact/abstract_artifact"
 
