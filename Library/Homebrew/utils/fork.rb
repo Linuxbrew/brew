@@ -12,6 +12,8 @@ module Utils
       # when we rescue this in `FormulaInstaller#build`.
       BuildError.new(nil, child_error.inner["cmd"],
                      child_error.inner["args"], child_error.inner["env"])
+    elsif child_error.inner_class == Interrupt
+      Interrupt.new
     else
       # Everything other error in the child just becomes a RuntimeError.
       RuntimeError.new(child_error.message)
@@ -48,6 +50,7 @@ module Utils
 
             write.puts error_hash.to_json
             write.close
+
             exit!
           else
             exit!(true)
@@ -64,21 +67,23 @@ module Utils
             socket.close
           end
           write.close
-          # Each line on the error pipe contains a JSON-serialized exception.
-          # We read the first, since only one is necessary for a failure.
-          data = read.gets
+          data = read.read
           read.close
           Process.wait(pid) unless socket.nil?
 
+          # 130 is the exit status for a process interrupted via Ctrl-C.
+          # We handle it here because of the possibility of an interrupted process terminating
+          # without writing its Interrupt exception to the error pipe.
+          raise Interrupt if $CHILD_STATUS.exitstatus == 130
+
           if data && !data.empty?
-            error_hash = JSON.parse(data) unless data.nil? || data.empty?
+            error_hash = JSON.parse(data.lines.first)
 
             e = ChildProcessError.new(error_hash)
 
             raise rewrite_child_error(e)
           end
 
-          raise Interrupt if $CHILD_STATUS.exitstatus == 130
           raise "Forked child process failed: #{$CHILD_STATUS}" unless $CHILD_STATUS.success?
         end
       end
