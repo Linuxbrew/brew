@@ -185,6 +185,11 @@ class SystemCommand
                          .join
     end
 
+    def merged_output
+      @merged_output ||= @output.map { |_, line| line }
+                                .join
+    end
+
     def success?
       @exit_status.zero?
     end
