@@ -21,12 +21,12 @@ elif [[ -n "$HOMEBREW_LINUX" ]]
 then
   case "$HOMEBREW_PROCESSOR" in
     x86_64)
-      ruby_URL="$HOMEBREW_BOTTLE_DEFAULT_DOMAIN_MACOS/bottles-portable-ruby/portable-ruby-2.3.7.x86_64_linux.bottle.tar.gz"
+      ruby_URL="$HOMEBREW_BOTTLE_DOMAIN/bottles-portable-ruby/portable-ruby-2.3.7.x86_64_linux.bottle.tar.gz"
       ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.7/portable-ruby-2.3.7.x86_64_linux.bottle.tar.gz"
       ruby_SHA="9df214085a0e566a580eea3dd9eab14a2a94930ff74fbf97fb1284e905c8921d"
       ;;
     armv[67]*)
-      ruby_URL="$HOMEBREW_BOTTLE_DEFAULT_DOMAIN_MACOS/bottles-portable-ruby/portable-ruby-2.3.3_2.armv6_linux.bottle.tar.gz"
+      ruby_URL="$HOMEBREW_BOTTLE_DOMAIN/bottles-portable-ruby/portable-ruby-2.3.3_2.armv6_linux.bottle.tar.gz"
       ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3_2/portable-ruby-2.3.3_2.armv6_linux.bottle.tar.gz"
       ruby_SHA="6ac992c4620912b50b3c74f2d4447d541bac4f1839e557c3edcfdebb141c9802"
       ;;
