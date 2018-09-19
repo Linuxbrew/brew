@@ -1,10 +1,14 @@
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
 
-  if ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
+  formatters = [SimpleCov::Formatter::HTMLFormatter]
+  if ENV["HOMEBREW_CODECOV_TOKEN"] || ENV["HOMEBREW_TRAVIS_CI"]
     require "codecov"
-    SimpleCov.formatter = SimpleCov::Formatter::Codecov
+    formatters << SimpleCov::Formatter::Codecov
+    ENV["CODECOV_TOKEN"] = ENV["HOMEBREW_CODECOV_TOKEN"]
   end
+
+  SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new(formatters)
 end
 
 require "rspec/its"
