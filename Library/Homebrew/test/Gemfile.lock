@@ -8,8 +8,10 @@ GEM
       url
     diff-lcs (1.3)
     docile (1.3.1)
+    hpricot (0.8.6)
     jaro_winkler (1.5.1)
     json (2.1.0)
+    mustache (1.0.5)
     parallel (1.12.1)
     parallel_tests (2.23.0)
       parallel
@@ -17,6 +19,11 @@ GEM
       ast (~> 2.4.0)
     powerpack (0.1.2)
     rainbow (3.0.0)
+    rdiscount (2.2.0.1)
+    ronn (0.7.3)
+      hpricot (>= 0.8.2)
+      mustache (>= 0.7.0)
+      rdiscount (>= 1.5.8)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
@@ -60,6 +67,7 @@ PLATFORMS
 DEPENDENCIES
   codecov
   parallel_tests
+  ronn
   rspec
   rspec-its
   rspec-retry
