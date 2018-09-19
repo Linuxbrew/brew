@@ -296,12 +296,6 @@ def with_custom_locale(locale)
   end
 end
 
-def run_as_not_developer
-  with_env(HOMEBREW_DEVELOPER: nil) do
-    yield
-  end
-end
-
 # Kernel.system but with exceptions
 def safe_system(cmd, *args, **options)
   return if Homebrew.system(cmd, *args, **options)
