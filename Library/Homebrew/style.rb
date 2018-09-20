@@ -18,10 +18,12 @@ module Homebrew
       fix = options[:fix]
 
       Homebrew.install_gem_setup_path! "rubocop", HOMEBREW_RUBOCOP_VERSION
+      Homebrew.install_gem! "rubocop-rspec"
       require "rubocop"
       require "rubocops"
 
       args = %w[
+        --require rubocop-rspec
         --force-exclusion
       ]
       if fix
@@ -32,11 +34,6 @@ module Homebrew
 
       if ARGV.verbose?
         args += ["--extra-details", "--display-cop-names"]
-      end
-
-      if ARGV.include?("--rspec")
-        Homebrew.install_gem! "rubocop-rspec"
-        args += %w[--require rubocop-rspec]
       end
 
       if options[:except_cops]
@@ -65,11 +62,7 @@ module Homebrew
         File.expand_path(file).start_with? HOMEBREW_LIBRARY_PATH
       end
       config_file = if files.nil? || has_non_formula
-        if ARGV.include?("--rspec")
-          HOMEBREW_LIBRARY_PATH/".rubocop-rspec.yml"
-        else
-          HOMEBREW_LIBRARY_PATH/".rubocop.yml"
-        end
+        HOMEBREW_LIBRARY_PATH/".rubocop.yml"
       else
         HOMEBREW_LIBRARY/".rubocop_audit.yml"
       end
