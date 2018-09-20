@@ -1,5 +1,6 @@
 require "dbm"
 require "json"
+require "timeout"
 
 #
 # `CacheStoreDatabase` acts as an interface to a persistent storage mechanism
@@ -46,7 +47,7 @@ class CacheStoreDatabase
   #
   # @return [Boolean]
   def created?
-    File.exist?(cache_path)
+    cache_path.exist?
   end
 
   private
@@ -57,6 +58,10 @@ class CacheStoreDatabase
   #   https://docs.oracle.com/cd/E17276_01/html/api_reference/C/envopen.html
   DATABASE_MODE = 0664
 
+  # Spend 5 seconds trying to read the DBM file. If it takes longer than this it
+  # has likely hung or segfaulted.
+  DBM_TEST_READ_TIMEOUT = 5
+
   # Lazily loaded database in read/write mode. If this method is called, a
   # database file with be created in the `HOMEBREW_CACHE` with name
   # corresponding to the `@type` instance variable
@@ -66,6 +71,29 @@ class CacheStoreDatabase
     # DBM::WRCREAT: Creates the database if it does not already exist
     @db ||= begin
       HOMEBREW_CACHE.mkpath
+      if created?
+        dbm_test_read_cmd = SystemCommand.new(
+          ENV["HOMEBREW_RUBY_PATH"],
+          args: [
+            "-rdbm",
+            "-e",
+            "DBM.open('#{dbm_file_path}', #{DATABASE_MODE}, DBM::READER).size",
+          ],
+          print_stderr: false,
+          must_succeed: true,
+        )
+        dbm_test_read_success = begin
+          Timeout.timeout(DBM_TEST_READ_TIMEOUT) do
+            dbm_test_read_cmd.run!
+            true
+          end
+        rescue ErrorDuringExecution, Timeout::Error
+          odebug "Failed to read #{dbm_file_path}!"
+          Process.kill(:KILL, dbm_test_read_cmd.pid)
+          false
+        end
+        cache_path.delete unless dbm_test_read_success
+      end
       DBM.open(dbm_file_path, DATABASE_MODE, DBM::WRCREAT)
     end
   end
@@ -83,7 +111,7 @@ class CacheStoreDatabase
   #
   # @return [String]
   def dbm_file_path
-    File.join(HOMEBREW_CACHE, @type.to_s)
+    "#{HOMEBREW_CACHE}/#{@type}"
   end
 
   # The path where the database resides in the `HOMEBREW_CACHE` for the given
@@ -91,7 +119,7 @@ class CacheStoreDatabase
   #
   # @return [String]
   def cache_path
-    "#{dbm_file_path}.db"
+    Pathname("#{dbm_file_path}.db")
   end
 end
 
