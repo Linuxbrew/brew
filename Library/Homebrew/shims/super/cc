@@ -18,7 +18,7 @@ def mac?
 end
 
 def high_sierra_or_later?
-  mac? && RUBY_PLATFORM[/darwin\d+/][/\d+/].to_i >= 17
+  mac? && ENV["HOMEBREW_MACOS_VERSION_NUMERIC"].to_s.to_i >= 101300
 end
 
 def linux?
