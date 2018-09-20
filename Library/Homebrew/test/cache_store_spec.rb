@@ -118,15 +118,15 @@ describe CacheStoreDatabase do
   end
 
   describe "#created?" do
-    let(:cache_path) { "path/to/homebrew/cache/sample.db" }
+    let(:cache_path) { Pathname("path/to/homebrew/cache/sample.db") }
 
     before(:each) do
       allow(subject).to receive(:cache_path).and_return(cache_path)
     end
 
-    context "`File.exist?(cache_path)` returns `true`" do
+    context "`cache_path.exist?` returns `true`" do
       before(:each) do
-        allow(File).to receive(:exist?).with(cache_path).and_return(true)
+        allow(cache_path).to receive(:exist?).and_return(true)
       end
 
       it "returns `true`" do
@@ -134,9 +134,9 @@ describe CacheStoreDatabase do
       end
     end
 
-    context "`File.exist?(cache_path)` returns `false`" do
+    context "`cache_path.exist?` returns `false`" do
       before(:each) do
-        allow(File).to receive(:exist?).with(cache_path).and_return(false)
+        allow(cache_path).to receive(:exist?).and_return(false)
       end
 
       it "returns `false`" do
