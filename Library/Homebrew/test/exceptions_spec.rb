@@ -16,7 +16,7 @@ describe FormulaValidationError do
   subject { described_class.new("foo", "sha257", "magic") }
 
   its(:to_s) {
-    expect(subject).to eq(%q(invalid attribute for formula 'foo': sha257 ("magic")))
+    expect(subject.to_s).to eq(%q(invalid attribute for formula 'foo': sha257 ("magic")))
   }
 end
 
@@ -49,7 +49,7 @@ describe FormulaUnavailableError do
     end
 
     its(:to_s) {
-      expect(subject).to eq('No available formula with the name "foo" (dependency of foobar)')
+      expect(subject.to_s).to eq('No available formula with the name "foo" (dependency of foobar)')
     }
   end
 end
@@ -76,7 +76,7 @@ describe FormulaClassUnavailableError do
     let(:list) { [] }
 
     its(:to_s) {
-      expect(subject).to match(/Expected to find class Foo, but found no classes\./)
+      expect(subject.to_s).to match(/Expected to find class Foo, but found no classes\./)
     }
   end
 
@@ -84,7 +84,7 @@ describe FormulaClassUnavailableError do
     let(:list) { [mod.const_get(:Bar)] }
 
     its(:to_s) {
-      expect(subject).to match(/Expected to find class Foo, but only found: Bar \(not derived from Formula!\)\./)
+      expect(subject.to_s).to match(/Expected to find class Foo, but only found: Bar \(not derived from Formula!\)\./)
     }
   end
 

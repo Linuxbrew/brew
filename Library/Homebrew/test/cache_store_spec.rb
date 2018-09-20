@@ -126,7 +126,7 @@ describe CacheStoreDatabase do
 
     context "`File.exist?(cache_path)` returns `true`" do
       before do
-        allow(File).to receive(:exist?).with(cache_path).and_return(true)
+        allow(cache_path).to receive(:exist?).and_return(true)
       end
 
       it "returns `true`" do
@@ -136,7 +136,7 @@ describe CacheStoreDatabase do
 
     context "`File.exist?(cache_path)` returns `false`" do
       before do
-        allow(File).to receive(:exist?).with(cache_path).and_return(false)
+        allow(cache_path).to receive(:exist?).and_return(false)
       end
 
       it "returns `false`" do
