@@ -137,7 +137,7 @@ describe Homebrew::Cleanup do
   end
 
   describe "#cleanup_cask", :cask do
-    before(:each) do
+    before do
       Cask::Cache.path.mkpath
     end
 

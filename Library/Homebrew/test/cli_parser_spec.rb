@@ -2,11 +2,6 @@ require_relative "../cli_parser"
 
 describe Homebrew::CLI::Parser do
   describe "test switch options" do
-    before do
-      allow(ENV).to receive(:[]).with("HOMEBREW_PRY").and_return("1")
-      allow(ENV).to receive(:[]).with("HOMEBREW_VERBOSE")
-    end
-
     subject(:parser) {
       described_class.new do
         switch :verbose, description: "Flag for verbosity"
@@ -14,6 +9,11 @@ describe Homebrew::CLI::Parser do
         switch "--pry", env: :pry
       end
     }
+
+    before do
+      allow(ENV).to receive(:[]).with("HOMEBREW_PRY").and_return("1")
+      allow(ENV).to receive(:[]).with("HOMEBREW_VERBOSE")
+    end
 
     it "parses short option" do
       parser.parse(["-v"])

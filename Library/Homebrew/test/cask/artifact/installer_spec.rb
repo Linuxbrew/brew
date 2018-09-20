@@ -1,7 +1,9 @@
 describe Cask::Artifact::Installer, :cask do
+  subject(:installer) { described_class.new(cask, **args) }
+
   let(:staged_path) { mktmpdir }
   let(:cask) { instance_double(Cask::Cask, staged_path: staged_path, config: nil) }
-  subject(:installer) { described_class.new(cask, **args) }
+
   let(:command) { SystemCommand }
 
   let(:args) { {} }
@@ -21,7 +23,7 @@ describe Cask::Artifact::Installer, :cask do
       let(:executable) { staged_path/"executable" }
       let(:args) { { script: { executable: "executable" } } }
 
-      before(:each) do
+      before do
         FileUtils.touch executable
       end
 

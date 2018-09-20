@@ -12,7 +12,7 @@ describe "Satisfy Dependencies and Requirements", :cask do
       let(:cask) { Cask::CaskLoader.load(cask_path("with-depends-on-cask-cyclic")) }
 
       it {
-        is_expected.to raise_error(
+        expect(subject).to raise_error(
           Cask::CaskCyclicDependencyError,
           "Cask 'with-depends-on-cask-cyclic' includes cyclic dependencies "\
           "on other Casks: with-depends-on-cask-cyclic-helper",

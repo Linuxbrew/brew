@@ -20,7 +20,7 @@ describe Cask::Cmd::Info, :cask do
     EOS
   end
 
-  it "it prints auto_updates if the Cask has `auto_updates true`" do
+  it "prints auto_updates if the Cask has `auto_updates true`" do
     expect {
       described_class.run("with-auto-updates")
     }.to output(<<~EOS).to_stdout

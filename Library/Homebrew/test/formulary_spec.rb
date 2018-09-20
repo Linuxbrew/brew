@@ -137,7 +137,7 @@ describe Formulary do
 
     context "with installed Formula" do
       before do
-        allow(Formulary).to receive(:loader_for).and_call_original
+        allow(described_class).to receive(:loader_for).and_call_original
         stub_formula_loader formula("patchelf") { url "patchelf-1.0" }
         allow(Formula["patchelf"]).to receive(:installed?).and_return(true)
       end

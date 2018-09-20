@@ -1,13 +1,15 @@
 require_relative "shared_examples"
 
 describe UnpackStrategy::Directory do
+  subject(:strategy) { described_class.new(path) }
+
   let(:path) {
     mktmpdir.tap do |path|
       FileUtils.touch path/"file"
       FileUtils.ln_s "file", path/"symlink"
     end
   }
-  subject(:strategy) { described_class.new(path) }
+
   let(:unpack_dir) { mktmpdir }
 
   it "does not follow symlinks" do

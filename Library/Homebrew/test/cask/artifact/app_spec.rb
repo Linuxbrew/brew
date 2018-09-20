@@ -112,6 +112,10 @@ describe Cask::Artifact::App, :cask do
             FileUtils.chmod 0555, target_path
           end
 
+          after do
+            FileUtils.chmod 0755, target_path
+          end
+
           it "overwrites the existing app" do
             expect(command).to receive(:run).with(
               "/bin/chmod", args: [
@@ -147,10 +151,6 @@ describe Cask::Artifact::App, :cask do
 
             contents_path = target_path.join("Contents/Info.plist")
             expect(contents_path).to exist
-          end
-
-          after do
-            FileUtils.chmod 0755, target_path
           end
         end
       end

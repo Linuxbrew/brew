@@ -2,6 +2,7 @@ module Cask
   describe Verify, :cask do
     describe "::all" do
       subject(:verification) { described_class.all(cask, downloaded_path) }
+
       let(:cask) { instance_double(Cask, token: "cask", sha256: expected_sha256) }
       let(:cafebabe) { "cafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe" }
       let(:deadbeef) { "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef" }

@@ -464,8 +464,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--display-cop-names` is passed, include the RuboCop cop name for each
     violation in the output.
 
-    If `--rspec` is passed, install and use the RuboCop RSpec gem.
-
     Passing `--only-cops=``cops` will check for violations of only the listed
     RuboCop `cops`, while `--except-cops=``cops` will skip checking the listed
     `cops`. For either option `cops` should be a comma-separated list of cop names.
