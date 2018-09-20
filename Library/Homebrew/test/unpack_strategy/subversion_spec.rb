@@ -5,7 +5,7 @@ describe UnpackStrategy::Subversion, :needs_svn do
   let(:working_copy) { mktmpdir }
   let(:path) { working_copy }
 
-  before(:each) do
+  before do
     system "svnadmin", "create", repo
 
     system "svn", "checkout", "file://#{repo}", working_copy

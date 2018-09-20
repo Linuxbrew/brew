@@ -104,7 +104,7 @@ describe Cask::Cask, :cask do
               allow(cask).to receive(:versions).and_return(installed_versions)
               allow(cask).to receive(:version).and_return(Cask::DSL::Version.new(tap_version))
               expect(cask).to receive(:outdated_versions).and_call_original
-              is_expected.to eq expected_output
+              expect(subject).to eq expected_output
             }
           end
         end
@@ -138,7 +138,7 @@ describe Cask::Cask, :cask do
               allow(cask).to receive(:versions).and_return(installed_version)
               allow(cask).to receive(:version).and_return(Cask::DSL::Version.new(tap_version))
               expect(cask).to receive(:outdated_versions).and_call_original
-              is_expected.to eq expected_output
+              expect(subject).to eq expected_output
             }
           end
         end

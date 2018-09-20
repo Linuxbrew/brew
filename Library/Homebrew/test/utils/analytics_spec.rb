@@ -10,7 +10,7 @@ describe Utils::Analytics do
 
       it "returns OS_VERSION and prefix when HOMEBREW_PREFIX is a custom prefix" do
         stub_const("HOMEBREW_PREFIX", "blah")
-        expect(described_class.os_prefix_ci).to include("#{OS_VERSION}, #{Utils::Analytics.custom_prefix_label}")
+        expect(described_class.os_prefix_ci).to include("#{OS_VERSION}, #{described_class.custom_prefix_label}")
       end
 
       it "includes CI when ENV['CI'] is set" do
@@ -20,7 +20,7 @@ describe Utils::Analytics do
 
       it "does not include prefix when HOMEBREW_PREFIX is the default prefix" do
         stub_const("HOMEBREW_PREFIX", Homebrew::DEFAULT_PREFIX)
-        expect(described_class.os_prefix_ci).not_to include(Utils::Analytics.custom_prefix_label)
+        expect(described_class.os_prefix_ci).not_to include(described_class.custom_prefix_label)
       end
     end
   end

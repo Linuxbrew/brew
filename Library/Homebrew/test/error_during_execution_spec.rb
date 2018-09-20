@@ -1,5 +1,6 @@
 describe ErrorDuringExecution do
   subject(:error) { described_class.new(command, status: status, output: output) }
+
   let(:command) { ["false"] }
   let(:status) { instance_double(Process::Status, exitstatus: exitstatus) }
   let(:exitstatus) { 1 }
@@ -43,7 +44,7 @@ describe ErrorDuringExecution do
       end
 
       its(:to_s) {
-        is_expected.to eq <<~EOS
+        expect(subject).to eq <<~EOS
           Failure while executing; `false` exited with 1. Here's the output:
           This still worked.
           #{Formatter.error("Here something went wrong.\n")}
@@ -55,7 +56,7 @@ describe ErrorDuringExecution do
       let(:command) { ["env", "PATH=/bin", "cat", "with spaces"] }
 
       its(:to_s) {
-        is_expected
+        expect(subject)
         .to eq 'Failure while executing; `env PATH=/bin cat with\ spaces` exited with 1.'
       }
     end

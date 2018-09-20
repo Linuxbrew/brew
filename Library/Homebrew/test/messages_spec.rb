@@ -2,7 +2,7 @@ require "messages"
 require "spec_helper"
 
 describe Messages do
-  let(:messages) { Messages.new }
+  let(:messages) { described_class.new }
   let(:test_formula) { formula("foo") { url("https://example.com/foo-0.1.tgz") } }
   let(:elapsed_time) { 1.1 }
 
@@ -18,7 +18,7 @@ describe Messages do
     it "increases the formula count" do
       expect {
         messages.formula_installed(test_formula, elapsed_time)
-      }.to change { messages.formula_count }.by(1)
+      }.to change(messages, :formula_count).by(1)
     end
 
     it "adds to install_times" do

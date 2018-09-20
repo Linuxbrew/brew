@@ -12,7 +12,7 @@ describe UpdateMigrator do
     let(:old_cache_file) { HOMEBREW_CACHE/"#{formula_name}-1.2.3.tar.gz" }
     let(:new_cache_file) { HOMEBREW_CACHE/"#{formula_name}--1.2.3.tar.gz" }
 
-    before(:each) do
+    before do
       FileUtils.touch old_cache_file
       allow(Formula).to receive(:each).and_yield(f)
     end
@@ -58,7 +58,7 @@ describe UpdateMigrator do
       HOMEBREW_CACHE/"downloads/5994e3a27baa3f448a001fb071ab1f0bf25c87aebcb254d91a6d0b02f46eef86--foo-1.2.3.tar.gz"
     }
 
-    before(:each) do
+    before do
       old_cache_file.dirname.mkpath
       FileUtils.touch old_cache_file
       allow(Formula).to receive(:[]).and_return(f)

@@ -18,6 +18,7 @@ describe Bottle::Filename do
 
     context "when rebuild is 1" do
       let(:rebuild) { 1 }
+
       its(:extname) { is_expected.to eq ".tag.bottle.1.tar.gz" }
     end
   end

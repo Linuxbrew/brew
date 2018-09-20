@@ -130,7 +130,7 @@ describe Cask::Quarantine, :cask do
         Cask::CaskLoader.load(cask_path("local-transmission")),
       ).to be_installed
 
-      expect(Cask::Config.global.appdir.join("Transmission.app")).to_not be_quarantined
+      expect(Cask::Config.global.appdir.join("Transmission.app")).not_to be_quarantined
     end
 
     it "does not quarantine Cask fetches" do
@@ -138,7 +138,7 @@ describe Cask::Quarantine, :cask do
       local_transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
       cached_location = Cask::Download.new(local_transmission).perform
 
-      expect(cached_location).to_not be_quarantined
+      expect(cached_location).not_to be_quarantined
     end
 
     it "does not quarantine Cask audits" do
@@ -147,7 +147,7 @@ describe Cask::Quarantine, :cask do
       local_transmission = Cask::CaskLoader.load(cask_path("local-transmission"))
       cached_location = Cask::Download.new(local_transmission).perform
 
-      expect(cached_location).to_not be_quarantined
+      expect(cached_location).not_to be_quarantined
     end
 
     it "does not quarantine Cask installs even if the fetch was" do
@@ -159,7 +159,7 @@ describe Cask::Quarantine, :cask do
         Cask::CaskLoader.load(cask_path("local-transmission")),
       ).to be_installed
 
-      expect(Cask::Config.global.appdir.join("Transmission.app")).to_not be_quarantined
+      expect(Cask::Config.global.appdir.join("Transmission.app")).not_to be_quarantined
     end
 
     it "does not quarantine dmg-based Casks" do
@@ -169,7 +169,7 @@ describe Cask::Quarantine, :cask do
         Cask::CaskLoader.load(cask_path("container-dmg")),
       ).to be_installed
 
-      expect(Cask::Config.global.appdir.join("container")).to_not be_quarantined
+      expect(Cask::Config.global.appdir.join("container")).not_to be_quarantined
     end
 
     it "does not quarantine tar-gz-based Casks" do
@@ -179,7 +179,7 @@ describe Cask::Quarantine, :cask do
         Cask::CaskLoader.load(cask_path("container-tar-gz")),
       ).to be_installed
 
-      expect(Cask::Config.global.appdir.join("container")).to_not be_quarantined
+      expect(Cask::Config.global.appdir.join("container")).not_to be_quarantined
     end
 
     it "does not quarantine xar-based Casks" do
@@ -189,7 +189,7 @@ describe Cask::Quarantine, :cask do
         Cask::CaskLoader.load(cask_path("container-xar")),
       ).to be_installed
 
-      expect(Cask::Config.global.appdir.join("container")).to_not be_quarantined
+      expect(Cask::Config.global.appdir.join("container")).not_to be_quarantined
     end
 
     it "does not quarantine pure bzip2-based Casks" do
@@ -199,7 +199,7 @@ describe Cask::Quarantine, :cask do
         Cask::CaskLoader.load(cask_path("container-bzip2")),
       ).to be_installed
 
-      expect(Cask::Config.global.appdir.join("container")).to_not be_quarantined
+      expect(Cask::Config.global.appdir.join("container")).not_to be_quarantined
     end
 
     it "does not quarantine pure gzip-based Casks" do
@@ -209,7 +209,7 @@ describe Cask::Quarantine, :cask do
         Cask::CaskLoader.load(cask_path("container-gzip")),
       ).to be_installed
 
-      expect(Cask::Config.global.appdir.join("container")).to_not be_quarantined
+      expect(Cask::Config.global.appdir.join("container")).not_to be_quarantined
     end
 
     it "does not quarantine the pkg in naked-pkg-based Casks" do
@@ -221,7 +221,7 @@ describe Cask::Quarantine, :cask do
 
       expect(
         Cask::Caskroom.path.join("container-pkg", naked_pkg.version, "container.pkg"),
-      ).to_not be_quarantined
+      ).not_to be_quarantined
     end
 
     it "does not quarantine a nested container" do
@@ -231,7 +231,7 @@ describe Cask::Quarantine, :cask do
         Cask::CaskLoader.load(cask_path("nested-app")),
       ).to be_installed
 
-      expect(Cask::Config.global.appdir.join("MyNestedApp.app")).to_not be_quarantined
+      expect(Cask::Config.global.appdir.join("MyNestedApp.app")).not_to be_quarantined
     end
   end
 end

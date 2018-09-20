@@ -1,14 +1,15 @@
 require "system_command"
 
 describe SystemCommand::Result do
+  subject(:result) {
+    described_class.new([], output_array, instance_double(Process::Status, exitstatus: 0, success?: true))
+  }
+
   let(:output_array) {
     [
       [:stdout, "output\n"],
       [:stderr, "error\n"],
     ]
-  }
-  subject(:result) {
-    described_class.new([], output_array, instance_double(Process::Status, exitstatus: 0, success?: true))
   }
 
   describe "#to_ary" do
@@ -41,6 +42,7 @@ describe SystemCommand::Result do
 
   describe "#plist" do
     subject { result.plist }
+
     let(:output_array) { [[:stdout, stdout]] }
     let(:garbage) {
       <<~EOS
@@ -114,7 +116,7 @@ describe SystemCommand::Result do
       end
 
       context "when verbose" do
-        before(:each) do
+        before do
           allow(ARGV).to receive(:verbose?).and_return(true)
         end
 
@@ -138,7 +140,7 @@ describe SystemCommand::Result do
       end
 
       context "when verbose" do
-        before(:each) do
+        before do
           allow(ARGV).to receive(:verbose?).and_return(true)
         end
 
