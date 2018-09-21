@@ -89,7 +89,12 @@ class CacheStoreDatabase
           end
         rescue ErrorDuringExecution, Timeout::Error
           odebug "Failed to read #{dbm_file_path}!"
-          Process.kill(:KILL, dbm_test_read_cmd.pid)
+          begin
+            Process.kill(:KILL, dbm_test_read_cmd.pid)
+          rescue Errno::ESRCH
+            # Process has already terminated.
+            nil
+          end
           false
         end
         cache_path.delete unless dbm_test_read_success
