@@ -168,6 +168,6 @@ module Homebrew
   end
 
   def format_long_opt(opt)
-    "`#{opt}`".ljust(30)
+    "`#{opt}`"
   end
 end

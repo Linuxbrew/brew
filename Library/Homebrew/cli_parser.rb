@@ -30,6 +30,7 @@ module Homebrew
                       .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
                       .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
                       .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
+          exit
         end
       end
 
@@ -54,7 +55,7 @@ module Homebrew
       end
 
       def usage_banner(text)
-        @parser.banner = text
+        @parser.banner = "#{text}\n"
       end
 
       def usage_banner_text
