@@ -16,6 +16,7 @@ module Cask
 
     def graph_dependencies(cask = self.cask, acc = TopologicalHash.new)
       return acc if acc.key?(cask)
+
       deps = cask.depends_on.cask.map(&CaskLoader.public_method(:load))
       acc[cask] = deps
       deps.each do |dep|
@@ -26,6 +27,7 @@ module Cask
 
     def sort
       raise CaskSelfReferencingDependencyError, cask.token if graph[cask].include?(cask)
+
       graph.tsort - [cask]
     rescue TSort::Cyclic
       strongly_connected_components = graph.strongly_connected_components.sort_by(&:count)

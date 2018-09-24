@@ -435,6 +435,7 @@ class BuildError < RuntimeError
     checks.build_error_checks.each do |check|
       out = checks.send(check)
       next if out.nil?
+
       puts
       ofail out
     end
@@ -625,7 +626,7 @@ class ChildProcessError < RuntimeError
     @inner_class = Object.const_get inner["json_class"]
 
     super <<~EOS
-      An exception occured within a build process:
+      An exception occured within a child process:
         #{inner_class}: #{inner["m"]}
     EOS
 

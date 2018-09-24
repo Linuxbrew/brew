@@ -40,6 +40,7 @@ module OS
         end
         # Only return an SDK older than the OS version if it was specifically requested
         return unless v || (!sdk.nil? && sdk.version >= OS::Mac.version)
+
         sdk
       end
 

@@ -92,6 +92,7 @@ module GitHub
     token, username = api_credentials
     return :none if !token || token.empty?
     return :environment if !username || username.empty?
+
     :keychain
   end
 
@@ -197,6 +198,7 @@ module GitHub
       key, _, value = l.delete(":").partition(" ")
       key = key.downcase.strip
       next if key.empty?
+
       meta[key] = value.strip
     end
 
@@ -297,6 +299,7 @@ module GitHub
 
   def create_issue_comment(body)
     return false unless PR_ENV
+
     _, user, repo, pr = *PR_ENV.match(HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
     if !user || !repo || !pr
       opoo <<-EOS.undent
@@ -321,6 +324,7 @@ module GitHub
     url = "#{API_URL}/repos/#{user}/#{repo}/issues/#{pr}/comments"
     comments = open_api(url)
     return unless comments
+
     comments.any? { |comment| comment["body"].eql?(body) }
   end
 

@@ -150,4 +150,15 @@ describe FormulaInstaller do
       temporary_install(Failball.new)
     }.to raise_error(RuntimeError)
   end
+
+  describe "#caveats" do
+    subject(:formula_installer) { described_class.new(Testball.new) }
+
+    it "shows audit problems if HOMEBREW_DEVELOPER is set" do
+      ENV["HOMEBREW_DEVELOPER"] = "1"
+      formula_installer.install
+      expect(formula_installer).to receive(:audit_installed).and_call_original
+      formula_installer.caveats
+    end
+  end
 end

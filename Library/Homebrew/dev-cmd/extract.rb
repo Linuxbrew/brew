@@ -127,10 +127,12 @@ module Homebrew
           rev = Git.last_revision_commit_of_file(repo, file, before_commit: "#{rev}~1")
           break if rev.empty?
           break unless Git.last_revision_of_file(repo, file, before_commit: rev).empty?
+
           ohai "Skipping revision #{rev} - file is empty at this revision" if ARGV.debug?
         end
         test_formula = formula_at_revision(repo, name, file, rev)
         break if test_formula.nil? || test_formula.version == version
+
         ohai "Trying #{test_formula.version} from revision #{rev} against desired #{version}" if ARGV.debug?
       end
       odie "Could not find #{name}! The formula or version may not have existed." if test_formula.nil?
@@ -172,6 +174,7 @@ module Homebrew
   # @private
   def formula_at_revision(repo, name, file, rev)
     return if rev.empty?
+
     contents = Git.last_revision_of_file(repo, file, before_commit: rev)
     contents.gsub!("@url=", "url ")
     contents.gsub!("require 'brewkit'", "require 'formula'")

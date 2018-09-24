@@ -22,14 +22,22 @@ module RuboCop
             [{ name: :head,     type: :method_call }],
             [{ name: :stable,   type: :block_call }],
             [{ name: :bottle,   type: :block_call }],
+            [{ name: :pour_bottle?, type: :block_call }],
             [{ name: :devel,    type: :block_call }],
             [{ name: :head,     type: :block_call }],
             [{ name: :bottle,   type: :method_call }],
             [{ name: :keg_only, type: :method_call }],
             [{ name: :option,   type: :method_call }],
+            [{ name: :deprecated_option, type: :method_call }],
             [{ name: :depends_on, type: :method_call }],
             [{ name: :conflicts_with, type: :method_call }],
+            [{ name: :skip_clean, type: :method_call }],
+            [{ name: :cxxstdlib_check, type: :method_call }],
+            [{ name: :link_overwrite, type: :method_call }],
+            [{ name: :fails_with, type: :method_call }, { name: :fails_with, type: :block_call }],
             [{ name: :go_resource, type: :block_call }, { name: :resource, type: :block_call }],
+            [{ name: :patch, type: :method_call }, { name: :patch, type: :block_call }],
+            [{ name: :needs, type: :method_call }],
             [{ name: :install, type: :method_definition }],
             [{ name: :post_install, type: :method_definition }],
             [{ name: :caveats, type: :method_definition }],
@@ -55,8 +63,10 @@ module RuboCop
           # Check if each present_components is above rest of the present_components
           @present_components.take(@present_components.size - 1).each_with_index do |preceding_component, p_idx|
             next if preceding_component.empty?
+
             @present_components.drop(p_idx + 1).each do |succeeding_component|
               next if succeeding_component.empty?
+
               @offensive_nodes = check_precedence(preceding_component, succeeding_component)
               component_problem @offensive_nodes[0], @offensive_nodes[1] if @offensive_nodes
             end
@@ -71,6 +81,7 @@ module RuboCop
         # Method to format message for reporting component precedence violations
         def component_problem(c1, c2)
           return if WHITELIST.include?(@formula_name)
+
           problem "`#{format_component(c1)}` (line #{line_number(c1)}) " \
                   "should be put before `#{format_component(c2)}` " \
                   "(line #{line_number(c2)})"

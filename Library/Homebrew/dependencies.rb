@@ -41,6 +41,7 @@ class Requirements < DelegateClass(Set)
     if other.is_a?(Comparable)
       grep(other.class) do |req|
         return self if req > other
+
         delete(req)
       end
     end
@@ -126,6 +127,7 @@ module Homebrew
   def reject_ignores(dependables, ignores, includes)
     dependables.reject do |dep|
       next false unless ignores.any? { |ignore| dep.send(ignore) }
+
       includes.none? { |include| dep.send(include) }
     end
   end

@@ -4,13 +4,16 @@ module Utils
 
     def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
       return unless src_dir.exist?
+
       conflicts = []
       src_paths = link_dir ? [src_dir] : src_dir.find
       src_paths.each do |src|
         next if src.directory? && !link_dir
+
         dst = dst_dir/src.relative_path_from(src_dir)
         if dst.symlink?
           next if src == dst.resolved_path
+
           dst.unlink
         end
         if dst.exist?
@@ -22,6 +25,7 @@ module Utils
       end
 
       return if conflicts.empty?
+
       onoe <<~EOS
         Could not link:
         #{conflicts.join("\n")}
@@ -33,9 +37,11 @@ module Utils
 
     def unlink_src_dst_dirs(src_dir, dst_dir, unlink_dir: false)
       return unless src_dir.exist?
+
       src_paths = unlink_dir ? [src_dir] : src_dir.find
       src_paths.each do |src|
         next if src.directory? && !unlink_dir
+
         dst = dst_dir/src.relative_path_from(src_dir)
         dst.delete if dst.symlink? && src == dst.resolved_path
         dst.parent.rmdir_if_possible

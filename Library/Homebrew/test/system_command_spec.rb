@@ -1,9 +1,5 @@
 describe SystemCommand do
   describe "#initialize" do
-    let(:env_args) { ["bash", "-c", 'printf "%s" "${A?}" "${B?}" "${C?}"'] }
-    let(:env) { { "A" => "1", "B" => "2", "C" => "3" } }
-    let(:sudo) { false }
-
     subject(:command) {
       described_class.new(
         "env",
@@ -13,6 +9,10 @@ describe SystemCommand do
         sudo: sudo,
       )
     }
+
+    let(:env_args) { ["bash", "-c", 'printf "%s" "${A?}" "${B?}" "${C?}"'] }
+    let(:env) { { "A" => "1", "B" => "2", "C" => "3" } }
+    let(:sudo) { false }
 
     context "when given some environment variables" do
       its("run!.stdout") { is_expected.to eq("123") }
@@ -237,7 +237,7 @@ describe SystemCommand do
     context "when given an executable with spaces and no arguments" do
       let(:executable) { mktmpdir/"App Uninstaller" }
 
-      before(:each) do
+      before do
         executable.write <<~SH
           #!/usr/bin/env bash
           true

@@ -15,6 +15,7 @@ module Homebrew
     config_file = HOMEBREW_REPOSITORY/".git/config"
 
     raise UsageError if ARGV.named.size > 1
+
     case ARGV.named.first
     when nil, "state"
       analyticsdisabled = \

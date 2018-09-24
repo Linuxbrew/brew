@@ -100,6 +100,7 @@ RSpec.shared_context "integration test" do
           # full_require_paths isn't available in RubyGems < 2.2.
           spec.require_paths.map do |lib|
             next lib if lib.include?(full_gem_path)
+
             "#{full_gem_path}/#{lib}"
           end
         end

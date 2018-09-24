@@ -151,6 +151,7 @@ module Cask
     def verify_has_sha
       odebug "Checking cask has checksum"
       return unless @cask.sha256 == :no_check
+
       raise CaskNoShasumError, @cask.token
     end
 
@@ -198,6 +199,7 @@ module Cask
 
       artifacts.each do |artifact|
         next unless artifact.respond_to?(:install_phase)
+
         odebug "Installing artifact of class #{artifact.class}"
 
         if artifact.is_a?(Artifact::Binary)
@@ -211,6 +213,7 @@ module Cask
       begin
         already_installed_artifacts.each do |artifact|
           next unless artifact.respond_to?(:uninstall_phase)
+
           odebug "Reverting installation of artifact of class #{artifact.class}"
           artifact.uninstall_phase(command: @command, verbose: verbose?, force: force?)
         end
@@ -236,6 +239,7 @@ module Cask
 
     def macos_dependencies
       return unless @cask.depends_on.macos
+
       if @cask.depends_on.macos.first.is_a?(Array)
         operator, release = @cask.depends_on.macos.first
         unless MacOS.version.send(operator, release)
@@ -262,11 +266,13 @@ module Cask
 
     def arch_dependencies
       return if @cask.depends_on.arch.nil?
+
       @current_arch ||= { type: Hardware::CPU.type, bits: Hardware::CPU.bits }
       return if @cask.depends_on.arch.any? do |arch|
         arch[:type] == @current_arch[:type] &&
         Array(arch[:bits]).include?(@current_arch[:bits])
       end
+
       raise CaskError,
         "Cask #{@cask} depends on hardware architecture being one of " \
         "[#{@cask.depends_on.arch.map(&:to_s).join(", ")}], " \
@@ -362,6 +368,7 @@ module Cask
     # TODO: logically could be in a separate class
     def enable_accessibility_access
       return unless @cask.accessibility_access
+
       ohai "Enabling accessibility access"
       if MacOS.version <= :mountain_lion
         @command.run!(
@@ -402,6 +409,7 @@ module Cask
 
     def disable_accessibility_access
       return unless @cask.accessibility_access
+
       if MacOS.version >= :mavericks && MacOS.version <= :el_capitan
         ohai "Disabling accessibility access"
         @command.run!("/usr/bin/sqlite3",
@@ -480,6 +488,7 @@ module Cask
 
       artifacts.each do |artifact|
         next unless artifact.respond_to?(:uninstall_phase)
+
         odebug "Un-installing artifact of class #{artifact.class}"
         artifact.uninstall_phase(command: @command, verbose: verbose?, skip: clear, force: force?)
       end
@@ -502,11 +511,13 @@ module Cask
 
     def backup_path
       return if @cask.staged_path.nil?
+
       Pathname("#{@cask.staged_path}.upgrading")
     end
 
     def backup_metadata_path
       return if @cask.metadata_versioned_path.nil?
+
       Pathname("#{@cask.metadata_versioned_path}.upgrading")
     end
 

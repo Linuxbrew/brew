@@ -21,6 +21,7 @@ module Cask
 
         pairs.each do |key, value|
           raise "invalid conflicts_with key: '#{key.inspect}'" unless VALID_KEYS.include?(key)
+
           instance_variable_set("@#{key}", instance_variable_get("@#{key}").merge([*value]))
         end
       end

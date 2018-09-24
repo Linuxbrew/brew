@@ -13,6 +13,7 @@ class XcodeRequirement < Requirement
   def xcode_installed_version
     return false unless MacOS::Xcode.installed?
     return true unless @version
+
     MacOS::Xcode.version >= @version
   end
 

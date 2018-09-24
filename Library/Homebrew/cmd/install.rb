@@ -98,6 +98,7 @@ module Homebrew
         if name !~ HOMEBREW_TAP_FORMULA_REGEX && name !~ HOMEBREW_CASK_TAP_CASK_REGEX
           next
         end
+
         tap = Tap.fetch(Regexp.last_match(1), Regexp.last_match(2))
         tap.install unless tap.installed?
       end
@@ -237,6 +238,7 @@ module Homebrew
         # Even if we don't install this formula mark it as no longer just
         # installed as a dependency.
         next unless f.opt_prefix.directory?
+
         keg = Keg.new(f.opt_prefix.resolved_path)
         tab = Tab.for_keg(keg)
         unless tab.installed_on_request
@@ -246,6 +248,7 @@ module Homebrew
       end
 
       return if formulae.empty?
+
       Install.perform_preinstall_checks
 
       formulae.each do |f|
@@ -288,6 +291,7 @@ module Homebrew
 
       # Do not search taps if the formula name is qualified
       return if e.name.include?("/")
+
       ohai "Searching taps..."
       taps_search_results = search_taps(e.name)[:formulae]
       case taps_search_results.length

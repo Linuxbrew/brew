@@ -24,10 +24,12 @@ class JavaRequirement < Requirement
 
   def java_home_cmd
     return unless File.executable?("/usr/libexec/java_home")
+
     args = %w[--failfast]
     args << "--version" << @version.to_s if @version
     java_home = Utils.popen_read("/usr/libexec/java_home", *args).chomp
     return unless $CHILD_STATUS.success?
+
     Pathname.new(java_home)/"bin/java"
   end
 

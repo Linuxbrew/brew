@@ -47,6 +47,7 @@ module Tty
 
   def current_escape_sequence
     return "" if @escape_sequence.nil?
+
     "\033[#{@escape_sequence.join(";")}m"
   end
 
@@ -64,6 +65,7 @@ module Tty
     if !ENV["HOMEBREW_COLOR"] && (ENV["HOMEBREW_NO_COLOR"] || !$stdout.tty?)
       return ""
     end
+
     current_escape_sequence
   ensure
     reset_escape_sequence!

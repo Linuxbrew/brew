@@ -368,6 +368,7 @@ class Version
     unless val.respond_to?(:to_str)
       raise TypeError, "Version value must be a string; got a #{val.class} (#{val})"
     end
+
     @version = val.to_str
   end
 
@@ -415,9 +416,11 @@ class Version
         return a <=> b
       elsif a.numeric?
         return 1 if a > NULL_TOKEN
+
         l += 1
       elsif b.numeric?
         return -1 if b > NULL_TOKEN
+
         r += 1
       else
         return a <=> b

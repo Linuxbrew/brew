@@ -15,11 +15,13 @@ module Cask
         @pairs = pairs
         pairs.each do |key, value|
           raise "invalid container key: '#{key.inspect}'" unless VALID_KEYS.include?(key)
+
           send(:"#{key}=", value)
         end
 
         return if type.nil?
         return unless UnpackStrategy.from_type(type).nil?
+
         raise "invalid container type: #{type.inspect}"
       end
 

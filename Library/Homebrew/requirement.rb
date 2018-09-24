@@ -16,6 +16,7 @@ class Requirement
     @download ||= self.class.download
     tags.each do |tag|
       next unless tag.is_a? Hash
+
       @cask ||= tag[:cask]
       @download ||= tag[:download]
     end
@@ -53,8 +54,10 @@ class Requirement
   def satisfied?
     satisfy = self.class.satisfy
     return true unless satisfy
+
     @satisfied_result = satisfy.yielder { |p| instance_eval(&p) }
     return false unless @satisfied_result
+
     true
   end
 
@@ -66,6 +69,7 @@ class Requirement
 
   def satisfied_result_parent
     return unless @satisfied_result.is_a?(Pathname)
+
     parent = @satisfied_result.resolved_path.parent
     if parent.to_s =~ %r{^#{Regexp.escape(HOMEBREW_CELLAR)}/([\w+-.@]+)/[^/]+/(s?bin)/?$}
       parent = HOMEBREW_PREFIX/"opt/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}"
@@ -88,6 +92,7 @@ class Requirement
     return unless parent
     return if ["#{HOMEBREW_PREFIX}/bin", "#{HOMEBREW_PREFIX}/bin"].include?(parent.to_s)
     return if PATH.new(ENV["PATH"]).include?(parent.to_s)
+
     ENV.prepend_path("PATH", parent)
   end
 
@@ -151,6 +156,7 @@ class Requirement
 
     def satisfy(options = nil, &block)
       return @satisfied if options.nil? && !block_given?
+
       options = {} if options.nil?
       @satisfied = Requirement::Satisfier.new(options, &block)
     end
@@ -203,6 +209,7 @@ class Requirement
       formulae.each do |f|
         f.requirements.each do |req|
           next if prune?(f, req, &block)
+
           reqs << req
         end
       end

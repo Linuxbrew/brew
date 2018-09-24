@@ -71,6 +71,7 @@ class FormulaVersions
       formula_at_revision(rev) do |f|
         [:stable, :devel].each do |spec_sym|
           next unless spec = f.send(spec_sym)
+
           map[spec_sym] ||= { version: spec.version, checksum: spec.checksum }
         end
       end
@@ -120,6 +121,7 @@ class FormulaVersions
       map[:stable][f.stable.version] << f.send(attribute)
     end
     return unless f.devel
+
     map[:devel][f.devel.version] ||= []
     map[:devel][f.devel.version] << f.send(attribute)
   end

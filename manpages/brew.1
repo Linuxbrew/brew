@@ -428,9 +428,6 @@ If \fB\-\-fix\fR is passed, automatically fix style violations using RuboCop\'s 
 If \fB\-\-display\-cop\-names\fR is passed, include the RuboCop cop name for each violation in the output\.
 .
 .IP
-If \fB\-\-rspec\fR is passed, install and use the RuboCop RSpec gem\.
-.
-.IP
 Passing \fB\-\-only\-cops=\fR\fIcops\fR will check for violations of only the listed RuboCop \fIcops\fR, while \fB\-\-except\-cops=\fR\fIcops\fR will skip checking the listed \fIcops\fR\. For either option \fIcops\fR should be a comma\-separated list of cop names\.
 .
 .IP
@@ -530,7 +527,7 @@ If \fB\-\-merge\fR is specified then \fBgit merge\fR is used to include updates 
 If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full update check even if unnecessary\.
 .
 .IP "\(bu" 4
-\fBupdate\-reset\fR: Fetches and resets Homebrew and all tap repositories using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
+\fBupdate\-reset\fR [\fIrepositories\fR]: Fetches and resets Homebrew and all tap repositories (or the specified \fBrepositories\fR) using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
 .
 .IP "\(bu" 4
 \fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fB\-\-display\-times\fR] [\fIformulae\fR]: Upgrade outdated, unpinned brews (with existing install options)\.

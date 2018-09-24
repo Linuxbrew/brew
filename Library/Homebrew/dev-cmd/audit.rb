@@ -126,6 +126,7 @@ module Homebrew
       fa = FormulaAuditor.new(f, options)
       fa.audit
       next if fa.problems.empty? && fa.new_formula_problems.empty?
+
       fa.problems
       formula_count += 1
       problem_count += fa.problems.size
@@ -240,9 +241,11 @@ module Homebrew
 
     def audit_style
       return unless @style_offenses
+
       @style_offenses.each do |offense|
         if offense.cop_name.start_with?("NewFormulaAudit")
           next if formula.versioned_formula?
+
           new_formula_problem offense.to_s(display_cop_name: @display_cop_names)
           next
         end
@@ -430,6 +433,7 @@ module Homebrew
 
           next unless @new_formula
           next unless @official_tap
+
           if dep.tags.include?(:recommended) || dep.tags.include?(:optional)
             new_formula_problem options_message
           end
@@ -437,6 +441,7 @@ module Homebrew
 
         next unless @new_formula
         next unless @official_tap
+
         if spec.requirements.map(&:recommended?).any? || spec.requirements.map(&:optional?).any?
           new_formula_problem options_message
         end
@@ -487,6 +492,7 @@ module Homebrew
       end
 
       return unless reason.end_with?(".")
+
       problem "keg_only reason should not end with a period."
     end
 
@@ -498,6 +504,7 @@ module Homebrew
       return unless @online
 
       return unless DevelopmentTools.curl_handles_most_https_certificates?
+
       if http_content_problem = curl_check_http_content(homepage,
                                   user_agents: [:browser, :default],
                                   check_content: true,
@@ -518,6 +525,7 @@ module Homebrew
           leafnode
         ]
         return if bottle_disabled_whitelist.include?(formula.name)
+
         problem "Formulae should not use `bottle :disabled`" if @official_tap
       end
     end
@@ -549,6 +557,7 @@ module Homebrew
       end
 
       return if Date.parse(metadata["created_at"]) <= (Date.today - 30)
+
       new_formula_problem "GitHub repository too new (<30 days old)"
     end
 
@@ -577,6 +586,7 @@ module Homebrew
 
         next if spec.patches.empty?
         next unless @new_formula
+
         new_formula_problem(
           "Formulae should not require patches to build. " \
           "Patches should be submitted and accepted upstream first.",
@@ -585,6 +595,7 @@ module Homebrew
 
       %w[Stable Devel].each do |name|
         next unless spec = formula.send(name.downcase)
+
         version = spec.version
         if version.to_s !~ /\d/
           problem "#{name}: version (#{version}) is set to a string without a digit"
@@ -627,6 +638,7 @@ module Homebrew
 
       throttled.each_slice(2).to_a.map do |a, b|
         next if formula.stable.nil?
+
         version = formula.stable.version.to_s.split(".").last.to_i
         if @strict && a == formula.name && version.modulo(b.to_i).nonzero?
           problem "should only be updated every #{b} releases on multiples of #{b}"
@@ -675,10 +687,12 @@ module Homebrew
         matched = Regexp.last_match(1)
         version_prefix = stable.version.to_s.sub(/\d+$/, "")
         return if unstable_whitelist.include?([formula.name, version_prefix])
+
         problem "Stable version URLs should not contain #{matched}"
       when %r{download\.gnome\.org/sources}, %r{ftp\.gnome\.org/pub/GNOME/sources}i
         version_prefix = stable.version.to_s.split(".")[0..1].join(".")
         return if gnome_devel_whitelist.include?([formula.name, version_prefix])
+
         version = Version.parse(stable.url)
         if version >= Version.create("1.0")
           minor_version = version.to_s.split(".", 3)[1].to_i
@@ -701,6 +715,7 @@ module Homebrew
         next unless spec = formula.send(spec_sym)
         next unless previous_version_and_checksum[spec_sym][:version] == spec.version
         next if previous_version_and_checksum[spec_sym][:checksum] == spec.checksum
+
         problem(
           "#{spec_sym}: sha256 changed without the version also changing; " \
           "please create an issue upstream to rule out malicious " \
@@ -743,6 +758,7 @@ module Homebrew
         map_includes_version = spec_version_scheme_map.key?(spec_version)
         next if !current_version_scheme.zero? &&
                 (above_max_version_scheme || map_includes_version)
+
         problem "#{spec} version should not decrease (from #{max_version} to #{spec_version})"
       end
 
@@ -777,6 +793,7 @@ module Homebrew
       bin_names += formula.aliases
       [formula.bin, formula.sbin].each do |dir|
         next unless dir.exist?
+
         bin_names += dir.children.map(&:basename).map(&:to_s)
       end
       bin_names.each do |name|
@@ -848,6 +865,7 @@ module Homebrew
       end
 
       return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
+
       problem "Use pkgshare instead of (share#{Regexp.last_match(1)}\"#{formula.name}\")"
     end
 
@@ -976,6 +994,7 @@ module Homebrew
       end
 
       return unless version.to_s =~ /_\d+$/
+
       problem "version #{version} should not end with an underline and a number"
     end
 
@@ -1011,6 +1030,7 @@ module Homebrew
       end
 
       return unless url_strategy == DownloadStrategyDetector.detect("", using)
+
       problem "Redundant :using value in URL"
     end
 
@@ -1040,6 +1060,7 @@ module Homebrew
       end
 
       return unless @online
+
       urls.each do |url|
         next if !@strict && mirrors.include?(url)
 
@@ -1048,6 +1069,7 @@ module Homebrew
           # A `brew mirror`'ed URL is usually not yet reachable at the time of
           # pull request.
           next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
+
           if http_content_problem = curl_check_http_content(url, require_http: curl_openssl_or_deps)
             problem http_content_problem
           end
@@ -1058,6 +1080,7 @@ module Homebrew
         elsif strategy <= SubversionDownloadStrategy
           next unless DevelopmentTools.subversion_handles_most_https_certificates?
           next unless Utils.svn_available?
+
           unless Utils.svn_remote_exists? url
             problem "The URL #{url} is not a valid svn URL"
           end

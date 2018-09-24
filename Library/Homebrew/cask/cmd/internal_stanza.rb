@@ -45,6 +45,7 @@ module Cask
         @format = :to_yaml if yaml?
 
         return if DSL::DSL_METHODS.include?(stanza)
+
         raise ArgumentError,
           <<~EOS
             Unknown/unsupported stanza: '#{stanza}'

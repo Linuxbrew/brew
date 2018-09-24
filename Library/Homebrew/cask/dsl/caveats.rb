@@ -39,11 +39,13 @@ module Cask
         result = instance_eval(&block)
         return unless result
         return if result == :built_in_caveat
+
         @custom_caveats << result.to_s.sub(/\s*\Z/, "\n")
       end
 
       caveat :kext do
         next if MacOS.version < :high_sierra
+
         <<~EOS
           To install and/or use #{@cask} you may need to enable their kernel extension in
 
@@ -76,6 +78,7 @@ module Cask
 
       caveat :files_in_usr_local do
         next unless HOMEBREW_PREFIX.to_s.downcase.start_with?("/usr/local")
+
         <<~EOS
           Cask #{@cask} installs files under /usr/local. The presence of such
           files can cause warnings when running "brew doctor", which is considered

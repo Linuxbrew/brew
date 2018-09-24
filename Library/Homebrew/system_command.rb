@@ -19,6 +19,8 @@ end
 class SystemCommand
   extend Predicable
 
+  attr_reader :pid
+
   def self.run(executable, **options)
     new(executable, **options).run!
   end
@@ -92,12 +94,14 @@ class SystemCommand
 
   def sudo_prefix
     return [] unless sudo?
+
     askpass_flags = ENV.key?("SUDO_ASKPASS") ? ["-A"] : []
     ["/usr/bin/sudo", *askpass_flags, "-E", "--"]
   end
 
   def assert_success
     return if @status.success?
+
     raise ErrorDuringExecution.new(command,
                                    status: @status,
                                    output: @output)
@@ -120,6 +124,7 @@ class SystemCommand
 
     raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
       Open3.popen3(env, [executable, executable], *args, **options)
+    @pid = raw_wait_thr.pid
 
     write_input_to(raw_stdin)
     raw_stdin.close_write
@@ -183,7 +188,13 @@ class SystemCommand
                          .join
     end
 
+    def merged_output
+      @merged_output ||= @output.map { |_, line| line }
+                                .join
+    end
+
     def success?
+      return false if @exit_status.nil?
       @exit_status.zero?
     end
 
@@ -212,6 +223,7 @@ class SystemCommand
     def warn_plist_garbage(garbage)
       return unless ARGV.verbose?
       return unless garbage =~ /\S/
+
       opoo "Received non-XML output from #{Formatter.identifier(command.first)}:"
       $stderr.puts garbage.strip
     end

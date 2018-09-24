@@ -99,6 +99,7 @@ module Cask
 
     def rmdir(path)
       return unless path.children.empty?
+
       if path.symlink?
         @command.run!("/bin/rm", args: ["-f", "--", path], sudo: true)
       else
@@ -125,6 +126,7 @@ module Cask
 
     def clean_ds_store(dir)
       return unless (ds_store = dir.join(".DS_Store")).exist?
+
       @command.run!("/bin/rm", args: ["--", ds_store], sudo: true)
     end
 

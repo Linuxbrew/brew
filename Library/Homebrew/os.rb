@@ -1,11 +1,13 @@
 module OS
   def self.mac?
     return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
+
     RbConfig::CONFIG["host_os"].include? "darwin"
   end
 
   def self.linux?
     return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
+
     RbConfig::CONFIG["host_os"].include? "linux"
   end
 

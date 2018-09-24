@@ -13,6 +13,7 @@ module Metafiles
 
   def list?(file)
     return false if %w[.DS_Store INSTALL_RECEIPT.json].include?(file)
+
     !copy?(file)
   end
 

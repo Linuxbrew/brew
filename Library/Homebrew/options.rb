@@ -13,6 +13,7 @@ class Option
 
   def <=>(other)
     return unless other.is_a?(Option)
+
     name <=> other.name
   end
 

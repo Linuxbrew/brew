@@ -69,6 +69,7 @@ module UnpackStrategy
         end
       rescue ErrorDuringExecution => e
         raise e if (tries -= 1).zero?
+
         sleep 1
         retry
       end

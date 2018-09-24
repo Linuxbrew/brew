@@ -58,6 +58,7 @@ class BottleDisableReason
 
   def to_s
     return "This formula doesn't require compiling." if unneeded?
+
     @reason
   end
 end

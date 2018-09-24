@@ -469,8 +469,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--display-cop-names` is passed, include the RuboCop cop name for each
     violation in the output.
 
-    If `--rspec` is passed, install and use the RuboCop RSpec gem.
-
     Passing `--only-cops=``cops` will check for violations of only the listed
     RuboCop `cops`, while `--except-cops=``cops` will skip checking the listed
     `cops`. For either option `cops` should be a comma-separated list of cop names.
@@ -583,10 +581,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--force` (or `-f`) is specified then always do a slower, full update check even
     if unnecessary.
 
-  * `update-reset`:
-    Fetches and resets Homebrew and all tap repositories using `git`(1) to
-    their latest `origin/master`. Note this will destroy all your uncommitted
-    or committed changes.
+  * `update-reset` [`repositories`]:
+    Fetches and resets Homebrew and all tap repositories (or the specified
+    `repositories`) using `git`(1) to their latest `origin/master`. Note this
+    will destroy all your uncommitted or committed changes.
 
   * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`--display-times`] [`formulae`]:
     Upgrade outdated, unpinned brews (with existing install options).

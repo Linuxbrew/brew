@@ -54,6 +54,7 @@ module Cask
 
       def unlink(**)
         return unless target.symlink?
+
         ohai "Unlinking #{self.class.english_name} '#{target}'."
         target.delete
       end

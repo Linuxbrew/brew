@@ -6,7 +6,15 @@ describe "brew commands", :integration_test do
   it "prints a list of all available commands" do
     expect { brew "commands" }
       .to output(/Built-in commands/).to_stdout
+      .and not_to_output.to_stderr
       .and be_a_success
+  end
+
+  it "prints a list without headers with the --quiet flag" do
+    expect { brew "commands", "--quiet" }
+      .to be_a_success
+      .and not_to_output.to_stderr
+      .and not_to_output(/Built-in commands/).to_stdout
   end
 end
 

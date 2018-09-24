@@ -18,6 +18,7 @@ module Cask
           end
         }).select do |cask|
           raise CaskNotInstalledError, cask unless cask.installed? || force?
+
           cask.outdated?(true)
         end
 

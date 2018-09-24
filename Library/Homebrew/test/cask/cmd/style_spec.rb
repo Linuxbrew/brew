@@ -93,7 +93,7 @@ describe Cask::Cmd::Style, :cask do
       end
 
       it {
-        is_expected.to contain_exactly(a_path_ending_with("/homebrew/homebrew-cask/Casks"),
+        expect(subject).to contain_exactly(a_path_ending_with("/homebrew/homebrew-cask/Casks"),
                                        a_path_ending_with("/third-party/homebrew-tap/Casks"))
       }
     end

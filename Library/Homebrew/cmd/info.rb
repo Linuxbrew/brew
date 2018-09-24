@@ -171,6 +171,7 @@ module Homebrew
       %w[build required recommended optional].map do |type|
         reqs = f.requirements.select(&:"#{type}?")
         next if reqs.to_a.empty?
+
         puts "#{type.capitalize}: #{decorate_requirements(reqs)}"
       end
     end
@@ -243,6 +244,7 @@ module Homebrew
 
   def dep_display_s(dep)
     return dep.name if dep.option_tags.empty?
+
     "#{dep.name} #{dep.option_tags.map { |o| "--#{o}" }.join(" ")}"
   end
 end

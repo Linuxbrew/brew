@@ -134,6 +134,7 @@ module OS
       def outdated?
         return false unless installed?
         return false if provided_by_apple?
+
         version < latest_version
       end
 

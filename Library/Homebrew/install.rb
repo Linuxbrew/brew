@@ -46,6 +46,7 @@ module Homebrew
       @checks.public_send(type).each do |check|
         out = @checks.public_send(check)
         next if out.nil?
+
         failed ||= true
         ofail out
       end

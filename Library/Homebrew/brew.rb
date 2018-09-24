@@ -51,8 +51,10 @@ begin
       internal_dev_cmd = require? HOMEBREW_LIBRARY_PATH/"dev-cmd"/cmd
       internal_cmd = internal_dev_cmd
       if internal_dev_cmd && !ARGV.homebrew_developer?
-        system "git", "config", "--file=#{HOMEBREW_REPOSITORY}/.git/config",
-                                "--replace-all", "homebrew.devcmdrun", "true"
+        if (HOMEBREW_REPOSITORY/".git/config").exist?
+          system "git", "config", "--file=#{HOMEBREW_REPOSITORY}/.git/config",
+                                  "--replace-all", "homebrew.devcmdrun", "true"
+        end
         ENV["HOMEBREW_DEV_CMD_RUN"] = "1"
       end
     end
@@ -128,6 +130,7 @@ rescue BuildError => e
   exit 1
 rescue RuntimeError, SystemCallError => e
   raise if e.message.empty?
+
   onoe e
   $stderr.puts e.backtrace if ARGV.debug?
   exit 1

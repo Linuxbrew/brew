@@ -1,14 +1,14 @@
 require "linkage_cache_store"
 
 describe LinkageCacheStore do
+  subject { described_class.new(keg_name, database) }
+
   let(:keg_name) { "keg_name" }
   let(:database) { double("database") }
 
-  subject { LinkageCacheStore.new(keg_name, database) }
-
   describe "#keg_exists?" do
     context "`keg_name` exists in cache" do
-      before(:each) do
+      before do
         expect(database).to receive(:get).with(keg_name).and_return("")
       end
 
@@ -18,7 +18,7 @@ describe LinkageCacheStore do
     end
 
     context "`keg_name` does not exist in cache" do
-      before(:each) do
+      before do
         expect(database).to receive(:get).with(keg_name).and_return(nil)
       end
 
@@ -52,7 +52,7 @@ describe LinkageCacheStore do
 
   describe "#fetch_type" do
     context "`HASH_LINKAGE_TYPES.include?(type)`" do
-      before(:each) do
+      before do
         expect(database).to receive(:get).with(keg_name).and_return(nil)
       end
 

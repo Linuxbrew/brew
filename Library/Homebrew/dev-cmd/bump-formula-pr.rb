@@ -378,11 +378,13 @@ module Homebrew
         unless old
           raise "No old value for new value #{new}! Did you pass the wrong arguments?"
         end
+
         contents.gsub!(old, new)
       end
       unless contents.errors.empty?
         raise Utils::InreplaceError, path => contents.errors
       end
+
       path.atomic_write(contents) if args.write?
       contents
     else
@@ -394,6 +396,7 @@ module Homebrew
           unless old
             raise "No old value for new value #{new}! Did you pass the wrong arguments?"
           end
+
           s.gsub!(old, new)
         end
       end
@@ -425,6 +428,7 @@ module Homebrew
     pull_requests = fetch_pull_requests(formula)
     return unless pull_requests
     return if pull_requests.empty?
+
     duplicates_message = <<~EOS
       These open pull requests may be duplicates:
       #{pull_requests.map { |pr| "#{pr["title"]} #{pr["html_url"]}" }.join("\n")}

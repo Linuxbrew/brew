@@ -8,4 +8,13 @@ describe "brew cat", :integration_test do
       .and not_to_output.to_stderr
       .and be_a_success
   end
+
+  it "fails when given multiple arguments" do
+    setup_test_formula "foo"
+    setup_test_formula "bar"
+    expect { brew "cat", "foo", "bar" }
+      .to output(/doesn't support multiple arguments/).to_stderr
+      .and not_to_output.to_stdout
+      .and be_a_failure
+  end
 end

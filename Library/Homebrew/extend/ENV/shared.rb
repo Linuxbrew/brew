@@ -95,6 +95,7 @@ module SharedEnvExtension
   # (e.g. <pre>ENV.prepend_path "PATH", which("emacs").dirname</pre>)
   def prepend_path(key, path)
     return if %w[/usr/bin /bin /usr/sbin /sbin].include? path.to_s
+
     self[key] = PATH.new(self[key]).prepend(path)
   end
 
@@ -106,8 +107,10 @@ module SharedEnvExtension
 
   def remove(keys, value)
     return if value.nil?
+
     Array(keys).each do |key|
       next unless self[key]
+
       self[key] = self[key].sub(value, "")
       delete(key) if self[key].empty?
     end
@@ -232,6 +235,7 @@ module SharedEnvExtension
     # building with an alternative Fortran compiler without optimization flags,
     # despite it often being the Homebrew-provided one set up in the first call.
     return if @fortran_setup_done
+
     @fortran_setup_done = true
 
     flags = []
@@ -304,6 +308,7 @@ module SharedEnvExtension
 
     return if OS.linux? && which(name)
     return if gcc_formula.opt_prefix.exist?
+
     raise <<~EOS
       The requested Homebrew GCC was not installed. You must:
         brew install #{gcc_formula.full_name}
@@ -323,6 +328,7 @@ module SharedEnvExtension
   # @private
   def compiler_with_cxx11_support?(cc)
     return if compiler_any_clang?(cc)
+
     if cc == :c_compiler
       version = DevelopmentTools.c_compiler_build_version
     else
@@ -358,6 +364,7 @@ module SharedEnvExtension
 
   def check_for_compiler_universal_support
     return unless homebrew_cc =~ GNU_GCC_REGEXP
+
     raise "Non-Apple GCC can't build universal binaries"
   end
 end

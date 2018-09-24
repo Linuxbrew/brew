@@ -9,7 +9,7 @@ describe "curl" do
 
     it "doesn't return -q as the first argument when HOMEBREW_CURLRC is set" do
       ENV["HOMEBREW_CURLRC"] = "1"
-      expect(curl_args("foo").first).to_not eq("-q")
+      expect(curl_args("foo").first).not_to eq("-q")
     end
   end
 end

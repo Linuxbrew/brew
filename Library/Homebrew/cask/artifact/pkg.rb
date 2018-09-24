@@ -39,6 +39,7 @@ module Cask
         unless path.exist?
           raise CaskError, "pkg source file not found: '#{path.relative_path_from(cask.staged_path)}'"
         end
+
         args = [
           "-pkg",    path,
           "-target", "/"

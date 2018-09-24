@@ -8,6 +8,7 @@ module Cask
 
       def self.can_load?(ref)
         return false unless ref.respond_to?(:to_str)
+
         content = ref.to_str
 
         token  = /(?:"[^"]*"|'[^']*')/

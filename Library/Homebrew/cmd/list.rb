@@ -47,6 +47,7 @@ module Homebrew
     # Things below use the CELLAR, which doesn't until the first formula is installed.
     unless HOMEBREW_CELLAR.exist?
       raise NoSuchKegError, ARGV.named.first unless ARGV.named.empty?
+
       return
     end
 
@@ -56,6 +57,7 @@ module Homebrew
       if args.full_name?
         full_names = Formula.installed.map(&:full_name).sort(&tap_and_name_comparison)
         return if full_names.empty?
+
         puts Formatter.columns(full_names)
       else
         ENV["CLICOLOR"] = nil
@@ -136,6 +138,7 @@ module Homebrew
       names.sort.each do |d|
         versions = d.subdirs.map { |pn| pn.basename.to_s }
         next if args.multiple? && versions.length < 2
+
         puts "#{d.basename} #{versions * " "}"
       end
     end

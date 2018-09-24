@@ -74,7 +74,7 @@ module Homebrew
         # `brew test-bot` runs `brew doctor` in the CI for the Homebrew/brew
         # repository. This only needs to support whatever CI provider
         # Homebrew/brew is currently using.
-        return if ENV["TRAVIS"]
+        return if ENV["HOMEBREW_TRAVIS_CI"]
 
         message = <<~EOS
           Your Xcode (#{MacOS::Xcode.version}) is outdated.
@@ -101,7 +101,7 @@ module Homebrew
         # `brew test-bot` runs `brew doctor` in the CI for the Homebrew/brew
         # repository. This only needs to support whatever CI provider
         # Homebrew/brew is currently using.
-        return if ENV["TRAVIS"]
+        return if ENV["HOMEBREW_TRAVIS_CI"]
 
         <<~EOS
           A newer Command Line Tools release is available.
@@ -352,6 +352,7 @@ module Homebrew
 
       def check_for_multiple_volumes
         return unless HOMEBREW_CELLAR.exist?
+
         volumes = Volumes.new
 
         # Find the volumes for the TMP folder & HOMEBREW_CELLAR

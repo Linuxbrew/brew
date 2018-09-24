@@ -8,6 +8,7 @@ class SystemConfig
 
       out, _, status = system_command("/usr/libexec/java_home", args: ["--xml", "--failfast"], print_stderr: false)
       return "N/A" unless status.success?
+
       javas = []
       xml = REXML::Document.new(out)
       REXML::XPath.each(xml, "//key[text()='JVMVersion']/following-sibling::string") do |item|

@@ -5,6 +5,7 @@ class OsxfuseRequirement < Requirement
 
   satisfy(build_env: false) do
     next true if libfuse_formula_exists? && Formula["libfuse"].installed?
+
     includedirs = %w[
       /usr/include
       /usr/local/include
@@ -12,6 +13,7 @@ class OsxfuseRequirement < Requirement
     next true if (includedirs.map do |dir|
       File.exist? "#{dir}/fuse.h"
     end).any?
+
     false
   end
 

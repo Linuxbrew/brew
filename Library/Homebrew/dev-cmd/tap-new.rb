@@ -11,6 +11,7 @@ module Homebrew
     path = tap.path/filename
     tap.path.mkpath
     raise "#{path} already exists" if path.exist?
+
     path.write content
   end
 
