@@ -121,8 +121,9 @@ class SystemConfig
         HOMEBREW_REPOSITORY: Homebrew::DEFAULT_REPOSITORY,
         HOMEBREW_CELLAR: Homebrew::DEFAULT_CELLAR,
         HOMEBREW_CACHE: "#{ENV["HOME"]}/Library/Caches/Homebrew",
-        HOMEBREW_RUBY_WARNINGS: "-W0",
         HOMEBREW_TEMP: ENV["HOMEBREW_SYSTEM_TEMP"],
+        HOMEBREW_RUBY_WARNINGS: "-W0",
+        HOMEBREW_GIT: "git",
       }.freeze
       boring_keys = %w[
         HOMEBREW_BROWSER
@@ -161,11 +162,14 @@ class SystemConfig
       if defaults_hash[:HOMEBREW_CACHE] != HOMEBREW_CACHE.to_s
         f.puts "HOMEBREW_CACHE: #{HOMEBREW_CACHE}"
       end
+      if defaults_hash[:HOMEBREW_TEMP] != HOMEBREW_TEMP.to_s
+        f.puts "HOMEBREW_TEMP: #{HOMEBREW_TEMP}"
+      end
       if defaults_hash[:HOMEBREW_RUBY_WARNINGS] != ENV["HOMEBREW_RUBY_WARNINGS"].to_s
         f.puts "HOMEBREW_RUBY_WARNINGS: #{ENV["HOMEBREW_RUBY_WARNINGS"]}"
       end
-      if defaults_hash[:HOMEBREW_TEMP] != HOMEBREW_TEMP.to_s
-        f.puts "HOMEBREW_TEMP: #{HOMEBREW_TEMP}"
+      if defaults_hash[:HOMEBREW_GIT] != ENV["HOMEBREW_GIT"].to_s
+        f.puts "HOMEBREW_GIT: #{ENV["HOMEBREW_GIT"]}"
       end
       unless ENV["HOMEBREW_ENV"]
         ENV.sort.each do |key, value|
