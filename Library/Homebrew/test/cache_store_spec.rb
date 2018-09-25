@@ -97,10 +97,6 @@ describe CacheStoreDatabase do
 
   describe "#close_if_open!" do
     context "database open" do
-      before do
-        subject.instance_variable_set(:@db, instance_double(DBM, close: nil))
-      end
-
       it "does not raise an error when `close` is called on the database" do
         expect { subject.close_if_open! }.not_to raise_error(NoMethodError)
       end
@@ -118,7 +114,7 @@ describe CacheStoreDatabase do
   end
 
   describe "#created?" do
-    let(:cache_path) { Pathname("path/to/homebrew/cache/sample.db") }
+    let(:cache_path) { Pathname("path/to/homebrew/cache/sample.json") }
 
     before do
       allow(subject).to receive(:cache_path).and_return(cache_path)
