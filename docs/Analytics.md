@@ -29,7 +29,6 @@ Homebrew's analytics records the following different events:
 - an `event` hit type with the `install_on_request` event category and the Homebrew formula from a non-private GitHub tap you have requested to install (e.g. explicitly named it with a `brew install`) plus options and an event label as above. This allows us to differentiate the formulae that users intend to install from those pulled in as dependencies.
 - an `event` hit type with the `cask_install` event category and the Homebrew cask from a non-private GitHub tap you install as the action and an event label as above. This allows us to identify the casks that need fixing and where more easily.
 - an `event` hit type with the `BuildError` event category and the Homebrew formula that failed to install, e.g. `wget` as the action and an event label e.g. `macOS 10.12`.
-- an `event` hit type with the `dbm_test_read` event category and `true` or `false` as the action (depending on if a corrupt DBM database was detected) and an event label e.g. `macOS 10.12`.
 
 You can also view all the information that is sent by Homebrew's analytics by setting `HOMEBREW_ANALYTICS_DEBUG=1` in your environment. Please note this will also stop any analytics from being sent.
 
