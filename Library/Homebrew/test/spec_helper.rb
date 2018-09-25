@@ -142,9 +142,10 @@ RSpec.configure do |config|
 
       FileUtils.rm_rf [
         TEST_DIRECTORIES.map(&:children),
-        *Keg::MUST_EXIST_DIRECTORIES,
+        *Keg::MUST_EXIST_SUBDIRECTORIES,
         HOMEBREW_LINKED_KEGS,
         HOMEBREW_PINNED_KEGS,
+        HOMEBREW_PREFIX/"var",
         HOMEBREW_PREFIX/"Caskroom",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-cask",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bar",

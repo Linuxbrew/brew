@@ -70,27 +70,27 @@ class Keg
   ].freeze
   # TODO: remove when brew-test-bot no longer uses this
   TOP_LEVEL_DIRECTORIES = KEG_LINK_DIRECTORIES
-  PRUNEABLE_DIRECTORIES = (
-    KEG_LINK_DIRECTORIES - %w[var] + %w[var/homebrew/linked]
-  ).map { |dir| HOMEBREW_PREFIX/dir }
+  MUST_EXIST_SUBDIRECTORIES = (
+    KEG_LINK_DIRECTORIES - %w[var] + %w[
+      opt
+      var/homebrew/linked
+    ]
+  ).map { |dir| HOMEBREW_PREFIX/dir }.uniq.sort.freeze
 
   # Keep relatively in sync with
   # https://github.com/Homebrew/install/blob/master/install
-  MUST_EXIST_DIRECTORIES = (
-    (KEG_LINK_DIRECTORIES + %w[
-      opt
-    ]).map { |dir| HOMEBREW_PREFIX/dir }
-  ).freeze
+  MUST_EXIST_DIRECTORIES = MUST_EXIST_SUBDIRECTORIES + [
+    HOMEBREW_CELLAR,
+  ].uniq.sort.freeze
   MUST_BE_WRITABLE_DIRECTORIES = (
-    (KEG_LINK_DIRECTORIES + %w[
-      opt
+    %w[
       etc/bash_completion.d lib/pkgconfig
       share/aclocal share/doc share/info share/locale share/man
       share/man/man1 share/man/man2 share/man/man3 share/man/man4
       share/man/man5 share/man/man6 share/man/man7 share/man/man8
       share/zsh share/zsh/site-functions
       var/log
-    ]).map { |dir| HOMEBREW_PREFIX/dir } + [
+    ].map { |dir| HOMEBREW_PREFIX/dir } + MUST_EXIST_SUBDIRECTORIES + [
       HOMEBREW_CACHE,
       HOMEBREW_CELLAR,
       HOMEBREW_LOCKS,
@@ -98,7 +98,7 @@ class Keg
       HOMEBREW_REPOSITORY,
       Language::Python.homebrew_site_packages,
     ]
-  ).freeze
+  ).uniq.sort.freeze
 
   # These paths relative to the keg's share directory should always be real
   # directories in the prefix, never symlinks.

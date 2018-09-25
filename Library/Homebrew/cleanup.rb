@@ -293,7 +293,6 @@ module Homebrew
     def rm_ds_store(dirs = nil)
       dirs ||= begin
         Keg::MUST_EXIST_DIRECTORIES + [
-          HOMEBREW_CELLAR,
           HOMEBREW_PREFIX/"Caskroom",
         ]
       end
