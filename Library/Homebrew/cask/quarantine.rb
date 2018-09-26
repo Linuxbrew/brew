@@ -12,10 +12,18 @@ module Cask
       @swift ||= DevelopmentTools.locate("swift")
     end
 
+    # @private
+    def xattr
+      @xattr ||= DevelopmentTools.locate("xattr")
+    end
+
     def check_quarantine_support
       odebug "Checking quarantine support"
 
-      if swift.nil?
+      if !system_command!(xattr).success?
+        odebug "There's not a working version of xattr."
+        :xattr_broken
+      elsif swift.nil?
         odebug "Swift is not available on this system."
         :no_swift
       else
@@ -56,13 +64,13 @@ module Cask
     end
 
     def status(file)
-      system_command("/usr/bin/xattr",
+      system_command(xattr,
                      args:         ["-p", QUARANTINE_ATTRIBUTE, file],
                      print_stderr: false).stdout.rstrip
     end
 
-    def toggle_no_translocation_bit(xattr)
-      fields = xattr.split(";")
+    def toggle_no_translocation_bit(attribute)
+      fields = attribute.split(";")
 
       # Fields: status, epoch, download agent, event ID
       # Let's toggle the app translocation bit, bit 8
@@ -78,7 +86,7 @@ module Cask
 
       odebug "Releasing #{download_path} from quarantine"
 
-      quarantiner = system_command("/usr/bin/xattr",
+      quarantiner = system_command(xattr,
                                    args: [
                                      "-d",
                                      QUARANTINE_ATTRIBUTE,
@@ -134,7 +142,7 @@ module Cask
                                    args: [
                                      "-0",
                                      "--",
-                                     "/usr/bin/xattr",
+                                     xattr,
                                      "-w",
                                      "-s",
                                      QUARANTINE_ATTRIBUTE,
