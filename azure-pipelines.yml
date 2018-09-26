@@ -4,10 +4,10 @@ jobs:
     vmImage: xcode9-macos10.13
   steps:
     - bash: |
-        HOMEBREW_REPOSITORY="$(brew --repo)";
-        mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library";
-        sudo rm -rf "$HOMEBREW_REPOSITORY";
-        sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
+        HOMEBREW_REPOSITORY="$(brew --repo)"
+        mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library"
+        sudo rm -rf "$HOMEBREW_REPOSITORY"
+        sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY"
         brew update-reset Library/Taps/homebrew/homebrew-core
         brew test-bot --coverage
       displayName: Run brew test-bot

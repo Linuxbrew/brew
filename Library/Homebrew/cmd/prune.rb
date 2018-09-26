@@ -15,7 +15,7 @@ module Homebrew
 
     dirs = []
 
-    Keg::PRUNEABLE_DIRECTORIES.each do |dir|
+    Keg::MUST_EXIST_SUBDIRECTORIES.each do |dir|
       next unless dir.directory?
 
       dir.find do |path|
@@ -32,8 +32,7 @@ module Homebrew
               path.unlink
             end
           end
-        elsif path.directory? && !Keg::PRUNEABLE_DIRECTORIES.include?(path) &&
-              !Keg::MUST_BE_WRITABLE_DIRECTORIES.include?(path)
+        elsif path.directory? && !Keg::MUST_EXIST_SUBDIRECTORIES.include?(path)
           dirs << path
         end
       end
