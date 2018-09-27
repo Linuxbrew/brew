@@ -68,8 +68,6 @@ class Keg
   KEG_LINK_DIRECTORIES = %w[
     bin etc include lib sbin share var Frameworks
   ].freeze
-  # TODO: remove when brew-test-bot no longer uses this
-  TOP_LEVEL_DIRECTORIES = KEG_LINK_DIRECTORIES
   MUST_EXIST_SUBDIRECTORIES = (
     KEG_LINK_DIRECTORIES - %w[var] + %w[
       opt
