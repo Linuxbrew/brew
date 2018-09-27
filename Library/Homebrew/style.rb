@@ -23,7 +23,6 @@ module Homebrew
       require "rubocops"
 
       args = %w[
-        --require rubocop-rspec
         --force-exclusion
       ]
       if fix
