@@ -99,7 +99,7 @@ class DevelopmentTools
         path = HOMEBREW_PREFIX/"opt/gcc/bin"/cc
         path = locate(cc) unless path.exist?
         version = if path &&
-                     build_version = `#{path} --version`[/gcc(?:-\d(?:\.\d)? \(.+\))? (\d\.\d\.\d)/, 1]
+                     build_version = `#{path} --version`[/gcc(?:(?:-\d(?:\.\d)?)? \(.+\))? (\d\.\d\.\d)/, 1]
           Version.new build_version
         else
           Version::NULL
