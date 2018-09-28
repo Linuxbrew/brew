@@ -5,9 +5,7 @@ AllCops:
     - '**/vendor/**/*'
   DisplayCopNames: false
 
-require: 
-  - rubocop-rspec
-  - ./Homebrew/rubocops.rb
+require: ./Homebrew/rubocops.rb
 
 # enable all formulae audits
 FormulaAudit:
