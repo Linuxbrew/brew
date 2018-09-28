@@ -12,6 +12,13 @@ module Homebrew
 
   def edit_args
     Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        * `edit`:
+          Open all of Homebrew for editing.
+      
+        * `edit` <formula>:
+          Open <formula> in the editor.
+      EOS
       switch :force
       switch :verbose
       switch :debug

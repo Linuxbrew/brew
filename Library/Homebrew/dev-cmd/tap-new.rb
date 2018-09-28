@@ -17,6 +17,11 @@ module Homebrew
 
   def tap_new_args
     Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `tap-new` <user>`/`<repo>:
+         
+        Generate the template files for a new tap.
+      EOS
       switch :debug
       switch :verbose
     end

@@ -24,8 +24,15 @@ module Homebrew
 
   def irb_args
     Homebrew::CLI::Parser.new do
-      switch "--examples"
-      switch "--pry", env: :pry
+      usage_banner <<~EOS
+        `irb` [<options>]:
+
+        Enter the interactive Homebrew Ruby shell.
+      EOS
+      switch "--examples",
+        description: "Show several examples."
+      switch "--pry", env: :pry,
+        description: "Pry will be used instead of irb if `--pry` is passed or HOMEBREW_PRY is set."
     end
   end
 

@@ -21,8 +21,23 @@ module Homebrew
 
   def linkage_args
     Homebrew::CLI::Parser.new do
-      switch "--test"
-      switch "--reverse"
+      usage_banner <<~EOS
+        `linkage` [<options>] <formula>:
+
+        Checks the library links of an installed formula.
+
+        Only works on installed formulae. An error is raised if it is run on
+        uninstalled formulae.
+      EOS
+      switch "--test",
+        description: "Display only missing libraries and exit with a non-zero exit code if any missing "\
+                     "libraries were found."
+      switch "--reverse",
+        description: "Print the dylib followed by the binaries which link to it for each library the keg "\
+                     "references."
+      switch "--cached",
+        description: "Print the cached linkage values stored in HOMEBREW_CACHE, set from a previous "\
+                     "`brew linkage` run."
       switch :verbose
       switch :debug
     end

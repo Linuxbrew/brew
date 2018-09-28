@@ -21,12 +21,23 @@ module Homebrew
 
   def update_test_args
     Homebrew::CLI::Parser.new do
-      switch "--to-tag"
-      switch "--keep-tmp"
+      usage_banner <<~EOS
+        `update-test` [<options>]:
+
+         Runs a test of `brew update` with a new repository clone.
+
+         If no arguments are passed, use `origin/master` as the start commit.
+      EOS
+      switch "--to-tag",
+        description: "Set `HOMEBREW_UPDATE_TO_TAG` to test updating between tags."
+      switch "--keep-tmp",
+        description: "Retain the temporary directory containing the new repository clone."
+      flag   "--commit=",
+        description: "Use provided <commit> as the start commit."
+      flag   "--before=",
+        description: "Use the commit at provided <date> as the start commit."
       switch :verbose
       switch :debug
-      flag   "--commit="
-      flag   "--before="
     end
   end
 

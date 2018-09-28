@@ -12,6 +12,19 @@ require "erb"
 require "ostruct"
 require "cli_parser"
 require "dev-cmd/audit"
+require "dev-cmd/bottle"
+require "dev-cmd/bump-formula-pr"
+require "dev-cmd/create"
+require "dev-cmd/edit"
+require "dev-cmd/formula"
+require "dev-cmd/irb"
+require "dev-cmd/linkage"
+require "dev-cmd/mirror"
+require "dev-cmd/pull"
+require "dev-cmd/release-notes"
+require "dev-cmd/tap-new"
+require "dev-cmd/tests"
+require "dev-cmd/update-test"
 
 module Homebrew
   module_function
@@ -22,8 +35,18 @@ module Homebrew
 
   def man_args
     Homebrew::CLI::Parser.new do
-      switch "--fail-if-changed"
-      switch "--link"
+      usage_banner <<~EOS
+        `man` [<options>]:
+
+        Generate Homebrew's manpages.
+      EOS
+      switch "--fail-if-changed",
+        description: "Return a failing status code if changes are detected in the manpage outputs. This "\
+                     "can be used for CI to be notified when the manpages are out of date. Additionally, "\
+                     "the date used in new manpages will match those in the existing manpages (to allow "\
+                     "comparison without factoring in the date)."
+      switch "--link",
+        description: "It is now done automatically by `brew update`."
     end
   end
 
@@ -58,7 +81,6 @@ module Homebrew
 
   def path_glob_commands(glob)
     Pathname.glob(glob)
-            .sort_by { |source_file| sort_key_for_path(source_file) }
             .map(&:read).map(&:lines)
             .map { |lines| lines.grep(/^#:/).map { |line| line.slice(2..-1) }.join }
             .reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
@@ -69,7 +91,8 @@ module Homebrew
     variables = OpenStruct.new
 
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
-    variables[:developer_commands] = generate_cmd_manpage(Homebrew.send(:audit_args)) + path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
+
+    variables[:developer_commands] = generate_cmd_manpages("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
     readme = HOMEBREW_REPOSITORY/"README.md"
     variables[:lead_maintainer] =
       readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
@@ -151,7 +174,25 @@ module Homebrew
     end
   end
 
-  def generate_cmd_manpage(cmd_parser)
+  def generate_cmd_manpages(glob)
+    cmd_paths = Pathname.glob(glob)
+    man_page_lines = []
+    cmd_paths.each do |cmd_path|
+      begin
+        cmd_parser = Homebrew.send(cmd_arg_parser(cmd_path))
+        man_page_lines << generate_cmd_manpage_lines(cmd_parser).join
+      rescue NoMethodError
+        man_page_lines << path_glob_commands(cmd_path.to_s)[0]
+      end
+    end
+    man_page_lines
+  end
+
+  def cmd_arg_parser(cmd_path)
+    "#{cmd_path.basename.to_s.gsub('.rb', '').gsub('-', '_')}_args".to_sym
+  end
+
+  def generate_cmd_manpage_lines(cmd_parser)
     lines = [cmd_parser.usage_banner_text]
     lines += cmd_parser.processed_options.map do |short, long, _, desc|
       generate_option_doc(short, long, desc)

@@ -71,18 +71,45 @@ module Homebrew
 
   def bottle_args
     Homebrew::CLI::Parser.new do
-      switch "--merge"
-      switch "--skip-relocation"
-      switch "--force-core-tap"
-      switch "--no-rebuild"
-      switch "--keep-old"
-      switch "--write"
-      switch "--no-commit"
-      switch "--json"
-      switch "--or-later"
+      usage_banner <<~EOS
+        `bottle` [<options>] [<formulae>]:
+
+        Generate a bottle (binary package) from a formula installed with
+        `--build-bottle`.
+
+        If the formula specifies a rebuild version, it will be incremented in the
+        generated DSL. Passing `--keep-old` will attempt to keep it at its
+        original value, while `--no-rebuild` will remove it.
+      EOS
+      switch "--skip-relocation",
+        description: "Do not check if the bottle can be marked as relocatable."
+      switch "--or-later",
+        description: "Append `_or_later` to the bottle tag."
+      switch "--force-core-tap",
+        description: "Build a bottle even if <formula> is not in homebrew/core or any installed taps."
+      switch "--no-rebuild",
+        description: "If the formula specifies a rebuild version, it will be removed in the generated DSL."
+      switch "--keep-old",
+        description: "If the formula specifies a rebuild version, it will attempted to be kept in the "\
+                     " generated DSL."
+      switch "--merge",
+        description: "Generate a bottle from a formula and print the new DSL merged into the "\
+                     "existing formula."
+      switch "--write",
+        description: "Changes will be written to the formula file. A new commit will be generated unless "\
+                     "`--no-commit` is passed."
+      switch "--no-commit",
+        description: "When passed with `--write`, a new commit will not generated while writing changes "\
+                     "to the formula file.",
+        depends_on: "--write"
+      switch "--json",
+        description: "Write bottle information to a JSON file, which can be used as the argument for "\
+                     "`--merge`."
+      flag   "--root-url",
+        description: "Use the specified <URL> as the root of the bottle's URL instead of Homebrew's "\
+                     "default."
       switch :verbose
       switch :debug
-      flag   "--root-url"
     end
   end
 

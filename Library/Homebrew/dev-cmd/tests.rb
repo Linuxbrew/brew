@@ -23,14 +23,28 @@ module Homebrew
 
   def tests_args
     Homebrew::CLI::Parser.new do
-      switch "--no-compat"
-      switch "--generic"
-      switch "--coverage"
-      switch "--online"
-      switch :debug
+      usage_banner <<~EOS
+        `tests` [<options>] <formula>:
+
+        Run Homebrew's unit and integration tests. If provided,
+        `--only=`<test_script> runs only <test_script>_spec.rb, and `--seed`
+        randomizes tests with the provided value instead of a random seed.
+      EOS
+      switch "--coverage",
+        description: "Generate code coverage reports."
+      switch "--generic",
+             description: "Run only OS-agnostic tests."
+      switch "--no-compat",
+        description: "Do not load the compatibility layer when running tests."
+      switch "--online",
+        description: "Include tests that use the GitHub API and tests that use any of the taps for "\
+                     "official external commands."
+      flag   "--only=",
+        description: "Run only <test_script>_spec.rb"
+      flag   "--seed=",
+        description: "Randomizes tests with the provided value instead of a random seed."
       switch :verbose
-      flag   "--only="
-      flag   "--seed="
+      switch :debug
     end
   end
 
