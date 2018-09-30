@@ -1,8 +1,5 @@
-require: rubocop-rspec
-
 inherit_from:
   - ../.rubocop.yml
-  - .rubocop_todo.yml
 
 AllCops:
   Include:
@@ -12,6 +9,8 @@ AllCops:
     - 'bin/*'
     - '**/Casks/**/*'
     - '**/vendor/**/*'
+    - 'extend/**/*_spec.rb'
+    - 'software_spec.rb'
 
 # make rspec formatting more flexible
 Layout/MultilineMethodCallIndentation:
