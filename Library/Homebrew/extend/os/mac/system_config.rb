@@ -57,11 +57,9 @@ class SystemConfig
       dump_generic_verbose_config(f)
       f.puts "macOS: #{MacOS.full_version}-#{kernel}"
       f.puts "CLT: #{clt || "N/A"}"
-      if MacOS::CLT.separate_header_package?
-        f.puts "CLT headers: #{clt_headers || "N/A"}"
-      end
       f.puts "Xcode: #{xcode || "N/A"}"
-      f.puts "XQuartz: #{xquartz || "N/A"}"
+      f.puts "CLT headers: #{clt_headers}" if MacOS::CLT.separate_header_package? && clt_headers
+      f.puts "XQuartz: #{xquartz}" if !MacOS::XQuartz.provided_by_apple? && xquartz
     end
   end
 end
