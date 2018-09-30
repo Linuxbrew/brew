@@ -36,6 +36,8 @@ module Homebrew
       attempt_directory_creation
       fatal_checks(:fatal_install_checks)
     end
+    alias generic_perform_preinstall_checks perform_preinstall_checks
+    module_function :generic_perform_preinstall_checks
 
     def fatal_checks(type)
       @checks ||= Diagnostic::Checks.new
@@ -51,3 +53,5 @@ module Homebrew
     end
   end
 end
+
+require "extend/os/install"
