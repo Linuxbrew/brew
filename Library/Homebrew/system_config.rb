@@ -196,7 +196,7 @@ class SystemConfig
       end
       f.puts "Git: #{describe_git}"
       f.puts "Curl: #{describe_curl}"
-      f.puts "Java: #{describe_java}"
+      f.puts "Java: #{describe_java}" if describe_java != "N/A"
     end
     alias dump_generic_verbose_config dump_verbose_config
   end
