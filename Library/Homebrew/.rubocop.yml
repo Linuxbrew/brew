@@ -9,8 +9,6 @@ AllCops:
     - 'bin/*'
     - '**/Casks/**/*'
     - '**/vendor/**/*'
-    - 'extend/**/*_spec.rb'
-    - 'software_spec.rb'
 
 # make rspec formatting more flexible
 Layout/MultilineMethodCallIndentation:
