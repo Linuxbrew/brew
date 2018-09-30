@@ -254,7 +254,11 @@ module OS
       end
 
       def update_instructions
-        if MacOS.version >= "10.9"
+        if MacOS.version >= "10.14"
+          <<~EOS
+            Update them from Software Update in System Preferences.
+          EOS
+        elsif MacOS.version >= "10.9"
           <<~EOS
             Update them from Software Update in the App Store.
           EOS
