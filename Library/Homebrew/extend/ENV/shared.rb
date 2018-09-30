@@ -319,7 +319,11 @@ module SharedEnvExtension
   def compiler_with_cxx11_support?(cc)
     return if compiler_any_clang?(cc)
 
-    version = cc[/^gcc-(\d+(?:\.\d+)?)$/, 1]
+    version = if cc == :gcc
+      non_apple_gcc_version "gcc"
+    else
+      cc[/^gcc-(\d+(?:\.\d+)?)$/, 1]
+    end
     version && Version.create(version) >= Version.create("4.8")
   end
 
