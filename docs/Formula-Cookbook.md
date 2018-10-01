@@ -552,18 +552,28 @@ class Python3 < Formula
   head "https://hg.python.org/cpython", :using => :hg
 ```
 
-Download strategies offered by Homebrew are:
+Homebrew offers both anonymous and authenticated download strategies.
 
 | `:using` value | download strategy             |
 |----------------|-------------------------------|
 | `:bzr`         | `BazaarDownloadStrategy`      |
 | `:curl`        | `CurlDownloadStrategy`        |
 | `:cvs`         | `CVSDownloadStrategy`         |
+| `:fossil`      | `FossilDownloadStrategy`      |
 | `:git`         | `GitDownloadStrategy`         |
 | `:hg`          | `MercurialDownloadStrategy`   |
 | `:nounzip`     | `NoUnzipCurlDownloadStrategy` |
 | `:post`        | `CurlPostDownloadStrategy`    |
 | `:svn`         | `SubversionDownloadStrategy`  |
+|----------------|-------------------------------|
+
+| `:using` value            | download strategy                                | authentication source                        |
+|---------------------------|--------------------------------------------------|----------------------------------------------|
+| `:github_private_release` | `GitHubPrivateRepositoryReleaseDownloadStrategy` | `HOMEBREW_GITHUB_API_TOKEN`                  |
+| `:github_private_repo`    | `GitHubPrivateRepositoryDownloadStrategy`        | `HOMEBREW_GITHUB_API_TOKEN`                  |
+| `:s3`                     | `S3DownloadStrategy`                             | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` |
+| `:scp`                    | `ScpDownloadStrategy`                            | SSH key pair                                 |
+|---------------------------|--------------------------------------------------|----------------------------------------------|
 
 If you need more control over the way files are downloaded and staged, you can create a custom download strategy and specify it using the [`url`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#url-class_method) method's `:using` option:
 
