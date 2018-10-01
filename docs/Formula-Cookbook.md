@@ -133,7 +133,9 @@ class Foo < Formula
   depends_on "jpeg"
   depends_on "readline" => :recommended
   depends_on "gtk+" => :optional
+  depends_on "httpd" => [:build, :test]
   depends_on :x11 => :optional
+  depends_on :xcode => "9.3"
 end
 ```
 
@@ -141,24 +143,23 @@ A String (e.g. `"jpeg"`) specifies a formula dependency.
 
 A Symbol (e.g. `:x11`) specifies a [`Requirement`](http://www.rubydoc.info/github/Homebrew/brew/master/Requirement) which can be fulfilled by one or more formulae, casks or other system-wide installed software (e.g. X11).
 
-A Hash (e.g. `=>`) specifies a formula dependency with some additional information. Given a single string key, the value can take several forms:
+A Hash (e.g. `=>`) adds information to a dependency. Given a String or Symbol, the value can be one or more of the following values:
 
-*   a Symbol (currently one of `:build`, `:test`, `:optional` or `:recommended`)
-    - `:build` means that dependency is a build-time only dependency so it can
-      be skipped when installing from a bottle or when listing missing
-      dependencies using `brew missing`.
-      - `:test` means that dependency is only required when running `brew test`.
-    - `:optional` generates an implicit `with-foo` option for the formula.
-      This means that, given `depends_on "foo" => :optional`, the user must pass `--with-foo` in order to use the dependency.
-    - `:recommended` generates an implicit `without-foo` option, meaning that
-      the dependency is enabled by default and the user must pass
-      `--without-foo` to disable this dependency. The default
-      description can be overridden using the normal option syntax (in this case, the option declaration must precede the dependency):
-
-      ```ruby
-      option "with-foo", "Compile with foo bindings" # This overrides the generated description if you want to
-      depends_on "foo" => :optional # Generated description is "Build with foo support"
-      ```
+* `:build` means that dependency is a build-time only dependency so it can
+be skipped when installing from a bottle or when listing missing
+dependencies using `brew missing`.
+* `:test` means that dependency is only required when running `brew test`.
+* `:optional` generates an implicit `with-foo` option for the formula.
+This means that, given `depends_on "foo" => :optional`, the user must pass `--with-foo` in order to use the dependency.
+* `:recommended` generates an implicit `without-foo` option, meaning that
+the dependency is enabled by default and the user must pass
+`--without-foo` to disable this dependency. The default
+description can be overridden using the normal option syntax (in this case, the option declaration must precede the dependency):
+    ```ruby
+    option "with-foo", "Compile with foo bindings" # This overrides the generated description if you want to
+    depends_on "foo" => :optional # Generated description would otherwise be "Build with foo support"
+    ```
+* Some [`Requirement`][6]s can also take a string specifying their minimum version that the formula depends on.
 
 We frown on [`option`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#option-class_method)s in Homebrew/homebrew-core as they are not tested by CI.
 
