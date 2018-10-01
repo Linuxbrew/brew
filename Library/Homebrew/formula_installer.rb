@@ -473,8 +473,7 @@ class FormulaInstaller
     # Installing bottles on Linux require a recent version of glibc and gcc.
     # GCC is required for libgcc_s.so and libstdc++.so. It depends on glibc.
     begin
-      glibc = Formula["glibc"]
-      if !glibc.installed? && OS::Linux::Glibc.system_version < glibc.version
+      if !Formula["glibc"].installed? && OS::Linux::Glibc.system_version < Version.new("2.17")
         gcc_dep = Dependency.new("gcc")
         deps += Dependency.expand(gcc_dep.to_formula) << gcc_dep
       end
