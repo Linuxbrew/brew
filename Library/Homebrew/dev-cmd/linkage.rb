@@ -22,7 +22,7 @@ module Homebrew
   def linkage_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `linkage` [<options>] <formula>:
+        ### linkage [options] [formula]:
 
         Checks the library links of an installed formula.
 

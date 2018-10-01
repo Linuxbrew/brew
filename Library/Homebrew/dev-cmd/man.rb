@@ -36,7 +36,7 @@ module Homebrew
   def man_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `man` [<options>]:
+        ### man [options]:
 
         Generate Homebrew's manpages.
       EOS

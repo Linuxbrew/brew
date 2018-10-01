@@ -1,4 +1,4 @@
-#:  * `prof` [<ruby options>]:
+#:  ### prof [ruby options]:
 #:    Run Homebrew with the Ruby profiler.
 #:    For example:
 #       brew prof readall

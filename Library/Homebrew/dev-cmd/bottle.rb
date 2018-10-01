@@ -72,11 +72,10 @@ module Homebrew
   def bottle_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `bottle` [<options>] [<formulae>]:
+        ### bottle [options] [formulae]:
 
         Generate a bottle (binary package) from a formula installed with
         `--build-bottle`.
-
         If the formula specifies a rebuild version, it will be incremented in the
         generated DSL. Passing `--keep-old` will attempt to keep it at its
         original value, while `--no-rebuild` will remove it.

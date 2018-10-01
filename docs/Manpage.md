@@ -663,11 +663,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 ## DEVELOPER COMMANDS
 
-`audit` [`options`] [`formulae`]:
+### audit [options] [formulae]:
 
 Check `formulae` for Homebrew coding style violations. This should be
 run before submitting a new formula.
-
 If no `formulae` are provided, all of them are checked.
 
 *  `--strict`:
@@ -697,11 +696,10 @@ Make some output more verbose.
 * `-d`,  `--debug`:
 Display any debugging information.
 
-`bottle` [`options`] [`formulae`]:
+### bottle [options] [formulae]:
 
 Generate a bottle (binary package) from a formula installed with
 `--build-bottle`.
-
 If the formula specifies a rebuild version, it will be incremented in the
 generated DSL. Passing `--keep-old` will attempt to keep it at its
 original value, while `--no-rebuild` will remove it.
@@ -731,7 +729,7 @@ Make some output more verbose.
 * `-d`,  `--debug`:
 Display any debugging information.
 
-`bump-formula-pr` [`options`] `formula`:
+### bump-formula-pr [options] [formula]:
 
 Creates a pull request to update the formula with a new URL or a new tag.
 
@@ -782,7 +780,7 @@ Make some output more verbose.
 * `-d`,  `--debug`:
 Display any debugging information.
 
-`create` `URL` [`options`]:
+### create URL [options]:
 
 Generate a formula for the downloadable file at `URL` and open it in the editor.
 Homebrew will attempt to automatically derive the formula name
@@ -813,10 +811,10 @@ Make some output more verbose.
 * `-d`,  `--debug`:
 Display any debugging information.
 
-* `edit`:
+### edit:
   Open all of Homebrew for editing.
 
-* `edit` `formula`:
+### edit [formula]:
   Open `formula` in the editor.
 
 * `-f`,  `--force`:
@@ -826,7 +824,7 @@ Make some output more verbose.
 * `-d`,  `--debug`:
 Display any debugging information.
 
-`formula` `formula`:
+### formula [formula]:
 
 Display the path where `formula` is located.
 
@@ -835,7 +833,7 @@ Display any debugging information.
 * `-v`,  `--verbose`:
 Make some output more verbose.
 
-`irb` [`options`]:
+### irb [options]:
 
 Enter the interactive Homebrew Ruby shell.
 
@@ -844,7 +842,7 @@ Show several examples.
 *  `--pry`:
 Pry will be used instead of irb if `--pry` is passed or HOMEBREW_PRY is set.
 
-`linkage` [`options`] `formula`:
+### linkage [options] [formula]:
 
 Checks the library links of an installed formula.
 
@@ -862,7 +860,7 @@ Make some output more verbose.
 * `-d`,  `--debug`:
 Display any debugging information.
 
-`man` [`options`]:
+### man [options]:
 
 Generate Homebrew's manpages.
 
@@ -871,7 +869,7 @@ Return a failing status code if changes are detected in the manpage outputs. Thi
 *  `--link`:
 It is now done automatically by `brew update`.
 
-`mirror` [`formulae`]:
+### mirror [formulae]:
  
  Reuploads the stable URL for a formula to Bintray to use it as a mirror.
 
@@ -880,11 +878,11 @@ Display any debugging information.
 * `-v`,  `--verbose`:
 Make some output more verbose.
 
-  * `prof` [`ruby options`]:
+  ### prof [ruby options]:
     Run Homebrew with the Ruby profiler.
     For example:
 
-`bump-formula-pr` [`options`] `formula`:
+### pull [options] [formula]:
 
 Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 Optionally, installs the formulae changed by the patch.
@@ -929,7 +927,7 @@ Make some output more verbose.
 * `-d`,  `--debug`:
 Display any debugging information.
 
-`release-notes` [`previous_tag`] [`end_ref`]:
+### release-notes [previous_tag] [end_ref]:
 
 Output the merged pull requests on Homebrew/brew between two Git refs.
 If no `previous_tag` is provided it defaults to the latest tag.
@@ -942,7 +940,7 @@ Output as a Markdown list.
     Run a Ruby instance with Homebrew's libraries loaded.
     For example:
 
-`tap-new` `user``/``repo`:
+### tap-new [user]/[repo]:
  
 Generate the template files for a new tap.
 
@@ -951,7 +949,7 @@ Display any debugging information.
 * `-v`,  `--verbose`:
 Make some output more verbose.
 
-  * `test` [`--devel`|`--HEAD`] [`--debug`] [`--keep-tmp`] `formula`:
+  ### test [--devel|--HEAD] [--debug] [--keep-tmp] [formula]:
     Most formulae provide a test method. `brew test` `formula` runs this
     test method. There is no standard output or return code, but it should
     generally indicate to the user if something is wrong with the installed
@@ -968,7 +966,7 @@ Make some output more verbose.
 
     Example: `brew install jruby && brew test jruby`
 
-`tests` [`options`] `formula`:
+### tests [options] [formula]:
 
 Run Homebrew's unit and integration tests. If provided,
 `--only=``test_script` runs only `test_script`_spec.rb, and `--seed`
@@ -991,7 +989,7 @@ Make some output more verbose.
 * `-d`,  `--debug`:
 Display any debugging information.
 
-`update-test` [`options`]:
+### update-test [options]:
 
  Runs a test of `brew update` with a new repository clone.
 

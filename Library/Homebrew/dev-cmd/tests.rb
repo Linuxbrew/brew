@@ -24,7 +24,7 @@ module Homebrew
   def tests_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `tests` [<options>] <formula>:
+        ### tests [options] [formula]:
 
         Run Homebrew's unit and integration tests. If provided,
         `--only=`<test_script> runs only <test_script>_spec.rb, and `--seed`
