@@ -38,17 +38,20 @@ module Homebrew
         puts
       end
 
-      download = f.fetch
-      f.verify_download_integrity(download)
-      filename = download.basename
-      destination_url = "https://dl.bintray.com/homebrew/mirror/#{filename}"
+      downloader = f.downloader
 
+      downloader.fetch
+      f.verify_download_integrity(downloader.cached_location)
+
+      filename = downloader.basename
+
+      destination_url = "https://dl.bintray.com/homebrew/mirror/#{filename}"
       ohai "Uploading to #{destination_url}"
-      content_url = "https://api.bintray.com/content/homebrew/mirror"
-      content_url += "/#{bintray_package}/#{f.pkg_version}/#{filename}"
-      content_url += "?publish=1"
+
+      content_url =
+        "https://api.bintray.com/content/homebrew/mirror/#{bintray_package}/#{f.pkg_version}/#{filename}?publish=1"
       curl "--silent", "--fail", "--user", "#{bintray_user}:#{bintray_key}",
-           "--upload-file", download, content_url
+           "--upload-file", downloader.cached_location, content_url
       puts
       ohai "Mirrored #{filename}!"
     end

@@ -333,6 +333,7 @@ class Formula
     :bottle_defined?,
     :bottled?,
     :bottle_specification,
+    :downloader,
   ] => :active_spec
 
   # The Bottle object for the currently active {SoftwareSpec}.
