@@ -136,6 +136,8 @@ module UnpackStrategy
       end
 
       Directory.new(tmp_unpack_dir).extract(to: to, verbose: verbose)
+
+      FileUtils.chmod_R "+w", tmp_unpack_dir
     end
   end
 
