@@ -489,14 +489,20 @@ class FormulaInstaller
       end
     end
 
-    if pour_bottle && !Keg.relocation_formulae.include?(formula.name)
-      bottle_deps = Keg.relocation_formulae
-                       .map { |formula| Dependency.new(formula) }
-                       .reject do |dep|
+    if pour_bottle && !Keg.bottle_dependencies.empty?
+      bottle_deps = if !Keg.bottle_dependencies.include?(formula.name)
+        Keg.bottle_dependencies
+      elsif !Keg.relocation_formulae.include?(formula.name)
+        Keg.relocation_formulae
+      else
+        []
+      end
+      bottle_deps = bottle_deps.map { |formula| Dependency.new(formula) }
+                               .reject do |dep|
         inherited_options[dep.name] |= inherited_options_for(dep)
         dep.satisfied? inherited_options[dep.name]
       end
-      expanded_deps = Dependency.merge_repeats(bottle_deps + expanded_deps) unless bottle_deps.empty?
+      expanded_deps = Dependency.merge_repeats(bottle_deps + expanded_deps)
     end
 
     expanded_deps.map { |dep| [dep, inherited_options[dep.name]] }

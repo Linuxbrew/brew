@@ -13,6 +13,9 @@ branches:
   only:
     - master
 
+env:
+  - HOMEBREW_FORCE_HOMEBREW_ON_LINUX=1
+
 before_install:
   - HOMEBREW_REPOSITORY="$(brew --repo)"
   - sudo chown -R "$USER" "$HOMEBREW_REPOSITORY"
