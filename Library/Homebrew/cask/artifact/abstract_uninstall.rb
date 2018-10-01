@@ -1,5 +1,6 @@
 require "timeout"
 
+require "utils/user"
 require "cask/artifact/abstract_artifact"
 
 module Cask
@@ -124,9 +125,14 @@ module Cask
       # :quit/:signal must come before :kext so the kext will not be in use by a running process
       def uninstall_quit(*bundle_ids, command: nil, **_)
         bundle_ids.each do |bundle_id|
-          ohai "Quitting application ID #{bundle_id}"
           next if running_processes(bundle_id, command: command).empty?
 
+          unless User.current.gui?
+            ohai "Not logged into a GUI; skipping quitting application ID '#{bundle_id}'."
+            next
+          end
+
+          ohai "Quitting application ID '#{bundle_id}'."
           command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{bundle_id}" to quit)], sudo: true)
 
           begin

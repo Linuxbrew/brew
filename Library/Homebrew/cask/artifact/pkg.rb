@@ -1,5 +1,6 @@
 require "plist"
 
+require "utils/user"
 require "cask/artifact/abstract_artifact"
 
 require "extend/hash_validator"
@@ -50,11 +51,10 @@ module Cask
         end
         with_choices_file do |choices_path|
           args << "-applyChoiceChangesXML" << choices_path if choices_path
-          logged_in_user = Utils.current_user
           env = {
-            "LOGNAME" => logged_in_user,
-            "USER" => logged_in_user,
-            "USERNAME" => logged_in_user,
+            "LOGNAME" => User.current,
+            "USER" => User.current,
+            "USERNAME" => User.current,
           }
           command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true, env: env)
         end

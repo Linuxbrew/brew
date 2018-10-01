@@ -8,12 +8,14 @@ require "extend/hash_validator"
 using HashValidator
 require "extend/predicable"
 
-def system_command(*args)
-  SystemCommand.run(*args)
-end
+module Kernel
+  def system_command(*args)
+    SystemCommand.run(*args)
+  end
 
-def system_command!(*args)
-  SystemCommand.run!(*args)
+  def system_command!(*args)
+    SystemCommand.run!(*args)
+  end
 end
 
 class SystemCommand

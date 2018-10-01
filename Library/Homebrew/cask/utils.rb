@@ -1,3 +1,4 @@
+require "utils/user"
 require "yaml"
 require "open3"
 require "stringio"
@@ -52,7 +53,7 @@ module Cask
           #       before using sudo+chown
           ohai "Using sudo to gain ownership of path '#{path}'"
           command.run("/usr/sbin/chown",
-                      args: command_args + ["--", current_user, path],
+                      args: command_args + ["--", User.current, path],
                       sudo: true)
           tried_ownership = true
           # retry chflags/chmod after chown
@@ -60,10 +61,6 @@ module Cask
           retry # rmtree
         end
       end
-    end
-
-    def self.current_user
-      Etc.getpwuid(Process.euid).name
     end
 
     def self.path_occupied?(path)
