@@ -156,6 +156,8 @@ module Homebrew
       ronn_output = ronn.read
       odie "Got no output from ronn!" unless ronn_output
       ronn_output.gsub!(%r{</var>`(?=[.!?,;:]?\s)}, "").gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
+      ronn_output = ronn_output.gsub(%r{<code>}, "\\fB").gsub(%r{</code>}, "\\fR")
+        .gsub(%r{<var>}, "\\fI").gsub(%r{</var>}, "\\fR") unless format_flag == '--markdown'
       target.atomic_write ronn_output
     end
   end
@@ -226,8 +228,6 @@ module Homebrew
   def format_usage_banner(usage_banner)
     synopsis, *remaining_lines = usage_banner.split('\n')
     synopsis = synopsis.sub(/^/, "###")
-                 .gsub(/`/, "")
-                 .gsub(/<(.*?)>/, "\\1")
     [synopsis, *remaining_lines].join("\n")
   end
 end

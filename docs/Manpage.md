@@ -663,11 +663,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 ## DEVELOPER COMMANDS
 
-###audit [options] [formulae]:
+###`audit` [`options`] [`formulae`]:
 
-Check formulae for Homebrew coding style violations. This should be
+Check `formulae` for Homebrew coding style violations. This should be
 run before submitting a new formula.
-If no formulae are provided, all of them are checked.
+If no `formulae` are provided, all of them are checked.
 
 *  `--strict`:
 Run additional style checks, including Rubocop style checks.
@@ -692,13 +692,13 @@ Passing `--only-cops`=`cops` will check for violations of only the listed RuboCo
 *  `--except-cops`:
 Passing `--except-cops`=`cops` will skip checking the listed RuboCop cops violations. `cops` should be a comma-separated list of cop names.
 
-###bottle [options] [formulae]:
+###`bottle` [`options`] [`formulae`]:
 
 Generate a bottle (binary package) from a formula installed with
---build-bottle.
+`--build-bottle`.
 If the formula specifies a rebuild version, it will be incremented in the
-generated DSL. Passing --keep-old will attempt to keep it at its
-original value, while --no-rebuild will remove it.
+generated DSL. Passing `--keep-old` will attempt to keep it at its
+original value, while `--no-rebuild` will remove it.
 
 *  `--skip-relocation`:
 Do not check if the bottle can be marked as relocatable.
@@ -721,15 +721,15 @@ Write bottle information to a JSON file, which can be used as the argument for `
 *  `--root-url`:
 Use the specified `URL` as the root of the bottle's URL instead of Homebrew's default.
 
-###bump-formula-pr [options] formula:
+###`bump-formula-pr` [`options`] `formula`:
 
 Creates a pull request to update the formula with a new URL or a new tag.
 
-If a URL is specified, the sha-256 checksum of the new download must
-also be specified. A best effort to determine the sha-256 and formula
+If a `URL` is specified, the `sha-256` checksum of the new download must
+also be specified. A best effort to determine the `sha-256` and `formula`
 name will be made if either or both values are not supplied by the user.
 
-If a tag is specified, the git commit revision corresponding to that
+If a `tag` is specified, the git commit `revision` corresponding to that
 tag must also be specified.
 
 Note that this command cannot be used to transition a formula from a
@@ -764,13 +764,13 @@ Use the provided `version` to override the value parsed from the URL or tag. Not
 *  `--message`:
 Append provided `message` to the default PR message.
 
-###create URL [options]:
+###`create` `URL` [`options`]:
 
-Generate a formula for the downloadable file at URL and open it in the editor.
+Generate a formula for the downloadable file at `URL` and open it in the editor.
 Homebrew will attempt to automatically derive the formula name
-and version, but if it fails, you'll have to make your own template. The wget
+and version, but if it fails, you'll have to make your own template. The `wget`
 formula serves as a simple example. For the complete API have a look at
-http://www.rubydoc.info/github/Homebrew/brew/master/Formula.
+<http://www.rubydoc.info/github/Homebrew/brew/master/Formula>.
 
 *  `--autotools`:
 Create a basic template for an Autotools-style build.
@@ -789,17 +789,17 @@ Set the provided version of the package you are creating.
 *  `--tap`:
 Takes a tap [`user``/``repo`] as argument and generates the formula in the specified tap.
 
-###edit formula:
-  Open formula in the editor. Open all of Homebrew for editing if
-  no formula is provided.
+###`edit` `formula`:
+  Open `formula` in the editor. Open all of Homebrew for editing if
+  no `formula` is provided.
 
 
-###formula formula:
+###`formula` `formula`:
 
-Display the path where formula is located.
+Display the path where `formula` is located.
 
 
-###irb [options]:
+###`irb` [`options`]:
 
 Enter the interactive Homebrew Ruby shell.
 
@@ -808,7 +808,7 @@ Show several examples.
 *  `--pry`:
 Pry will be used instead of irb if `--pry` is passed or HOMEBREW_PRY is set.
 
-###linkage [options] formula:
+###`linkage` [`options`] `formula`:
 
 Checks the library links of an installed formula.
 
@@ -822,7 +822,7 @@ Print the dylib followed by the binaries which link to it for each library the k
 *  `--cached`:
 Print the cached linkage values stored in HOMEBREW_CACHE, set from a previous `brew linkage` run.
 
-###man [options]:
+###`man` [`options`]:
 
 Generate Homebrew's manpages.
 
@@ -831,7 +831,7 @@ Return a failing status code if changes are detected in the manpage outputs. Thi
 *  `--link`:
 It is now done automatically by `brew update`.
 
-###mirror formulae:
+###`mirror` `formulae`:
  
 Reuploads the stable URL for a formula to Bintray to use it as a mirror.
 
@@ -840,12 +840,12 @@ Reuploads the stable URL for a formula to Bintray to use it as a mirror.
     Run Homebrew with the Ruby profiler.
     For example:
 
-###pull [options] [formula]:
+###pull [`options`] [`formula`]:
 
 Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 Optionally, installs the formulae changed by the patch.
 
-Each patch-source may be one of:
+Each `patch-source` may be one of:
 
   ~ The ID number of a PR (pull request) in the homebrew/core GitHub
     repository
@@ -881,11 +881,11 @@ Publish at the given Bintray organisation.
 *  `--test-bot-user`:
 Pull the bottle block commit from the specified user on GitHub.
 
-###release-notes [previous_tag] [end_ref]:
+###`release-notes` [`previous_tag`] [`end_ref`]:
 
 Output the merged pull requests on Homebrew/brew between two Git refs.
-If no previous_tag is provided it defaults to the latest tag.
-If no end_ref is provided it defaults to origin/master.
+If no `previous_tag` is provided it defaults to the latest tag.
+If no `end_ref` is provided it defaults to `origin/master`.
 
 *  `--markdown`:
 Output as a Markdown list.
@@ -894,7 +894,7 @@ Output as a Markdown list.
     Run a Ruby instance with Homebrew's libraries loaded.
     For example:
 
-###tap-new user/repo:
+###`tap-new` `user`/`repo`:
  
 Generate the template files for a new tap.
 
@@ -916,10 +916,10 @@ Generate the template files for a new tap.
 
     Example: `brew install jruby && brew test jruby`
 
-###tests [options] formula:
+###`tests` [`options`] `formula`:
 
 Run Homebrew's unit and integration tests. If provided,
---only=test_script runs only test_script_spec.rb, and --seed
+`--only=``test_script` runs only `test_script`_spec.rb, and `--seed`
 randomizes tests with the provided value instead of a random seed.
 
 *  `--coverage`:
@@ -935,11 +935,11 @@ Run only `test_script`_spec.rb
 *  `--seed`:
 Randomizes tests with the provided value instead of a random seed.
 
-###update-test [options]:
+###`update-test` [options]:
 
-Runs a test of brew update with a new repository clone.
+Runs a test of `brew update` with a new repository clone.
 
-If no arguments are passed, use origin/master as the start commit.
+If no arguments are passed, use `origin/master` as the start commit.
 
 *  `--to-tag`:
 Set `HOMEBREW_UPDATE_TO_TAG` to test updating between tags.
