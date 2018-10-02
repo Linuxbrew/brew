@@ -150,7 +150,9 @@ module MachO
       # @return [Boolean] whether the flag is present in the section's {flags}
       def flag?(flag)
         flag = SECTION_FLAGS[flag]
+
         return false if flag.nil?
+
         flags & flag == flag
       end
 

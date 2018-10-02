@@ -75,35 +75,49 @@ module MachO
     # @param num [Integer] the number being checked
     # @return [Boolean] whether `num` is a valid Fat magic number
     def self.fat_magic?(num)
+      [Headers::FAT_MAGIC, Headers::FAT_MAGIC_64].include? num
+    end
+
+    # Compares the given number to valid 32-bit Fat magic numbers.
+    # @param num [Integer] the number being checked
+    # @return [Boolean] whether `num` is a valid 32-bit fat magic number
+    def self.fat_magic32?(num)
       num == Headers::FAT_MAGIC
+    end
+
+    # Compares the given number to valid 64-bit Fat magic numbers.
+    # @param num [Integer] the number being checked
+    # @return [Boolean] whether `num` is a valid 64-bit fat magic number
+    def self.fat_magic64?(num)
+      num == Headers::FAT_MAGIC_64
     end
 
     # Compares the given number to valid 32-bit Mach-O magic numbers.
     # @param num [Integer] the number being checked
     # @return [Boolean] whether `num` is a valid 32-bit magic number
     def self.magic32?(num)
-      num == Headers::MH_MAGIC || num == Headers::MH_CIGAM
+      [Headers::MH_MAGIC, Headers::MH_CIGAM].include? num
     end
 
     # Compares the given number to valid 64-bit Mach-O magic numbers.
     # @param num [Integer] the number being checked
     # @return [Boolean] whether `num` is a valid 64-bit magic number
     def self.magic64?(num)
-      num == Headers::MH_MAGIC_64 || num == Headers::MH_CIGAM_64
+      [Headers::MH_MAGIC_64, Headers::MH_CIGAM_64].include? num
     end
 
     # Compares the given number to valid little-endian magic numbers.
     # @param num [Integer] the number being checked
     # @return [Boolean] whether `num` is a valid little-endian magic number
     def self.little_magic?(num)
-      num == Headers::MH_CIGAM || num == Headers::MH_CIGAM_64
+      [Headers::MH_CIGAM, Headers::MH_CIGAM_64].include? num
     end
 
     # Compares the given number to valid big-endian magic numbers.
     # @param num [Integer] the number being checked
     # @return [Boolean] whether `num` is a valid big-endian magic number
     def self.big_magic?(num)
-      num == Headers::MH_CIGAM || num == Headers::MH_CIGAM_64
+      [Headers::MH_MAGIC, Headers::MH_MAGIC_64].include? num
     end
   end
 end
