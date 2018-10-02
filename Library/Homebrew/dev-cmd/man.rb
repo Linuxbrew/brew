@@ -36,7 +36,7 @@ module Homebrew
   def man_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `man` [<options>]:
+        `man` <options>:
 
         Generate Homebrew's manpages.
       EOS
@@ -226,8 +226,6 @@ module Homebrew
   end
 
   def format_usage_banner(usage_banner)
-    synopsis, *remaining_lines = usage_banner.split('\n')
-    synopsis = synopsis.sub(/^/, "###")
-    [synopsis, *remaining_lines].join("\n")
+    usage_banner.sub(/^/, "###")
   end
 end

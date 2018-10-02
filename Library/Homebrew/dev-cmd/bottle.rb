@@ -72,7 +72,7 @@ module Homebrew
   def bottle_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `bottle` [<options>] [<formulae>]:
+        `bottle` <options> <formulae>:
 
         Generate a bottle (binary package) from a formula installed with
         `--build-bottle`.

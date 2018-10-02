@@ -50,7 +50,7 @@ module Homebrew
   def bump_formula_pr_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `bump-formula-pr` [<options>] <formula>:
+        `bump-formula-pr` <options> <formula>:
 
         Creates a pull request to update the formula with a new URL or a new tag.
     

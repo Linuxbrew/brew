@@ -25,7 +25,7 @@ module Homebrew
   def irb_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `irb` [<options>]:
+        `irb` <options>:
 
         Enter the interactive Homebrew Ruby shell.
       EOS
