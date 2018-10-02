@@ -21,7 +21,7 @@ class Keg
     # Skip ELF files that do not have a .dynstr section.
     return if ["cannot find section .dynstr", "strange: no string table"].include?(old_rpath)
     unless $CHILD_STATUS.success?
-      raise ErrorDuringExecution.new(cmd_rpath, status: $CHILD_STATUS, output: [:stdout, old_rpath])
+      raise ErrorDuringExecution.new(cmd_rpath, status: $CHILD_STATUS, output: [[:stderr, old_rpath]])
     end
 
     rpath = old_rpath
