@@ -7,7 +7,7 @@ module Stdenv
 
   # @private
   SAFE_CFLAGS_FLAGS = "-w -pipe".freeze
-  DEFAULT_FLAGS = "-march=core2 -msse4".freeze
+  DEFAULT_FLAGS = "-march=native".freeze
 
   # @private
   def setup_build_environment(formula = nil)
@@ -108,7 +108,7 @@ module Stdenv
 
   def gcc_4_2
     super
-    set_cpu_cflags
+    set_cpu_cflags "-march=core2 -msse4"
   end
 
   GNU_GCC_VERSIONS.each do |n|
@@ -124,7 +124,7 @@ module Stdenv
     # Clang mistakenly enables AES-NI on plain Nehalem
     map = Hardware::CPU.optimization_flags
     map = map.merge(nehalem: "-march=native -Xclang -target-feature -Xclang -aes")
-    set_cpu_cflags "-march=native", map
+    set_cpu_cflags DEFAULT_FLAGS, map
   end
 
   def minimal_optimization
