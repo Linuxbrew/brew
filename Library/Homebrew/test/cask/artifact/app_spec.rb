@@ -80,7 +80,7 @@ describe Cask::Artifact::App, :cask do
         let(:force) { true }
 
         before do
-          allow(Cask::Utils).to receive(:current_user).and_return("fake_user")
+          allow(User).to receive(:current).and_return(User.new("fake_user"))
         end
 
         describe "target is both writable and user-owned" do

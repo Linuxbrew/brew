@@ -76,7 +76,7 @@ shared_examples Cask::Staged do
   it "can set the ownership of a file" do
     fake_pathname = existing_path
 
-    allow(staged).to receive(:current_user).and_return("fake_user")
+    allow(User).to receive(:current).and_return(User.new("fake_user"))
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     FakeSystemCommand.expects_command(
@@ -89,7 +89,7 @@ shared_examples Cask::Staged do
   it "can set the ownership of multiple files" do
     fake_pathname = existing_path
 
-    allow(staged).to receive(:current_user).and_return("fake_user")
+    allow(User).to receive(:current).and_return(User.new("fake_user"))
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     FakeSystemCommand.expects_command(
@@ -112,7 +112,7 @@ shared_examples Cask::Staged do
   end
 
   it "cannot set the ownership of a file that does not exist" do
-    allow(staged).to receive(:current_user).and_return("fake_user")
+    allow(User).to receive(:current).and_return(User.new("fake_user"))
     fake_pathname = non_existent_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 

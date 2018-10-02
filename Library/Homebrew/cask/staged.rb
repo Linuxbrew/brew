@@ -1,3 +1,5 @@
+require "utils/user"
+
 module Cask
   module Staged
     def info_plist_file(index = 0)
@@ -31,17 +33,13 @@ module Cask
                                   sudo: false)
     end
 
-    def set_ownership(paths, user: current_user, group: "staff")
+    def set_ownership(paths, user: User.current, group: "staff")
       full_paths = remove_nonexistent(paths)
       return if full_paths.empty?
 
       ohai "Changing ownership of paths required by #{@cask}; your password may be necessary"
       @command.run!("/usr/sbin/chown", args: ["-R", "--", "#{user}:#{group}"] + full_paths,
                                        sudo: true)
-    end
-
-    def current_user
-      Utils.current_user
     end
 
     private
