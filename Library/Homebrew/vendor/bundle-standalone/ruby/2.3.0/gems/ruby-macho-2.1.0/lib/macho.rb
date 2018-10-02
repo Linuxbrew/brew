@@ -12,7 +12,7 @@ require_relative "macho/tools"
 # The primary namespace for ruby-macho.
 module MachO
   # release version
-  VERSION = "2.0.0".freeze
+  VERSION = "2.1.0".freeze
 
   # Opens the given filename as a MachOFile or FatFile, depending on its magic.
   # @param filename [String] the file being opened

@@ -242,6 +242,7 @@ module MachO
       # @api private
       def serialize(context)
         raise LoadCommandNotSerializableError, LOAD_COMMANDS[cmd] unless serializable?
+
         format = Utils.specialize_format(FORMAT, context.endianness)
         [cmd, SIZEOF].pack(format)
       end
@@ -298,7 +299,9 @@ module MachO
             lc_end = view.offset + lc.cmdsize - 1
             raw_string = view.raw_data.slice(lc_str_abs..lc_end)
             @string, null_byte, _padding = raw_string.partition("\x00")
+
             raise LCStrMalformedError, lc if null_byte.empty?
+
             @string_offset = lc_str
           else
             @string = lc_str
@@ -473,7 +476,9 @@ module MachO
       # @return [Boolean] true if `flag` is present in the segment's flag field
       def flag?(flag)
         flag = SEGMENT_FLAGS[flag]
+
         return false if flag.nil?
+
         flags & flag == flag
       end
 

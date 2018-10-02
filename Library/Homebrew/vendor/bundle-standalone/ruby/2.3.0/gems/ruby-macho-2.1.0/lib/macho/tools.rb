@@ -89,8 +89,9 @@ module MachO
     # Merge multiple Mach-Os into one universal (Fat) binary.
     # @param filename [String] the fat binary to create
     # @param files [Array<String>] the files to merge
+    # @param fat64 [Boolean] whether to use {Headers::FatArch64}s to represent each slice
     # @return [void]
-    def self.merge_machos(filename, *files)
+    def self.merge_machos(filename, *files, fat64: false)
       machos = files.map do |file|
         macho = MachO.open(file)
         case macho
@@ -101,7 +102,7 @@ module MachO
         end
       end.flatten
 
-      fat_macho = MachO::FatFile.new_from_machos(*machos)
+      fat_macho = MachO::FatFile.new_from_machos(*machos, :fat64 => fat64)
       fat_macho.write(filename)
     end
   end
