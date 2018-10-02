@@ -36,7 +36,7 @@ module Homebrew
   def man_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        ### man [options]:
+        `man` [<options>]:
 
         Generate Homebrew's manpages.
       EOS
@@ -93,6 +93,7 @@ module Homebrew
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
 
     variables[:developer_commands] = generate_cmd_manpages("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
+    variables[:global_options] = global_options_manpage_lines
     readme = HOMEBREW_REPOSITORY/"README.md"
     variables[:lead_maintainer] =
       readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
@@ -180,7 +181,7 @@ module Homebrew
     cmd_paths.each do |cmd_path|
       begin
         cmd_parser = Homebrew.send(cmd_arg_parser(cmd_path))
-        man_page_lines << generate_cmd_manpage_lines(cmd_parser).join
+        man_page_lines << cmd_manpage_lines(cmd_parser).join
       rescue NoMethodError
         man_page_lines << path_glob_commands(cmd_path.to_s)[0]
       end
@@ -192,9 +193,19 @@ module Homebrew
     "#{cmd_path.basename.to_s.gsub('.rb', '').gsub('-', '_')}_args".to_sym
   end
 
-  def generate_cmd_manpage_lines(cmd_parser)
-    lines = [cmd_parser.usage_banner_text]
+  def cmd_manpage_lines(cmd_parser)
+    lines = ["#{format_usage_banner(cmd_parser.usage_banner_text)}"]
     lines += cmd_parser.processed_options.map do |short, long, _, desc|
+      next if !long.nil? && cmd_parser.global_option?(cmd_parser.option_to_name(long))
+      generate_option_doc(short, long, desc)
+    end
+    lines
+  end
+
+  def global_options_manpage_lines
+    lines = ["These options are applicable across all sub-commands.\n"]
+    lines += Homebrew::CLI::Parser.global_options.values.map do |names, _, desc|
+      short, long = names
       generate_option_doc(short, long, desc)
     end
     lines
@@ -210,5 +221,13 @@ module Homebrew
 
   def format_long_opt(opt)
     "`#{opt}`"
+  end
+
+  def format_usage_banner(usage_banner)
+    synopsis, *remaining_lines = usage_banner.split('\n')
+    synopsis = synopsis.sub(/^/, "###")
+                 .gsub(/`/, "")
+                 .gsub(/<(.*?)>/, "\\1")
+    [synopsis, *remaining_lines].join("\n")
   end
 end

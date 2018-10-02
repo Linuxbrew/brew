@@ -622,7 +622,7 @@ If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full upd
 .SH "DEVELOPER COMMANDS"
 .
 .SS "audit [options] [formulae]:"
-Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\. If no \fIformulae\fR are provided, all of them are checked\.
+Check formulae for Homebrew coding style violations\. This should be run before submitting a new formula\. If no formulae are provided, all of them are checked\.
 .
 .TP
 \fB\-\-strict\fR
@@ -668,16 +668,8 @@ Passing \fB\-\-only\-cops\fR=\fIcops\fR will check for violations of only the li
 \fB\-\-except\-cops\fR
 Passing \fB\-\-except\-cops\fR=\fIcops\fR will skip checking the listed RuboCop cops violations\. \fBcops\fR should be a comma\-separated list of cop names\.
 .
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
 .SS "bottle [options] [formulae]:"
-Generate a bottle (binary package) from a formula installed with \fB\-\-build\-bottle\fR\. If the formula specifies a rebuild version, it will be incremented in the generated DSL\. Passing \fB\-\-keep\-old\fR will attempt to keep it at its original value, while \fB\-\-no\-rebuild\fR will remove it\.
+Generate a bottle (binary package) from a formula installed with \-\-build\-bottle\. If the formula specifies a rebuild version, it will be incremented in the generated DSL\. Passing \-\-keep\-old will attempt to keep it at its original value, while \-\-no\-rebuild will remove it\.
 .
 .TP
 \fB\-\-skip\-relocation\fR
@@ -719,22 +711,14 @@ Write bottle information to a JSON file, which can be used as the argument for \
 \fB\-\-root\-url\fR
 Use the specified \fIURL\fR as the root of the bottle\'s URL instead of Homebrew\'s default\.
 .
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
-.SS "bump\-formula\-pr [options] [formula]:"
+.SS "bump\-formula\-pr [options] formula:"
 Creates a pull request to update the formula with a new URL or a new tag\.
 .
 .P
-If a \fIURL\fR is specified, the \fIsha\-256\fR checksum of the new download must also be specified\. A best effort to determine the \fIsha\-256\fR and \fIformula\fR name will be made if either or both values are not supplied by the user\.
+If a URL is specified, the sha\-256 checksum of the new download must also be specified\. A best effort to determine the sha\-256 and formula name will be made if either or both values are not supplied by the user\.
 .
 .P
-If a \fItag\fR is specified, the git commit \fIrevision\fR corresponding to that tag must also be specified\.
+If a tag is specified, the git commit revision corresponding to that tag must also be specified\.
 .
 .P
 Note that this command cannot be used to transition a formula from a URL\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.
@@ -794,24 +778,8 @@ Use the provided \fIversion\fR to override the value parsed from the URL or tag\
 \fB\-\-message\fR
 Append provided \fImessage\fR to the default PR message\.
 .
-.TP
-\fB\-q\fR, \fB\-\-quiet\fR
-Suppress any warnings\.
-.
-.TP
-\fB\-f\fR, \fB\-\-force\fR
-Override warnings and enable potentially unsafe operations\.
-.
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
 .SS "create URL [options]:"
-Generate a formula for the downloadable file at \fIURL\fR and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The \fBwget\fR formula serves as a simple example\. For the complete API have a look at \fIhttp://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\fR\.
+Generate a formula for the downloadable file at URL and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The wget formula serves as a simple example\. For the complete API have a look at http://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\.
 .
 .TP
 \fB\-\-autotools\fR
@@ -845,46 +813,11 @@ Set the provided version of the package you are creating\.
 \fB\-\-tap\fR
 Takes a tap [\fIuser\fR\fB/\fR\fIrepo\fR] as argument and generates the formula in the specified tap\.
 .
-.TP
-\fB\-f\fR, \fB\-\-force\fR
-Override warnings and enable potentially unsafe operations\.
+.SS "edit formula:"
+Open formula in the editor\. Open all of Homebrew for editing if no formula is provided\.
 .
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
-.SS "edit:"
-Open all of Homebrew for editing\.
-.
-.SS "edit [formula]:"
-Open \fIformula\fR in the editor\.
-.
-.TP
-\fB\-f\fR, \fB\-\-force\fR
-Override warnings and enable potentially unsafe operations\.
-.
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
-.SS "formula [formula]:"
-Display the path where \fIformula\fR is located\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
+.SS "formula formula:"
+Display the path where formula is located\.
 .
 .SS "irb [options]:"
 Enter the interactive Homebrew Ruby shell\.
@@ -897,7 +830,7 @@ Show several examples\.
 \fB\-\-pry\fR
 Pry will be used instead of irb if \fB\-\-pry\fR is passed or HOMEBREW_PRY is set\.
 .
-.SS "linkage [options] [formula]:"
+.SS "linkage [options] formula:"
 Checks the library links of an installed formula\.
 .
 .P
@@ -915,14 +848,6 @@ Print the dylib followed by the binaries which link to it for each library the k
 \fB\-\-cached\fR
 Print the cached linkage values stored in HOMEBREW_CACHE, set from a previous \fBbrew linkage\fR run\.
 .
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
 .SS "man [options]:"
 Generate Homebrew\'s manpages\.
 .
@@ -934,27 +859,18 @@ Return a failing status code if changes are detected in the manpage outputs\. Th
 \fB\-\-link\fR
 It is now done automatically by \fBbrew update\fR\.
 .
-.SS "mirror [formulae]:"
+.SS "mirror formulae:"
 Reuploads the stable URL for a formula to Bintray to use it as a mirror\.
 .
 .TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.SS "prof [ruby options]:"
-.
-.IP
+\fBprof\fR [ruby options]
 Run Homebrew with the Ruby profiler\. For example:
 .
 .SS "pull [options] [formula]:"
 Gets a patch from a GitHub commit or pull request and applies it to Homebrew\. Optionally, installs the formulae changed by the patch\.
 .
 .P
-Each \fIpatch\-source\fR may be one of:
+Each patch\-source may be one of:
 .
 .P
 ~ The ID number of a PR (pull request) in the homebrew/core GitHub repository
@@ -1012,16 +928,8 @@ Publish at the given Bintray organisation\.
 \fB\-\-test\-bot\-user\fR
 Pull the bottle block commit from the specified user on GitHub\.
 .
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
 .SS "release\-notes [previous_tag] [end_ref]:"
-Output the merged pull requests on Homebrew/brew between two Git refs\. If no \fIprevious_tag\fR is provided it defaults to the latest tag\. If no \fIend_ref\fR is provided it defaults to \fBorigin/master\fR\.
+Output the merged pull requests on Homebrew/brew between two Git refs\. If no previous_tag is provided it defaults to the latest tag\. If no end_ref is provided it defaults to origin/master\.
 .
 .TP
 \fB\-\-markdown\fR
@@ -1031,20 +939,11 @@ Output as a Markdown list\.
 \fBruby\fR [\fIruby options\fR]
 Run a Ruby instance with Homebrew\'s libraries loaded\. For example:
 .
-.SS "tap\-new [user]/[repo]:"
+.SS "tap\-new user/repo:"
 Generate the template files for a new tap\.
 .
 .TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.SS "test [\-\-devel|\-\-HEAD] [\-\-debug] [\-\-keep\-tmp] [formula]:"
-.
-.IP
+test [\-\-devel|\-\-HEAD] [\-\-debug] [\-\-keep\-tmp] [formula]
 Most formulae provide a test method\. \fBbrew test\fR \fIformula\fR runs this test method\. There is no standard output or return code, but it should generally indicate to the user if something is wrong with the installed formula\.
 .
 .IP
@@ -1059,8 +958,8 @@ If \fB\-\-keep\-tmp\fR is passed, the temporary files created for the test are n
 .IP
 Example: \fBbrew install jruby && brew test jruby\fR
 .
-.SS "tests [options] [formula]:"
-Run Homebrew\'s unit and integration tests\. If provided, \fB\-\-only=\fR\fItest_script\fR runs only \fItest_script\fR_spec\.rb, and \fB\-\-seed\fR randomizes tests with the provided value instead of a random seed\.
+.SS "tests [options] formula:"
+Run Homebrew\'s unit and integration tests\. If provided, \-\-only=test_script runs only test_script_spec\.rb, and \-\-seed randomizes tests with the provided value instead of a random seed\.
 .
 .TP
 \fB\-\-coverage\fR
@@ -1086,19 +985,11 @@ Run only \fItest_script\fR_spec\.rb
 \fB\-\-seed\fR
 Randomizes tests with the provided value instead of a random seed\.
 .
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-Make some output more verbose\.
-.
-.TP
-\fB\-d\fR, \fB\-\-debug\fR
-Display any debugging information\.
-.
 .SS "update\-test [options]:"
-Runs a test of \fBbrew update\fR with a new repository clone\.
+Runs a test of brew update with a new repository clone\.
 .
 .P
-If no arguments are passed, use \fBorigin/master\fR as the start commit\.
+If no arguments are passed, use origin/master as the start commit\.
 .
 .TP
 \fB\-\-to\-tag\fR
@@ -1116,6 +1007,13 @@ Use provided \fIcommit\fR as the start commit\.
 \fB\-\-before\fR
 Use the commit at provided \fIdate\fR as the start commit\.
 .
+.SH "GLOBAL OPTIONS"
+These options are applicable across all sub\-commands\.
+.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Suppress any warnings\.
+.
 .TP
 \fB\-v\fR, \fB\-\-verbose\fR
 Make some output more verbose\.
@@ -1123,6 +1021,10 @@ Make some output more verbose\.
 .TP
 \fB\-d\fR, \fB\-\-debug\fR
 Display any debugging information\.
+.
+.TP
+\fB\-f\fR, \fB\-\-force\fR
+Override warnings and enable potentially unsafe operations\.
 .
 .SH "OFFICIAL EXTERNAL COMMANDS"
 .

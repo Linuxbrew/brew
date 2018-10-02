@@ -10,9 +10,9 @@ module Homebrew
   def mirror_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        ### mirror [formulae]:
+        `mirror` <formulae>:
          
-         Reuploads the stable URL for a formula to Bintray to use it as a mirror.
+        Reuploads the stable URL for a formula to Bintray to use it as a mirror.
       EOS
       switch :debug
       switch :verbose

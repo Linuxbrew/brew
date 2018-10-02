@@ -10,7 +10,7 @@ module Homebrew
   def formula_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        ### formula [formula]:
+        `formula` <formula>:
 
         Display the path where <formula> is located.
       EOS

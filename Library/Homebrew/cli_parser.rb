@@ -11,6 +11,15 @@ module Homebrew
         new(&block).parse(args)
       end
 
+      def self.global_options
+        {
+          quiet: [["-q", "--quiet"], :quiet, "Suppress any warnings."],
+          verbose: [["-v", "--verbose"], :verbose, "Make some output more verbose."],
+          debug: [["-d", "--debug"], :debug, "Display any debugging information."],
+          force: [["-f", "--force"], :force, "Override warnings and enable potentially unsafe operations."],
+        }
+      end
+
       def initialize(&block)
         @parser = OptionParser.new
         Homebrew.args = OpenStruct.new
@@ -32,10 +41,6 @@ module Homebrew
                       .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
           exit
         end
-      end
-
-      def wrap_option_desc(desc)
-        Formatter.wrap(desc, @desc_line_length).split("\n")
       end
 
       def switch(*names, description: nil, env: nil, required_for: nil, depends_on: nil)
@@ -119,6 +124,10 @@ module Homebrew
         @parser
       end
 
+      def global_option?(name)
+        Homebrew::CLI::Parser.global_options.has_key?(name.to_sym)
+      end
+
       private
 
       def enable_switch(*names)
@@ -129,17 +138,15 @@ module Homebrew
 
       # These are common/global switches accessible throughout Homebrew
       def common_switch(name)
-        case name
-        when :quiet   then [["-q", "--quiet"], :quiet, "Suppress any warnings."]
-        when :verbose then [["-v", "--verbose"], :verbose, "Make some output more verbose."]
-        when :debug   then [["-d", "--debug"], :debug, "Display any debugging information."]
-        when :force   then [["-f", "--force"], :force, "Override warnings and enable potentially unsafe operations."]
-        else name
-        end
+        Homebrew::CLI::Parser.global_options.fetch(name, name)
       end
 
       def option_passed?(name)
         Homebrew.args.respond_to?(name) || Homebrew.args.respond_to?("#{name}?")
+      end
+
+      def wrap_option_desc(desc)
+        Formatter.wrap(desc, @desc_line_length).split("\n")
       end
 
       def set_constraints(name, depends_on:, required_for:)

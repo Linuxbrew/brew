@@ -1,4 +1,4 @@
-#:  ### test [--devel|--HEAD] [--debug] [--keep-tmp] [formula]:
+#:  * test [--devel|--HEAD] [--debug] [--keep-tmp] [formula]:
 #:    Most formulae provide a test method. `brew test` <formula> runs this
 #:    test method. There is no standard output or return code, but it should
 #:    generally indicate to the user if something is wrong with the installed
