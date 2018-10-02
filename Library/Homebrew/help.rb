@@ -38,8 +38,13 @@ module Homebrew
     module_function
 
     def help(cmd = nil, flags = {})
-      # Let OptionParser generate help text for developer commands
-      return if require? HOMEBREW_LIBRARY_PATH/"dev-cmd"/cmd
+      # Let OptionParser generate help text for commands which have a parser defined
+      begin
+        Homebrew.send("#{cmd.gsub('-','_')}_args".to_sym)
+        return
+      rescue NoMethodError
+        nil
+      end
 
       # Resolve command aliases and find file containing the implementation.
       if cmd
