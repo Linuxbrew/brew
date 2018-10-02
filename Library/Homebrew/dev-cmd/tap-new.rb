@@ -19,7 +19,7 @@ module Homebrew
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
         `tap-new` <user>/<repo>:
-         
+
         Generate the template files for a new tap.
       EOS
       switch :debug

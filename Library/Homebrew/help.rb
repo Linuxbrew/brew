@@ -40,7 +40,7 @@ module Homebrew
     def help(cmd = nil, flags = {})
       # Let OptionParser generate help text for commands which have a parser defined
       begin
-        Homebrew.send("#{cmd.gsub('-','_')}_args".to_sym)
+        Homebrew.send("#{cmd.tr("-", "_")}_args".to_sym)
         return
       rescue NoMethodError
         nil

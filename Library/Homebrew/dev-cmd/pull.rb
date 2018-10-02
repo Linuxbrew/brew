@@ -79,18 +79,18 @@ module Homebrew
 
         Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
         Optionally, installs the formulae changed by the patch.
-    
+
         Each <patch-source> may be one of:
-    
+
           ~ The ID number of a PR (pull request) in the homebrew/core GitHub
             repository
-    
+
           ~ The URL of a PR on GitHub, using either the web page or API URL
             formats. In this form, the PR may be on Homebrew/brew,
             Homebrew/homebrew-core or any tap.
-    
+
           ~ The URL of a commit on GitHub
-    
+
           ~ A "https://jenkins.brew.sh/job/..." string specifying a testing job ID
       EOS
       switch "--bottle",

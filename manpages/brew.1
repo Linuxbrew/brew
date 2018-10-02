@@ -863,8 +863,8 @@ It is now done automatically by \fBbrew update\fR\.
 Reuploads the stable URL for a formula to Bintray to use it as a mirror\.
 .
 .TP
-\fBprof\fR [ruby options]
-Run Homebrew with the Ruby profiler\. For example:
+\fBprof\fR [\fIruby options\fR]
+Run Homebrew with the Ruby profiler\. For example: brew prof readall
 .
 .SS "pull \fIoptions\fR \fIformula\fR:"
 Gets a patch from a GitHub commit or pull request and applies it to Homebrew\. Optionally, installs the formulae changed by the patch\.
@@ -943,7 +943,7 @@ Run a Ruby instance with Homebrew\'s libraries loaded\. For example:
 Generate the template files for a new tap\.
 .
 .TP
-test [\-\-devel|\-\-HEAD] [\-\-debug] [\-\-keep\-tmp] [formula]
+\fBtest\fR [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-debug\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
 Most formulae provide a test method\. \fBbrew test\fR \fIformula\fR runs this test method\. There is no standard output or return code, but it should generally indicate to the user if something is wrong with the installed formula\.
 .
 .IP

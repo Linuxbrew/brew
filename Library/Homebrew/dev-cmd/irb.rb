@@ -31,7 +31,8 @@ module Homebrew
       EOS
       switch "--examples",
         description: "Show several examples."
-      switch "--pry", env: :pry,
+      switch "--pry",
+        env: :pry,
         description: "Pry will be used instead of irb if `--pry` is passed or HOMEBREW_PRY is set."
     end
   end

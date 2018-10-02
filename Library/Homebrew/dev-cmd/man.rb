@@ -156,8 +156,10 @@ module Homebrew
       ronn_output = ronn.read
       odie "Got no output from ronn!" unless ronn_output
       ronn_output.gsub!(%r{</var>`(?=[.!?,;:]?\s)}, "").gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
-      ronn_output = ronn_output.gsub(%r{<code>}, "\\fB").gsub(%r{</code>}, "\\fR")
-        .gsub(%r{<var>}, "\\fI").gsub(%r{</var>}, "\\fR") unless format_flag == '--markdown'
+      unless format_flag == "--markdown"
+        ronn_output = ronn_output.gsub(/<code>/, "\\fB").gsub(%r{</code>}, "\\fR")
+                                 .gsub(/<var>/, "\\fI").gsub(%r{</var>}, "\\fR")
+      end
       target.atomic_write ronn_output
     end
   end
@@ -192,11 +194,11 @@ module Homebrew
   end
 
   def cmd_arg_parser(cmd_path)
-    "#{cmd_path.basename.to_s.gsub('.rb', '').gsub('-', '_')}_args".to_sym
+    "#{cmd_path.basename.to_s.gsub(".rb", "").tr("-", "_")}_args".to_sym
   end
 
   def cmd_manpage_lines(cmd_parser)
-    lines = ["#{format_usage_banner(cmd_parser.usage_banner_text)}"]
+    lines = [format_usage_banner(cmd_parser.usage_banner_text)]
     lines += cmd_parser.processed_options.map do |short, long, _, desc|
       next if !long.nil? && cmd_parser.global_option?(cmd_parser.option_to_name(long))
       generate_option_doc(short, long, desc)

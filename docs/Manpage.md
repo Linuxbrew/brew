@@ -832,13 +832,14 @@ Return a failing status code if changes are detected in the manpage outputs. Thi
 It is now done automatically by `brew update`.
 
 ###`mirror` `formulae`:
- 
+
 Reuploads the stable URL for a formula to Bintray to use it as a mirror.
 
 
-  * `prof` [ruby options]:
+  * `prof` [`ruby options`]:
     Run Homebrew with the Ruby profiler.
     For example:
+      brew prof readall
 
 ###pull `options` `formula`:
 
@@ -895,11 +896,11 @@ Output as a Markdown list.
     For example:
 
 ###`tap-new` `user`/`repo`:
- 
+
 Generate the template files for a new tap.
 
 
-  * test [--devel|--HEAD] [--debug] [--keep-tmp] [formula]:
+  * `test` [`--devel`|`--HEAD`] [`--debug`] [`--keep-tmp`] `formula`:
     Most formulae provide a test method. `brew test` `formula` runs this
     test method. There is no standard output or return code, but it should
     generally indicate to the user if something is wrong with the installed

@@ -125,7 +125,7 @@ module Homebrew
       end
 
       def global_option?(name)
-        Homebrew::CLI::Parser.global_options.has_key?(name.to_sym)
+        Homebrew::CLI::Parser.global_options.key?(name.to_sym)
       end
 
       private
