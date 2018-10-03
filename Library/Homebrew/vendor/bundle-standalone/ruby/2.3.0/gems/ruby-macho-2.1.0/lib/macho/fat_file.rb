@@ -14,7 +14,7 @@ module MachO
     # @return [Headers::FatHeader] the file's header
     attr_reader :header
 
-    # @return [Array<Headers::FatArch>] an array of fat architectures
+    # @return [Array<Headers::FatArch>, Array<Headers::FatArch64] an array of fat architectures
     attr_reader :fat_archs
 
     # @return [Array<MachOFile>] an array of Mach-O binaries
@@ -22,37 +22,49 @@ module MachO
 
     # Creates a new FatFile from the given (single-arch) Mach-Os
     # @param machos [Array<MachOFile>] the machos to combine
+    # @param fat64 [Boolean] whether to use {Headers::FatArch64}s to represent each slice
     # @return [FatFile] a new FatFile containing the give machos
     # @raise [ArgumentError] if less than one Mach-O is given
-    def self.new_from_machos(*machos)
+    # @raise [FatArchOffsetOverflowError] if the Mach-Os are too big to be represented
+    #  in a 32-bit {Headers::FatArch} and `fat64` is `false`.
+    def self.new_from_machos(*machos, fat64: false)
       raise ArgumentError, "expected at least one Mach-O" if machos.empty?
+
+      fa_klass, magic = if fat64
+        [Headers::FatArch64, Headers::FAT_MAGIC_64]
+      else
+        [Headers::FatArch, Headers::FAT_MAGIC]
+      end
 
       # put the smaller alignments further forwards in fat macho, so that we do less padding
       machos = machos.sort_by(&:segment_alignment)
 
       bin = +""
 
-      bin << Headers::FatHeader.new(Headers::FAT_MAGIC, machos.size).serialize
-      offset = Headers::FatHeader.bytesize + (machos.size * Headers::FatArch.bytesize)
+      bin << Headers::FatHeader.new(magic, machos.size).serialize
+      offset = Headers::FatHeader.bytesize + (machos.size * fa_klass.bytesize)
 
       macho_pads = {}
-      macho_bins = {}
 
       machos.each do |macho|
-        macho_offset      = Utils.round(offset, 2**macho.segment_alignment)
+        macho_offset = Utils.round(offset, 2**macho.segment_alignment)
+
+        if !fat64 && macho_offset > (2**32 - 1)
+          raise FatArchOffsetOverflowError, macho_offset
+        end
+
         macho_pads[macho] = Utils.padding_for(offset, 2**macho.segment_alignment)
-        macho_bins[macho] = macho.serialize
 
-        bin << Headers::FatArch.new(macho.header.cputype, macho.header.cpusubtype,
-                                    macho_offset, macho_bins[macho].bytesize,
-                                    macho.segment_alignment).serialize
+        bin << fa_klass.new(macho.header.cputype, macho.header.cpusubtype,
+                            macho_offset, macho.serialize.bytesize,
+                            macho.segment_alignment).serialize
 
-        offset += (macho_bins[macho].bytesize + macho_pads[macho])
+        offset += (macho.serialize.bytesize + macho_pads[macho])
       end
 
       machos.each do |macho|
         bin << Utils.nullpad(macho_pads[macho])
-        bin << macho_bins[macho]
+        bin << macho.serialize
       end
 
       new_from_bin(bin)
@@ -278,6 +290,7 @@ module MachO
     # @note Overwrites all data in the file!
     def write!
       raise MachOError, "no initial file to write to" if filename.nil?
+
       File.open(@filename, "wb") { |f| f.write(@raw_data) }
     end
 
@@ -327,10 +340,12 @@ module MachO
     def populate_fat_archs
       archs = []
 
-      fa_off = Headers::FatHeader.bytesize
-      fa_len = Headers::FatArch.bytesize
+      fa_klass = Utils.fat_magic32?(header.magic) ? Headers::FatArch : Headers::FatArch64
+      fa_off   = Headers::FatHeader.bytesize
+      fa_len   = fa_klass.bytesize
+
       header.nfat_arch.times do |i|
-        archs << Headers::FatArch.new_from_bin(:big, @raw_data[fa_off + (fa_len * i), fa_len])
+        archs << fa_klass.new_from_bin(:big, @raw_data[fa_off + (fa_len * i), fa_len])
       end
 
       archs
@@ -380,6 +395,7 @@ module MachO
 
           # Strict mode: Immediately re-raise. Otherwise: Retain, check later.
           raise error if strict
+
           errors << error
         end
       end

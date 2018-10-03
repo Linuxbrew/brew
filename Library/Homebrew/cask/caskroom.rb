@@ -1,3 +1,5 @@
+require "utils/user"
+
 module Cask
   module Caskroom
     module_function
@@ -18,7 +20,7 @@ module Cask
 
       SystemCommand.run("/bin/mkdir", args: ["-p", path], sudo: sudo)
       SystemCommand.run("/bin/chmod", args: ["g+rwx", path], sudo: sudo)
-      SystemCommand.run("/usr/sbin/chown", args: [Utils.current_user, path], sudo: sudo)
+      SystemCommand.run("/usr/sbin/chown", args: [User.current, path], sudo: sudo)
       SystemCommand.run("/usr/bin/chgrp", args: ["admin", path], sudo: sudo)
     end
 

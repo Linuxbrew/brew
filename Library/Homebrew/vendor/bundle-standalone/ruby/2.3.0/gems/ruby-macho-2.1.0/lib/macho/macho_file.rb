@@ -431,6 +431,7 @@ module MachO
     # @note Overwrites all data in the file!
     def write!
       raise MachOError, "no initial file to write to" if @filename.nil?
+
       File.open(@filename, "wb") { |f| f.write(@raw_data) }
     end
 

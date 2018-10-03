@@ -12,7 +12,7 @@ GEM
       concurrent-ruby (~> 1.0)
     minitest (5.11.3)
     plist (3.4.0)
-    ruby-macho (2.0.0)
+    ruby-macho (2.1.0)
     thread_safe (0.3.6)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)

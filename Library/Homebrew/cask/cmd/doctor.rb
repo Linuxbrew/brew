@@ -124,6 +124,8 @@ module Cask
         case Quarantine.check_quarantine_support
         when :quarantine_available
           puts "Enabled"
+        when :xattr_broken
+          add_error "There's not a working version of xattr."
         when :no_swift
           add_error "Swift is not available on this system."
         when :no_quarantine

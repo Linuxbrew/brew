@@ -75,6 +75,14 @@ module Homebrew
     end
 
     def command_help(path)
+      # Let OptionParser generate help text for commands which have a parser defined
+      begin
+        cmd = path.basename(path.extname)
+        return Homebrew.send("#{cmd.to_s.tr("-", "_")}_args".to_sym).generate_help_text
+      rescue NoMethodError
+        nil
+      end
+
       help_lines = command_help_lines(path)
       if help_lines.empty?
         opoo "No help text in: #{path}" if ARGV.homebrew_developer?

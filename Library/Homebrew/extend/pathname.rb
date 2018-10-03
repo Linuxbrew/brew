@@ -160,9 +160,16 @@ class Pathname
     open("a", *open_args) { |f| f.puts(content) }
   end
 
-  # NOTE always overwrites
+  # NOTE: This always overwrites.
   def atomic_write(content)
+    # The enclosing `mktmpdir` and the `chmod` are a workaround
+    # for https://github.com/rails/rails/pull/34037.
     Dir.mktmpdir(".d", dirname) do |tmpdir|
+      begin
+        FileUtils.chmod "+t", dirname
+      rescue Errno::EPERM
+        :ignore
+      end
       File.atomic_write(self, tmpdir) do |file|
         file.write(content)
       end
@@ -200,7 +207,7 @@ class Pathname
     return archive_ext if archive_ext
 
     # Don't treat version numbers as extname.
-    return "" if basename.match?(/\b\d+\.\d+[^\.]*\Z/)
+    return "" if basename.match?(/\b\d+\.\d+[^\.]*\Z/) && !basename.end_with?(".7z")
 
     File.extname(basename)
   end

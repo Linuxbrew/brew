@@ -36,7 +36,6 @@ class DevelopmentTools
     end
 
     def default_compiler
-      return :c_compiler unless OS.mac?
       :clang
     end
 
@@ -105,17 +104,13 @@ class DevelopmentTools
         path = locate(cc) unless path.exist?
         path = locate(cc.delete("-.")) if OS.linux? && !path
         version = if path &&
-                     build_version = `#{path} --version`[/g?cc(?:(?:-\d(?:\.\d)?)? \(.+\))? (\d\.\d\.\d)/, 1]
+                     build_version = `#{path} --version`[/gcc(?:(?:-\d(?:\.\d)?)? \(.+\))? (\d\.\d\.\d)/, 1]
           Version.new build_version
         else
           Version::NULL
         end
         @non_apple_gcc_version[cc] = version
       end
-    end
-
-    def c_compiler_build_version
-      non_apple_gcc_version "cc"
     end
 
     def clear_version_cache

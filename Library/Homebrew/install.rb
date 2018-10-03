@@ -18,7 +18,7 @@ module Homebrew
     end
 
     def attempt_directory_creation
-      Keg::MUST_BE_WRITABLE_DIRECTORIES.each do |dir|
+      Keg::MUST_EXIST_DIRECTORIES.each do |dir|
         begin
           FileUtils.mkdir_p(dir) unless dir.exist?
         rescue
@@ -39,6 +39,8 @@ module Homebrew
       symlink_ld_so
       symlink_host_gcc
     end
+    alias generic_perform_preinstall_checks perform_preinstall_checks
+    module_function :generic_perform_preinstall_checks
 
     def fatal_checks(type)
       @checks ||= Diagnostic::Checks.new
@@ -94,3 +96,5 @@ module Homebrew
     end
   end
 end
+
+require "extend/os/install"

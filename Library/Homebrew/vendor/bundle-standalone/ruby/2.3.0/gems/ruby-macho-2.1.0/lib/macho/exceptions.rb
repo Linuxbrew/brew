@@ -194,4 +194,14 @@ module MachO
       super "Unimplemented: #{thing}"
     end
   end
+
+  # Raised when attempting to create a {FatFile} from one or more {MachOFile}s
+  #  whose offsets will not fit within the resulting 32-bit {Headers::FatArch#offset} fields.
+  class FatArchOffsetOverflowError < MachOError
+    # @param offset [Integer] the offending offset
+    def initialize(offset)
+      super "Offset #{offset} exceeds the 32-bit width of a fat_arch offset." \
+            " Consider merging with `fat64: true`"
+    end
+  end
 end

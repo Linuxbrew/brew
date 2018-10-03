@@ -70,11 +70,11 @@ module Homebrew
       def check_xcode_up_to_date
         return unless MacOS::Xcode.outdated?
 
-        # Travis CI images are going to end up outdated so don't complain when
+        # CI images are going to end up outdated so don't complain when
         # `brew test-bot` runs `brew doctor` in the CI for the Homebrew/brew
-        # repository. This only needs to support whatever CI provider
+        # repository. This only needs to support whatever CI providers
         # Homebrew/brew is currently using.
-        return if ENV["HOMEBREW_TRAVIS_CI"]
+        return if ENV["HOMEBREW_TRAVIS_CI"] || ENV["HOMEBREW_AZURE_PIPELINES"]
 
         message = <<~EOS
           Your Xcode (#{MacOS::Xcode.version}) is outdated.
@@ -97,11 +97,11 @@ module Homebrew
       def check_clt_up_to_date
         return unless MacOS::CLT.outdated?
 
-        # Travis CI images are going to end up outdated so don't complain when
+        # CI images are going to end up outdated so don't complain when
         # `brew test-bot` runs `brew doctor` in the CI for the Homebrew/brew
-        # repository. This only needs to support whatever CI provider
+        # repository. This only needs to support whatever CI providers
         # Homebrew/brew is currently using.
-        return if ENV["HOMEBREW_TRAVIS_CI"]
+        return if ENV["HOMEBREW_TRAVIS_CI"] || ENV["HOMEBREW_AZURE_PIPELINES"]
 
         <<~EOS
           A newer Command Line Tools release is available.

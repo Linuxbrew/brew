@@ -35,7 +35,7 @@ class LinkageCacheStore < CacheStore
       EOS
     end
 
-    database.set @keg_path, ruby_hash_to_json_string(hash_values)
+    database.set @keg_path, hash_values
   end
 
   # @param  [Symbol] the type to fetch from the `LinkageCacheStore`
@@ -68,6 +68,6 @@ class LinkageCacheStore < CacheStore
     keg_cache = database.get(@keg_path)
     return {} unless keg_cache
 
-    json_string_to_ruby_hash(keg_cache)[type.to_s]
+    keg_cache[type.to_s]
   end
 end

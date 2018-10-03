@@ -12,4 +12,4 @@ $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/activesupport-5.2.1/l
 $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/backports-3.11.4/lib"
 $:.unshift "#{path}/"
 $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/plist-3.4.0/lib"
-$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/ruby-macho-2.0.0/lib"
+$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/ruby-macho-2.1.0/lib"

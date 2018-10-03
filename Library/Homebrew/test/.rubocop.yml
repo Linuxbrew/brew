@@ -1,0 +1,5 @@
+inherit_from: 
+  - ../.rubocop.yml
+  - .rubocop_todo.yml
+
+require: rubocop-rspec

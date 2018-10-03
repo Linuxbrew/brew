@@ -5,8 +5,19 @@ require "set"
 module Homebrew
   module CLI
     class Parser
+      attr_reader :processed_options
+
       def self.parse(args = ARGV, &block)
         new(&block).parse(args)
+      end
+
+      def self.global_options
+        {
+          quiet: [["-q", "--quiet"], :quiet, "Suppress any warnings."],
+          verbose: [["-v", "--verbose"], :verbose, "Make some output more verbose."],
+          debug: [["-d", "--debug"], :debug, "Display any debugging information."],
+          force: [["-f", "--force"], :force, "Override warnings and enable potentially unsafe operations."],
+        }
       end
 
       def initialize(&block)
@@ -16,14 +27,25 @@ module Homebrew
         Homebrew.args.instance_eval { undef tap }
         @constraints = []
         @conflicts = []
+        @processed_options = []
+        @desc_line_length = 48
         instance_eval(&block)
+        post_initialize
+      end
+
+      def post_initialize
+        @parser.on_tail("-h", "--help", "Show this message") do
+          puts generate_help_text
+          exit 0
+        end
       end
 
       def switch(*names, description: nil, env: nil, required_for: nil, depends_on: nil)
-        description = option_to_description(*names) if description.nil?
         global_switch = names.first.is_a?(Symbol)
-        names, env = common_switch(*names) if global_switch
-        @parser.on(*names, description) do
+        names, env, description = common_switch(*names) if global_switch
+        description = option_to_description(*names) if description.nil?
+        process_option(*names, description)
+        @parser.on(*names, *wrap_option_desc(description)) do
           enable_switch(*names)
         end
 
@@ -34,9 +56,18 @@ module Homebrew
         enable_switch(*names) if !env.nil? && !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
       end
 
+      def usage_banner(text)
+        @parser.banner = "#{text}\n"
+      end
+
+      def usage_banner_text
+        @parser.banner
+      end
+
       def comma_array(name, description: nil)
         description = option_to_description(name) if description.nil?
-        @parser.on(name, OptionParser::REQUIRED_ARGUMENT, Array, description) do |list|
+        process_option(name, description)
+        @parser.on(name, OptionParser::REQUIRED_ARGUMENT, Array, *wrap_option_desc(description)) do |list|
           Homebrew.args[option_to_name(name)] = list
         end
       end
@@ -49,7 +80,8 @@ module Homebrew
           required = OptionParser::OPTIONAL_ARGUMENT
         end
         description = option_to_description(name) if description.nil?
-        @parser.on(name, description, required) do |option_value|
+        process_option(name, description)
+        @parser.on(name, *wrap_option_desc(description), required) do |option_value|
           Homebrew.args[option_to_name(name)] = option_value
         end
 
@@ -78,10 +110,26 @@ module Homebrew
         names.map { |name| name.to_s.sub(/\A--?/, "").tr("-", " ") }.max
       end
 
-      def parse(cmdline_args)
+      def summary
+        @parser.to_s
+      end
+
+      def parse(cmdline_args = ARGV)
         remaining_args = @parser.parse(cmdline_args)
         check_constraint_violations
         Homebrew.args[:remaining] = remaining_args
+        @parser
+      end
+
+      def global_option?(name)
+        Homebrew::CLI::Parser.global_options.key?(name.to_sym)
+      end
+
+      def generate_help_text
+        @parser.to_s.sub(/^/, "#{Tty.bold}Usage: brew#{Tty.reset} ")
+               .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
+               .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
+               .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
       end
 
       private
@@ -94,17 +142,15 @@ module Homebrew
 
       # These are common/global switches accessible throughout Homebrew
       def common_switch(name)
-        case name
-        when :quiet   then [["-q", "--quiet"], :quiet]
-        when :verbose then [["-v", "--verbose"], :verbose]
-        when :debug   then [["-d", "--debug"], :debug]
-        when :force   then [["-f", "--force"], :force]
-        else name
-        end
+        Homebrew::CLI::Parser.global_options.fetch(name, name)
       end
 
       def option_passed?(name)
         Homebrew.args.respond_to?(name) || Homebrew.args.respond_to?("#{name}?")
+      end
+
+      def wrap_option_desc(desc)
+        Formatter.wrap(desc, @desc_line_length).split("\n")
       end
 
       def set_constraints(name, depends_on:, required_for:)
@@ -159,6 +205,11 @@ module Homebrew
         check_invalid_constraints
         check_conflicts
         check_constraints
+      end
+
+      def process_option(*args)
+        option, = @parser.make_switch(args)
+        @processed_options << [option.short.first, option.long.first, option.arg, option.desc.first]
       end
     end
 

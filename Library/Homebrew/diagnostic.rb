@@ -276,7 +276,7 @@ module Homebrew
       def check_for_broken_symlinks
         broken_symlinks = []
 
-        Keg::PRUNEABLE_DIRECTORIES.each do |d|
+        Keg::MUST_EXIST_SUBDIRECTORIES.each do |d|
           next unless d.directory?
 
           d.find do |path|
