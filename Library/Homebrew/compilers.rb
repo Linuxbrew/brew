@@ -1,7 +1,7 @@
 # @private
 module CompilerConstants
-  GNU_GCC_VERSIONS = %w[4.3 4.4 4.5 4.6 4.7 4.8 4.9 5 6 7 8].freeze
-  GNU_GCC_REGEXP = /^gcc-(4\.[3-9]|[5-8])$/
+  GNU_GCC_VERSIONS = %w[4.4 4.5 4.6 4.7 4.8 4.9 5 6 7 8].freeze
+  GNU_GCC_REGEXP = /^gcc-(4\.[4-9]|[5-8])$/
   COMPILER_SYMBOL_MAP = {
     "gcc"        => :gcc,
     "gcc-4.0"    => :gcc_4_0,
@@ -71,7 +71,6 @@ class CompilerFailure
       create(:gcc_4_0),
       create(:gcc_4_2),
       create(:clang) { build 425 },
-      create(gcc: "4.3"),
       create(gcc: "4.4"),
       create(gcc: "4.5"),
       create(gcc: "4.6"),
@@ -80,7 +79,6 @@ class CompilerFailure
       create(:clang) { build 600 },
       create(:gcc_4_0),
       create(:gcc_4_2),
-      create(gcc: "4.3"),
       create(gcc: "4.4"),
       create(gcc: "4.5"),
       create(gcc: "4.6"),
