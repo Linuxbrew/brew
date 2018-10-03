@@ -123,7 +123,7 @@ in case you need to do different things for different resources.
 
 To add bindings for Python 3, please add `depends_on "python"`.
 
-Build Python 2 bindings with the system Python by default (don't add an option) and they should be usable with any binary-compatible Python. If that isn't the case, it's an upstream bug; [here's some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
+Build Python 2 bindings with the system Python by default (don't add an option) and they should be usable with any binary-compatible Python. If that isn't the case, it's an upstream bug; [here's some advice for resolving it](https://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
 
 ### Dependencies
 
@@ -155,7 +155,7 @@ Sometimes we have to `inreplace` a `Makefile` to use our prefix for the Python b
 
 Libraries built for Python 3 should include `depends_on "python"`, which will bottle against Homebrew's Python 3.x. Python 2.x libraries must function when they are installed against either the system Python or brewed Python.
 
-Python 2 libraries do not need a `depends_on "python@2"` declaration; they will be built with the system Python, but should still be usable with any other Python 2.7. If this is not the case, it is an upstream bug; [here is some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
+Python 2 libraries do not need a `depends_on "python@2"` declaration; they will be built with the system Python, but should still be usable with any other Python 2.7. If this is not the case, it is an upstream bug; [here is some advice for resolving it](https://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
 
 ### Installing
 
@@ -215,4 +215,4 @@ It is probably safe to use `--prefix` with `--root=/`, which should work with ei
 
 ### `pip` vs. `setup.py`
 
-[PEP 453](http://legacy.python.org/dev/peps/pep-0453/#recommendations-for-downstream-distributors) makes a recommendation to downstream distributors (us) that sdist tarballs should be installed with `pip` instead of by invoking `setup.py` directly. We do not do this because Apple's Python distribution does not include pip, so we can't assume that pip is available. We could do something clever to work around Apple's piplessness but the value proposition is not yet clear.
+[PEP 453](https://legacy.python.org/dev/peps/pep-0453/#recommendations-for-downstream-distributors) makes a recommendation to downstream distributors (us) that sdist tarballs should be installed with `pip` instead of by invoking `setup.py` directly. We do not do this because Apple's Python distribution does not include pip, so we can't assume that pip is available. We could do something clever to work around Apple's piplessness but the value proposition is not yet clear.

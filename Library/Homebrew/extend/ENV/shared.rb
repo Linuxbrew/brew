@@ -6,7 +6,7 @@ require "development_tools"
 # {Stdenv} (depending on the build mode).
 # @see Superenv
 # @see Stdenv
-# @see http://www.rubydoc.info/stdlib/Env Ruby's ENV API
+# @see https://www.rubydoc.info/stdlib/Env Ruby's ENV API
 module SharedEnvExtension
   include CompilerConstants
 
