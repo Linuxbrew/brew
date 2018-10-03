@@ -76,13 +76,15 @@ module Homebrew
 
       cache_env = { "XDG_CACHE_HOME" => "#{HOMEBREW_CACHE}/style" }
 
+      rubocop_success = false
+
       case output_type
       when :print
         args << "--debug" if ARGV.debug?
         args << "--display-cop-names" if ARGV.include? "--display-cop-names"
         args << "--format" << "simple" if files
         system(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", *args)
-        !$CHILD_STATUS.success?
+        rubocop_success = $CHILD_STATUS.success?
       when :json
         json, err, status =
           Open3.capture3(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_",
@@ -96,10 +98,35 @@ module Homebrew
           raise "Error running `rubocop --format json #{args.join " "}`\n#{err}"
         end
 
-        RubocopResults.new(JSON.parse(json))
+        return RubocopResults.new(JSON.parse(json))
       else
         raise "Invalid output_type for check_style_impl: #{output_type}"
       end
+
+      return !rubocop_success if !files.nil? && !has_non_formula
+
+      shellcheck   = which("shellcheck")
+      shellcheck ||= which("shellcheck", ENV["HOMEBREW_PATH"])
+      shellcheck ||= begin
+        ohai "Installing `shellcheck` for shell style checks..."
+        system HOMEBREW_BREW_FILE, "install", "shellcheck"
+        which("shellcheck") || which("shellcheck", ENV["HOMEBREW_PATH"])
+      end
+      unless shellcheck
+        opoo "Could not find or install `shellcheck`! Not checking shell style."
+        return !rubocop_success
+      end
+
+      shell_files = [
+        HOMEBREW_BREW_FILE,
+        *Pathname.glob("#{HOMEBREW_LIBRARY}/Homebrew/*.sh"),
+        *Pathname.glob("#{HOMEBREW_LIBRARY}/Homebrew/cmd/*.sh"),
+        *Pathname.glob("#{HOMEBREW_LIBRARY}/Homebrew/utils/*.sh"),
+      ].select(&:exist?)
+      # TODO: check, fix completions here too.
+      # TODO: consider using ShellCheck JSON output
+      shellcheck_success = system shellcheck, "--shell=bash", *shell_files
+      !rubocop_success || !shellcheck_success
     end
 
     class RubocopResults
