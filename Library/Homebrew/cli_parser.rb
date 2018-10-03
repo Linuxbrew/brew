@@ -35,11 +35,8 @@ module Homebrew
 
       def post_initialize
         @parser.on_tail("-h", "--help", "Show this message") do
-          puts @parser.to_s.sub(/^/, "#{Tty.bold}Usage: brew#{Tty.reset} ")
-                      .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
-                      .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
-                      .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
-          exit
+          puts generate_help_text
+          exit 0
         end
       end
 
@@ -126,6 +123,13 @@ module Homebrew
 
       def global_option?(name)
         Homebrew::CLI::Parser.global_options.key?(name.to_sym)
+      end
+
+      def generate_help_text
+        @parser.to_s.sub(/^/, "#{Tty.bold}Usage: brew#{Tty.reset} ")
+               .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
+               .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
+               .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
       end
 
       private
