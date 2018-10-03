@@ -621,7 +621,7 @@ If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full upd
 .
 .SH "DEVELOPER COMMANDS"
 .
-.SS "\fBaudit\fR \fIoptions\fR \fIformulae\fR:"
+.SS "\fBaudit\fR [\fIoptions\fR] \fIformulae\fR:"
 Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\. If no \fIformulae\fR are provided, all of them are checked\.
 .
 .TP
@@ -668,7 +668,7 @@ Passing \fB\-\-only\-cops\fR=\fIcops\fR will check for violations of only the li
 \fB\-\-except\-cops\fR
 Passing \fB\-\-except\-cops\fR=\fIcops\fR will skip checking the listed RuboCop cops violations\. \fBcops\fR should be a comma\-separated list of cop names\.
 .
-.SS "\fBbottle\fR \fIoptions\fR \fIformulae\fR:"
+.SS "\fBbottle\fR [\fIoptions\fR] \fIformulae\fR:"
 Generate a bottle (binary package) from a formula installed with \fB\-\-build\-bottle\fR\. If the formula specifies a rebuild version, it will be incremented in the generated DSL\. Passing \fB\-\-keep\-old\fR will attempt to keep it at its original value, while \fB\-\-no\-rebuild\fR will remove it\.
 .
 .TP
@@ -711,7 +711,7 @@ Write bottle information to a JSON file, which can be used as the argument for \
 \fB\-\-root\-url\fR
 Use the specified \fIURL\fR as the root of the bottle\'s URL instead of Homebrew\'s default\.
 .
-.SS "\fBbump\-formula\-pr\fR \fIoptions\fR \fIformula\fR:"
+.SS "\fBbump\-formula\-pr\fR [\fIoptions\fR] \fIformula\fR:"
 Creates a pull request to update the formula with a new URL or a new tag\.
 .
 .P
@@ -778,7 +778,7 @@ Use the provided \fIversion\fR to override the value parsed from the URL or tag\
 \fB\-\-message\fR
 Append provided \fImessage\fR to the default PR message\.
 .
-.SS "\fBcreate\fR \fIURL\fR \fIoptions\fR:"
+.SS "\fBcreate\fR \fIURL\fR [\fIoptions\fR]:"
 Generate a formula for the downloadable file at \fIURL\fR and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The \fBwget\fR formula serves as a simple example\. For the complete API have a look at \fIhttp://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\fR\.
 .
 .TP
@@ -819,7 +819,7 @@ Open \fIformula\fR in the editor\. Open all of Homebrew for editing if no \fIfor
 .SS "\fBformula\fR \fIformula\fR:"
 Display the path where \fIformula\fR is located\.
 .
-.SS "\fBirb\fR \fIoptions\fR:"
+.SS "\fBirb\fR [\fIoptions\fR]:"
 Enter the interactive Homebrew Ruby shell\.
 .
 .TP
@@ -830,7 +830,7 @@ Show several examples\.
 \fB\-\-pry\fR
 Pry will be used instead of irb if \fB\-\-pry\fR is passed or HOMEBREW_PRY is set\.
 .
-.SS "\fBlinkage\fR \fIoptions\fR \fIformula\fR:"
+.SS "\fBlinkage\fR [\fIoptions\fR] \fIformula\fR:"
 Checks the library links of an installed formula\.
 .
 .P
@@ -848,7 +848,7 @@ Print the dylib followed by the binaries which link to it for each library the k
 \fB\-\-cached\fR
 Print the cached linkage values stored in HOMEBREW_CACHE, set from a previous \fBbrew linkage\fR run\.
 .
-.SS "\fBman\fR \fIoptions\fR:"
+.SS "\fBman\fR [\fIoptions\fR]:"
 Generate Homebrew\'s manpages\.
 .
 .TP
@@ -866,7 +866,7 @@ Reuploads the stable URL for a formula to Bintray to use it as a mirror\.
 \fBprof\fR [\fIruby options\fR]
 Run Homebrew with the Ruby profiler\. For example: brew prof readall
 .
-.SS "pull \fIoptions\fR \fIformula\fR:"
+.SS "pull [\fIoptions\fR] \fIformula\fR:"
 Gets a patch from a GitHub commit or pull request and applies it to Homebrew\. Optionally, installs the formulae changed by the patch\.
 .
 .P
@@ -928,7 +928,7 @@ Publish at the given Bintray organisation\.
 \fB\-\-test\-bot\-user\fR
 Pull the bottle block commit from the specified user on GitHub\.
 .
-.SS "\fBrelease\-notes\fR \fIprevious_tag\fR \fIend_ref\fR:"
+.SS "\fBrelease\-notes\fR [\fIoptions\fR] [\fIprevious_tag\fR] [\fIend_ref\fR]:"
 Output the merged pull requests on Homebrew/brew between two Git refs\. If no \fIprevious_tag\fR is provided it defaults to the latest tag\. If no \fIend_ref\fR is provided it defaults to \fBorigin/master\fR\.
 .
 .TP
@@ -958,7 +958,7 @@ If \fB\-\-keep\-tmp\fR is passed, the temporary files created for the test are n
 .IP
 Example: \fBbrew install jruby && brew test jruby\fR
 .
-.SS "\fBtests\fR \fIoptions\fR \fIformula\fR:"
+.SS "\fBtests\fR [\fIoptions\fR]:"
 Run Homebrew\'s unit and integration tests\. If provided, \fB\-\-only=\fR\fItest_script\fR runs only \fItest_script\fR_spec\.rb, and \fB\-\-seed\fR randomizes tests with the provided value instead of a random seed\.
 .
 .TP
@@ -985,7 +985,7 @@ Run only \fItest_script\fR_spec\.rb
 \fB\-\-seed\fR
 Randomizes tests with the provided value instead of a random seed\.
 .
-.SS "\fBupdate\-test\fR \fIoptions\fR:"
+.SS "\fBupdate\-test\fR [\fIoptions\fR]:"
 Runs a test of \fBbrew update\fR with a new repository clone\.
 .
 .P

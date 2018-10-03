@@ -55,7 +55,7 @@ module Homebrew
   def audit_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `audit` <options> <formulae>:
+        `audit` [<options>] <formulae>:
 
         Check <formulae> for Homebrew coding style violations. This should be
         run before submitting a new formula.

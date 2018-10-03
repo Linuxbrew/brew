@@ -663,7 +663,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 ## DEVELOPER COMMANDS
 
-###`audit` `options` `formulae`:
+###`audit` [`options`] `formulae`:
 
 Check `formulae` for Homebrew coding style violations. This should be
 run before submitting a new formula.
@@ -692,7 +692,7 @@ Passing `--only-cops`=`cops` will check for violations of only the listed RuboCo
 *  `--except-cops`:
 Passing `--except-cops`=`cops` will skip checking the listed RuboCop cops violations. `cops` should be a comma-separated list of cop names.
 
-###`bottle` `options` `formulae`:
+###`bottle` [`options`] `formulae`:
 
 Generate a bottle (binary package) from a formula installed with
 `--build-bottle`.
@@ -721,7 +721,7 @@ Write bottle information to a JSON file, which can be used as the argument for `
 *  `--root-url`:
 Use the specified `URL` as the root of the bottle's URL instead of Homebrew's default.
 
-###`bump-formula-pr` `options` `formula`:
+###`bump-formula-pr` [`options`] `formula`:
 
 Creates a pull request to update the formula with a new URL or a new tag.
 
@@ -764,7 +764,7 @@ Use the provided `version` to override the value parsed from the URL or tag. Not
 *  `--message`:
 Append provided `message` to the default PR message.
 
-###`create` `URL` `options`:
+###`create` `URL` [`options`]:
 
 Generate a formula for the downloadable file at `URL` and open it in the editor.
 Homebrew will attempt to automatically derive the formula name
@@ -799,7 +799,7 @@ Takes a tap [`user``/``repo`] as argument and generates the formula in the speci
 Display the path where `formula` is located.
 
 
-###`irb` `options`:
+###`irb` [`options`]:
 
 Enter the interactive Homebrew Ruby shell.
 
@@ -808,7 +808,7 @@ Show several examples.
 *  `--pry`:
 Pry will be used instead of irb if `--pry` is passed or HOMEBREW_PRY is set.
 
-###`linkage` `options` `formula`:
+###`linkage` [`options`] `formula`:
 
 Checks the library links of an installed formula.
 
@@ -822,7 +822,7 @@ Print the dylib followed by the binaries which link to it for each library the k
 *  `--cached`:
 Print the cached linkage values stored in HOMEBREW_CACHE, set from a previous `brew linkage` run.
 
-###`man` `options`:
+###`man` [`options`]:
 
 Generate Homebrew's manpages.
 
@@ -841,7 +841,7 @@ Reuploads the stable URL for a formula to Bintray to use it as a mirror.
     For example:
       brew prof readall
 
-###pull `options` `formula`:
+###pull [`options`] `formula`:
 
 Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 Optionally, installs the formulae changed by the patch.
@@ -882,7 +882,7 @@ Publish at the given Bintray organisation.
 *  `--test-bot-user`:
 Pull the bottle block commit from the specified user on GitHub.
 
-###`release-notes` `previous_tag` `end_ref`:
+###`release-notes` [`options`] [`previous_tag`] [`end_ref`]:
 
 Output the merged pull requests on Homebrew/brew between two Git refs.
 If no `previous_tag` is provided it defaults to the latest tag.
@@ -917,7 +917,7 @@ Generate the template files for a new tap.
 
     Example: `brew install jruby && brew test jruby`
 
-###`tests` `options` `formula`:
+###`tests` [`options`]:
 
 Run Homebrew's unit and integration tests. If provided,
 `--only=``test_script` runs only `test_script`_spec.rb, and `--seed`
@@ -936,7 +936,7 @@ Run only `test_script`_spec.rb
 *  `--seed`:
 Randomizes tests with the provided value instead of a random seed.
 
-###`update-test` `options`:
+###`update-test` [`options`]:
 
 Runs a test of `brew update` with a new repository clone.
 

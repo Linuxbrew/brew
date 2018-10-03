@@ -36,7 +36,7 @@ module Homebrew
   def man_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `man` <options>:
+        `man` [<options>]:
 
         Generate Homebrew's manpages.
       EOS
@@ -157,8 +157,8 @@ module Homebrew
       odie "Got no output from ronn!" unless ronn_output
       ronn_output.gsub!(%r{</var>`(?=[.!?,;:]?\s)}, "").gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
       unless format_flag == "--markdown"
-        ronn_output = ronn_output.gsub(/<code>/, "\\fB").gsub(%r{</code>}, "\\fR")
-                                 .gsub(/<var>/, "\\fI").gsub(%r{</var>}, "\\fR")
+        ronn_output = ronn_output.gsub(%r{<code>(.*?)</code>}, "\\fB\\1\\fR")
+                                 .gsub(%r{<var>(.*?)</var>}, "\\fI\\1\\fR")
       end
       target.atomic_write ronn_output
     end
@@ -187,7 +187,7 @@ module Homebrew
         cmd_parser = Homebrew.send(cmd_arg_parser(cmd_path))
         man_page_lines << cmd_manpage_lines(cmd_parser).join
       rescue NoMethodError
-        man_page_lines << path_glob_commands(cmd_path.to_s)[0]
+        man_page_lines << path_glob_commands(cmd_path.to_s).first
       end
     end
     man_page_lines

@@ -22,7 +22,7 @@ module Homebrew
   def update_test_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `update-test` <options>:
+        `update-test` [<options>]:
 
         Runs a test of `brew update` with a new repository clone.
 
