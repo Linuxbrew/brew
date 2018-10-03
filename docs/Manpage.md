@@ -794,17 +794,14 @@ Takes a tap [`user``/``repo`] as argument and generates the formula in the speci
   no `formula` is provided.
 
 
-  * `extract` [`--force`] `formula` `tap` [`--version=``version`]:
-    Looks through repository history to find the `version` of `formula` and
-    creates a copy in `tap`/Formula/`formula`@`version`.rb. If the tap is
-    not installed yet, attempts to install/clone the tap before continuing.
+###`extract` [`options`] `formula` `tap`
 
-    If `--force` is passed, the file at the destination will be overwritten
-    if it already exists. Otherwise, existing files will be preserved.
+Looks through repository history to find the `version` of `formula` and
+creates a copy in `tap`/Formula/`formula`@`version`.rb. If the tap is
+not installed yet, attempts to install/clone the tap before continuing.
 
-    If an argument is passed through `--version`, `version` of `formula`
-    will be extracted and placed in the destination tap. Otherwise, the most
-    recent version that can be found will be used.
+*  `--version`:
+Provided `version` of `formula` will be extracted and placed in the destination tap. Otherwise, the most recent version that can be found will be used.
 
 ###`formula` `formula`:
 

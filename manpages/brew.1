@@ -794,15 +794,12 @@ Takes a tap [\fIuser\fR\fB/\fR\fIrepo\fR] as argument and generates the formula 
 .SS "\fBedit\fR \fIformula\fR:"
 Open \fIformula\fR in the editor\. Open all of Homebrew for editing if no \fIformula\fR is provided\.
 .
-.TP
-\fBextract\fR [\fB\-\-force\fR] \fIformula\fR \fItap\fR [\fB\-\-version=\fR\fIversion\fR]
+.SS "\fBextract\fR [\fIoptions\fR] \fIformula\fR \fItap\fR"
 Looks through repository history to find the \fIversion\fR of \fIformula\fR and creates a copy in \fItap\fR/Formula/\fIformula\fR@\fIversion\fR\.rb\. If the tap is not installed yet, attempts to install/clone the tap before continuing\.
 .
-.IP
-If \fB\-\-force\fR is passed, the file at the destination will be overwritten if it already exists\. Otherwise, existing files will be preserved\.
-.
-.IP
-If an argument is passed through \fB\-\-version\fR, \fIversion\fR of \fIformula\fR will be extracted and placed in the destination tap\. Otherwise, the most recent version that can be found will be used\.
+.TP
+\fB\-\-version\fR
+Provided \fIversion\fR of \fIformula\fR will be extracted and placed in the destination tap\. Otherwise, the most recent version that can be found will be used\.
 .
 .SS "\fBformula\fR \fIformula\fR:"
 Display the path where \fIformula\fR is located\.
