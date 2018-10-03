@@ -11,8 +11,11 @@ module Hardware
         return :dunno unless intel?
 
         # See https://software.intel.com/en-us/articles/intel-architecture-and-processor-identification-with-cpuid-model-and-family-numbers
+        # and https://github.com/llvm-mirror/llvm/blob/master/lib/Support/Host.cpp
+        # and https://en.wikipedia.org/wiki/List_of_Intel_CPU_microarchitectures#Roadmap
         cpu_family = cpuinfo[/^cpu family\s*: ([0-9]+)/, 1].to_i
         cpu_model = cpuinfo[/^model\s*: ([0-9]+)/, 1].to_i
+        unknown = :"unknown_0x#{cpu_family.to_s(16)}_0x#{cpu_model.to_s(16)}"
         case cpu_family
         when 0x06
           case cpu_model
@@ -36,12 +39,10 @@ module Hardware
             :haswell
           when 0x3d, 0x47, 0x4f, 0x56
             :broadwell
-          when 0x5e
+          when 0x4e, 0x55, 0x5e, 0x8e, 0x9e
             :skylake
-          when 0x8e
-            :kabylake
           else
-            :dunno
+            unknown
           end
         when 0x0f
           case cpu_model
@@ -50,10 +51,10 @@ module Hardware
           when 0x03, 0x04
             :prescott
           else
-            :dunno
+            unknown
           end
         else
-          :dunno
+          unknown
         end
       end
 
