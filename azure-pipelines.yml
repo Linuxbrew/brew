@@ -16,6 +16,7 @@ jobs:
 
     - task: PublishTestResults@2
       displayName: Publish test-bot test results
+      condition: succeededOrFailed()
       inputs:
         testRunner: JUnit
         testResultsFiles: brew-test-bot.xml
