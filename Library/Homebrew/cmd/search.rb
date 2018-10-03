@@ -2,7 +2,7 @@
 #:    Display all locally available formulae (including tapped ones).
 #:    No online search is performed.
 #:
-#:  * `search` `--casks`
+#:  * `search` `--casks`:
 #:    Display all locally available casks (including tapped ones).
 #:    No online search is performed.
 #:

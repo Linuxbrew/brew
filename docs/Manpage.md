@@ -455,7 +455,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Display all locally available formulae (including tapped ones).
     No online search is performed.
 
-  * `search` `--casks`
+  * `search` `--casks`:
     Display all locally available casks (including tapped ones).
     No online search is performed.
 
@@ -794,7 +794,7 @@ Takes a tap [`user``/``repo`] as argument and generates the formula in the speci
   no `formula` is provided.
 
 
-###`extract` [`options`] `formula` `tap`
+###`extract` [`options`] `formula` `tap`:
 
 Looks through repository history to find the `version` of `formula` and
 creates a copy in `tap`/Formula/`formula`@`version`.rb. If the tap is
@@ -850,7 +850,7 @@ Reuploads the stable URL for a formula to Bintray to use it as a mirror.
     For example:
       brew prof readall
 
-###pull [`options`] `formula`:
+###`pull` [`options`] `formula`:
 
 Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 Optionally, installs the formulae changed by the patch.
@@ -979,140 +979,79 @@ Override warnings and enable potentially unsafe operations.
 ## OFFICIAL EXTERNAL COMMANDS
 
   * `bundle` `command`:
+    Bundler for non-Ruby dependencies from Homebrew.
 
-      Bundler for non-Ruby dependencies from Homebrew.
+    `brew bundle` [`install`] [`-v`|`--verbose`] [`--no-upgrade`] [`--file=``path`|`--global`]:
+    Install or upgrade all dependencies in a Brewfile.
 
-  
+    `brew bundle dump` [`--force`] [`--describe`] [`--file=``path`|`--global`]:
+    Write all installed casks/formulae/taps into a Brewfile.
 
-      `bundle` [`install`] [`-v`|`--verbose`] [`--no-upgrade`] [`--file=``path`|`--global`]:
+    `brew bundle cleanup` [`--force`] [`--zap`] [`--file=``path`|`--global`]:
+    Uninstall all dependencies not listed in a Brewfile.
 
-      Install or upgrade all dependencies in a Brewfile.
+    `brew bundle check` [`--no-upgrade`] [`--file=``path`|`--global`] [`--verbose`]:
+    Check if all dependencies are installed in a Brewfile. Missing dependencies are listed in verbose mode.
+    `check` will exit on the first category missing a dependency unless in verbose mode.
 
-  
+    `brew bundle exec` `command`:
+    Run an external command in an isolated build environment.
 
-      `brew bundle dump` [`--force`] [`--describe`] [`--file=``path`|`--global`]
+    `brew bundle list` [`--all`|`--brews`|`--casks`|`--taps`|`--mas`] [`--file=``path`|`--global`]:
+    List all dependencies present in a Brewfile, optionally limiting by types.
+    By default, only brew dependencies are output.
 
-      Write all installed casks/formulae/taps into a Brewfile.
+    If `-v` or `--verbose` are passed, print verbose output.
 
-  
+    If `--no-upgrade` is passed, don't run `brew upgrade` on outdated dependencies.
+    Note they may still be upgraded by `brew install` if needed.
 
-      `brew bundle cleanup` [`--force`] [`--zap`] [`--file=``path`|`--global`]
+    If `--force` is passed, uninstall dependencies or overwrite an existing Brewfile.
 
-      Uninstall all dependencies not listed in a Brewfile.
+    If `--zap` is passed, casks will be removed using the `zap` command instead of `uninstall`.
 
-  
+    If `--file=``path` is passed, the Brewfile path is set accordingly.
+    Use `--file=-` to output to console.
 
-      `brew bundle check` [`--no-upgrade`] [`--file`=`path`|`--global`] [`--verbose`]
+    If `--global` is passed, set the Brewfile path to `~/.Brewfile`.
 
-      Check if all dependencies are installed in a Brewfile. Missing dependencies are listed in verbose mode. `check` will exit on the first category missing a dependency unless in verbose mode.
+    If `--describe` is passed, output a description comment above each line.
+    This comment will not be output if the dependency does not have a description.
 
-  
+    If `-h` or `--help` are passed, print this help message and exit.
 
-      `brew bundle exec` `command`
-
-      Run an external command in an isolated build environment.
-
-  
-
-      `brew bundle list` [`--all`|`--brews`|`--casks`|`--taps`|`--mas`] [`--file=``path`|`--global`]
-
-      List all dependencies present in a Brewfile, optionally limiting by types.
-
-      By default, only brew dependencies are output.
-
-  
-
-      If `-v` or `--verbose` are passed, print verbose output.
-
-  
-
-      If `--no-upgrade` is passed, don't run `brew upgrade` outdated dependencies.
-
-      Note they may still be upgraded by `brew install` if needed.
-
-  
-
-      If `--force` is passed, uninstall dependencies or overwrite an existing Brewfile.
-
-  
-
-      If `--zap` is passed, casks will be removed using the `zap` command instead of `uninstall`.
-
-  
-
-      If `--file=`path is passed, the Brewfile path is set accordingly
-
-      Use `--file=-` to output to console.
-
-  
-
-      If `--global` is passed, set Brewfile path to `$HOME/.Brewfile`.
-
-  
-
-      If `--describe` is passed, output a description comment above each line.
-
-      This comment will not be output if the dependency does not have a description.
-
-  
-
-      If `-h` or `--help` are passed, print this help message and exit.
-
-  Homebrew/homebrew-bundle <https://github.com/Homebrew/homebrew-bundle>
+    **Homebrew/homebrew-bundle**: <https://github.com/Homebrew/homebrew-bundle>
 
   * `cask` [`--version` | `audit` | `cat` | `cleanup` | `create` | `doctor` | `edit` | `fetch` | `home` | `info`]:
     Install macOS applications distributed as binaries.
 
-
-  Homebrew/homebrew-cask <https://github.com/Homebrew/homebrew-cask>
+    **Homebrew/homebrew-cask**: <https://github.com/Homebrew/homebrew-cask>
 
   * `services` `command`:
+    Integrates Homebrew formulae with macOS' `launchctl` manager.
 
-      Integrates Homebrew formulae with macOS' `launchctl` manager.
+    [`sudo`] `brew services list`:
+    List all running services for the current user (or root).
 
-  
+    [`sudo`] `brew services run` (`formula`|`--all`):
+    Run the service `formula` without registering to launch at login (or boot).
 
-      [`sudo`] `brew services list`
+    [`sudo`] `brew services start` (`formula`|`--all`):
+    Start the service `formula` immediately and register it to launch at login (or boot).
 
-      List all running services for the current user (or `root`)
+    [`sudo`] `brew services stop` (`formula`|`--all`):
+    Stop the service `formula` immediately and unregister it from launching at login (or boot).
 
-  
+    [`sudo`] `brew services restart` (`formula`|`--all`):
+    Stop (if necessary) and start the service `formula` immediately and register it to launch at login (or boot).
 
-      [`sudo`] `brew services run` `formula|--all`
+    [`sudo`] `brew services cleanup`:
+    Remove all unused services.
 
-      Run the service `formula` without starting at login (or boot).
+    If `sudo` is passed, operate on `/Library/LaunchDaemons` (started at boot).
+    Otherwise, operate on `~/Library/LaunchAgents` (started at login).
 
-  
-
-      [`sudo`] `brew services` `start` `formula|--all`
-
-      Start the service `formula` immediately and register it to launch at login (or `boot`).
-
-  
-
-      [`sudo`] `brew services` `stop` `formula|--all`
-
-      Stop the service `formula` immediately and unregister it from launching at login (or `boot`).
-
-  
-
-      [`sudo`] `brew services` `restart` `formula|--all`
-
-      Stop (if necessary) and start the service immediately and register it to launch at login (or `boot`).
-
-  
-
-      [`sudo`] `brew services` `cleanup`
-
-      Remove all unused services.
-
-  
-
-      If `sudo` is passed, operate on `/Library/LaunchDaemons` (started at boot).
-
-      Otherwise, operate on `~/Library/LaunchAgents (started at login)`.
-
-  Homebrew/homebrew-services <https://github.com/Homebrew/homebrew-services>
+    **Homebrew/homebrew-services**: <https://github.com/Homebrew/homebrew-services>
 
 ## CUSTOM EXTERNAL COMMANDS
 
@@ -1367,9 +1306,11 @@ Former maintainers with significant contributions include Dominyk Tiller, Tim Sm
 
 See our issues on GitHub:
 
- * Homebrew/brew <https://github.com/Homebrew/brew/issues>
+  * **Homebrew/brew**:
+    <https://github.com/Homebrew/brew/issues>
 
- * Homebrew/homebrew-core <https://github.com/Homebrew/homebrew-core/issues>
+  * **Homebrew/homebrew-core**:
+    <https://github.com/Homebrew/homebrew-core/issues>
 
 
 [SYNOPSIS]: #SYNOPSIS "SYNOPSIS"
