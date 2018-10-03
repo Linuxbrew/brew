@@ -735,3 +735,5 @@ class TapConfig
     end
   end
 end
+
+require "extend/os/tap"
