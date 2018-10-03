@@ -16,7 +16,7 @@ Homebrew's audience includes users with a wide range of education and experience
 
 We strive for "correct" but not "fancy" usage. Think newspaper article, not academic paper.
 
-This is a set of guidelines to be applied using human judgment, not a set of hard and fast rules. It is like [The Economist's Style Guide](https://www.economist.com/styleguide/introduction) or [Garner's Modern American Usage](https://en.wikipedia.org/wiki/Garner's_Modern_American_Usage). It is less like the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide). All guidelines here are open to interpretation and discussion. 100% conformance to these guidelines is *not* a goal.
+This is a set of guidelines to be applied using human judgment, not a set of hard and fast rules. It is like [The Economist's Style Guide](https://web.archive.org/web/20170830001125/https://www.economist.com/styleguide/introduction) or [Garner's Modern American Usage](https://en.wikipedia.org/wiki/Garner's_Modern_American_Usage). It is less like the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide). All guidelines here are open to interpretation and discussion. 100% conformance to these guidelines is *not* a goal.
 
 The intent of this document is to help authors make decisions about clarity, style, and consistency. It is not to help settle arguments about who knows English better. Don't use this document to be a jerk.
 
