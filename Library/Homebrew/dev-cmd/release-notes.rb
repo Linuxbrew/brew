@@ -10,10 +10,22 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def release_notes
-    Homebrew::CLI::Parser.parse do
-      switch "--markdown"
+  def release_notes_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `release-notes` [<options>] [<previous_tag>] [<end_ref>]:
+
+        Output the merged pull requests on Homebrew/brew between two Git refs.
+        If no <previous_tag> is provided it defaults to the latest tag.
+        If no <end_ref> is provided it defaults to `origin/master`.
+      EOS
+      switch "--markdown",
+        description: "Output as a Markdown list."
     end
+  end
+
+  def release_notes
+    release_notes_args.parse
 
     previous_tag = ARGV.named.first
     previous_tag ||= Utils.popen_read(

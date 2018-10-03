@@ -96,12 +96,26 @@ end
 module Homebrew
   module_function
 
-  def extract
-    Homebrew::CLI::Parser.parse do
-      flag   "--version="
+  def extract_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `extract` [<options>] <formula> <tap>
+
+        Looks through repository history to find the <version> of <formula> and
+        creates a copy in <tap>/Formula/<formula>@<version>.rb. If the tap is
+        not installed yet, attempts to install/clone the tap before continuing.
+      EOS
+
+      flag "--version=",
+        description: "Provided <version> of <formula> will be extracted and placed in the destination "\
+                     "tap. Otherwise, the most recent version that can be found will be used."
       switch :debug
       switch :force
     end
+  end
+
+  def extract
+    extract_args.parse
 
     # Expect exactly two named arguments: formula and tap
     raise UsageError if ARGV.named.length != 2

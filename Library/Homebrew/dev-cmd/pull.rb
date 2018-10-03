@@ -72,24 +72,59 @@ end
 module Homebrew
   module_function
 
+  def pull_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        pull [<options>] <formula>:
+
+        Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
+        Optionally, installs the formulae changed by the patch.
+
+        Each <patch-source> may be one of:
+
+          ~ The ID number of a PR (pull request) in the homebrew/core GitHub
+            repository
+
+          ~ The URL of a PR on GitHub, using either the web page or API URL
+            formats. In this form, the PR may be on Homebrew/brew,
+            Homebrew/homebrew-core or any tap.
+
+          ~ The URL of a commit on GitHub
+
+          ~ A "https://jenkins.brew.sh/job/..." string specifying a testing job ID
+      EOS
+      switch "--bottle",
+        description: "Handle bottles, pulling the bottle-update commit and publishing files on Bintray."
+      switch "--bump",
+        description: "For one-formula PRs, automatically reword commit message to our preferred format."
+      switch "--clean",
+        description: "Do not rewrite or otherwise modify the commits found in the pulled PR."
+      switch "--ignore-whitespace",
+        description: "Silently ignore whitespace discrepancies when applying diffs."
+      switch "--resolve",
+        description: "When a patch fails to apply, leave in progress and allow user to resolve, instead "\
+                     "of aborting."
+      switch "--branch-okay",
+        description: "Do not warn if pulling to a branch besides master (useful for testing)."
+      switch "--no-pbcopy",
+        description: "Do not copy anything to the system clipboard."
+      switch "--no-publish",
+        description: "Do not publish bottles to Bintray."
+      switch "--warn-on-publish-failure",
+        description: "Do not exit if there's a failure publishing bottles on Bintray."
+      flag   "--bintray-org=",
+        description: "Publish at the given Bintray organisation."
+      flag   "--test-bot-user=",
+        description: "Pull the bottle block commit from the specified user on GitHub."
+      switch :verbose
+      switch :debug
+    end
+  end
+
   def pull
     odie "You meant `git pull --rebase`." if ARGV[0] == "--rebase"
 
-    Homebrew::CLI::Parser.parse do
-      switch "--bottle"
-      switch "--bump"
-      switch "--clean"
-      switch "--ignore-whitespace"
-      switch "--resolve"
-      switch "--branch-okay"
-      switch "--no-pbcopy"
-      switch "--no-publish"
-      switch "--warn-on-publish-failure"
-      switch :verbose
-      switch :debug
-      flag   "--bintray-org="
-      flag   "--test-bot-user="
-    end
+    pull_args.parse
 
     if ARGV.named.empty?
       odie "This command requires at least one argument containing a URL or pull request number"

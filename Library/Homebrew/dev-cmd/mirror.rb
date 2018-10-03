@@ -7,11 +7,20 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def mirror
-    Homebrew::CLI::Parser.parse do
+  def mirror_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `mirror` <formulae>:
+
+        Reuploads the stable URL for a formula to Bintray to use it as a mirror.
+      EOS
       switch :debug
       switch :verbose
     end
+  end
+
+  def mirror
+    mirror_args.parse
 
     odie "This command requires at least formula argument!" if ARGV.named.empty?
 

@@ -10,12 +10,21 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def edit
-    Homebrew::CLI::Parser.parse do
+  def edit_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `edit` <formula>:
+          Open <formula> in the editor. Open all of Homebrew for editing if
+          no <formula> is provided.
+      EOS
       switch :force
       switch :verbose
       switch :debug
     end
+  end
+
+  def edit
+    edit_args.parse
 
     unless (HOMEBREW_REPOSITORY/".git").directory?
       raise <<~EOS

@@ -22,11 +22,23 @@ end
 module Homebrew
   module_function
 
-  def irb
-    Homebrew::CLI::Parser.parse do
-      switch "--examples"
-      switch "--pry", env: :pry
+  def irb_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `irb` [<options>]:
+
+        Enter the interactive Homebrew Ruby shell.
+      EOS
+      switch "--examples",
+        description: "Show several examples."
+      switch "--pry",
+        env: :pry,
+        description: "Pry will be used instead of irb if `--pry` is passed or HOMEBREW_PRY is set."
     end
+  end
+
+  def irb
+    irb_args.parse
 
     if args.examples?
       puts "'v8'.f # => instance of the v8 formula"
