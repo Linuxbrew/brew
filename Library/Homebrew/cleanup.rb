@@ -162,8 +162,10 @@ module Homebrew
         end
         cleanup_cache
         cleanup_logs
+        cleanup_portable_ruby
         return if dry_run?
 
+        cleanup_linkage_db
         rm_ds_store
       else
         args.each do |arg|
@@ -288,6 +290,45 @@ module Homebrew
           file.open(File::RDWR).flock(File::LOCK_UN) if file.exist?
         end
       end
+    end
+
+    def cleanup_portable_ruby
+      system_ruby_version =
+        Utils.popen_read("/usr/bin/ruby", "-e", "puts RUBY_VERSION")
+             .chomp
+      use_system_ruby = (
+        Gem::Version.new(system_ruby_version) >= Gem::Version.new(RUBY_VERSION)
+      ) && ENV["HOMEBREW_FORCE_VENDOR_RUBY"].nil?
+      vendor_path = HOMEBREW_LIBRARY/"Homebrew/vendor"
+      portable_ruby_version_file = vendor_path/"portable-ruby-version"
+      portable_ruby_version = if portable_ruby_version_file.exist?
+        portable_ruby_version_file.read
+                                  .chomp
+      end
+
+      portable_ruby_path = vendor_path/"portable-ruby"
+      portable_ruby_glob = "#{portable_ruby_path}/*.*"
+      Pathname.glob(portable_ruby_glob).each do |path|
+        next if !use_system_ruby && portable_ruby_version == path.basename.to_s
+        if dry_run?
+          puts "Would remove: #{path} (#{path.abv})"
+        else
+          FileUtils.rm_rf path
+        end
+      end
+
+      return unless Dir.glob(portable_ruby_glob).empty?
+      return unless portable_ruby_path.exist?
+
+      if dry_run?
+        puts "Would remove: #{portable_ruby_path} (#{portable_ruby_path.abv})"
+      else
+        FileUtils.rm_rf portable_ruby_path
+      end
+    end
+
+    def cleanup_linkage_db
+      FileUtils.rm_rf [cache/"linkage.db", cache/"linkage.db.db"]
     end
 
     def rm_ds_store(dirs = nil)
