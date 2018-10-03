@@ -174,7 +174,16 @@ RSpec.shared_context "integration test" do
 
   def setup_remote_tap(name)
     Tap.fetch(name).tap do |tap|
-      tap.install(full_clone: false, quiet: true) unless tap.installed?
+      next if tap.installed?
+      full_name = Tap.fetch(name).full_name
+      # Check to see if the original Homebrew process has taps we can use.
+      system_tap_path = Pathname("#{ENV["HOMEBREW_LIBRARY"]}/Taps/#{full_name}")
+      if system_tap_path.exist?
+        system "git", "clone", "--shared", system_tap_path, tap.path
+        system "git", "-C", tap.path, "checkout", "master"
+      else
+        tap.install(full_clone: false, quiet: true)
+      end
     end
   end
 
