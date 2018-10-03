@@ -61,7 +61,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     the list is formatted for export to `bash`(1) unless `--plain` is passed.
 
   * `--prefix`:
-    Display Homebrew's install path. *Default:* `/usr/local`
+    Display Homebrew's install path. *Default:* `/usr/local` on macOS and `/home/linuxbrew/.linuxbrew` on Linux
 
   * `--prefix` `formula`:
     Display the location in the cellar where `formula` is or would be installed.
@@ -479,16 +479,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--env=std` is passed, use the standard `PATH` instead of superenv's.
 
-  * `shellenv`:
-    Prints export statements - run them in a shell and this installation of
-    Homebrew will be included into your PATH, MANPATH, and INFOPATH.
-
-    HOMEBREW_PREFIX, HOMEBREW_CELLAR and HOMEBREW_REPOSITORY are also exported
-    to save multiple queries of those variables.
-
-    Consider adding evaluating the output in your dotfiles (e.g. `~/.profile`)
-    with `eval $(brew shellenv)`
-
   * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=``cops`|`--except-cops=``cops`] [`files`|`taps`|`formulae`]:
     Check formulae or files for conformance to Homebrew style guidelines.
 
@@ -604,7 +594,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `untap` `tap`:
     Remove a tapped repository.
 
-  * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`formulae`]:
+  * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`--display-times`] [`formulae`]:
     Upgrade outdated, unpinned brews (with existing install options).
 
     Options for the `install` command are also valid here.
@@ -646,10 +636,20 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     cases where `formulae` is used by development or HEAD build, pass
     `--devel` or `--HEAD`.
 
-  * `update-reset`:
-    Fetches and resets Homebrew and all tap repositories using `git`(1) to
-    their latest `origin/master`. Note this will destroy all your uncommitted
-    or committed changes.
+  * `shellenv`:
+    Prints export statements - run them in a shell and this installation of
+    Homebrew will be included into your PATH, MANPATH, and INFOPATH.
+
+    HOMEBREW_PREFIX, HOMEBREW_CELLAR and HOMEBREW_REPOSITORY are also exported
+    to save multiple queries of those variables.
+
+    Consider adding evaluating the output in your dotfiles (e.g. `~/.profile`)
+    with `eval $(brew shellenv)`
+
+  * `update-reset` [`repositories`]:
+    Fetches and resets Homebrew and all tap repositories (or the specified
+    `repositories`) using `git`(1) to their latest `origin/master`. Note this
+    will destroy all your uncommitted or committed changes.
 
   * `update` [`--merge`] [`--force`]:
     Fetch the newest version of Homebrew and all formulae from GitHub using
@@ -793,6 +793,18 @@ Takes a tap [`user``/``repo`] as argument and generates the formula in the speci
   Open `formula` in the editor. Open all of Homebrew for editing if
   no `formula` is provided.
 
+
+  * `extract` [`--force`] `formula` `tap` [`--version=``version`]:
+    Looks through repository history to find the `version` of `formula` and
+    creates a copy in `tap`/Formula/`formula`@`version`.rb. If the tap is
+    not installed yet, attempts to install/clone the tap before continuing.
+
+    If `--force` is passed, the file at the destination will be overwritten
+    if it already exists. Otherwise, existing files will be preserved.
+
+    If an argument is passed through `--version`, `version` of `formula`
+    will be extracted and placed in the destination tap. Otherwise, the most
+    recent version that can be found will be used.
 
 ###`formula` `formula`:
 

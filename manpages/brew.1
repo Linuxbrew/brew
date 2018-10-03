@@ -43,25 +43,20 @@ Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is su
 .
 .SH "COMMANDS"
 .
-.TP
-\fB\-\-cache\fR
-Display Homebrew\'s download cache\. See also \fBHOMEBREW_CACHE\fR\.
+.IP "\(bu" 4
+\fB\-\-cache\fR: Display Homebrew\'s download cache\. See also \fBHOMEBREW_CACHE\fR\.
 .
-.TP
-\fB\-\-cache\fR [\fB\-\-build\-from\-source\fR|\fB\-s\fR] [\fB\-\-force\-bottle\fR] \fIformula\fR
-Display the file or directory used to cache \fIformula\fR\.
+.IP "\(bu" 4
+\fB\-\-cache\fR [\fB\-\-build\-from\-source\fR|\fB\-s\fR] [\fB\-\-force\-bottle\fR] \fIformula\fR: Display the file or directory used to cache \fIformula\fR\.
 .
-.TP
-\fB\-\-cellar\fR
-Display Homebrew\'s Cellar path\. \fIDefault:\fR \fB$(brew \-\-prefix)/Cellar\fR, or if that directory doesn\'t exist, \fB$(brew \-\-repository)/Cellar\fR\.
+.IP "\(bu" 4
+\fB\-\-cellar\fR: Display Homebrew\'s Cellar path\. \fIDefault:\fR \fB$(brew \-\-prefix)/Cellar\fR, or if that directory doesn\'t exist, \fB$(brew \-\-repository)/Cellar\fR\.
 .
-.TP
-\fB\-\-cellar\fR \fIformula\fR
-Display the location in the cellar where \fIformula\fR would be installed, without any sort of versioned directory as the last path\.
+.IP "\(bu" 4
+\fB\-\-cellar\fR \fIformula\fR: Display the location in the cellar where \fIformula\fR would be installed, without any sort of versioned directory as the last path\.
 .
-.TP
-\fB\-\-env\fR [\fB\-\-shell=\fR(\fIshell\fR|\fBauto\fR)|\fB\-\-plain\fR]
-Show a summary of the Homebrew build environment as a plain list\.
+.IP "\(bu" 4
+\fB\-\-env\fR [\fB\-\-shell=\fR(\fIshell\fR|\fBauto\fR)|\fB\-\-plain\fR]: Show a summary of the Homebrew build environment as a plain list\.
 .
 .IP
 Pass \fB\-\-shell=\fR\fIshell\fR to generate a list of environment variables for the specified shell, or \fB\-\-shell=auto\fR to detect the current shell\.
@@ -69,29 +64,23 @@ Pass \fB\-\-shell=\fR\fIshell\fR to generate a list of environment variables for
 .IP
 If the command\'s output is sent through a pipe and no shell is specified, the list is formatted for export to \fBbash\fR(1) unless \fB\-\-plain\fR is passed\.
 .
-.TP
-\fB\-\-prefix\fR
-Display Homebrew\'s install path\. \fIDefault:\fR \fB/usr/local\fR
+.IP "\(bu" 4
+\fB\-\-prefix\fR: Display Homebrew\'s install path\. \fIDefault:\fR \fB/usr/local\fR on macOS and \fB/home/linuxbrew/\.linuxbrew\fR on Linux
 .
-.TP
-\fB\-\-prefix\fR \fIformula\fR
-Display the location in the cellar where \fIformula\fR is or would be installed\.
+.IP "\(bu" 4
+\fB\-\-prefix\fR \fIformula\fR: Display the location in the cellar where \fIformula\fR is or would be installed\.
 .
-.TP
-\fB\-\-repository\fR
-Display where Homebrew\'s \fB\.git\fR directory is located\.
+.IP "\(bu" 4
+\fB\-\-repository\fR: Display where Homebrew\'s \fB\.git\fR directory is located\.
 .
-.TP
-\fB\-\-repository\fR \fIuser\fR\fB/\fR\fIrepo\fR
-Display where tap \fIuser\fR\fB/\fR\fIrepo\fR\'s directory is located\.
+.IP "\(bu" 4
+\fB\-\-repository\fR \fIuser\fR\fB/\fR\fIrepo\fR: Display where tap \fIuser\fR\fB/\fR\fIrepo\fR\'s directory is located\.
 .
-.TP
-\fB\-\-version\fR
-Print the version number of Homebrew to standard output and exit\.
+.IP "\(bu" 4
+\fB\-\-version\fR: Print the version number of Homebrew to standard output and exit\.
 .
-.TP
-\fBanalytics\fR [\fBstate\fR]
-Display anonymous user behaviour analytics state\. Read more at \fIhttps://docs\.brew\.sh/Analytics\fR\.
+.IP "\(bu" 4
+\fBanalytics\fR [\fBstate\fR]: Display anonymous user behaviour analytics state\. Read more at \fIhttps://docs\.brew\.sh/Analytics\fR\.
 .
 .IP "\(bu" 4
 \fBanalytics\fR (\fBon\fR|\fBoff\fR): Turn on/off Homebrew\'s analytics\.
@@ -451,15 +440,6 @@ If \fB\-\-desc\fR is passed, search formulae with a description matching \fItext
 If \fB\-\-env=std\fR is passed, use the standard \fBPATH\fR instead of superenv\'s\.
 .
 .IP "\(bu" 4
-\fBshellenv\fR: Prints export statements \- run them in a shell and this installation of Homebrew will be included into your PATH, MANPATH, and INFOPATH\.
-.
-.IP
-HOMEBREW_PREFIX, HOMEBREW_CELLAR and HOMEBREW_REPOSITORY are also exported to save multiple queries of those variables\.
-.
-.IP
-Consider adding evaluating the output in your dotfiles (e\.g\. \fB~/\.profile\fR) with \fBeval $(brew shellenv)\fR
-.
-.IP "\(bu" 4
 \fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-only\-cops=\fR\fIcops\fR|\fB\-\-except\-cops=\fR\fIcops\fR] [\fIfiles\fR|\fItaps\fR|\fIformulae\fR]: Check formulae or files for conformance to Homebrew style guidelines\.
 .
 .IP
@@ -480,20 +460,17 @@ Exits with a non\-zero status if any style violations are found\.
 .IP "\(bu" 4
 \fBswitch\fR \fIformula\fR \fIversion\fR: Symlink all of the specific \fIversion\fR of \fIformula\fR\'s install to Homebrew prefix\.
 .
-.TP
-\fBtap\-info\fR
-Display a brief summary of all installed taps\.
+.IP "\(bu" 4
+\fBtap\-info\fR: Display a brief summary of all installed taps\.
 .
-.TP
-\fBtap\-info\fR (\fB\-\-installed\fR|\fItaps\fR)
-Display detailed information about one or more \fItaps\fR\.
+.IP "\(bu" 4
+\fBtap\-info\fR (\fB\-\-installed\fR|\fItaps\fR): Display detailed information about one or more \fItaps\fR\.
 .
 .IP
 Pass \fB\-\-installed\fR to display information on all installed taps\.
 .
-.TP
-\fBtap\-info\fR \fB\-\-json=\fR\fIversion\fR (\fB\-\-installed\fR|\fItaps\fR)
-Print a JSON representation of \fItaps\fR\. Currently the only accepted value for \fIversion\fR is \fBv1\fR\.
+.IP "\(bu" 4
+\fBtap\-info\fR \fB\-\-json=\fR\fIversion\fR (\fB\-\-installed\fR|\fItaps\fR): Print a JSON representation of \fItaps\fR\. Currently the only accepted value for \fIversion\fR is \fBv1\fR\.
 .
 .IP
 Pass \fB\-\-installed\fR to get information on installed taps\.
@@ -501,17 +478,14 @@ Pass \fB\-\-installed\fR to get information on installed taps\.
 .IP
 See the docs for examples of using the JSON output: \fIhttps://docs\.brew\.sh/Querying\-Brew\fR
 .
-.TP
-\fBtap\-pin\fR \fItap\fR
-Pin \fItap\fR, prioritizing its formulae over core when formula names are supplied by the user\. See also \fBtap\-unpin\fR\.
+.IP "\(bu" 4
+\fBtap\-pin\fR \fItap\fR: Pin \fItap\fR, prioritizing its formulae over core when formula names are supplied by the user\. See also \fBtap\-unpin\fR\.
 .
-.TP
-\fBtap\-unpin\fR \fItap\fR
-Unpin \fItap\fR so its formulae are no longer prioritized\. See also \fBtap\-pin\fR\.
+.IP "\(bu" 4
+\fBtap\-unpin\fR \fItap\fR: Unpin \fItap\fR so its formulae are no longer prioritized\. See also \fBtap\-pin\fR\.
 .
-.TP
-\fBtap\fR
-List all installed taps\.
+.IP "\(bu" 4
+\fBtap\fR: List all installed taps\.
 .
 .IP "\(bu" 4
 \fBtap\fR [\fB\-\-full\fR] [\fB\-\-force\-auto\-update\fR] \fIuser\fR\fB/\fR\fIrepo\fR [\fIURL\fR]: Tap a formula repository\.
@@ -537,9 +511,8 @@ By default, only taps hosted on GitHub are auto\-updated (for performance reason
 .IP "\(bu" 4
 \fBtap\fR \fB\-\-list\-pinned\fR: List all pinned taps\.
 .
-.TP
-\fBuninstall\fR, \fBrm\fR, \fBremove\fR [\fB\-\-force\fR] [\fB\-\-ignore\-dependencies\fR] \fIformula\fR
-Uninstall \fIformula\fR\.
+.IP "\(bu" 4
+\fBuninstall\fR, \fBrm\fR, \fBremove\fR [\fB\-\-force\fR] [\fB\-\-ignore\-dependencies\fR] \fIformula\fR: Uninstall \fIformula\fR\.
 .
 .IP
 If \fB\-\-force\fR (or \fB\-f\fR) is passed, and there are multiple versions of \fIformula\fR installed, delete all installed versions\.
@@ -568,9 +541,8 @@ If \fB\-\-git\fR (or \fB\-g\fR) is passed, a Git repository will be initialized 
 .IP "\(bu" 4
 \fBuntap\fR \fItap\fR: Remove a tapped repository\.
 .
-.TP
-\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fIformulae\fR]
-Upgrade outdated, unpinned brews (with existing install options)\.
+.IP "\(bu" 4
+\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fB\-\-display\-times\fR] [\fIformulae\fR]: Upgrade outdated, unpinned brews (with existing install options)\.
 .
 .IP
 Options for the \fBinstall\fR command are also valid here\.
@@ -605,19 +577,28 @@ By default, \fBuses\fR shows all formulae that specify \fIformulae\fR as a requi
 .IP
 By default, \fBuses\fR shows usage of \fIformulae\fR by stable builds\. To find cases where \fIformulae\fR is used by development or HEAD build, pass \fB\-\-devel\fR or \fB\-\-HEAD\fR\.
 .
-.TP
-\fBupdate\-reset\fR
-Fetches and resets Homebrew and all tap repositories using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
+.IP "\(bu" 4
+\fBshellenv\fR: Prints export statements \- run them in a shell and this installation of Homebrew will be included into your PATH, MANPATH, and INFOPATH\.
 .
-.TP
-\fBupdate\fR [\fB\-\-merge\fR] [\fB\-\-force\fR]
-Fetch the newest version of Homebrew and all formulae from GitHub using \fBgit\fR(1) and perform any necessary migrations\.
+.IP
+HOMEBREW_PREFIX, HOMEBREW_CELLAR and HOMEBREW_REPOSITORY are also exported to save multiple queries of those variables\.
+.
+.IP
+Consider adding evaluating the output in your dotfiles (e\.g\. \fB~/\.profile\fR) with \fBeval $(brew shellenv)\fR
+.
+.IP "\(bu" 4
+\fBupdate\-reset\fR [\fIrepositories\fR]: Fetches and resets Homebrew and all tap repositories (or the specified \fBrepositories\fR) using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
+.
+.IP "\(bu" 4
+\fBupdate\fR [\fB\-\-merge\fR] [\fB\-\-force\fR]: Fetch the newest version of Homebrew and all formulae from GitHub using \fBgit\fR(1) and perform any necessary migrations\.
 .
 .IP
 If \fB\-\-merge\fR is specified then \fBgit merge\fR is used to include updates (rather than \fBgit rebase\fR)\.
 .
 .IP
 If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full update check even if unnecessary\.
+.
+.IP "" 0
 .
 .SH "DEVELOPER COMMANDS"
 .
@@ -723,9 +704,6 @@ If a \fItag\fR is specified, the git commit \fIrevision\fR corresponding to that
 .P
 Note that this command cannot be used to transition a formula from a URL\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.
 .
-.IP
-If \fB\-\-json\fR is passed, write bottle information to a JSON file, which can be used as the argument for \fB\-\-merge\fR\.
-.
 .TP
 \fB\-\-devel\fR
 Bump the development rather than stable version\. The development spec must already exist\.
@@ -815,6 +793,16 @@ Takes a tap [\fIuser\fR\fB/\fR\fIrepo\fR] as argument and generates the formula 
 .
 .SS "\fBedit\fR \fIformula\fR:"
 Open \fIformula\fR in the editor\. Open all of Homebrew for editing if no \fIformula\fR is provided\.
+.
+.TP
+\fBextract\fR [\fB\-\-force\fR] \fIformula\fR \fItap\fR [\fB\-\-version=\fR\fIversion\fR]
+Looks through repository history to find the \fIversion\fR of \fIformula\fR and creates a copy in \fItap\fR/Formula/\fIformula\fR@\fIversion\fR\.rb\. If the tap is not installed yet, attempts to install/clone the tap before continuing\.
+.
+.IP
+If \fB\-\-force\fR is passed, the file at the destination will be overwritten if it already exists\. Otherwise, existing files will be preserved\.
+.
+.IP
+If an argument is passed through \fB\-\-version\fR, \fIversion\fR of \fIformula\fR will be extracted and placed in the destination tap\. Otherwise, the most recent version that can be found will be used\.
 .
 .SS "\fBformula\fR \fIformula\fR:"
 Display the path where \fIformula\fR is located\.
