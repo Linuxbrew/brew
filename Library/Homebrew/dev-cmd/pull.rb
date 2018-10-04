@@ -125,7 +125,9 @@ module Homebrew
     tap = nil
 
     ARGV.named.each do |arg|
-      arg = "#{CoreTap.instance.default_remote}/pull/#{arg}" if arg.to_i.positive?
+      remote = CoreTap.instance.default_remote
+      remote = remote.sub(/^git@github.com:/, "https://github.com/")
+      arg = "#{remote}/pull/#{arg}" if arg.to_i.positive?
       if (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
         tap = @args[:tap]
         tap = if tap&.start_with?("homebrew/")
