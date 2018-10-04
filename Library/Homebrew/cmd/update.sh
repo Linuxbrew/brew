@@ -8,8 +8,8 @@
 #:    If `--force` (or `-f`) is specified then always do a slower, full update check even
 #:    if unnecessary.
 
-# Hide shellcheck complaint:
-# shellcheck source=/dev/null
+# Don't need shellcheck to follow this `source`.
+# shellcheck disable=SC1090
 source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
 # Replaces the function in Library/Homebrew/brew.sh to cache the Git executable to

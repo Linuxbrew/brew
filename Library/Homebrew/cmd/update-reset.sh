@@ -26,12 +26,12 @@ homebrew-update-reset() {
     set -x
   fi
 
-  if [[ -z "$REPOS" ]]
+  if [[ -z "${REPOS[]}" ]]
   then
     REPOS+=("$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*)
   fi
 
-  for DIR in ${REPOS[@]}
+  for DIR in "${REPOS[@]}"
   do
     [[ -d "$DIR/.git" ]] || continue
     cd "$DIR" || continue
