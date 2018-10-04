@@ -4,8 +4,13 @@ AllCops:
     - '**/Casks/**/*'
     - '**/vendor/**/*'
   DisplayCopNames: false
+  RSpec:
+    Patterns:
+    - Homebrew/test/*
 
-require: ./Homebrew/rubocops.rb
+require: 
+  - ./Homebrew/rubocops.rb
+  - rubocop-rspec
 
 # enable all formulae audits
 FormulaAudit:
