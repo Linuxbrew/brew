@@ -320,10 +320,12 @@ module Homebrew
       return unless Dir.glob(portable_ruby_glob).empty?
       return unless portable_ruby_path.exist?
 
+      bundler_path = vendor_path/"bundle/ruby"
       if dry_run?
+        puts "Would remove: #{bundler_path} (#{bundler_path.abv})"
         puts "Would remove: #{portable_ruby_path} (#{portable_ruby_path.abv})"
       else
-        FileUtils.rm_rf portable_ruby_path
+        FileUtils.rm_rf [bundler_path, portable_ruby_path]
       end
     end
 
