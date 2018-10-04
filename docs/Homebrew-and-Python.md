@@ -21,7 +21,7 @@ The executables are organized as follows so that Python 2 and Python 3 can both 
 ([Wondering which one to choose?](https://wiki.python.org/moin/Python2orPython3))
 
 ## Setuptools, Pip, etc.
-The Python formulae install [pip](http://www.pip-installer.org) (as `pip` or `pip2`) and [Setuptools](https://pypi.python.org/pypi/setuptools).
+The Python formulae install [pip](https://pip.pypa.io/) (as `pip` or `pip2`) and [Setuptools](https://pypi.python.org/pypi/setuptools).
 
 Setuptools can be updated via pip, without having to re-brew Python:
 

@@ -62,7 +62,7 @@ following content:
 
 ### Using virtualenv - works with brewed and system’s Python
 
-[Virtualenv](http://www.virtualenv.org/en/latest/) ships `pip` and
+[Virtualenv](https://virtualenv.pypa.io/) ships `pip` and
 creates isolated Python environments with separate site-packages,
 therefore you won’t need sudo.
 

@@ -74,7 +74,7 @@ module Cask
 
       # Fields: status, epoch, download agent, event ID
       # Let's toggle the app translocation bit, bit 8
-      # http://openradar.me/radar?id=5022734169931776
+      # http://www.openradar.me/radar?id=5022734169931776
 
       fields[0] = (fields[0].to_i(16) | 0x0100).to_s(16).rjust(4, "0")
 

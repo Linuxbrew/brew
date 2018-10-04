@@ -353,7 +353,7 @@ class Version
     m = %r{/([rvV]_?)?(\d\.\d+(\.\d+){,2})}.match(spec_s)
     return m.captures[1] unless m.nil?
 
-    # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz
+    # e.g. https://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)
     return m.captures.first unless m.nil?
 
