@@ -60,13 +60,10 @@ module Homebrew
       has_non_formula = Array(files).any? do |file|
         File.expand_path(file).start_with? HOMEBREW_LIBRARY_PATH
       end
-      config_file = if files.nil? || has_non_formula
-        HOMEBREW_LIBRARY_PATH/".rubocop.yml"
-      else
-        HOMEBREW_LIBRARY/".rubocop_audit.yml"
-      end
 
-      args << "--config" << config_file
+      unless files.nil? || has_non_formula
+        args << "--config" << HOMEBREW_LIBRARY/".rubocop_audit.yml"
+      end
 
       if files.nil?
         args << HOMEBREW_LIBRARY_PATH
