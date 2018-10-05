@@ -70,7 +70,7 @@ These are likely due to one of four issues:
 
 1. You are using iTerm. The solution is to use Terminal.app when interacting with `launchctl`.
 2. You are using a terminal multiplexer such as `tmux` or `screen`. You should interact with `launchctl` from a separate Terminal.app shell.
-3. You are attempting to run `launchctl` while logged in remotely.  You should enable screen sharing on the remote machine and issue the command using Terminal.app running on that machine.
+3. You are attempting to run `launchctl` while logged in remotely. You should enable screen sharing on the remote machine and issue the command using Terminal.app running on that machine.
 4. You are `su`'ed as a different user.
 
 ### `brew upgrade` errors out
@@ -99,7 +99,7 @@ git clean -n # if this doesn't list anything that you want to keep, then
 git clean -f # this will remove untracked files
 ```
 
-### Python: easy-install.pth cannot be linked
+### Python: `easy-install.pth` cannot be linked
 
 ```
 Warning: Could not link <formula>. Unlinking...

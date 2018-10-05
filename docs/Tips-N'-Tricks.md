@@ -7,10 +7,10 @@ some formulae is to see if there is a versioned formula (e.g. `gcc@6`) available
 
 ### Installing directly from pull requests
 You can [browse pull requests](https://github.com/Homebrew/homebrew-core/pulls)
-and install through the direct link. For example, Python 3.3.0 from pull request [Homebrew/homebrew#15199](https://github.com/Homebrew/homebrew/pull/15199):
+and install through their direct link. For example, Python 3.7.0 from pull request [Homebrew/homebrew-core#29490](https://github.com/Homebrew/homebrew-core/pull/29490):
 
 ```sh
-brew install https://raw.github.com/dsr/homebrew/9b22d42f50fcbc5e52c764448b3ac002bc153bd7/Library/Formula/python3.rb
+brew install https://raw.githubusercontent.com/sashkab/homebrew-core/176823eb82ee1b5ce55a91e5e1bf2f50aa674092/Formula/python.rb
 ```
 
 ## Quickly remove something from `/usr/local`
@@ -40,20 +40,20 @@ Use `brew info <formula>` to check what versions are installed but not currently
 
 ## Pre-downloading a file for a formula
 Sometimes it's faster to download a file via means other than those
-strategies that are available as part of Homebrew.  For example,
+strategies that are available as part of Homebrew. For example,
 Erlang provides a torrent that'll let you download at 4–5× the normal
 HTTP method.
 
 Download the file and drop it in `~/Library/Caches/Homebrew`, but
-watch the file name.  Homebrew downloads files as `<formula>-<version>`.
+watch the file name. Homebrew downloads files as `<formula>-<version>`.
 In the case of Erlang, this requires renaming the file from `otp_src_R13B03` to
 `erlang-R13B03`.
 
 `brew --cache -s erlang` will print the correct name of the cached
-download.  This means instead of manually renaming a formula, you can
+download. This means instead of manually renaming a formula, you can
 run `mv the_tarball $(brew --cache -s <formula>)`.
 
-You can also pre-cache the download by using the command `brew fetch formula` which also displays the SHA-256 hash. This can be useful for updating formulae to new versions.
+You can also pre-cache the download by using the command `brew fetch <formula>` which also displays the SHA-256 hash. This can be useful for updating formulae to new versions.
 
 ## Installing stuff without the Xcode CLT
 
@@ -85,7 +85,7 @@ $ brew irb
 export HOMEBREW_NO_EMOJI=1
 ```
 
-This sets the HOMEBREW_NO_EMOJI environment variable, causing Homebrew
+This sets the `HOMEBREW_NO_EMOJI` environment variable, causing Homebrew
 to hide all emoji.
 
 The beer emoji can also be replaced with other character(s):

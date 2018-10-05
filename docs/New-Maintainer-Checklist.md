@@ -26,22 +26,22 @@ contribute to Homebrew, but we will ask you to step down as a maintainer.
 
 A few requests:
 
-- please make pull requests on any changes to Homebrew/brew code or any
+- Please make pull requests on any changes to Homebrew/brew code or any
   non-trivial (e.g. not a test or audit improvement or version bump) changes
   to formulae code and don't merge them unless you get at least one approval
   and passing tests.
-- use `brew pull` for formulae changes that require new bottles or change
+- Use `brew pull` for formulae changes that require new bottles or change
   multiple formulae and let it auto-close issues wherever possible (it may
   take ~5m). When this isn't necessary use GitHub's "Merge pull request"
   button in "create a merge commit" mode for Homebrew/brew or "squash and
   merge" for a single formulae change. If in doubt, check with e.g. GitX that
-  you've not accidentally added merge commits
-- still create your branches on your fork rather than in the main repository.
+  you've not accidentally added merge commits.
+- Still create your branches on your fork rather than in the main repository.
   Note GitHub's UI will create edits and reverts on the main repository if you
-  make edits or click revert on the Homebrew/brew repository rather than your
+  make edits or click "Revert" on the Homebrew/brew repository rather than your
   own fork.
-- if still in doubt please ask for help and we'll help you out
-- please read:
+- If still in doubt please ask for help and we'll help you out.
+- Please read:
     - https://docs.brew.sh/Brew-Test-Bot-For-Core-Contributors
     - https://docs.brew.sh/Maintainer-Guidelines
     - anything else you haven't read on https://docs.brew.sh
@@ -54,23 +54,23 @@ Thanks for all your work so far!
 If they accept, follow a few steps to get them set up:
 
 - Invite them to the [**@Homebrew/maintainers** team](https://github.com/orgs/Homebrew/teams/maintainers) (or any relevant [subteams](https://github.com/orgs/Homebrew/teams/maintainers/teams)) to give them write access to relevant repositories (but don't make them owners). They will need to enable [GitHub's Two Factor Authentication](https://help.github.com/articles/about-two-factor-authentication/).
-- Ask them to sign in to [Bintray](https://bintray.com) using their GitHub account and they should auto-sync to [Bintray's Homebrew organisation](https://bintray.com/homebrew/organization/edit/members) as a member so they can publish new bottles
-- Add them to the [Jenkins' GitHub Authorization Settings admin user names](https://jenkins.brew.sh/configureSecurity/) so they can adjust settings and restart jobs
-- Add them to the [Jenkins' GitHub Pull Request Builder admin list](https://jenkins.brew.sh/configure) to enable `@BrewTestBot test this please` for them
-- Invite them to the [`homebrew-maintainers` private maintainers mailing list](https://lists.sfconservancy.org/mailman/admin/homebrew-maintainers/members/add)
-- Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites) (and ensure they've read the [communication guidelines](Maintainer-Guidelines.md#communication))
+- Ask them to sign in to [Bintray](https://bintray.com) using their GitHub account and they should auto-sync to [Bintray's Homebrew organisation](https://bintray.com/homebrew/organization/edit/members) as a member so they can publish new bottles.
+- Add them to the [Jenkins' GitHub Authorization Settings admin user names](https://jenkins.brew.sh/configureSecurity/) so they can adjust settings and restart jobs.
+- Add them to the [Jenkins' GitHub Pull Request Builder admin list](https://jenkins.brew.sh/configure) to enable `@BrewTestBot test this please` for them.
+- Invite them to the [`homebrew-maintainers` private maintainers mailing list](https://lists.sfconservancy.org/mailman/admin/homebrew-maintainers/members/add).
+- Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites) (and ensure they've read the [communication guidelines](Maintainer-Guidelines.md#communication)).
 - Ask them to disable SMS as a 2FA device or fallback on their GitHub account in favour of using one of the other authentication methods.
-- Ask them to (regularly) review remove any unneeded [GitHub personal access tokens](https://github.com/settings/tokens)
-- Add them to [Homebrew/brew's README](https://github.com/Homebrew/brew/edit/master/README.md)
+- Ask them to (regularly) review remove any unneeded [GitHub personal access tokens](https://github.com/settings/tokens).
+- Add them to [Homebrew/brew's README](https://github.com/Homebrew/brew/edit/master/README.md).
 
 If they are also interested in doing system administration work:
 
-- Invite them to the [`homebrew-ops` private operations mailing list](https://lists.sfconservancy.org/mailman/admin/homebrew-ops/members/add)
-- Invite them to the [`homebrew` private 1Password](https://homebrew.1password.com/people)
+- Invite them to the [`homebrew-ops` private operations mailing list](https://lists.sfconservancy.org/mailman/admin/homebrew-ops/members/add).
+- Invite them to the [`homebrew` private 1Password](https://homebrew.1password.com/people).
 
 If they want to consume raw anonymous aggregate analytics data (rather than use `brew formula-analytics`):
 
-- Invite them to [Google Analytics](https://analytics.google.com/analytics/web/?authuser=1#management/Settings/a76679469w115400090p120682403/%3Fm.page%3DAccountUsers/)
+- Invite them to [Google Analytics](https://analytics.google.com/analytics/web/?authuser=1#management/Settings/a76679469w115400090p120682403/%3Fm.page%3DAccountUsers/).
 
 Once they have been active maintainers for at least a year and had some activity on more than one Homebrew organisation repository (or one repository and helped with system administration work):
 

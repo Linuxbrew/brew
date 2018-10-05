@@ -18,7 +18,9 @@ If the Node module is also available on the npm registry, we prefer npm hosted r
 
 The npm registry URLs usually have the format of:
 
-    https://registry.npmjs.org/<name>/-/<name>-<version>.tgz
+```
+https://registry.npmjs.org/<name>/-/<name>-<version>.tgz
+```
 
 Alternatively you could `curl` the JSON at `https://registry.npmjs.org/<name>` and look for the value of `versions[<version>].dist.tarball` for the correct tarball URL.
 
@@ -46,11 +48,12 @@ Also note that such a formula would only be compatible with the same Node major 
 
 Node modules should be installed to `libexec`. This prevents the Node modules from contaminating the global `node_modules`, which is important so that npm doesn't try to manage Homebrew-installed Node modules.
 
-In the following we distinguish between two types of Node modules using formulae:
-* formulae for standard Node modules compatible with npm's global module format which should use [`std_npm_install_args`](#installing-global-style-modules-with-std_npm_install_args-to-libexec) (like [`azure-cli`](https://github.com/Homebrew/homebrew-core/blob/0f3b27d252b8112c744e0460d871cfe1def6b993/Formula/azure-cli.rb) or [`webpack`](https://github.com/Homebrew/homebrew-core/blob/6282879973d569962e63da7c81ac4623e1a8336b/Formula/webpack.rb)) and
-* formulae where the `npm install` call is not the only required install step (e.g. need to compile non-JavaScript sources too) have to use [`local_npm_install_args`](#installing-module-dependencies-locally-with-local_npm_install_args) (like [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/4bb491b7b246830aed57b97348a17e9401374978/Formula/elixirscript.rb)
+In the following we distinguish between two types of Node modules installed using formulae:
 
-Both methods have in common that they are setting the correct environment for using npm inside Homebrew and are returning the arguments for invoking `npm install` for their specific use cases. This includes fixing an important edge case with the npm cache (caused by Homebrew's redirection of `HOME` during the build and test process) by using our own custom `npm_cache` inside `HOMEBREW_CACHE`, which would otherwise result in very long build times and high disk space usage.
+* formulae for standard Node modules compatible with npm's global module format which should use [`std_npm_install_args`](#installing-global-style-modules-with-std_npm_install_args-to-libexec) (like [`azure-cli`](https://github.com/Homebrew/homebrew-core/blob/0f3b27d252b8112c744e0460d871cfe1def6b993/Formula/azure-cli.rb) or [`webpack`](https://github.com/Homebrew/homebrew-core/blob/6282879973d569962e63da7c81ac4623e1a8336b/Formula/webpack.rb))
+* formulae where the `npm install` call is not the only required install step (e.g. need to also compile non-JavaScript sources) which have to use [`local_npm_install_args`](#installing-module-dependencies-locally-with-local_npm_install_args) (like [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/4bb491b7b246830aed57b97348a17e9401374978/Formula/elixirscript.rb) or [`grunt-cli`](https://github.com/Homebrew/homebrew-core/blob/93be1840908adb2f9ee8c48c66586ee6327480e3/Formula/grunt-cli.rb))
+
+What both methods have in common is that they are setting the correct environment for using npm inside Homebrew and are returning the arguments for invoking `npm install` for their specific use cases. This includes fixing an important edge case with the npm cache (caused by Homebrew's redirection of `HOME` during the build and test process) by using our own custom `npm_cache` inside `HOMEBREW_CACHE`, which would otherwise result in very long build times and high disk space usage.
 
 To use them you have to require the Node language module at the beginning of your formula file with:
 
@@ -111,8 +114,6 @@ class Foo < Formula
   end
 end
 ```
-
-For examples using the `local_npm_install_args` method look at the  [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/ec1e40d37e81af63122a354f0101c377f6a4e66d/Formula/elixirscript.rb) or [`kibana`](https://github.com/Homebrew/homebrew-core/blob/c6202f91a129e2f994d904f299a308cc6fbd58e5/Formula/kibana.rb) formulae.
 
 ## Tooling
 
