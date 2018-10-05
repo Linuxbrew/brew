@@ -11,6 +11,7 @@ RUN localedef -i en_US -f UTF-8 en_US.UTF-8 \
 ADD . /home/linuxbrew/.linuxbrew/Homebrew
 RUN cd /home/linuxbrew/.linuxbrew \
 	&& mkdir -p bin etc include lib opt sbin share var/homebrew/linked Cellar \
+	&& ln -s ../Homebrew/bin/brew /home/linuxbrew/.linuxbrew/bin/ \
 	&& chown -R linuxbrew: /home/linuxbrew/.linuxbrew \
 	&& cd /home/linuxbrew/.linuxbrew/Homebrew \
 	&& git remote set-url origin https://github.com/Linuxbrew/brew
