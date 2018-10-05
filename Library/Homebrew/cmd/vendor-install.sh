@@ -25,6 +25,11 @@ then
       ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.7/portable-ruby-2.3.7.x86_64_linux.bottle.tar.gz"
       ruby_SHA="9df214085a0e566a580eea3dd9eab14a2a94930ff74fbf97fb1284e905c8921d"
       ;;
+    armv[67]*)
+      ruby_URL="$HOMEBREW_BOTTLE_DOMAIN/bottles-portable-ruby/portable-ruby-2.3.7.armv6_linux.bottle.tar.gz"
+      ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.7/portable-ruby-2.3.7.armv6_linux.bottle.tar.gz"
+      ruby_SHA="17dce8965d7c935ec1dd0c5bb0be937b685ffe65529141d9e6ed78f4925b4570"
+      ;;
   esac
 fi
 
