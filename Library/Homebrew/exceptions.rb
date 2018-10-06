@@ -620,7 +620,7 @@ class ChildProcessError < RuntimeError
     @inner_class = Object.const_get inner["json_class"]
 
     super <<~EOS
-      An exception occured within a child process:
+      An exception occurred within a child process:
         #{inner_class}: #{inner["m"]}
     EOS
 
