@@ -79,17 +79,17 @@ module Homebrew
       switch "-D", "--audit-debug",
         description: "Activates debugging and profiling"
       comma_array "--only",
-        description: "Passing `--only`=<method> will run only the methods named audit_<method>, `method` "\
-                     "should be a comma-separated list."
+        description: "Passing `--only=`<method> will run only the methods named audit_<method>. "\
+                     "<method> should be a comma-separated list."
       comma_array "--except",
-        description: "Passing `--except`=<method> will run only the methods named audit_<method>, "\
-                     "`method` should be a comma-separated list."
+        description: "Passing `--except=`<method> will run only the methods named audit_<method>, "\
+                     "<method> should be a comma-separated list."
       comma_array "--only-cops",
-        description: "Passing `--only-cops`=<cops> will check for violations of only the listed "\
-                     "RuboCop cops. `cops` should be a comma-separated list of cop names."
+        description: "Passing `--only-cops=`<cops> will check for violations of only the listed "\
+                     "RuboCop cops. <cops> should be a comma-separated list of cop names."
       comma_array "--except-cops",
-        description: "Passing `--except-cops`=<cops> will skip checking the listed RuboCop cops "\
-                     "violations. `cops` should be a comma-separated list of cop names."
+        description: "Passing `--except-cops=`<cops> will skip checking the listed RuboCop cops "\
+                     "violations. <cops> should be a comma-separated list of cop names."
       switch :verbose
       switch :debug
     end

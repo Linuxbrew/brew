@@ -294,15 +294,15 @@ Note that environment variables must have a value set to be detected. For exampl
 ## USING HOMEBREW BEHIND A PROXY
 Use the `http_proxy`, `https_proxy`, `all_proxy`, `no_proxy` and/or `ftp_proxy` documented above.
 
-For example for an unauthenticated HTTP or SOCKS5 proxy:
+For example, for an unauthenticated HTTP or SOCKS5 proxy:
 
-    export http_proxy=http://<host>:<port>
+    export http_proxy=http://$HOST:$PORT
 
-    export all_proxy=socks5://<host>:<port>
+    export all_proxy=socks5://$HOST:$PORT
 
 And for an authenticated HTTP proxy:
 
-    export http_proxy=http://<user>:<password>@<host>:<port>
+    export http_proxy=http://$USER:$PASSWORD@$HOST:$PORT
 
 ## SEE ALSO
 

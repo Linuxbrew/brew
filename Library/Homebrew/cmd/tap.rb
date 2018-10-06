@@ -6,7 +6,7 @@
 #:
 #:    With <URL> unspecified, taps a formula repository from GitHub using HTTPS.
 #:    Since so many taps are hosted on GitHub, this command is a shortcut for
-#:    `tap <user>/<repo> https://github.com/<user>/homebrew-<repo>`.
+#:    `brew tap` <user>`/`<repo> `https://github.com/`<user>`/homebrew-`<repo>.
 #:
 #:    With <URL> specified, taps a formula repository from anywhere, using
 #:    any transport protocol that `git` handles. The one-argument form of `tap`

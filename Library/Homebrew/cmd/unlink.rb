@@ -1,7 +1,7 @@
 #:  * `unlink` [`--dry-run`] <formula>:
 #:    Remove symlinks for <formula> from the Homebrew prefix. This can be useful
 #:    for temporarily disabling a formula:
-#:    `brew unlink <formula> && <commands> && brew link <formula>`
+#:    `brew unlink` <formula> `&&` <commands> `&& brew link` <formula>
 #:
 #:    If `--dry-run` or `-n` is passed, Homebrew will list all files which would
 #:    be unlinked, but will not actually unlink or delete any files.

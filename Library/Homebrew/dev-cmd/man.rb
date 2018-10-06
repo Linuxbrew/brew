@@ -158,8 +158,7 @@ module Homebrew
       ronn_output = ronn.read
       odie "Got no output from ronn!" unless ronn_output
       if format_flag == "--markdown"
-        ronn_output = ronn_output.gsub(%r{</var>`(?=[.!?,;:]?\s)}, "")
-                                 .gsub(%r{</?var>}, "`")
+        ronn_output = ronn_output.gsub(%r{<var>(.*?)</var>}, "*`\\1`*")
       elsif format_flag == "--roff"
         ronn_output = ronn_output.gsub(%r{<code>(.*?)</code>}, "\\fB\\1\\fR")
                                  .gsub(%r{<var>(.*?)</var>}, "\\fI\\1\\fR")
@@ -233,6 +232,6 @@ module Homebrew
   end
 
   def format_usage_banner(usage_banner)
-    usage_banner.sub(/^/, "###")
+    usage_banner.sub(/^/, "### ")
   end
 end
