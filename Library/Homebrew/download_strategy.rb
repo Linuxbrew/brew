@@ -336,7 +336,10 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
                      .compact
 
     redirect_url = locations.reduce(url) do |current_url, location|
-      if location.start_with?("/")
+      if location.start_with?("//")
+        uri = URI(current_url)
+        "#{uri.scheme}:#{location}"
+      elsif location.start_with?("/")
         uri = URI(current_url)
         "#{uri.scheme}://#{uri.host}#{location}"
       else
