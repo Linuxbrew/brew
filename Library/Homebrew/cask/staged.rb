@@ -2,29 +2,6 @@ require "utils/user"
 
 module Cask
   module Staged
-    def info_plist_file(index = 0)
-      index =  0 if index == :first
-      index =  1 if index == :second
-      index = -1 if index == :last
-      @cask.artifacts.select { |a| a.is_a?(Artifact::App) }.at(index).target.join("Contents", "Info.plist")
-    end
-
-    def plist_exec(cmd)
-      @command.run!("/usr/libexec/PlistBuddy", args: ["-c", cmd, info_plist_file])
-    end
-
-    def plist_set(key, value)
-      plist_exec("Set #{key} #{value}")
-    rescue => e
-      raise CaskError, "#{@cask.token}: 'plist_set' failed with: #{e}"
-    end
-
-    def bundle_identifier
-      plist_exec("Print CFBundleIdentifier").stdout.chomp
-    rescue => e
-      raise CaskError, "#{@cask.token}: 'bundle_identifier' failed with: #{e}"
-    end
-
     def set_permissions(paths, permissions_str)
       full_paths = remove_nonexistent(paths)
       return if full_paths.empty?
