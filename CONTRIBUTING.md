@@ -5,7 +5,7 @@ First time contributing to Homebrew? Read our [Code of Conduct](https://github.c
 
 * Run `brew update` (twice).
 * Run and read `brew doctor`.
-* Read [the Troubleshooting Checklist](https://docs.brew.sh/Troubleshooting).
+* Read the [Troubleshooting checklist](https://docs.brew.sh/Troubleshooting).
 * Open an issue on the formula's repository or on Homebrew/brew if it's not a formula-specific issue.
 
 ### Propose a feature

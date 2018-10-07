@@ -1,7 +1,7 @@
 # Interesting Taps & Forks
 
-A _tap_ is homebrew-speak for a Git repository containing extra formulae.
-Homebrew has the capability to add (and remove) multiple taps to your local installation with the `brew tap` and `brew untap` commands. Type `man brew` in your Terminal. The main repository [https://github.com/Homebrew/homebrew-core](https://github.com/Homebrew/homebrew-core), often called `homebrew/core`, is always built-in.
+A [tap](Taps.md) is Homebrew-speak for a Git repository containing extra formulae.
+Homebrew has the capability to add (and remove) multiple taps to your local installation with the `brew tap` and `brew untap` commands. Type `man brew` in your terminal. The main repository at <https://github.com/Homebrew/homebrew-core>, often called `homebrew/core`, is always built-in.
 
 Your taps are Git repositories located at `$(brew --repository)/Library/Taps`.
 

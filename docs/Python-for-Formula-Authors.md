@@ -4,7 +4,7 @@ This document explains how to successfully use Python in a Homebrew formula.
 
 Homebrew draws a distinction between Python **applications** and Python **libraries**. The difference is that users generally do not care that applications are written in Python; it is unusual that a user would expect to be able to `import foo` after installing an application. Examples of applications are [`ansible`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/ansible.rb) and [`jrnl`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/jrnl.rb).
 
-Python libraries exist to be imported by other Python modules; they are often dependencies of Python applications. They are usually no more than incidentally useful from a Terminal.app command line. Examples of libraries are [`py2cairo`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/py2cairo.rb) and the bindings that are installed by [`protobuf --with-python`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/protobuf.rb).
+Python libraries exist to be imported by other Python modules; they are often dependencies of Python applications. They are usually no more than incidentally useful in a terminal. Examples of libraries are [`py2cairo`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/py2cairo.rb) and the bindings that are installed by [`protobuf --with-python`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/protobuf.rb).
 
 Bindings are a special case of libraries that allow Python code to interact with a library or application implemented in another language.
 
@@ -143,11 +143,11 @@ If the configure script takes a `--with-python` flag, it usually will not need e
 
 If the `configure` and `make` scripts do not want to install into the Cellar, sometimes you can:
 
-1. Call `./configure --without-python` (or a similar named option)
-1. `cd` into the directory containing the Python bindings
-1. Call `setup.py` with `system` and `Language::Python.setup_install_args` (as described above)
+1. call `./configure --without-python` (or a similar named option)
+2. `cd` into the directory containing the Python bindings
+3. call `setup.py` with `system` and `Language::Python.setup_install_args` (as described above)
 
-Sometimes we have to `inreplace` a `Makefile` to use our prefix for the Python bindings. (`inreplace` is one of Homebrew's helper methods, which greps and edits text files on-the-fly.)
+Sometimes we have to edit a `Makefile` on-the-fly to use our prefix for the Python bindings using Homebrew's [`inreplace`](Formula-Cookbook.md#inreplace) helper method.
 
 ## Libraries
 
@@ -155,17 +155,17 @@ Sometimes we have to `inreplace` a `Makefile` to use our prefix for the Python b
 
 Libraries built for Python 3 should include `depends_on "python"`, which will bottle against Homebrew's Python 3.x. Python 2.x libraries must function when they are installed against either the system Python or brewed Python.
 
-Python 2 libraries do not need a `depends_on "python@2"` declaration; they will be built with the system Python, but should still be usable with any other Python 2.7. If this is not the case, it is an upstream bug; [here is some advice for resolving it](https://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
+Python 2 libraries do not need a `depends_on "python@2"` declaration; they will be built with the system Python, but should still be usable with any other Python 2.7. If this is not the case, it's an upstream bug; [here's some advice for resolving it](https://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
 
 ### Installing
 
-Libraries may be installed to `libexec` and added to `sys.path` by writing a .pth file (named like "homebrew-foo.pth") to the `prefix` site-packages. This simplifies the ensuing drama if `pip` is accidentally used to upgrade a Homebrew-installed package and prevents the accumulation of stale .pyc files in Homebrew's site-packages.
+Libraries may be installed to `libexec` and added to `sys.path` by writing a `.pth` file (named like "homebrew-foo.pth") to the `prefix` site-packages. This simplifies the ensuing drama if `pip` is accidentally used to upgrade a Homebrew-installed package and prevents the accumulation of stale .pyc files in Homebrew's site-packages.
 
 Most formulae presently just install to `prefix`.
 
 ### Dependencies
 
-The dependencies of libraries must be installed so that they are importable. To minimize the potential for linking conflicts, dependencies should be installed to `libexec/"vendor"` and added to `sys.path` by writing a second .pth file (named like "homebrew-foo-dependencies.pth") to the `prefix` site-packages.
+The dependencies of libraries must be installed so that they are importable. To minimise the potential for linking conflicts, dependencies should be installed to `libexec/<vendor>` and added to `sys.path` by writing a second `.pth` file (named like "homebrew-foo-dependencies.pth") to the `prefix` site-packages.
 
 ## Further down the rabbit hole
 
@@ -199,7 +199,7 @@ where `prefix` is the destination prefix (usually `libexec` or `prefix`).
 
 * fetches and installs dependencies
 * upgrades dependencies in `sys.path` in-place
-* writes .pth and site.py files which aren't useful for us and cause link conflicts
+* writes `.pth` and `site.py` files which aren't useful for us and cause link conflicts
 
 Setuptools requires that SVEM is used in conjunction with `--record`, which provides a list of files that can later be used to uninstall the package. We don't need or want this because Homebrew can manage uninstallation but since setuptools demands it we comply. The Homebrew convention is to call the record file "installed.txt".
 

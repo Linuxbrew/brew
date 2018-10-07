@@ -12,6 +12,7 @@ This document is current practice. If you wish to change or discuss any of the b
 ## Quick checklist
 
 This is all that really matters:
+
 - Ensure the name seems reasonable.
 - Add aliases.
 - Ensure it uses `keg_only :provided_by_macos` if it already comes with macOS.
@@ -117,7 +118,6 @@ Formulae that:
 - do not require patches rejected by upstream to work
 - do not have known security vulnerabilities or CVEs for the version we package
 - are shown to be still installed by users in our analytics with a `BuildError` rate of <25%
-
 
 should not be removed from Homebrew. The exception to this rule are [versioned formulae](Versions.md) for which there are higher standards of usage and a maximum number of versions for a given formula.
 

@@ -3,16 +3,20 @@
 On a fresh macOS installation there are three empty directories for
 add-ons available to all users:
 
-    /Library/Ruby
-    /Library/Python
-    /Library/Perl
+* `/Library/Ruby`
+* `/Library/Python`
+* `/Library/Perl`
 
 Starting with OS X Lion (10.7), you need `sudo` to install to these like
 so: `sudo gem install`, `sudo easy_install` or `sudo cpan -i`.
 
-An option to avoid sudo is to use an access control list:
-`chmod +a 'user:YOUR_NAME_HERE allow add_subdirectory,add_file,delete_child,directory_inherit' /Library/Python/3.y/site-packages`,
-for example, will let you add packages to Python 3.y as yourself. That
+An option to avoid sudo is to use an access control list. For example:
+
+```sh
+chmod +a 'user:<YOUR_NAME_HERE> allow add_subdirectory,add_file,delete_child,directory_inherit' /Library/Python/3.y/site-packages
+```
+
+will let you add packages to Python 3.y as yourself, which
 is probably safer than changing the group ownership of the directory.
 
 ### So why was I using sudo?
@@ -57,10 +61,12 @@ To teach `easy_install` and `pip` to install there, either use the
 `--user` switch or create a `~/.pydistutils.cfg` file with the
 following content:
 
-    [install]
-    install_lib = ~/Library/Python/$py_version_short/lib/python/site-packages
+```
+[install]
+install_lib = ~/Library/Python/$py_version_short/lib/python/site-packages
+```
 
-### Using virtualenv - works with brewed and system’s Python
+### Using virtualenv (works with brewed and system’s Python)
 
 [Virtualenv](https://virtualenv.pypa.io/) ships `pip` and
 creates isolated Python environments with separate site-packages,
@@ -141,7 +147,7 @@ subdirectories will be in your `PATH` and `PERL5LIB` etc.
 
 If you don’t even want (or can’t) use sudo for bootstrapping
 `local::lib`, just manually install `local::lib` in
-`~/perl5` and add the relevant path to `PERL5LIB` before the .bashrc eval incantation.
+`~/perl5` and add the relevant path to `PERL5LIB` before the `.bashrc` eval incantation.
 
 Another alternative is to use `perlbrew` to install a separate copy of Perl in your home directory, or wherever you like:
 

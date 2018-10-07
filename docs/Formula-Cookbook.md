@@ -12,8 +12,8 @@ A *formula* is a package definition written in Ruby. It can be created with `bre
 | **Cellar**     | All **Kegs** are installed here                            | `/usr/local/Cellar`                                             |
 | **Tap**        | A Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core`   |
 | **Bottle**     | Pre-built **Keg** used instead of building from source     | `qt-4.8.4.mavericks.bottle.tar.gz`                              |
-| **Cask**       | An [extension of homebrew](https://github.com/Homebrew/homebrew-cask) to install macOS native apps  | `/Applications/MacDown.app/Contents/SharedSupport/bin/macdown` |
-| **Brew Bundle**| An [extension of homebrew](https://github.com/Homebrew/homebrew-bundle) to describe dependencies    | `brew 'myservice', restart_service: true` |
+| **Cask**       | An [extension of Homebrew](https://github.com/Homebrew/homebrew-cask) to install macOS native apps  | `/Applications/MacDown.app/Contents/SharedSupport/bin/macdown` |
+| **Brew Bundle**| An [extension of Homebrew](https://github.com/Homebrew/homebrew-bundle) to describe dependencies    | `brew 'myservice', restart_service: true` |
 
 ## An introduction
 
@@ -29,12 +29,12 @@ Make sure you run `brew update` before you start. This turns your Homebrew insta
 
 Before submitting a new formula make sure your package:
 
-*   meets all our [Acceptable Formulae](Acceptable-Formulae.md) requirements
-*   isn't already in Homebrew (check `brew search <formula>`)
-*   isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
-*   is still supported by upstream (i.e. doesn't require extensive patching)
-*   has a stable, tagged version (i.e. not just a GitHub repository with no versions)
-*   passes all `brew audit --new-formula <formula>` tests.
+* meets all our [Acceptable Formulae](Acceptable-Formulae.md) requirements
+* isn't already in Homebrew (check `brew search <formula>`)
+* isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
+* is still supported by upstream (i.e. doesn't require extensive patching)
+* has a stable, tagged version (i.e. not just a GitHub repository with no versions)
+* passes all `brew audit --new-formula <formula>` tests
 
 Before submitting a new formula make sure you read over our [contribution guidelines](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md#contributing-to-homebrew).
 
@@ -112,7 +112,7 @@ There are plenty of others; check `/usr/lib` for them.
 
 We generally try not to duplicate system libraries and complicated tools in core Homebrew but we do duplicate some commonly used tools.
 
-Special exceptions are OpenSSL and LibreSSL. Things that use either *should* be built using Homebrew’s shipped equivalent and our test bot's post-install `audit` will warn if it detects you haven't done this.
+Special exceptions are OpenSSL and LibreSSL. Things that use either *should* be built using Homebrew’s shipped equivalent and our Brew Test Bot's post-install `audit` will warn if it detects you haven't done this.
 
 Homebrew’s OpenSSL is [`keg_only`](https://www.rubydoc.info/github/Homebrew/brew/master/Formula#keg_only-class_method)
 to avoid conflicting with the system so sometimes formulae need to
@@ -202,21 +202,21 @@ When you already have a lot of formulae installed, it's easy to miss a common de
 ```sh
 $ otool -L /usr/local/bin/ldapvi
 /usr/local/bin/ldapvi:
-/usr/local/opt/openssl/lib/libssl.1.0.0.dylib (compatibility version 1.0.0, current version 1.0.0)
-/usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib (compatibility version 1.0.0, current version 1.0.0)
-/usr/local/lib/libglib-2.0.0.dylib (compatibility version 4201.0.0, current version 4201.0.0)
-/usr/local/opt/gettext/lib/libintl.8.dylib (compatibility version 10.0.0, current version 10.2.0)
-/usr/local/opt/readline/lib/libreadline.6.dylib (compatibility version 6.0.0, current version 6.3.0)
-/usr/local/lib/libpopt.0.dylib (compatibility version 1.0.0, current version 1.0.0)
-/usr/lib/libncurses.5.4.dylib (compatibility version 5.4.0, current version 5.4.0)
-/System/Library/Frameworks/LDAP.framework/Versions/A/LDAP (compatibility version 1.0.0, current version 2.4.0)
-/usr/lib/libresolv.9.dylib (compatibility version 1.0.0, current version 1.0.0)
-/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1213.0.0)
+    /usr/local/opt/openssl/lib/libssl.1.0.0.dylib (compatibility version 1.0.0, current version 1.0.0)
+    /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib (compatibility version 1.0.0, current version 1.0.0)
+    /usr/local/lib/libglib-2.0.0.dylib (compatibility version 4201.0.0, current version 4201.0.0)
+    /usr/local/opt/gettext/lib/libintl.8.dylib (compatibility version 10.0.0, current version 10.2.0)
+    /usr/local/opt/readline/lib/libreadline.6.dylib (compatibility version 6.0.0, current version 6.3.0)
+    /usr/local/lib/libpopt.0.dylib (compatibility version 1.0.0, current version 1.0.0)
+    /usr/lib/libncurses.5.4.dylib (compatibility version 5.4.0, current version 5.4.0)
+    /System/Library/Frameworks/LDAP.framework/Versions/A/LDAP (compatibility version 1.0.0, current version 2.4.0)
+    /usr/lib/libresolv.9.dylib (compatibility version 1.0.0, current version 1.0.0)
+    /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1213.0.0)
 ```
 
 ### Specifying gems, Python modules, Go projects, etc. as dependencies
 
-Homebrew doesn’t package already packaged language-specific libraries. These should be installed directly from `gem`/`cpan`/`pip` etc.
+Homebrew doesn’t package already-packaged language-specific libraries. These should be installed directly from `gem`/`cpan`/`pip` etc.
 
 If you're installing an application then use [`resource`](https://www.rubydoc.info/github/Homebrew/brew/master/Formula#resource-class_method)s for all language-specific dependencies:
 
@@ -245,7 +245,7 @@ brew install --verbose --debug foo
 
 `--debug` will ask you to open an interactive shell if the build fails so you can try to figure out what went wrong.
 
-Check the top of the e.g. `./configure` output. Some configure scripts do not recognize e.g. `--disable-debug`. If you see a warning about it, remove the option from the formula.
+Check the top of the e.g. `./configure` output. Some configure scripts do not recognise e.g. `--disable-debug`. If you see a warning about it, remove the option from the formula.
 
 ### Add a test to the formula
 
@@ -269,20 +269,20 @@ Some software installs to `man` instead of `share/man`, so check the output and 
 
 Name the formula like the project markets the product. So it’s `pkg-config`, not `pkgconfig`; `sdl_mixer`, not `sdl-mixer` or `sdlmixer`.
 
-The only exception is stuff like “Apache Ant”. Apache sticks “Apache” in front of everything, but we use the formula name `ant`. We only include the prefix in cases like *GNUplot* (because it’s part of the name) and *GNU Go* (because everyone calls it “GNU Go”—nobody just calls it “Go”). The word “Go” is too common and there are too many implementations of it.
+The only exception is stuff like “Apache Ant”. Apache sticks “Apache” in front of everything, but we use the formula name `ant`. We only include the prefix in cases like `gnuplot` (because it’s part of the name) and `gnu-go` (because everyone calls it “GNU Go”—nobody just calls it “Go”). The word “Go” is too common and there are too many implementations of it.
 
-If you’re not sure about the name check the homepage, and check the Wikipedia page and [what Debian calls it](https://www.debian.org/distrib/packages).
+If you’re not sure about the name, check its homepage, Wikipedia page and [what Debian calls it](https://www.debian.org/distrib/packages).
 
 When Homebrew already has a formula called `foo` we typically do not accept requests to replace that formula with something else also named `foo`. This is to avoid both confusing and surprising users’ expectations.
 
-When two formulae share an upstream name, e.g. [`AESCrypt`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/aescrypt.rb) and [`AESCrypt`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/aescrypt-packetizer.rb) the newer formula must typically adapt the name to avoid conflict with the current formula.
+When two formulae share an upstream name, e.g. [AESCrypt](https://github.com/Homebrew/homebrew-core/blob/master/Formula/aescrypt.rb) and [AES Crypt](https://github.com/Homebrew/homebrew-core/blob/master/Formula/aescrypt-packetizer.rb) the newer formula must typically adapt its name to avoid conflict with the current formula.
 
 If you’re *still* not sure, just commit. We’ll apply some arbitrary rule and make a decision 😉.
 
 When importing classes, Homebrew will require the formula and then create an instance of the class. It does this by assuming the formula name can be directly converted to the class name using a `regexp`. The rules are simple:
 
-*   `foo-bar.rb` => `FooBar`
-*   `foobar.rb` => `Foobar`
+* `foo-bar.rb` => `FooBar`
+* `foobar.rb` => `Foobar`
 
 Thus, if you change the name of the class, you must also rename the file. Filenames should be all lowercase, and class names should be the strict CamelCase equivalent, e.g. formulae `gnu-go` and `sdl_mixer` become classes `GnuGo` and `SdlMixer`, even if part of their name is an acronym.
 
@@ -306,7 +306,7 @@ brew update # required in more ways than you think (initializes the brew git rep
 cd $(brew --repo homebrew/core)
 # Create a new git branch for your formula so your pull request is easy to
 # modify if any changes come up during review.
-git checkout -b <some-descriptive-name>
+git checkout -b <some-descriptive-name> origin/master
 git add Formula/foo.rb
 git commit
 ```
@@ -315,7 +315,7 @@ The established standard for Git commit messages is:
 
 * the first line is a commit summary of *50 characters or less*
 * two (2) newlines, then
-* explain the commit thoroughly
+* explain the commit thoroughly.
 
 At Homebrew, we like to put the name of the formula up front like so: `foobar 7.3 (new formula)`.
 This may seem crazy short, but you’ll find that forcing yourself to summarise the commit encourages you to be atomic and concise. If you can’t summarise it in 50-80 characters, you’re probably trying to commit two commits as one. For a more thorough explanation, please read Tim Pope’s excellent blog post, [A Note About Git Commit Messages](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
@@ -338,8 +338,8 @@ git push https://github.com/myname/homebrew-core/ <what-you-called-your-branch>
 
 Now, [open a pull request](https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request) for your changes.
 
-*   One formula per commit; one commit per formula
-*   Keep merge commits out of the pull request
+* One formula per commit; one commit per formula.
+* Keep merge commits out of the pull request.
 
 ## Convenience tools
 
@@ -347,9 +347,9 @@ Now, [open a pull request](https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Requ
 
 Three commands are provided for displaying informational messages to the user:
 
-*   `ohai` for general info
-*   `opoo` for warning messages
-*   `odie` for error messages and immediately exiting
+* `ohai` for general info
+* `opoo` for warning messages
+* `odie` for error messages and immediately exiting
 
 In particular, when a test needs to be performed before installation use `odie` to bail out gracefully. For example:
 
@@ -457,11 +457,11 @@ index 643c60b..543379c 100644
 
 Patches can also be embedded by passing a string. This makes it possible to provide multiple embedded patches while making only some of them conditional.
 
-```rb
+```ruby
 patch :p0, "..."
 ```
 
-In embedded patches, the string `HOMEBREW_PREFIX` is replaced with the value of the constant `HOMEBREW_PREFIX` before the patch is applied.
+In embedded patches, the string "HOMEBREW\_PREFIX" is replaced with the value of the constant `HOMEBREW_PREFIX` before the patch is applied.
 
 ### Creating the diff
 
@@ -473,7 +473,7 @@ brew edit foo
 ```
 
 Now just paste into the formula after `__END__`.
-Instead of `git diff | pbcopy`, for some editors `git diff >> path/to/your/formula/foo.rb` might help you ensure that the patch is not touched (e.g. white space removal, indentation, etc.)
+Instead of `git diff | pbcopy`, for some editors `git diff >> path/to/your/formula/foo.rb` might help you ensure that the patch is not touched, e.g. white space removal, indentation changes, etc.
 
 ## Advanced formula tricks
 
@@ -691,7 +691,7 @@ The symlinks created by [`install_symlink`](https://www.rubydoc.info/github/Home
 
 ### Handling files that should persist over formula upgrades
 
-For example, Ruby 1.9’s gems should be installed to `var/lib/ruby/` so that gems don’t need to be reinstalled when upgrading Ruby. You can usually do this with symlink trickery, or *better* a configure option.
+For example, Ruby 1.9’s gems should be installed to `var/lib/ruby/` so that gems don’t need to be reinstalled when upgrading Ruby. You can usually do this with symlink trickery, or (ideally) a configure option.
 
 Another example would be configuration files that should not be overwritten on package upgrades. If after installation you find that to-be-persisted configuration files are not copied but instead *symlinked* into `/usr/local/etc/` from the Cellar, this can often be rectified by passing an appropriate argument to the package’s configure script. That argument will vary depending on a given package’s configure script and/or Makefile, but one example might be: `--sysconfdir=#{etc}`
 
@@ -708,14 +708,14 @@ Eventually a new version of the software will be released. In this case you shou
 
 Leave the `bottle do ... end`  block as-is; our CI system will update it when we pull your change.
 
-Check if the formula you are updating is a dependency for any other formulae by running `brew uses UPDATED_FORMULA`. If it is a dependency, run `brew reinstall` for all the dependencies after it is installed and verify they work correctly.
+Check if the formula you are updating is a dependency for any other formulae by running `brew uses <formula>`. If it is a dependency, run `brew reinstall` for all the dependencies after it is installed and verify they work correctly.
 
 ## Style guide
 
 Homebrew wants to maintain a consistent Ruby style across all formulae based on [Ruby Style Guide](https://github.com/styleguide/ruby). Other formulae may not have been updated to match this guide yet but all new ones should. Also:
 
-* The order of methods in a formula should be consistent with other formulae (e.g.: `def install` goes before `def post_install`)
-* An empty line is required before the `__END__` line
+* The order of methods in a formula should be consistent with other formulae (e.g.: `def install` goes before `def post_install`).
+* An empty line is required before the `__END__` line.
 
 ## Troubleshooting for people writing new formulae
 
@@ -740,8 +740,8 @@ If that fixes it, please open an [issue](https://github.com/Homebrew/homebrew-co
 Check out what MacPorts and Fink do:
 
 ```sh
-brew -S --macports foo
-brew -S --fink foo
+brew search --macports foo
+brew search --fink foo
 ```
 
 ## Superenv notes

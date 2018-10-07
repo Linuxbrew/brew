@@ -2,7 +2,7 @@
 
 ## What does "keg-only" mean?
 
-The [FAQ](FAQ.md) briefly explains this.
+The [FAQ](FAQ.md#what-does-keg-only-mean) briefly explains this.
 
 As an example:
 
@@ -38,7 +38,7 @@ CFLAGS=-I$(brew --prefix)/opt/icu4c/include LDFLAGS=-L$(brew --prefix)/opt/icu4c
 
 ### `PATH` modification
 
-You can temporarily prepend your `PATH` with the tool’s bin directory, such as:
+You can temporarily prepend your `PATH` with the tool’s `bin` directory, such as:
 
 ```sh
 export PATH=$(brew --prefix)/opt/openssl/bin:$PATH

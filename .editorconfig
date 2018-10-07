@@ -9,9 +9,13 @@ indent_style = space
 indent_size = 2
 insert_final_newline = true
 
-[{Homebrew/**.rb,.simplecov}]
+[{Library/Homebrew/**.rb,.simplecov}]
 trim_trailing_whitespace = true
 
-[Taps/homebrew/**.rb]
+[Library/Taps/homebrew/**.rb]
 # trailing whitespace is crucial for patches
 trim_trailing_whitespace = false
+
+[**.md]
+trim_trailing_whitespace = true
+x-soft-wrap-text = true

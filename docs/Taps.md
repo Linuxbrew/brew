@@ -4,7 +4,7 @@
 and installs from. By default, `tap` assumes that the repositories come from GitHub,
 but the command isn't limited to any one location.
 
-## The command (`brew tap`)
+## The `brew tap` command
 
 * `brew tap` without arguments lists the currently tapped repositories. For
   example:
@@ -28,8 +28,8 @@ dunn/emacs
   doesn't have to be HTTP. Any location and any protocol that Git can handle is
   fine.
 
-* Add `--full` to either the one- or two-argument invocations above, and Git
-  will make a complete clone rather than a shallow one. Full is the default for
+* Add `--full` to either the one- or two-argument invocations above to have Git
+  make a complete clone rather than a shallow one. Full is the default for
   Homebrew developers.
 
 * `brew tap --repair` migrates tapped formulae from a symlink-based to
@@ -42,7 +42,7 @@ dunn/emacs
 ## Repository naming conventions and assumptions
 
 * On GitHub, your repository must be named `homebrew-something` in order to use
-  the one-argument form of `brew tap`.  The prefix 'homebrew-' is not optional.
+  the one-argument form of `brew tap`. The prefix 'homebrew-' is not optional.
   (The two-argument form doesn't have this limitation, but it forces you to
   give the full URL explicitly.)
 
@@ -56,7 +56,7 @@ dunn/emacs
 ## Formula duplicate names
 
 If your tap contains a formula that is also present in
-[`homebrew/core`](https://github.com/Homebrew/homebrew-core), that's fine,
+[homebrew/core](https://github.com/Homebrew/homebrew-core), that's fine,
 but it means that you must install it explicitly by default.
 
 If you would like to prioritise a tap over `homebrew/core`, you can use
@@ -74,21 +74,21 @@ If you need a formula to be installed from a particular tap, you can use fully
 qualified names to refer to them.
 
 For example, you can create a tap for an alternative `vim` formula. Without
-pinning it, the behaviour will be
+pinning it, the behaviour will be:
 
 ```sh
 brew install vim                     # installs from homebrew/core
-brew install username/repo/vim       # installs from your custom repo
+brew install username/repo/vim       # installs from your custom repository
 ```
 
 However if you pin the tap with `brew tap-pin username/repo`, you will need to
 use `homebrew/core` to refer to the core formula.
 
 ```sh
-brew install vim                     # installs from your custom repo
+brew install vim                     # installs from your custom repository
 brew install homebrew/core/vim       # installs from homebrew/core
 ```
 
-Do note that pinned taps are prioritized only when the formula name is directly
+Note that pinned taps are prioritized only when the formula name is directly
 given by you, i.e. it will not influence formulae automatically installed as
 dependencies.

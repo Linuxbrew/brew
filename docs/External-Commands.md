@@ -3,7 +3,7 @@
 Homebrew, like Git, supports *external commands*. This lets you create new commands that can be run like:
 
 ```sh
-brew mycommand --option1 --option3 formula
+brew mycommand --option1 --option3 <formula>
 ```
 
 without modifying Homebrew's internals.
@@ -27,7 +27,7 @@ A shell script for a command named `extcmd` should be named `brew-extcmd`. This 
 | `HOMEBREW_CELLAR`      | The location of the Homebrew Cellar, where software is staged. This will be `HOMEBREW_PREFIX/Cellar` if that directory exists, or `HOMEBREW_REPOSITORY/Cellar` otherwise.   |
 | `HOMEBREW_LIBRARY_PATH`| The directory containing Homebrew’s own application code.                                                                                                                   |
 | `HOMEBREW_PREFIX`      | Where Homebrew installs software. This is always the grandparent directory of the `brew` executable, `/usr/local` by default.                                               |
-| `HOMEBREW_REPOSITORY`  | If installed from a Git clone, the repository directory (i.e. where Homebrew’s .git directory lives).                                                                       |
+| `HOMEBREW_REPOSITORY`  | If installed from a Git clone, the repository directory (i.e. where Homebrew’s `.git` directory lives).                                                                       |
 
 Note that the script itself can use any suitable shebang (`#!`) line, so an external “shell script” can be written for sh, bash, Ruby, or anything else.
 
@@ -35,7 +35,7 @@ Note that the script itself can use any suitable shebang (`#!`) line, so an exte
 
 All internal and external Homebrew commands can provide styled `--help` output by using lines starting with `#:` (a comment then `:` character in both Bash and Ruby) which are then output by `--help`.
 
-For example, see the [header of `brew services`](https://github.com/Homebrew/homebrew-services/blob/a5115e47b05e8d2a632ba7775599e698b240e5a2/cmd/brew-services.rb#L1-L31) which is output with `brew services --help`.
+For example, see the [header of `brew-services.rb`](https://github.com/Homebrew/homebrew-services/blob/a58a1fe9145de4e50e1cbfb5b0e8a30087826393/cmd/brew-services.rb#L1-L23) which is output with `brew services --help`.
 
 ## Homebrew organisation external commands
 
