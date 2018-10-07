@@ -20,7 +20,6 @@ module Cask
     #       should be explicit checks on whether staged state is valid in
     #       every method.
     include Staged
-    include Verify
 
     def initialize(cask, command: SystemCommand, force: false,
                    skip_cask_deps: false, binaries: true, verbose: false,
