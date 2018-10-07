@@ -89,6 +89,7 @@ describe Homebrew::CLI::Parser do
 
     it "raises exception on depends_on constraint violation" do
       expect { parser.parse(["--flag2=flag2"]) }.to raise_error(Homebrew::CLI::OptionConstraintError)
+      expect { parser.parse(["--flag4=flag4"]) }.to raise_error(Homebrew::CLI::OptionConstraintError)
     end
 
     it "raises exception for conflict violation" do
@@ -139,6 +140,7 @@ describe Homebrew::CLI::Parser do
 
     it "raises exception on depends_on constraint violation" do
       expect { parser.parse(["--switch-c"]) }.to raise_error(Homebrew::CLI::OptionConstraintError)
+      expect { parser.parse(["--switch-d"]) }.to raise_error(Homebrew::CLI::OptionConstraintError)
     end
 
     it "raises exception for conflict violation" do

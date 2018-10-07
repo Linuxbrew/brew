@@ -28,13 +28,13 @@ module Homebrew
         @constraints = []
         @conflicts = []
         @processed_options = []
-        @desc_line_length = 48
+        @desc_line_length = 43
         instance_eval(&block)
         post_initialize
       end
 
       def post_initialize
-        @parser.on_tail("-h", "--help", "Show this message") do
+        @parser.on_tail("-h", "--help", "Show this message.") do
           puts generate_help_text
           exit 0
         end
@@ -127,9 +127,10 @@ module Homebrew
 
       def generate_help_text
         @parser.to_s.sub(/^/, "#{Tty.bold}Usage: brew#{Tty.reset} ")
-               .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
+               .gsub(/`(.*?)`/m, "#{Tty.bold}\\1#{Tty.reset}")
                .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
-               .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
+               .gsub(/<(.*?)>/m, "#{Tty.underline}\\1#{Tty.reset}")
+               .gsub(/\*(.*?)\*/m, "#{Tty.underline}\\1#{Tty.reset}")
       end
 
       private

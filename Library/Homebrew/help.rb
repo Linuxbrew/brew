@@ -93,6 +93,7 @@ module Homebrew
               .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
               .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
               .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
+              .gsub(/\*(.*?)\*/, "#{Tty.underline}\\1#{Tty.reset}")
               .gsub("@hide_from_man_page", "")
         end.join.strip
       end
