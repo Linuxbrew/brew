@@ -8,6 +8,10 @@ module Cask
       def license(*)
         odisabled "the `license` stanza"
       end
+
+      def accessibility_access(*)
+        odeprecated "the `accessibility_access` stanza"
+      end
     end
 
     prepend Compat

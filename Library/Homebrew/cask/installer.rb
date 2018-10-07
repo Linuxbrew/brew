@@ -94,7 +94,6 @@ module Cask
       opoo "macOS's Gatekeeper has been disabled for this Cask" unless quarantine?
       stage
       install_artifacts
-      enable_accessibility_access
 
       unless @cask.tap&.private?
         ::Utils::Analytics.report_event("cask_install", @cask.token)
@@ -365,67 +364,6 @@ module Cask
       self.class.print_caveats(@cask)
     end
 
-    # TODO: logically could be in a separate class
-    def enable_accessibility_access
-      return unless @cask.accessibility_access
-
-      ohai "Enabling accessibility access"
-      if MacOS.version <= :mountain_lion
-        @command.run!(
-          "/usr/bin/touch",
-          args: [MacOS.pre_mavericks_accessibility_dotfile],
-          sudo: true,
-        )
-      elsif MacOS.version <= :yosemite
-        @command.run!(
-          "/usr/bin/sqlite3",
-          args: [
-            MacOS.tcc_db,
-            "INSERT OR REPLACE INTO access " \
-            "VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
-          ],
-          sudo: true,
-        )
-      elsif MacOS.version <= :el_capitan
-        @command.run!(
-          "/usr/bin/sqlite3",
-          args: [
-            MacOS.tcc_db,
-            "INSERT OR REPLACE INTO access " \
-            "VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
-          ],
-          sudo: true,
-        )
-      else
-        opoo <<~EOS
-          Accessibility access cannot be enabled automatically on this version of macOS.
-          See System Preferences to enable it manually.
-        EOS
-      end
-    rescue => e
-      purge_versioned_files
-      raise e
-    end
-
-    def disable_accessibility_access
-      return unless @cask.accessibility_access
-
-      if MacOS.version >= :mavericks && MacOS.version <= :el_capitan
-        ohai "Disabling accessibility access"
-        @command.run!("/usr/bin/sqlite3",
-                      args: [
-                        MacOS.tcc_db,
-                        "DELETE FROM access WHERE client='#{bundle_identifier}';",
-                      ],
-                      sudo: true)
-      else
-        opoo <<~EOS
-          Accessibility access cannot be disabled automatically on this version of macOS.
-          See System Preferences to disable it manually.
-        EOS
-      end
-    end
-
     def save_caskfile
       old_savedir = @cask.metadata_timestamped_path
 
@@ -438,7 +376,6 @@ module Cask
 
     def uninstall
       oh1 "Uninstalling Cask #{Formatter.identifier(@cask)}"
-      disable_accessibility_access
       uninstall_artifacts(clear: true)
       purge_versioned_files
       purge_caskroom_path if force?
@@ -447,7 +384,6 @@ module Cask
     def start_upgrade
       oh1 "Starting upgrade for Cask #{Formatter.identifier(@cask)}"
 
-      disable_accessibility_access
       uninstall_artifacts
       backup
     end
@@ -471,7 +407,6 @@ module Cask
       opoo "Reverting upgrade for Cask #{@cask}"
       restore_backup
       install_artifacts
-      enable_accessibility_access
     end
 
     def finalize_upgrade
