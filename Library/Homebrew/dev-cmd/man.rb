@@ -82,6 +82,7 @@ module Homebrew
 
   def path_glob_commands(glob)
     Pathname.glob(glob)
+            .sort_by { |source_file| sort_key_for_path(source_file) }
             .map(&:read).map(&:lines)
             .map { |lines| lines.grep(/^#:/).map { |line| line.slice(2..-1) }.join }
             .reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
@@ -156,10 +157,12 @@ module Homebrew
       ronn.close_write
       ronn_output = ronn.read
       odie "Got no output from ronn!" unless ronn_output
-      ronn_output.gsub!(%r{</var>`(?=[.!?,;:]?\s)}, "").gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
-      unless format_flag == "--markdown"
+      if format_flag == "--markdown"
+        ronn_output = ronn_output.gsub(%r{<var>(.*?)</var>}, "*`\\1`*")
+      elsif format_flag == "--roff"
         ronn_output = ronn_output.gsub(%r{<code>(.*?)</code>}, "\\fB\\1\\fR")
                                  .gsub(%r{<var>(.*?)</var>}, "\\fI\\1\\fR")
+                                 .gsub(/(^\[?\\fB.+): /, "\\1\n    ")
       end
       target.atomic_write ronn_output
     end
@@ -229,6 +232,6 @@ module Homebrew
   end
 
   def format_usage_banner(usage_banner)
-    usage_banner.sub(/^/, "###")
+    usage_banner.sub(/^/, "### ")
   end
 end
