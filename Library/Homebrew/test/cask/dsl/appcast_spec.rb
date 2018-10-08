@@ -21,13 +21,5 @@ describe Cask::DSL::Appcast do
         expect(subject.to_yaml).to eq(yaml)
       end
     end
-
-    context "with checkpoint in parameters" do
-      let(:params) { { checkpoint: "abc123" } }
-
-      it "returns an YAML serialized array composed of the URI and parameters" do
-        expect(subject.to_yaml).to eq(yaml)
-      end
-    end
   end
 end

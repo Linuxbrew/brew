@@ -26,7 +26,6 @@ module Cask
       check_version_and_checksum
       check_version
       check_sha256
-      check_appcast_checkpoint
       check_url
       check_generic_artifacts
       check_token_conflicts
@@ -212,13 +211,6 @@ module Cask
       return unless sha256 == empty_sha256
 
       add_error "cannot use the sha256 for an empty string in #{stanza}: #{empty_sha256}"
-    end
-
-    def check_appcast_checkpoint
-      return unless cask.appcast
-      return unless cask.appcast.checkpoint
-
-      add_error "Appcast checkpoints have been removed from Homebrew Cask"
     end
 
     def check_latest_with_appcast
