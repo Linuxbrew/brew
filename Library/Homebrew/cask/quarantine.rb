@@ -136,11 +136,6 @@ module Cask
 
       resolved_paths = Pathname.glob(to/"**/*", File::FNM_DOTMATCH)
 
-      system_command!("/bin/chmod", args: ["-R", "u+w", to])
-
-      # Symlinks cannot be fixed with -R.
-      resolved_symlinks = resolved_paths.select(&:symlink?)
-
       system_command!("/usr/bin/xargs",
                       args: [
                         "-0",
@@ -149,7 +144,7 @@ module Cask
                         "-h",
                         "u+w",
                       ],
-                      input: resolved_symlinks.join("\0"))
+                      input: resolved_paths.join("\0"))
 
       quarantiner = system_command("/usr/bin/xargs",
                                    args: [
