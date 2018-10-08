@@ -135,7 +135,6 @@ module Cask
         "depends_on" => depends_on,
         "conflicts_with" => conflicts_with.to_a,
         "container" => container,
-        "accessibility_access" => accessibility_access,
         "auto_updates" => auto_updates,
       }
     end

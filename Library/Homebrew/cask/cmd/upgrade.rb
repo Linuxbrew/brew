@@ -83,8 +83,6 @@ module Cask
             new_cask_installer.install_artifacts
             new_artifacts_installed = true
 
-            new_cask_installer.enable_accessibility_access
-
             # If successful, wipe the old Cask from staging
             old_cask_installer.finalize_upgrade
           rescue CaskError => e
