@@ -138,6 +138,19 @@ module Cask
 
       system_command!("/bin/chmod", args: ["-R", "u+w", to])
 
+      # Symlinks cannot be fixed with -R.
+      resolved_symlinks = resolved_paths.select(&:symlink?)
+
+      system_command!("/usr/bin/xargs",
+                      args: [
+                        "-0",
+                        "--",
+                        "/bin/chmod",
+                        "-h",
+                        "u+w",
+                      ],
+                      input: resolved_symlinks.join("\0"))
+
       quarantiner = system_command("/usr/bin/xargs",
                                    args: [
                                      "-0",
