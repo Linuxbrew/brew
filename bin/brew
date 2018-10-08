@@ -8,12 +8,13 @@ if ! [[ -d "$PWD" ]]; then
 fi
 
 quiet_cd() {
-  cd "$@" >/dev/null
+  cd "$@" >/dev/null || return
 }
 
 symlink_target_directory() {
-  local target="$(readlink "$1")"
-  local target_dirname="$(dirname "$target")"
+  local target target_dirname
+  target="$(readlink "$1")"
+  target_dirname="$(dirname "$target")"
   local directory="$2"
   quiet_cd "$directory" && quiet_cd "$target_dirname" && pwd -P
 }
@@ -83,5 +84,7 @@ then
 
   exec /usr/bin/env -i "${FILTERED_ENV[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
 else
+  # Don't need shellcheck to follow this `source`.
+  # shellcheck disable=SC1090
   source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
 fi
