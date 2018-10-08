@@ -7,8 +7,8 @@ module Tty
 
   def width
     @width ||= begin
-      width = `/bin/stty size 2>/dev/null`.split[1]
-      width = `/usr/bin/tput cols 2>/dev/null`.split[0] if width.to_i.zero?
+      _, width = `/bin/stty size 2>/dev/null`.split
+      width, = `/usr/bin/tput cols 2>/dev/null`.split if width.to_i.zero?
       width ||= 80
       width.to_i
     end

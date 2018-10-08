@@ -186,9 +186,9 @@ module Homebrew
     end
 
     total_problems_count = problem_count + new_formula_problem_count
-    problem_plural = Formatter.pluralize(total_problems_count, "problem")
-    formula_plural = Formatter.pluralize(formula_count, "formula")
-    corrected_problem_plural = Formatter.pluralize(corrected_problem_count, "problem")
+    problem_plural = "#{total_problems_count} #{"problem".pluralize(total_problems_count)}"
+    formula_plural = "#{formula_count} #{"formula".pluralize(formula_count)}"
+    corrected_problem_plural = "#{corrected_problem_count} #{"problem".pluralize(corrected_problem_count)}"
     errors_summary = "#{problem_plural} in #{formula_plural} detected"
     if corrected_problem_count.positive?
       errors_summary += ", #{corrected_problem_plural} corrected"
@@ -512,7 +512,7 @@ module Homebrew
       # Formulae names can legitimately be uppercase/lowercase/both.
       name = Regexp.new(formula.name, Regexp::IGNORECASE)
       reason.sub!(name, "")
-      first_word = reason.split[0]
+      first_word = reason.split.first
 
       if reason =~ /\A[A-Z]/ && !reason.start_with?(*whitelist)
         problem <<~EOS
@@ -724,7 +724,7 @@ module Homebrew
 
         version = Version.parse(stable.url)
         if version >= Version.create("1.0")
-          minor_version = version.to_s.split(".", 3)[1].to_i
+          _, minor_version, = version.to_s.split(".", 3).map(&:to_i)
           if minor_version.odd?
             problem "#{stable.version} is a development release"
           end

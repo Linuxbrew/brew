@@ -28,7 +28,7 @@ module Homebrew
                    .map { |d| Keg.new(d).version }
                    .sort
                    .join(", ")
-    version = ARGV[1]
+    version = ARGV.second
 
     if !version || ARGV.named.length > 2
       onoe usage

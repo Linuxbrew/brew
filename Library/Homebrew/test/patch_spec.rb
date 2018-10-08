@@ -86,8 +86,8 @@ describe Patch do
       )
 
       expect(patches.length).to eq(2)
-      expect(patches[0].strip).to eq(:p1)
-      expect(patches[1].strip).to eq(:p1)
+      expect(patches.first.strip).to eq(:p1)
+      expect(patches.second.strip).to eq(:p1)
     end
 
     it "can create patches from a :p0 hash" do

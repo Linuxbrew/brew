@@ -351,7 +351,7 @@ class Version
     # e.g. https://github.com/JustArchi/ArchiSteamFarm/releases/download/2.3.2.0/ASF.zip
     # e.g. https://people.gnome.org/~newren/eg/download/1.7.5.2/eg
     m = %r{/([rvV]_?)?(\d\.\d+(\.\d+){,2})}.match(spec_s)
-    return m.captures[1] unless m.nil?
+    return m.captures.second unless m.nil?
 
     # e.g. https://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)

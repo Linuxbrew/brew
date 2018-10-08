@@ -22,14 +22,14 @@ module Homebrew
   def update_report
     HOMEBREW_REPOSITORY.cd do
       analytics_message_displayed =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chomp == "true"
       cask_analytics_message_displayed =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.caskanalyticsmessage").chuzzle
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.caskanalyticsmessage").chomp == "true"
       analytics_disabled =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
-      if analytics_message_displayed != "true" &&
-         cask_analytics_message_displayed != "true" &&
-         analytics_disabled != "true" &&
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chomp == "true"
+      if !analytics_message_displayed &&
+         !cask_analytics_message_displayed &&
+         !analytics_disabled &&
          !ENV["HOMEBREW_NO_ANALYTICS"] &&
          !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
 
@@ -53,8 +53,8 @@ module Homebrew
       end
 
       donation_message_displayed =
-        Utils.popen_read("git", "config", "--local", "--get", "homebrew.donationmessage").chuzzle
-      if donation_message_displayed != "true"
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.donationmessage").chomp == "true"
+      unless donation_message_displayed
         ohai "Homebrew is run entirely by unpaid volunteers. Please consider donating:"
         puts "  #{Formatter.url("https://github.com/Homebrew/brew#donations")}\n"
 
@@ -107,8 +107,7 @@ module Homebrew
 
     unless updated_taps.empty?
       update_preinstall_header
-      puts "Updated #{Formatter.pluralize(updated_taps.size, "tap")} " \
-           "(#{updated_taps.join(", ")})."
+      puts "Updated #{updated_taps.count} #{"tap".pluralize(updated_taps.count)} (#{updated_taps.to_sentence})."
       updated = true
     end
 

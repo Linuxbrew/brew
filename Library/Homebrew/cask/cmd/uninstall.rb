@@ -23,11 +23,9 @@ module Cask
 
           next if (versions = cask.versions).empty?
 
-          single = versions.count == 1
-
           puts <<~EOS
-            #{cask} #{versions.join(", ")} #{single ? "is" : "are"} still installed.
-            Remove #{single ? "it" : "them all"} with `brew cask uninstall --force #{cask}`.
+            #{cask} #{versions.to_sentence} #{"is".pluralize(versions.count)} still installed.
+            Remove #{(versions.count == 1) ? "it" : "them all"} with `brew cask uninstall --force #{cask}`.
           EOS
         end
       end

@@ -63,14 +63,14 @@ module Homebrew
     formulae_to_install = outdated.map(&:latest_formula)
 
     if !pinned.empty? && !ARGV.include?("--ignore-pinned")
-      ofail "Not upgrading #{Formatter.pluralize(pinned.length, "pinned package")}:"
+      ofail "Not upgrading #{pinned.count} pinned #{"package".pluralize(pinned.count)}:"
       puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
     if formulae_to_install.empty?
       oh1 "No packages to upgrade"
     else
-      oh1 "Upgrading #{Formatter.pluralize(formulae_to_install.length, "outdated package")}, with result:"
+      oh1 "Upgrading #{formulae_to_install.count} outdated #{"package".pluralize(formulae_to_install.count)}:"
       formulae_upgrades = formulae_to_install.map do |f|
         if f.optlinked?
           "#{f.full_specified_name} #{Keg.new(f.opt_prefix).version} -> #{f.pkg_version}"
@@ -304,7 +304,7 @@ module Homebrew
 
     # Print the pinned dependents.
     unless pinned.empty?
-      ohai "Not upgrading #{Formatter.pluralize(pinned.length, "pinned dependent")}:"
+      ohai "Not upgrading #{pinned.count} pinned #{"dependent".pluralize(pinned.count)}:"
       puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
@@ -312,7 +312,7 @@ module Homebrew
     if upgradable.empty?
       ohai "No dependents to upgrade" if ARGV.verbose?
     else
-      ohai "Upgrading #{Formatter.pluralize(upgradable.length, "dependent")}:"
+      ohai "Upgrading #{upgradable.count} #{"dependent".pluralize(upgradable.count)}:"
       formulae_upgrades = upgradable.map do |f|
         if f.optlinked?
           "#{f.full_specified_name} #{Keg.new(f.opt_prefix).version} -> #{f.pkg_version}"
@@ -337,7 +337,7 @@ module Homebrew
 
     # Print the pinned dependents.
     unless pinned.empty?
-      onoe "Not reinstalling #{Formatter.pluralize(pinned.length, "broken and outdated, but pinned dependent")}:"
+      onoe "Not reinstalling #{pinned.count} broken and outdated, but pinned #{"dependent".pluralize(pinned.count)}:"
       $stderr.puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
@@ -345,7 +345,7 @@ module Homebrew
     if reinstallable.empty?
       ohai "No broken dependents to reinstall" if ARGV.verbose?
     else
-      ohai "Reinstalling #{Formatter.pluralize(reinstallable.length, "broken dependent")} from source:"
+      ohai "Reinstalling #{reinstallable.count} broken #{"dependent".pluralize(reinstallable.count)} from source:"
       puts reinstallable.map(&:full_specified_name).join(", ")
     end
 

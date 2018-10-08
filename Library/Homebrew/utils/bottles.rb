@@ -54,7 +54,7 @@ module Utils
       end
 
       def resolve_version(bottle_file)
-        PkgVersion.parse receipt_path(bottle_file).split("/")[1]
+        PkgVersion.parse receipt_path(bottle_file).split("/").second
       end
 
       def formula_contents(bottle_file,

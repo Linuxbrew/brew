@@ -89,19 +89,19 @@ module Cask
       end
 
       def before_comma
-        version { split(",", 2)[0] }
+        version { split(",", 2).first }
       end
 
       def after_comma
-        version { split(",", 2)[1] }
+        version { split(",", 2).second }
       end
 
       def before_colon
-        version { split(":", 2)[0] }
+        version { split(":", 2).first }
       end
 
       def after_colon
-        version { split(":", 2)[1] }
+        version { split(":", 2).second }
       end
 
       def no_dividers

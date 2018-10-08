@@ -1,10 +1,12 @@
 # Contains backports from newer versions of Ruby
 require "backports/2.4.0/string/match"
 require "backports/2.5.0/string/delete_prefix"
+require "active_support/core_ext/object/blank"
 
 class String
   # String.chomp, but if result is empty: returns nil instead.
   # Allows `chuzzle || foo` short-circuits.
+  # TODO: Deprecate.
   def chuzzle
     s = chomp
     s unless s.empty?
@@ -12,6 +14,7 @@ class String
 end
 
 class NilClass
+  # TODO: Deprecate.
   def chuzzle; end
 end
 

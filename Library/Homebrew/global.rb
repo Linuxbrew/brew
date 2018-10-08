@@ -7,6 +7,21 @@ require "pp"
 
 require_relative "load_path"
 
+require "active_support/core_ext/object/blank"
+require "active_support/core_ext/numeric/time"
+require "active_support/core_ext/array/access"
+require "active_support/i18n"
+require "active_support/inflector/inflections"
+
+I18n.backend.available_locales # Initialize locales so they can be overwritten.
+I18n.backend.store_translations :en, support: { array: { last_word_connector: " and " } }
+
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.irregular "formula", "formulae"
+  inflect.irregular "is", "are"
+  inflect.irregular "it", "they"
+end
+
 require "config"
 require "os"
 require "extend/ARGV"
