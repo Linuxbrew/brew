@@ -642,7 +642,7 @@ module Homebrew
         end
       end
 
-      if formula.head || formula.devel
+      if @official_tap && (formula.head || formula.devel)
         unstable_spec_message = "Formulae should not have a `HEAD` or `devel` spec"
         if @new_formula
           new_formula_problem unstable_spec_message
