@@ -10,7 +10,7 @@ Patches to fix issues particular to Linux should not affect the behaviour of the
 
 * Run `brew update` (twice).
 * Run and read `brew doctor`.
-* Read [the Troubleshooting Checklist](https://docs.brew.sh/Troubleshooting).
+* Read the [Troubleshooting checklist](https://docs.brew.sh/Troubleshooting).
 * Open an issue on the formula's repository or on Linuxbrew/brew if it's not a formula-specific issue.
 
 ### Propose a feature

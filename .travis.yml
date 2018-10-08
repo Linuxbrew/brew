@@ -26,7 +26,7 @@ before_install:
       sudo chown -R "$USER" "$HOMEBREW_REPOSITORY";
     else
       LINUX="1";
-      export PATH="$PWD/bin:/usr/bin:/bin";
+      export PATH="$PWD/bin:/usr/bin:/bin:/usr/local/bin";
     fi
   # umask 022 fixes Linux `brew tests` failures;
   - if [ "$LINUX" ]; then

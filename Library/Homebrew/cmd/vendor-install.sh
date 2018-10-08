@@ -2,13 +2,16 @@
 #:  * `vendor-install` [<target>]:
 #:     Install vendor version of Homebrew dependencies.
 
-# Hide shellcheck complaint:
-# shellcheck source=/dev/null
+# Don't need shellcheck to follow this `source`.
+# shellcheck disable=SC1090
 source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
 VENDOR_DIR="$HOMEBREW_LIBRARY/Homebrew/vendor"
 
 # Built from https://github.com/Homebrew/homebrew-portable-ruby.
+#
+# Dynamic variables can't be detected by shellcheck
+# shellcheck disable=SC2034
 if [[ -n "$HOMEBREW_MACOS" ]]
 then
   if [[ "$HOMEBREW_PROCESSOR" = "Intel" ]]
@@ -152,7 +155,6 @@ EOS
 
 install() {
   local tar_args
-  local verb
 
   if [[ -n "$HOMEBREW_VERBOSE" ]]
   then
@@ -168,13 +170,7 @@ install() {
 
   if [[ -d "$VENDOR_VERSION" ]]
   then
-    verb="reinstall"
     mv "$VENDOR_VERSION" "$VENDOR_VERSION.reinstall"
-  elif [[ -n "$(ls -A .)" ]]
-  then
-    verb="upgrade"
-  else
-    verb="install"
   fi
 
   safe_cd "$VENDOR_DIR"
@@ -185,8 +181,6 @@ install() {
   if quiet_stderr "./$VENDOR_VERSION/bin/$VENDOR_NAME" --version >/dev/null
   then
     ln -sfn "$VENDOR_VERSION" current
-    # remove old vendor installations by sorting files with modified time.
-    ls -t | grep -Ev "^(current|$VENDOR_VERSION)" | tail -n +4 | xargs rm -rf
     if [[ -d "$VENDOR_VERSION.reinstall" ]]
     then
       rm -rf "$VENDOR_VERSION.reinstall"
@@ -197,7 +191,7 @@ install() {
     then
       mv "$VENDOR_VERSION.reinstall" "$VENDOR_VERSION"
     fi
-    odie "Failed to $verb vendor $VENDOR_NAME."
+    odie "Failed to vendor $VENDOR_NAME $VENDOR_VERSION."
   fi
 
   trap - SIGINT

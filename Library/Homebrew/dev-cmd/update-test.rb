@@ -61,7 +61,7 @@ module Homebrew
         Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
       elsif args.to_tag?
         tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
-        previous_tag = tags.lines[1]
+        previous_tag = tags.lines.second
         previous_tag ||= begin
           if (HOMEBREW_REPOSITORY/".git/shallow").exist?
             safe_system "git", "fetch", "--tags", "--depth=1"
@@ -69,7 +69,7 @@ module Homebrew
           elsif OS.linux?
             tags = Utils.popen_read("git tag --list | sort -rV")
           end
-          tags.lines[1]
+          tags.lines.second
         end
         previous_tag = previous_tag.to_s.chomp
         odie "Could not find previous tag in:\n#{tags}" if previous_tag.empty?

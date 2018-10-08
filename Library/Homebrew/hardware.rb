@@ -11,7 +11,6 @@ module Hardware
         core: "-march=prescott",
         armv6: "-march=armv6",
         armv8: "-march=armv8-a",
-        dunno: "-march=native",
       }.freeze
 
       def optimization_flags

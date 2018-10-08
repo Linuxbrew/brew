@@ -33,7 +33,7 @@ module Homebrew
     ).lines.first.chomp
     odie "Could not find any previous tags!" unless previous_tag
 
-    end_ref = ARGV.named[1] || "origin/master"
+    end_ref = ARGV.named.second || "origin/master"
 
     [previous_tag, end_ref].each do |ref|
       next if quiet_system "git", "-C", HOMEBREW_REPOSITORY, "rev-parse", "--verify", "--quiet", ref

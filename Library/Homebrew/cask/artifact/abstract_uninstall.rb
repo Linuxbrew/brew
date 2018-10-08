@@ -115,10 +115,8 @@ module Cask
         command.run!("/bin/launchctl", args: ["list"]).stdout.lines
                .map { |line| line.chomp.split("\t") }
                .map { |pid, state, id| [pid.to_i, state.to_i, id] }
-               .select do |fields|
-                 next if fields[0].zero?
-
-                 fields[2] =~ /^#{Regexp.escape(bundle_id)}($|\.\d+)/
+               .select do |(pid, _, id)|
+                 pid.nonzero? && id.match?(/^#{Regexp.escape(bundle_id)}($|\.\d+)/)
                end
       end
 

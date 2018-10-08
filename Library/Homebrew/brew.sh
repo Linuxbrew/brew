@@ -26,7 +26,7 @@ export HOMEBREW_COMMAND_DEPTH=$((HOMEBREW_COMMAND_DEPTH + 1))
 onoe() {
   if [[ -t 2 ]] # check whether stderr is a tty.
   then
-    echo -ne "\033[4;31mError\033[0m: " >&2 # highlight Error with underline and red color
+    echo -ne "\\033[4;31mError\\033[0m: " >&2 # highlight Error with underline and red color
   else
     echo -n "Error: " >&2
   fi
@@ -90,6 +90,9 @@ then
 
   # The system Curl is too old for some modern HTTPS certificates on
   # older macOS versions.
+  #
+  # Intentionally set this variable by exploding another.
+  # shellcheck disable=SC2086,SC2183
   printf -v HOMEBREW_MACOS_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_MACOS_VERSION//./ }
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "101000" ]]
   then
@@ -162,6 +165,7 @@ export HOMEBREW_CACHE
 export HOMEBREW_CELLAR
 export HOMEBREW_SYSTEM
 export HOMEBREW_CURL
+export HOMEBREW_SYSTEM_CURL_TOO_OLD
 export HOMEBREW_GIT
 export HOMEBREW_PROCESSOR
 export HOMEBREW_PRODUCT
@@ -340,8 +344,8 @@ access to all bottles."
 EOS
 fi
 
-# Hide shellcheck complaint:
-# shellcheck source=/dev/null
+# Don't need shellcheck to follow this `source`.
+# shellcheck disable=SC1090
 source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
 setup-analytics
 
@@ -401,13 +405,13 @@ then
   # a Ruby script and avoids hard-to-debug issues if the Bash script is updated
   # at the same time as being run.
   #
-  # Hide shellcheck complaint:
-  # shellcheck source=/dev/null
+  # Don't need shellcheck to follow this `source`.
+  # shellcheck disable=SC1090
   source "$HOMEBREW_BASH_COMMAND"
   { update-preinstall; "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
 else
-  # Hide shellcheck complaint:
-  # shellcheck source=/dev/null
+  # Don't need shellcheck to follow this `source`.
+  # shellcheck disable=SC1090
   source "$HOMEBREW_LIBRARY/Homebrew/utils/ruby.sh"
   setup-ruby-path
 

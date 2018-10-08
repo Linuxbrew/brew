@@ -4,7 +4,7 @@ require "cask/cask_loader"
 require "set"
 
 module CleanupRefinement
-  LATEST_CASK_DAYS = 7
+  LATEST_CASK_OUTDATED = 7.days.ago
 
   refine Enumerator do
     def parallel
@@ -51,8 +51,7 @@ module CleanupRefinement
 
       return true if symlink? && !exist?
 
-      # TODO: Replace with ActiveSupport's `.days.ago`.
-      mtime < ((@time ||= Time.now) - days * 60 * 60 * 24)
+      mtime < days.days.ago
     end
 
     def stale?(scrub = false)
@@ -124,10 +123,7 @@ module CleanupRefinement
 
       return true if scrub && !cask.versions.include?(cask.version)
 
-      if cask.version.latest?
-        # TODO: Replace with ActiveSupport's `.days.ago`.
-        return mtime < ((@time ||= Time.now) - LATEST_CASK_DAYS * 60 * 60 * 24)
-      end
+      return mtime < LATEST_CASK_OUTDATED if cask.version.latest?
 
       false
     end
@@ -162,8 +158,10 @@ module Homebrew
         end
         cleanup_cache
         cleanup_logs
+        cleanup_portable_ruby
         return if dry_run?
 
+        cleanup_linkage_db
         rm_ds_store
       else
         args.each do |arg|
@@ -288,6 +286,47 @@ module Homebrew
           file.open(File::RDWR).flock(File::LOCK_UN) if file.exist?
         end
       end
+    end
+
+    def cleanup_portable_ruby
+      system_ruby_version =
+        Utils.popen_read("/usr/bin/ruby", "-e", "puts RUBY_VERSION")
+             .chomp
+      use_system_ruby = (
+        Gem::Version.new(system_ruby_version) >= Gem::Version.new(RUBY_VERSION)
+      ) && ENV["HOMEBREW_FORCE_VENDOR_RUBY"].nil?
+      vendor_path = HOMEBREW_LIBRARY/"Homebrew/vendor"
+      portable_ruby_version_file = vendor_path/"portable-ruby-version"
+      portable_ruby_version = if portable_ruby_version_file.exist?
+        portable_ruby_version_file.read
+                                  .chomp
+      end
+
+      portable_ruby_path = vendor_path/"portable-ruby"
+      portable_ruby_glob = "#{portable_ruby_path}/*.*"
+      Pathname.glob(portable_ruby_glob).each do |path|
+        next if !use_system_ruby && portable_ruby_version == path.basename.to_s
+        if dry_run?
+          puts "Would remove: #{path} (#{path.abv})"
+        else
+          FileUtils.rm_rf path
+        end
+      end
+
+      return unless Dir.glob(portable_ruby_glob).empty?
+      return unless portable_ruby_path.exist?
+
+      bundler_path = vendor_path/"bundle/ruby"
+      if dry_run?
+        puts "Would remove: #{bundler_path} (#{bundler_path.abv})"
+        puts "Would remove: #{portable_ruby_path} (#{portable_ruby_path.abv})"
+      else
+        FileUtils.rm_rf [bundler_path, portable_ruby_path]
+      end
+    end
+
+    def cleanup_linkage_db
+      FileUtils.rm_rf [cache/"linkage.db", cache/"linkage.db.db"]
     end
 
     def rm_ds_store(dirs = nil)

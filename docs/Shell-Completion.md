@@ -18,7 +18,7 @@ fi
 ```
 
 ## Configuring Completions in `zsh`
-To make Homebrew's completions available in `zsh`, you must get the Homebrew-managed zsh site-functions on your `$FPATH` before initialising `zsh`'s completion facility. Add the following to your `~/.zshrc` file:
+To make Homebrew's completions available in `zsh`, you must get the Homebrew-managed zsh site-functions on your `FPATH` before initialising `zsh`'s completion facility. Add the following to your `~/.zshrc` file:
 
 ```sh
 if type brew &>/dev/null; then
@@ -26,7 +26,7 @@ if type brew &>/dev/null; then
 fi
 ```
 
-This must be done before `compinit` is called. (Note: if you are using Oh My Zsh, it will call `compinit` for you, so this must be done before you call `oh-my-zsh.sh`.)
+This must be done before `compinit` is called. Note that if you are using Oh My Zsh, it will call `compinit` for you, so this must be done before you call `oh-my-zsh.sh`.
 
 You may also need to forcibly rebuild `zcompdump`:
 

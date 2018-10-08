@@ -182,10 +182,14 @@ module Cask
       end
 
       def self.cask_count_for_tap(tap)
-        Formatter.pluralize(tap.cask_files.count, "cask")
-      rescue
-        add_error "Unable to read from Tap: #{tap.path}"
-        "0"
+        cask_count = begin
+          tap.cask_files.count
+        rescue
+          add_error "Unable to read from Tap: #{tap.path}"
+          0
+        end
+
+        "#{cask_count} #{"cask".pluralize(cask_count)}"
       end
 
       def self.render_env_var(var)

@@ -8,4 +8,4 @@ As Homebrew became primarily a binary package manager, most users were fulfillin
 
 ## Today
 
-If you wish to build against custom non-Homebrew dependencies that are provided by Homebrew (e.g. a non-Homebrew, non-macOS `ruby`) then you must [create and maintain your own tap](How-to-Create-and-Maintain-a-Tap.md) as these formulae will not be accepted in Homebrew/homebrew-core. Once you have done that you can specify `env :std` in the formula which will allow a e.g. `which ruby` to access your existing `PATH` variable and allow compilation to link against this Ruby.
+If you wish to build against custom non-Homebrew dependencies that are provided by Homebrew (e.g. a non-Homebrew, non-macOS `ruby`) then you must [create and maintain your own tap](How-to-Create-and-Maintain-a-Tap.md) as these formulae will not be accepted in Homebrew/homebrew-core. Once you have done that you can specify `env :std` in the formula which will allow e.g. `which ruby` to access your existing `PATH` variable and allow compilation to link against this Ruby.

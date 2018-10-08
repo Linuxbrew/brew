@@ -10,7 +10,7 @@ Bottles will not be used if the user requests it (see above), if the formula req
 ## Creation
 Bottles are created using the [Brew Test Bot](Brew-Test-Bot.md). This happens mostly when people submit pull requests to Homebrew and the `bottle do` block is updated by maintainers when they `brew pull --bottle` the contents of a pull request. For the Homebrew organisations' taps they are uploaded to and downloaded from [Bintray](https://bintray.com/homebrew).
 
-By default, bottles will be built for the oldest CPU supported by the OS/architecture you're building for (Core 2 for 64-bit OSs). This ensures that bottles are compatible with all computers you might distribute them to. If you *really* want your bottles to be optimized for something else, you can pass the `--bottle-arch=` option to build for another architecture - for example, `brew install foo --bottle-arch=penryn`. Just remember that if you build for a newer architecture some of your users might get binaries they can't run and that would be sad!
+By default, bottles will be built for the oldest CPU supported by the OS/architecture you're building for (Core 2 for 64-bit OSs). This ensures that bottles are compatible with all computers you might distribute them to. If you *really* want your bottles to be optimized for something else, you can pass the `--bottle-arch=` option to build for another architecture; for example, `brew install foo --build-bottle --bottle-arch=penryn`. Just remember that if you build for a newer architecture some of your users might get binaries they can't run and that would be sad!
 
 ## Format
 Bottles are simple gzipped tarballs of compiled binaries. Any metadata is stored in a formula's bottle DSL and in the bottle filename (i.e. macOS version, revision).
@@ -62,7 +62,7 @@ Sometimes bottles may need be updated without bumping the version of the formula
 Contains the SHA-256 hash of a bottle for a particular version of macOS.
 
 ## Formula DSL
-Additionally there is a method available in the formula DSL.
+An additional method is available in the formula DSL.
 
 ### Pour bottle (`pour_bottle?`)
 Optionally returns a boolean to decide whether a bottle should be used for this formula.

@@ -53,8 +53,9 @@ RSpec.shared_context "integration test" do
   def command_id_from_args(args)
     @command_count ||= 0
     pretty_args = args.join(" ").gsub(TEST_TMPDIR, "@TMPDIR@")
-    file_and_line = caller[1].sub(/(.*\d+):.*/, '\1')
-                             .sub("#{HOMEBREW_LIBRARY_PATH}/test/", "")
+    file_and_line = caller.second
+                          .sub(/(.*\d+):.*/, '\1')
+                          .sub("#{HOMEBREW_LIBRARY_PATH}/test/", "")
     "#{file_and_line}:brew #{pretty_args}:#{@command_count += 1}"
   end
 

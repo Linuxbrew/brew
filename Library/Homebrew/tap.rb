@@ -17,8 +17,8 @@ class Tap
     when 1
       user, repo = args.first.split("/", 2)
     when 2
-      user = args[0]
-      repo = args[1]
+      user = args.first
+      repo = args.second
     end
 
     if [user, repo].any? { |part| part.nil? || part.include?("/") }
@@ -315,7 +315,7 @@ class Tap
 
     link_completions_and_manpages
 
-    formatted_contents = Formatter.comma_and(*contents)&.prepend(" ")
+    formatted_contents = contents.presence&.to_sentence&.dup&.prepend(" ")
     puts "Tapped#{formatted_contents} (#{path.abv})." unless quiet
     Descriptions.cache_formulae(formula_names)
 
@@ -346,7 +346,7 @@ class Tap
     puts "Untapping #{name}..."
 
     abv = path.abv
-    formatted_contents = Formatter.comma_and(*contents)&.prepend(" ")
+    formatted_contents = contents.presence&.to_sentence&.dup&.prepend(" ")
 
     unpin if pinned?
     Descriptions.uncache_formulae(formula_names)
@@ -383,15 +383,15 @@ class Tap
     contents = []
 
     if (command_count = command_files.count).positive?
-      contents << Formatter.pluralize(command_count, "command")
+      contents << "#{command_count} #{"command".pluralize(command_count)}"
     end
 
     if (cask_count = cask_files.count).positive?
-      contents << Formatter.pluralize(cask_count, "cask")
+      contents << "#{cask_count} #{"cask".pluralize(cask_count)}"
     end
 
     if (formula_count = formula_files.count).positive?
-      contents << Formatter.pluralize(formula_count, "formula")
+      contents << "#{formula_count} #{"formula".pluralize(formula_count)}"
     end
 
     contents
@@ -744,7 +744,7 @@ class TapConfig
     return unless Utils.git_available?
 
     tap.path.cd do
-      Utils.popen_read("git", "config", "--get", "homebrew.#{key}").chuzzle
+      Utils.popen_read("git", "config", "--get", "homebrew.#{key}").chomp.presence
     end
   end
 
@@ -757,3 +757,5 @@ class TapConfig
     end
   end
 end
+
+require "extend/os/tap"

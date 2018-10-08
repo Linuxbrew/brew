@@ -21,30 +21,6 @@ shared_examples Cask::Staged do
     staged.system_command("echo", args: ["homebrew-cask", "rocks!"])
   end
 
-  it "can get the Info.plist file for the primary app" do
-    expect(staged.info_plist_file).to eq Cask::Config.global.appdir.join("TestCask.app/Contents/Info.plist")
-  end
-
-  it "can execute commands on the Info.plist file" do
-    allow(staged).to receive(:bundle_identifier).and_return("com.example.BasicCask")
-
-    FakeSystemCommand.expects_command(
-      ["/usr/libexec/PlistBuddy", "-c", "Print CFBundleIdentifier", staged.info_plist_file],
-    )
-
-    staged.plist_exec("Print CFBundleIdentifier")
-  end
-
-  it "can set a key in the Info.plist file" do
-    allow(staged).to receive(:bundle_identifier).and_return("com.example.BasicCask")
-
-    FakeSystemCommand.expects_command(
-      ["/usr/libexec/PlistBuddy", "-c", "Set :JVMOptions:JVMVersion 1.6+", staged.info_plist_file],
-    )
-
-    staged.plist_set(":JVMOptions:JVMVersion", "1.6+")
-  end
-
   it "can set the permissions of a file" do
     fake_pathname = existing_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)

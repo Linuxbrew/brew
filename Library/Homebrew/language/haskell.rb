@@ -71,9 +71,7 @@ module Language
         rm_rf Dir[".cabal-sandbox/*packages.conf.d/"]
       end
 
-      def install_cabal_package(*args)
-        options = args[-1].is_a?(Hash) ? args.pop : {}
-
+      def install_cabal_package(*args, **options)
         cabal_sandbox do
           cabal_install_tools(*options[:using]) if options[:using]
 

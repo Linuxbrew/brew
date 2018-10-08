@@ -6,9 +6,6 @@ using CleanupRefinement
 module Cask
   class Cmd
     class Cleanup < AbstractCommand
-      OUTDATED_DAYS = 10
-      OUTDATED_TIMESTAMP = Time.now - (60 * 60 * 24 * OUTDATED_DAYS)
-
       def self.help
         "cleans up cached downloads and tracker symlinks"
       end

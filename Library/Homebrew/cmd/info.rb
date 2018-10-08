@@ -1,7 +1,7 @@
 #:  * `info`:
 #:    Display brief statistics for your Homebrew installation.
 #:
-#:  * `info` <formula>  (`--verbose`):
+#:  * `info` <formula> [`--verbose`]:
 #:    Display information about <formula> and analytics data (provided neither
 #:    `HOMEBREW_NO_ANALYTICS` or `HOMEBREW_NO_GITHUB_API` are set)
 #:
@@ -10,7 +10,7 @@
 #:  * `info` `--github` <formula>:
 #:    Open a browser to the GitHub History page for <formula>.
 #:
-#:    To view formula history locally: `brew log -p <formula>`
+#:    To view formula history locally: `brew log -p` <formula>
 #:
 #:  * `info` `--json=`<version> (`--all`|`--installed`|<formulae>):
 #:    Print a JSON representation of <formulae>. Currently the only accepted value
@@ -49,7 +49,7 @@ module Homebrew
     if ARGV.named.empty?
       if HOMEBREW_CELLAR.exist?
         count = Formula.racks.length
-        puts "#{Formatter.pluralize(count, "keg")}, #{HOMEBREW_CELLAR.abv}"
+        puts "#{count} #{"keg".pluralize(count)}, #{HOMEBREW_CELLAR.abv}"
       end
     else
       ARGV.named.each_with_index do |f, i|

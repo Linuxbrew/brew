@@ -4,7 +4,7 @@ The suggested and easiest way to install Homebrew is on the
 [homepage](https://brew.sh).
 
 The standard script installs Homebrew to `/usr/local` so that
-[you don’t need sudo](FAQ.md) when you
+[you don’t need sudo](FAQ.md#why-does-homebrew-say-sudo-is-bad) when you
 `brew install`. It is a careful script; it can be run even if you have stuff
 installed to `/usr/local` already. It tells you exactly what it will do before
 it does it too. And you have to confirm everything it will do before it starts.
@@ -24,11 +24,10 @@ it does it too. And you have to confirm everything it will do before it starts.
 Using the instructions on https://brew.sh or below whenever you call `curl` you must pass `--insecure` as an argument. This is because your system `curl` is too old to speak to GitHub using HTTPS. Don't worry, on the first `brew update` Homebrew will install a newer, more secure `curl` for your machine.
 
 ### Untar anywhere
-Just extract (or `git clone`) Homebrew wherever you want. Just
-avoid:
+Just extract (or `git clone`) Homebrew wherever you want. Just avoid:
 
 * Directories with names that contain spaces. Homebrew itself can handle spaces, but many build scripts cannot.
-* `/tmp` subdirectories because Homebrew gets upset
+* `/tmp` subdirectories because Homebrew gets upset.
 * `/sw` and `/opt/local` because build scripts get confused when Homebrew is there instead of Fink or MacPorts, respectively.
 
 However do yourself a favor and install to `/usr/local`. Some things may

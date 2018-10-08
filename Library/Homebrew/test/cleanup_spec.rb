@@ -16,7 +16,7 @@ describe CleanupRefinement do
     end
 
     it "returns true when path_modified_time < days_default" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 2 * 60 * 60 * 24)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(2.days.ago)
       expect(path.prune?(1)).to be true
     end
 
@@ -181,7 +181,7 @@ describe Homebrew::Cleanup do
       it "removes the download for the latest version after a week" do
         download = Cask::Cache.path/"#{cask.token}--#{cask.version}"
 
-        FileUtils.touch download, mtime: Time.now - 7 * 60 * 60 * 24
+        FileUtils.touch download, mtime: 7.days.ago - 1.hour
 
         subject.cleanup_cask(cask)
 
@@ -203,13 +203,13 @@ describe Homebrew::Cleanup do
     end
 
     it "cleans up logs if older than 14 days" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 15 * 60 * 60 * 24)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(15.days.ago)
       subject.cleanup_logs
       expect(path).not_to exist
     end
 
     it "does not clean up logs less than 14 days old" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 2 * 60 * 60 * 24)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(2.days.ago)
       subject.cleanup_logs
       expect(path).to exist
     end

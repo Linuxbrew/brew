@@ -282,10 +282,6 @@ module Cask
                       [
                         %r{\Ahttps://sourceforge\.net/projects/[^/]+/files/latest/download\Z},
                         %r{\Ahttps://downloads\.sourceforge\.net/(?!(project|sourceforge)\/)},
-                        # special cases: cannot find canonical format URL
-                        %r{\Ahttps?://brushviewer\.sourceforge\.net/brushviewql\.zip\Z},
-                        %r{\Ahttps?://doublecommand\.sourceforge\.net/files/},
-                        %r{\Ahttps?://excalibur\.sourceforge\.net/get\.php\?id=},
                       ])
     end
 

@@ -1,5 +1,5 @@
 #:  * `unpin` <formulae>:
-#:    Unpin <formulae>, allowing them to be upgraded by `brew upgrade <formulae>`.
+#:    Unpin <formulae>, allowing them to be upgraded by `brew upgrade` <formulae>.
 #:    See also `pin`.
 
 require "formula"

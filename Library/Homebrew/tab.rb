@@ -78,7 +78,7 @@ class Tab < OpenStruct
     end
 
     if attributes["source"]["spec"].nil?
-      version = PkgVersion.parse path.to_s.split("/")[-2]
+      version = PkgVersion.parse path.to_s.split("/").second_to_last
       if version.head?
         attributes["source"]["spec"] = "head"
       else

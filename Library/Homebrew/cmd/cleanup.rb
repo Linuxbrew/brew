@@ -1,4 +1,4 @@
-#:  * `cleanup` [`--prune=`<days>] [`--dry-run`] [`-s`] [<formula/cask> ...]:
+#:  * `cleanup` [`--prune=`<days>] [`--dry-run`] [`-s`] [<formulae>|<casks>]:
 #:    Remove stale lock files and outdated downloads for formulae and casks,
 #:    and remove old versions of installed formulae. If arguments are specified,
 #:    only do this for the specified formulae and casks.

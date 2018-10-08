@@ -54,7 +54,6 @@ module Cask
     ].freeze
 
     DSL_METHODS = Set.new [
-      :accessibility_access,
       :appcast,
       :artifacts,
       :auto_updates,
@@ -249,10 +248,6 @@ module Cask
         return @caveats.to_s
       end
       @caveats
-    end
-
-    def accessibility_access(accessibility_access = nil)
-      set_unique_stanza(:accessibility_access, accessibility_access.nil?) { accessibility_access }
     end
 
     def auto_updates(auto_updates = nil)

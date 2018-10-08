@@ -1,0 +1,31 @@
+require "rake"
+
+task default: :build
+
+desc "Build the site."
+task :build do
+  sh "jekyll", "build"
+end
+
+desc "Run html proofer to validate the HTML output."
+task test: :build do
+  require "html-proofer"
+  HTMLProofer.check_directory(
+    "./_site",
+    parallel: { in_threads: 4 },
+    favicon: true,
+    http_status_ignore: [0, 403],
+    assume_extension: true,
+    check_favicon: true,
+    check_opengraph: true,
+    check_html: true,
+    check_img_http: true,
+    file_ignore: [
+      %r{Kickstarter-Supporters},
+    ],
+    url_ignore: [
+      "http://formulae.brew.sh",
+      %r{https://github.com/Homebrew/brew/edit/gh-pages//},
+    ]
+  ).run
+end

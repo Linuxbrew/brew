@@ -48,11 +48,11 @@ module Homebrew
         pinned_count += 1 if tap.pinned?
         private_count += 1 if tap.private?
       end
-      info = Formatter.pluralize(tap_count, "tap").to_s
+      info = "#{tap_count} #{"tap".pluralize(tap_count)}"
       info += ", #{pinned_count} pinned"
       info += ", #{private_count} private"
-      info += ", #{Formatter.pluralize(formula_count, "formula")}"
-      info += ", #{Formatter.pluralize(command_count, "command")}"
+      info += ", #{formula_count} #{"formula".pluralize(formula_count)}"
+      info += ", #{command_count} #{"command".pluralize(command_count)}"
       info += ", #{Tap::TAP_DIRECTORY.abv}" if Tap::TAP_DIRECTORY.directory?
       puts info
     else
