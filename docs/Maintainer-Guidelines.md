@@ -153,7 +153,7 @@ Individual Homebrew repositories should not have formal lead maintainers (althou
 
 Maintainers should feel even more free to pleasantly disagree with the work and decisions of the lead maintainer: with greater authority comes greater responsibility to handle and moderate technical disagreements.
 
-Homebrew's last lead maintainer will be Mike McQuaid. On February 1st, Mike will step down as lead maintainer of Homebrew and his responsibilities will be passed on to the project leadership committee and/or a new, technical steering committee and/or something else.
+Homebrew's last lead maintainer will be Mike McQuaid. On February 4th (to coincide with Homebrew maintainers' conference), Mike will step down as lead maintainer of Homebrew and his responsibilities will be passed on to the project leadership committee and/or a new, technical steering committee and/or something else.
 
 Some food for thought and discussion before those dates:
 
