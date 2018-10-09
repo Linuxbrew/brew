@@ -432,6 +432,7 @@ module Homebrew
 
           if @new_formula && dep_f.keg_only_reason &&
              !["openssl", "apr", "apr-util"].include?(dep.name) &&
+             (!["openblas"].include?(dep.name) || @official_tap) &&
              dep_f.keg_only_reason.reason == :provided_by_macos
             new_formula_problem(
               "Dependency '#{dep.name}' may be unnecessary as it is provided " \
