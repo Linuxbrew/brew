@@ -1,12 +1,11 @@
 module Cask
   class DSL
     class Appcast
-      attr_reader :uri, :checkpoint, :parameters
+      attr_reader :uri, :parameters
 
       def initialize(uri, **parameters)
         @uri        = URI(uri)
         @parameters = parameters
-        @checkpoint = parameters[:checkpoint]
       end
 
       def to_yaml

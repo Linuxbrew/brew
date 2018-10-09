@@ -317,22 +317,6 @@ describe Cask::Audit, :cask do
       end
     end
 
-    describe "appcast checkpoint check" do
-      let(:error_msg) { "Appcast checkpoints have been removed from Homebrew Cask" }
-
-      context "when the Cask does not have a checkpoint" do
-        let(:cask_token) { "with-appcast" }
-
-        it { is_expected.not_to fail_with(error_msg) }
-      end
-
-      context "when the Cask has a checkpoint" do
-        let(:cask_token) { "appcast-with-checkpoint" }
-
-        it { is_expected.to fail_with(error_msg) }
-      end
-    end
-
     describe "hosting with appcast checks" do
       let(:appcast_warning) { /please add an appcast/ }
 
