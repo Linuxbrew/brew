@@ -1,5 +1,5 @@
 #:  * `update-test` [`--commit=`<commit>] [`--before=`<date>] [`--to-tag`] [`--keep-tmp`]:
-#:    Runs a test of `brew update` with a new repository clone.
+#:    Run a test of `brew update` with a new repository clone.
 #:
 #:    If no arguments are passed, use `origin/master` as the start commit.
 #:
@@ -24,8 +24,7 @@ module Homebrew
       usage_banner <<~EOS
         `update-test` [<options>]:
 
-        Runs a test of `brew update` with a new repository clone.
-
+        Run a test of `brew update` with a new repository clone.
         If no arguments are passed, use `origin/master` as the start commit.
       EOS
       switch "--to-tag",

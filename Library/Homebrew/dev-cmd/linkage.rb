@@ -1,14 +1,12 @@
 #:  * `linkage` [`--test`] [`--reverse`] [<formulae>]:
-#:    Checks the library links of installed formulae.
-#:
-#:    Only works on installed formulae. An error is raised if it is run on
-#:    uninstalled formulae.
+#:    Check the library links for kegs of installed formulae.
+#:    Raises an error if run on uninstalled formulae.
 #:
 #:    If `--test` is passed, only display missing libraries and exit with a
-#:    non-zero exit code if any missing libraries were found.
+#:    non-zero status if any missing libraries are found.
 #:
-#:    If `--reverse` is passed, print the dylib followed by the binaries
-#:    which link to it for each library the keg references.
+#:    If `--reverse` is passed, for every library that a keg references,
+#:    print its dylib path followed by the binaries that link to it.
 #:
 #:    If <formulae> are given, check linkage for only the specified brews.
 
@@ -22,21 +20,19 @@ module Homebrew
   def linkage_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `linkage` [<options>] <formula>:
+        `linkage` [<options>] [<formulae>]:
 
-        Checks the library links of an installed formula.
-
-        Only works on installed formulae. An error is raised if it is run on
-        uninstalled formulae.
+        Check the library links for kegs of installed formulae.
+        Raises an error if run on uninstalled formulae.
       EOS
       switch "--test",
-        description: "Display only missing libraries and exit with a non-zero exit code if any missing "\
-                     "libraries were found."
+        description: "Display only missing libraries and exit with a non-zero status if any missing "\
+                     "libraries are found."
       switch "--reverse",
-        description: "Print the dylib followed by the binaries which link to it for each library the keg "\
-                     "references."
+        description: "For every library that a keg references, print its dylib path followed by the "\
+                     "binaries that link to it."
       switch "--cached",
-        description: "Print the cached linkage values stored in HOMEBREW_CACHE, set from a previous "\
+        description: "Print the cached linkage values stored in `HOMEBREW_CACHE`, set by a previous "\
                      "`brew linkage` run."
       switch :verbose
       switch :debug

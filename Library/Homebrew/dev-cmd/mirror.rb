@@ -14,15 +14,15 @@ module Homebrew
 
         Reuploads the stable URL for a formula to Bintray to use it as a mirror.
       EOS
-      switch :debug
       switch :verbose
+      switch :debug
     end
   end
 
   def mirror
     mirror_args.parse
 
-    odie "This command requires at least formula argument!" if ARGV.named.empty?
+    odie "This command requires at least one formula argument!" if ARGV.named.empty?
 
     bintray_user = ENV["HOMEBREW_BINTRAY_USER"]
     bintray_key = ENV["HOMEBREW_BINTRAY_KEY"]

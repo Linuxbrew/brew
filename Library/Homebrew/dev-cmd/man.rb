@@ -47,7 +47,7 @@ module Homebrew
                      "the date used in new manpages will match those in the existing manpages (to allow "\
                      "comparison without factoring in the date)."
       switch "--link",
-        description: "It is now done automatically by `brew update`."
+        description: "This is now done automatically by `brew update`."
     end
   end
 
@@ -220,7 +220,7 @@ module Homebrew
   end
 
   def generate_option_doc(short, long, desc)
-    "* #{format_short_opt(short)} #{format_long_opt(long)}:" + "\n" + desc + "\n"
+    "* #{format_short_opt(short)}#{format_long_opt(long)}:" + "\n  " + desc + "\n"
   end
 
   def format_short_opt(opt)

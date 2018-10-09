@@ -7,23 +7,15 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def write_path(tap, filename, content)
-    path = tap.path/filename
-    tap.path.mkpath
-    raise "#{path} already exists" if path.exist?
-
-    path.write content
-  end
-
   def tap_new_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `tap-new` <user>/<repo>:
+        `tap-new` <user>`/`<repo>:
 
         Generate the template files for a new tap.
       EOS
-      switch :debug
       switch :verbose
+      switch :debug
     end
   end
 
@@ -83,5 +75,13 @@ module Homebrew
         - brew test-bot
     YAML
     write_path(tap, ".travis.yml", travis)
+  end
+
+  def write_path(tap, filename, content)
+    path = tap.path/filename
+    tap.path.mkpath
+    raise "#{path} already exists" if path.exist?
+
+    path.write content
   end
 end

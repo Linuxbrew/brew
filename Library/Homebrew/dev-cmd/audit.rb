@@ -1,6 +1,7 @@
 #:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method>] [`--only-cops=`<cops>|`--except-cops=`<cops>] [<formulae>]:
-#:    Check <formulae> for Homebrew coding style violations. This should be
-#:    run before submitting a new formula.
+#:    Check <formulae> for Homebrew coding style violations. This should be run
+#:    before submitting a new formula. Will exit with a non-zero status if any errors
+#:    are found, which can be useful for implementing pre-commit hooks.
 #:
 #:    If no <formulae> are provided, all of them are checked.
 #:
@@ -23,16 +24,13 @@
 #:    If `--display-filename` is passed, every line of output is prefixed with the
 #:    name of the file or formula being audited, to make the output easy to grep.
 #:
-#:    Passing `--only=`<method> will run only the methods named `audit_<method>`,
-#:    while `--except=`<method> will skip the methods named `audit_<method>`.
+#:    Specifying `--only=`<method> will run only the methods named `audit_`<method>,
+#:    while `--except=`<method> will skip the methods named `audit_`<method>.
 #:    For either option <method> should be a comma-separated list.
 #:
-#:    Passing `--only-cops=`<cops> will check for violations of only the listed
+#:    Specifying `--only-cops=`<cops> will check for violations of only the listed
 #:    RuboCop <cops>, while `--except-cops=`<cops> will skip checking the listed
 #:    <cops>. For either option <cops> should be a comma-separated list of cop names.
-#:
-#:    `audit` exits with a non-zero status if any errors are found. This is useful,
-#:    for instance, for implementing pre-commit hooks.
 
 # Undocumented options:
 #     `-D` activates debugging and profiling of the audit methods (not the same as `--debug`)
@@ -57,12 +55,13 @@ module Homebrew
       usage_banner <<~EOS
         `audit` [<options>] <formulae>:
 
-        Check <formulae> for Homebrew coding style violations. This should be
-        run before submitting a new formula.
+        Check <formulae> for Homebrew coding style violations. This should be run before
+        submitting a new formula. Will exit with a non-zero status if any errors are
+        found, which can be useful for implementing pre-commit hooks.
         If no <formulae> are provided, all of them are checked.
       EOS
       switch "--strict",
-        description: "Run additional style checks, including Rubocop style checks."
+        description: "Run additional style checks, including RuboCop style checks."
       switch "--online",
         description: "Run additional slower style checks that require a network connection."
       switch "--new-formula",
@@ -74,24 +73,26 @@ module Homebrew
       switch "--display-cop-names",
         description: "Include the RuboCop cop name for each violation in the output."
       switch "--display-filename",
-        description: "Prefix everyline of output with name of the file or formula being audited, to "\
+        description: "Prefix every line of output with name of the file or formula being audited, to "\
                      "make output easy to grep."
       switch "-D", "--audit-debug",
-        description: "Activates debugging and profiling"
+        description: "Enable debugging and profiling of audit methods."
       comma_array "--only",
-        description: "Passing `--only=`<method> will run only the methods named audit_<method>. "\
-                     "<method> should be a comma-separated list."
+        description: "Specify a comma-separated <method> list to only run the methods named "\
+                     "`audit_`<method>."
       comma_array "--except",
-        description: "Passing `--except=`<method> will run only the methods named audit_<method>, "\
-                     "<method> should be a comma-separated list."
+        description: "Specify a comma-separated <method> list to skip running the methods named "\
+                     "`audit_`<method>."
       comma_array "--only-cops",
-        description: "Passing `--only-cops=`<cops> will check for violations of only the listed "\
-                     "RuboCop cops. <cops> should be a comma-separated list of cop names."
+        description: "Specify a comma-separated <cops> list to check for violations of only the listed "\
+                     "RuboCop cops."
       comma_array "--except-cops",
-        description: "Passing `--except-cops=`<cops> will skip checking the listed RuboCop cops "\
-                     "violations. <cops> should be a comma-separated list of cop names."
+        description: "Specify a comma-separated <cops> list to skip checking for violations of the listed "\
+                     "RuboCop cops."
       switch :verbose
       switch :debug
+      conflicts "--only", "--except"
+      conflicts "--only-cops", "--except-cops"
     end
   end
 
@@ -126,7 +127,7 @@ module Homebrew
     if only_cops && except_cops
       odie "--only-cops and --except-cops cannot be used simultaneously!"
     elsif (only_cops || except_cops) && (strict || args.only)
-      odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously"
+      odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously!"
     end
 
     options = { fix: args.fix?, realpath: true }

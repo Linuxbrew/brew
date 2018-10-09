@@ -1,11 +1,11 @@
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run` [`--write`]] [`--audit`|`--strict`] [`--mirror=`<URL>] [`--version=`<version>] [`--message=`<message>] (`--url=`<URL> `--sha256=`<sha-256>|`--tag=`<tag> `--revision=`<revision>) <formula>:
-#:    Creates a pull request to update the formula with a new URL or a new tag.
+#:  * `bump-formula-pr` [`--devel`] [`--dry-run` [`--write`]] [`--audit`|`--strict`] [`--no-browse] [`--mirror=`<URL>] [`--version=`<version>] [`--message=`<message>] (`--url=`<URL> `--sha256=`<SHA-256>|`--tag=`<tag> `--revision=`<revision>) [<formula>]:
+#:    Create a pull request to update a formula with a new URL or a new tag.
 #:
-#:    If a <URL> is specified, the <sha-256> checksum of the new download must
-#:    also be specified. A best effort to determine the <sha-256> and <formula>
+#:    If a <URL> is specified, the <SHA-256> checksum of the new download should
+#:    also be specified. A best effort to determine the <SHA-256> and <formula>
 #:    name will be made if either or both values are not supplied by the user.
 #:
-#:    If a <tag> is specified, the git commit <revision> corresponding to that
+#:    If a <tag> is specified, the Git commit <revision> corresponding to that
 #:    tag must also be specified.
 #:
 #:    If `--devel` is passed, bump the development rather than stable version.
@@ -13,8 +13,8 @@
 #:
 #:    If `--dry-run` is passed, print what would be done rather than doing it.
 #:
-#:    If `--write` is passed along with `--dry-run`, perform a not-so-dry run
-#:    making the expected file modifications but not taking any git actions.
+#:    If `--write` is passed along with `--dry-run`, perform a not-so-dry run by
+#:    making the expected file modifications but not taking any Git actions.
 #:
 #:    If `--audit` is passed, run `brew audit` before opening the PR.
 #:
@@ -24,7 +24,7 @@
 #:
 #:    If `--version=`<version> is passed, use the value to override the value
 #:    parsed from the URL or tag. Note that `--version=0` can be used to delete
-#:    an existing `version` override from a formula if it has become redundant.
+#:    an existing version override from a formula if it has become redundant.
 #:
 #:    If `--message=`<message> is passed, append <message> to the default PR
 #:    message.
@@ -36,8 +36,8 @@
 #:    If `--quiet` is passed, don't output replacement messages or warn about
 #:    duplicate pull requests.
 #:
-#:    Note that this command cannot be used to transition a formula from a
-#:    URL-and-sha256 style specification into a tag-and-revision style
+#:    *Note:* this command cannot be used to transition a formula from a
+#:    URL-and-SHA-256 style specification into a tag-and-revision style
 #:    specification, nor vice versa. It must use whichever style specification
 #:    the preexisting formula already uses.
 
@@ -50,57 +50,58 @@ module Homebrew
   def bump_formula_pr_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `bump-formula-pr` [<options>] <formula>:
+        `bump-formula-pr` [<options>] [<formula>]:
 
-        Creates a pull request to update the formula with a new URL or a new tag.
+        Create a pull request to update a formula with a new URL or a new tag.
 
-        If a <URL> is specified, the <sha-256> checksum of the new download must
-        also be specified. A best effort to determine the <sha-256> and <formula>
-        name will be made if either or both values are not supplied by the user.
+        If a <URL> is specified, the <SHA-256> checksum of the new download should also
+        be specified. A best effort to determine the <SHA-256> and <formula> name will
+        be made if either or both values are not supplied by the user.
 
-        If a <tag> is specified, the git commit <revision> corresponding to that
-        tag must also be specified.
+        If a <tag> is specified, the Git commit <revision> corresponding to that tag
+        must also be specified.
 
-        Note that this command cannot be used to transition a formula from a
-        URL-and-sha256 style specification into a tag-and-revision style
-        specification, nor vice versa. It must use whichever style specification
-        the preexisting formula already uses.
+        *Note:* this command cannot be used to transition a formula from a
+        URL-and-SHA-256 style specification into a tag-and-revision style specification,
+        nor vice versa. It must use whichever style specification the preexisting
+        formula already uses.
       EOS
       switch "--devel",
         description: "Bump the development rather than stable version. The development spec must already exist."
       switch "-n", "--dry-run",
         description: "Print what would be done rather than doing it."
       switch "--write",
-        description: "When passed along with `--dry-run`, perform a not-so-dry run making the expected "\
-                     "file modifications but not taking any git actions."
+        depends_on: "--dry-run",
+        description: "When passed along with `--dry-run`, perform a not-so-dry run by making the expected "\
+                     "file modifications but not taking any Git actions."
       switch "--audit",
         description: "Run `brew audit` before opening the PR."
       switch "--strict",
         description: "Run `brew audit --strict` before opening the PR."
       switch "--no-browse",
-        description: "Output the pull request URL instead of opening in a browser"
-      flag "--url=",
-        description: "Provide new <URL> for the formula. If a <URL> is specified, the <sha-256> "\
-                     "checksum of the new download must also be specified."
-      flag "--revision=",
-        description: "Specify the new git commit <revision> corresponding to a specified <tag>."
-      flag "--tag=",
-        required_for: "--revision=",
-        description: "Specify the new git commit <tag> for the formula."
-      flag "--sha256=",
-        depends_on: "--url=",
-        description: "Specify the <sha-256> checksum of new download."
-      flag "--mirror=",
+        description: "Print the pull request URL instead of opening in a browser."
+      flag   "--mirror=",
         description: "Use the provided <URL> as a mirror URL."
-      flag "--version=",
+      flag   "--version=",
         description: "Use the provided <version> to override the value parsed from the URL or tag. Note "\
-                     "that `--version=0` can be used to delete an existing `version` override from a "\
+                     "that `--version=0` can be used to delete an existing version override from a "\
                      "formula if it has become redundant."
-      flag "--message=",
-        description: "Append provided <message> to the default PR message."
+      flag   "--message=",
+        description: "Append the provided <message> to the default PR message."
+      flag   "--url=",
+        description: "Specify the <URL> for the new download. If a <URL> is specified, the <SHA-256> "\
+                     "checksum of the new download should also be specified."
+      flag   "--sha256=",
+        depends_on: "--url=",
+        description: "Specify the <SHA-256> checksum of the new download."
+      flag   "--tag=",
+        description: "Specify the new git commit <tag> for the formula."
+      flag   "--revision=",
+        required_for: "--tag=",
+        description: "Specify the new git commit <revision> corresponding to a specified <tag>."
 
-      switch :quiet
       switch :force
+      switch :quiet
       switch :verbose
       switch :debug
       conflicts "--url", "--tag"
@@ -352,7 +353,7 @@ module Homebrew
              "#{new_formula_version}#{devel_message}' -- #{formula.path}"
         ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
         ohai "create pull request with GitHub API"
-        ohai "git checkout -"
+        ohai "git checkout --quiet -"
       else
 
         begin

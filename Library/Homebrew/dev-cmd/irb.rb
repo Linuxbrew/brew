@@ -2,8 +2,9 @@
 #:    Enter the interactive Homebrew Ruby shell.
 #:
 #:    If `--examples` is passed, several examples will be shown.
-#:    If `--pry` is passed or HOMEBREW_PRY is set, pry will be
-#:    used instead of irb.
+#:
+#:    If `--pry` is passed or `HOMEBREW_PRY` is set, Pry will be
+#:    used instead of IRB.
 
 require "cli_parser"
 
@@ -33,7 +34,7 @@ module Homebrew
         description: "Show several examples."
       switch "--pry",
         env: :pry,
-        description: "Pry will be used instead of irb if `--pry` is passed or HOMEBREW_PRY is set."
+        description: "Use Pry instead of IRB. Implied if `HOMEBREW_PRY` is set."
     end
   end
 

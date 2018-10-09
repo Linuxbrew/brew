@@ -1,6 +1,6 @@
 #:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=`<bintray-org>] [`--test-bot-user=`<test-bot-user>] <patch-source> [<patch-source>]:
-#:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
-#:    Optionally, installs the formulae changed by the patch.
+#:    Get a patch from a GitHub commit or pull request and apply it to Homebrew.
+#:    Optionally, publish updated bottles for the formulae changed by the patch.
 #:
 #:    Each <patch-source> may be one of:
 #:
@@ -41,11 +41,11 @@
 #:    If `--warn-on-publish-failure` was passed, do not exit if there's a
 #:    failure publishing bottles on Bintray.
 #:
-#:    If `--bintray-org=`<bintray-org> is passed, publish at the given Bintray
+#:    If `--bintray-org=`<bintray-org> is passed, publish at the provided Bintray
 #:    organisation.
 #:
 #:    If `--test-bot-user=`<test-bot-user> is passed, pull the bottle block
-#:    commit from the specified user on GitHub.
+#:    commit from the provided user on GitHub.
 
 require "net/http"
 require "net/https"
@@ -74,12 +74,12 @@ module Homebrew
   def pull_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `pull` [<options>] <formula>:
+        `pull` [<options>] <patch sources>:
 
-        Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
-        Optionally, installs the formulae changed by the patch.
+        Get a patch from a GitHub commit or pull request and apply it to Homebrew.
+        Optionally, publish updated bottles for the formulae changed by the patch.
 
-        Each <patch-source> may be one of:
+        Each <patch source> may be one of:
 
           ~ The ID number of a PR (pull request) in the homebrew/core GitHub
             repository
@@ -112,9 +112,9 @@ module Homebrew
       switch "--warn-on-publish-failure",
         description: "Do not exit if there's a failure publishing bottles on Bintray."
       flag   "--bintray-org=",
-        description: "Publish at the given Bintray organisation."
+        description: "Publish bottles at the provided Bintray <organisation>."
       flag   "--test-bot-user=",
-        description: "Pull the bottle block commit from the specified user on GitHub."
+        description: "Pull the bottle block commit from the provided <user> on GitHub."
       switch :verbose
       switch :debug
     end
