@@ -4,9 +4,6 @@ AllCops:
     - '**/Casks/**/*'
     - '**/vendor/**/*'
   DisplayCopNames: false
-  RSpec:
-    Patterns:
-    - Homebrew/test/*
 
 require: 
   - ./Homebrew/rubocops.rb
