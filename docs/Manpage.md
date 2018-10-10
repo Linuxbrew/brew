@@ -1030,26 +1030,26 @@ Override warnings and enable potentially unsafe operations.
   * `services` *`command`*:
     Integrates Homebrew formulae with macOS' `launchctl` manager.
 
-    [`sudo`] `brew services list`:
-    List all running services for the current user (or root).
+    [*`sudo`*] `brew services list`
+    List all running services for the current user (or *`root`*)
 
-    [`sudo`] `brew services run` (*`formula`*|`--all`):
-    Run the service *`formula`* without registering to launch at login (or boot).
+    [*`sudo`*] `brew services run` *`formula|--all`*
+    Run the service *`formula`* without starting at login (or boot).
 
-    [`sudo`] `brew services start` (*`formula`*|`--all`):
-    Start the service *`formula`* immediately and register it to launch at login (or boot).
+    [*`sudo`*] `brew services` `start` *`formula|--all`*
+    Start the service *`formula`* immediately and register it to launch at login (or *`boot`*).
 
-    [`sudo`] `brew services stop` (*`formula`*|`--all`):
-    Stop the service *`formula`* immediately and unregister it from launching at login (or boot).
+    [*`sudo`*] `brew services` `stop` *`formula|--all`*
+    Stop the service *`formula`* immediately and unregister it from launching at login (or *`boot`*).
 
-    [`sudo`] `brew services restart` (*`formula`*|`--all`):
-    Stop (if necessary) and start the service *`formula`* immediately and register it to launch at login (or boot).
+    [*`sudo`*] `brew services` `restart` *`formula|--all`*
+    Stop (if necessary) and start the service immediately and register it to launch at login (or *`boot`*).
 
-    [`sudo`] `brew services cleanup`:
+    [*`sudo`*] `brew services` `cleanup`
     Remove all unused services.
 
     If `sudo` is passed, operate on `/Library/LaunchDaemons` (started at boot).
-    Otherwise, operate on `~/Library/LaunchAgents` (started at login).
+    Otherwise, operate on `~/Library/LaunchAgents (started at login)`.
 
     **Homebrew/homebrew-services**: <https://github.com/Homebrew/homebrew-services>
 
@@ -1300,7 +1300,7 @@ Homebrew/brew's Linux support (and Linuxbrew) maintainers are Michka Popoff and 
 
 Homebrew/homebrew-core's other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Izaak Beekman, Sean Molenaar, Jan Viljanen, Viktor Szakats, FX Coudert, Steven Peters, JCount, Misty De Meo and Tom Schoonjans.
 
-Former maintainers with significant contributions include Dominyk Tiller, Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew,  Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
+Former maintainers with significant contributions include Dominyk Tiller, Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew's creator: Max Howell.
 
 ## BUGS
 

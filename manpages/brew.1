@@ -1156,31 +1156,25 @@ Install macOS applications distributed as binaries\.
 Integrates Homebrew formulae with macOS\' \fBlaunchctl\fR manager\.
 .
 .IP
-[\fBsudo\fR] \fBbrew services list\fR
-    List all running services for the current user (or root)\.
+[\fIsudo\fR] \fBbrew services list\fR List all running services for the current user (or \fIroot\fR)
 .
 .IP
-[\fBsudo\fR] \fBbrew services run\fR (\fIformula\fR|\fB\-\-all\fR)
-    Run the service \fIformula\fR without registering to launch at login (or boot)\.
+[\fIsudo\fR] \fBbrew services run\fR \fIformula|\-\-all\fR Run the service \fIformula\fR without starting at login (or boot)\.
 .
 .IP
-[\fBsudo\fR] \fBbrew services start\fR (\fIformula\fR|\fB\-\-all\fR)
-    Start the service \fIformula\fR immediately and register it to launch at login (or boot)\.
+[\fIsudo\fR] \fBbrew services\fR \fBstart\fR \fIformula|\-\-all\fR Start the service \fIformula\fR immediately and register it to launch at login (or \fIboot\fR)\.
 .
 .IP
-[\fBsudo\fR] \fBbrew services stop\fR (\fIformula\fR|\fB\-\-all\fR)
-    Stop the service \fIformula\fR immediately and unregister it from launching at login (or boot)\.
+[\fIsudo\fR] \fBbrew services\fR \fBstop\fR \fIformula|\-\-all\fR Stop the service \fIformula\fR immediately and unregister it from launching at login (or \fIboot\fR)\.
 .
 .IP
-[\fBsudo\fR] \fBbrew services restart\fR (\fIformula\fR|\fB\-\-all\fR)
-    Stop (if necessary) and start the service \fIformula\fR immediately and register it to launch at login (or boot)\.
+[\fIsudo\fR] \fBbrew services\fR \fBrestart\fR \fIformula|\-\-all\fR Stop (if necessary) and start the service immediately and register it to launch at login (or \fIboot\fR)\.
 .
 .IP
-[\fBsudo\fR] \fBbrew services cleanup\fR
-    Remove all unused services\.
+[\fIsudo\fR] \fBbrew services\fR \fBcleanup\fR Remove all unused services\.
 .
 .IP
-If \fBsudo\fR is passed, operate on \fB/Library/LaunchDaemons\fR (started at boot)\. Otherwise, operate on \fB~/Library/LaunchAgents\fR (started at login)\.
+If \fBsudo\fR is passed, operate on \fB/Library/LaunchDaemons\fR (started at boot)\. Otherwise, operate on \fB~/Library/LaunchAgents (started at login)\fR\.
 .
 .IP
 \fBHomebrew/homebrew\-services\fR
