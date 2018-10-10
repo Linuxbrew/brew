@@ -321,7 +321,9 @@ module Cask
     end
 
     def check_https_availability
-      check_url_for_https_availability(cask.url, user_agents: [cask.url.user_agent]) unless cask.url.to_s.empty?
+      unless cask.url.to_s.empty? || cask.url.using
+        check_url_for_https_availability(cask.url, user_agents: [cask.url.user_agent])
+      end
       check_url_for_https_availability(cask.appcast) unless cask.appcast.to_s.empty?
       check_url_for_https_availability(cask.homepage) unless cask.homepage.to_s.empty?
     end
