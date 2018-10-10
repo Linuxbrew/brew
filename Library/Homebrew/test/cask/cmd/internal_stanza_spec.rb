@@ -3,7 +3,7 @@ describe Cask::Cmd::InternalStanza, :cask do
     command = described_class.new("homepage", "local-caffeine")
     expect {
       command.run
-    }.to output("https://example.com/local-caffeine\n").to_stdout
+    }.to output("https://example.com\n").to_stdout
   end
 
   it "raises an exception when stanza is unknown/unsupported" do

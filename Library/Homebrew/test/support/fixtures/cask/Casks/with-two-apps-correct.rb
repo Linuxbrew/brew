@@ -3,7 +3,7 @@ cask 'with-two-apps-correct' do
   sha256 '3178fbfd1ea5d87a2a0662a4eb599ebc9a03888e73f37538d9f3f6ee69d2368e'
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeines.zip"
-  homepage 'https://example.com/local-caffeine'
+  homepage 'https://example.com'
 
   app 'Caffeine Mini.app'
   app 'Caffeine Pro.app'

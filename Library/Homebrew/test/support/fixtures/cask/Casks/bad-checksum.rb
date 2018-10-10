@@ -3,7 +3,7 @@ cask 'bad-checksum' do
   sha256 'badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadb'
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
-  homepage 'https://example.com/local-caffeine'
+  homepage 'https://example.com'
 
   app 'Caffeine.app'
 end
