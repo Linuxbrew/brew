@@ -382,7 +382,7 @@ class Tap
   # an array of all {Formula} files of this {Tap}.
   def formula_files
     @formula_files ||= if formula_dir.directory?
-      formula_dir.children.select { |file| file.extname == ".rb" }
+      formula_dir.children.select(&method(:ruby_file?))
     else
       []
     end
@@ -391,10 +391,16 @@ class Tap
   # an array of all {Cask} files of this {Tap}.
   def cask_files
     @cask_files ||= if cask_dir.directory?
-      cask_dir.children.select { |file| file.extname == ".rb" }
+      cask_dir.children.select(&method(:ruby_file?))
     else
       []
     end
+  end
+
+  # returns true if the file has a Ruby extension
+  # @private
+  def ruby_file?(file)
+    file.extname == ".rb"
   end
 
   # return true if given path would present a {Formula} file in this {Tap}.
@@ -403,7 +409,7 @@ class Tap
   def formula_file?(file)
     file = Pathname.new(file) unless file.is_a? Pathname
     file = file.expand_path(path)
-    file.extname == ".rb" && file.parent == formula_dir
+    ruby_file?(file) && file.parent == formula_dir
   end
 
   # return true if given path would present a {Cask} file in this {Tap}.
@@ -412,7 +418,7 @@ class Tap
   def cask_file?(file)
     file = Pathname.new(file) unless file.is_a? Pathname
     file = file.expand_path(path)
-    file.extname == ".rb" && file.parent == cask_dir
+    ruby_file?(file) && file.parent == cask_dir
   end
 
   # an array of all {Formula} names of this {Tap}.
