@@ -111,7 +111,7 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
   file_match = details[:file_hash] == secure_details[:file_hash]
 
   if etag_match || content_length_match || file_match
-    return "The URL #{url} should use HTTPS rather than HTTP"
+    return curl_check_http_redirections(secure_url, original_url: url, user_agents: user_agents)
   end
 
   return unless check_content
@@ -122,7 +122,7 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
 
   # Check for the same content after removing all protocols
   if details[:file] == secure_details[:file]
-    return "The URL #{url} should use HTTPS rather than HTTP"
+    return curl_check_http_redirections(secure_url, original_url: url, user_agents: user_agents)
   end
 
   return unless strict
@@ -142,7 +142,7 @@ end
 def curl_http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
   max_time = hash_needed ? "600" : "25"
   output, = curl_output(
-    "--connect-timeout", "15", "--include", "--max-time", max_time, "--location", url,
+    "--connect-timeout", "15", "--include", "--max-time", max_time, "--location", url, "--head",
     user_agent: user_agent
   )
 
@@ -161,4 +161,32 @@ def curl_http_content_headers_and_checksum(url, hash_needed: false, user_agent: 
     file_hash: output_hash,
     file: output,
   }
+end
+
+def curl_check_http_redirections(url, original_url: nil, user_agents: [:default])
+  out, _, status= curl_output("--location", "--silent", "--head", url.to_s)
+
+  lines = status.success? ? out.lines.map(&:chomp) : []
+
+  locations = lines.map { |line| line[/^Location:\s*(.*)$/i, 1] }
+                   .compact
+
+  redirect_url = locations.reduce(url) do |current_url, location|
+    if location.start_with?("/")
+      uri = URI(current_url)
+      "#{uri.scheme}://#{uri.host}#{location}"
+    else
+      location
+    end
+  end
+
+  if original_url.start_with?("https://")
+    unless redirect_url.start_with?("https://")
+      return "The URL #{original_url} redirects back to HTTP"
+    end
+  elsif url.start_with?("https://")
+    if redirect_url.start_with?("https://")
+      return "The URL #{original_url} should use HTTPS rather than HTTP"
+    end
+  end
 end
