@@ -60,7 +60,7 @@ module Cask
       download = audit_download? && Download.new(cask, quarantine: quarantine?)
       audit = Audit.new(cask, download:              download,
                               check_token_conflicts: check_token_conflicts?,
-                              commit_range: commit_range)
+                              commit_range:          commit_range)
       audit.run!
       puts audit.summary
       audit.success?

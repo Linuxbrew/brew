@@ -321,6 +321,7 @@ module Cask
     end
 
     def check_https_availability
+      return unless download
       unless cask.url.to_s.empty? || cask.url.using
         check_url_for_https_availability(cask.url, user_agents: [cask.url.user_agent])
       end

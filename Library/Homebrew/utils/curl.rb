@@ -92,6 +92,12 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
     return "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
   end
 
+  if url.start_with?("https://") && ENV["HOMEBREW_NO_INSECURE_REDIRECT"]
+    unless details[:final_url].start_with?("https://")
+      return "The URL #{url} redirects back to HTTP"
+    end
+  end
+
   return unless hash_needed
 
   secure_url = url.sub "http", "https"
@@ -111,7 +117,9 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
   file_match = details[:file_hash] == secure_details[:file_hash]
 
   if etag_match || content_length_match || file_match
-    return curl_check_http_redirections(secure_url, original_url: url, user_agents: user_agents)
+    if secure_details[:final_url].start_with?("https://")
+      return "The URL #{url} should use HTTPS rather than HTTP" if url.start_with?("http://")
+    end
   end
 
   return unless check_content
@@ -122,7 +130,9 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
 
   # Check for the same content after removing all protocols
   if details[:file] == secure_details[:file]
-    return curl_check_http_redirections(secure_url, original_url: url, user_agents: user_agents)
+    if secure_details[:final_url].start_with?("https://")
+      return "The URL #{url} should use HTTPS rather than HTTP" if url.start_with?("http://")
+    end
   end
 
   return unless strict
@@ -142,7 +152,7 @@ end
 def curl_http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
   max_time = hash_needed ? "600" : "25"
   output, = curl_output(
-    "--connect-timeout", "15", "--include", "--max-time", max_time, "--location", url, "--head",
+    "--connect-timeout", "15", "--include", "--max-time", max_time, "--location", url,
     user_agent: user_agent
   )
 
@@ -150,43 +160,25 @@ def curl_http_content_headers_and_checksum(url, hash_needed: false, user_agent: 
   while status_code == :unknown || status_code.to_s.start_with?("3")
     headers, _, output = output.partition("\r\n\r\n")
     status_code = headers[%r{HTTP\/.* (\d+)}, 1]
+    location = headers[/^Location:\s*(.*)$/i, 1]
+    # puts "URL: #{url}, location: #{location.inspect}, status: #{status_code}"
+    # puts headers
+    unless location.nil?
+      final_url = location.chomp
+    end
   end
 
   output_hash = Digest::SHA256.digest(output) if hash_needed
 
+  final_url = url if final_url.nil?
+
   {
+    url: url,
+    final_url: final_url,
     status: status_code,
     etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
     content_length: headers[/Content-Length: (\d+)/, 1],
     file_hash: output_hash,
     file: output,
   }
-end
-
-def curl_check_http_redirections(url, original_url: nil, user_agents: [:default])
-  out, _, status= curl_output("--location", "--silent", "--head", url.to_s)
-
-  lines = status.success? ? out.lines.map(&:chomp) : []
-
-  locations = lines.map { |line| line[/^Location:\s*(.*)$/i, 1] }
-                   .compact
-
-  redirect_url = locations.reduce(url) do |current_url, location|
-    if location.start_with?("/")
-      uri = URI(current_url)
-      "#{uri.scheme}://#{uri.host}#{location}"
-    else
-      location
-    end
-  end
-
-  if original_url.start_with?("https://")
-    unless redirect_url.start_with?("https://")
-      return "The URL #{original_url} redirects back to HTTP"
-    end
-  elsif url.start_with?("https://")
-    if redirect_url.start_with?("https://")
-      return "The URL #{original_url} should use HTTPS rather than HTTP"
-    end
-  end
 end
