@@ -663,17 +663,21 @@ module Homebrew
         end
       end
 
-      if @core_tap && (formula.head || formula.devel)
-        unstable_spec_message = "Formulae should not have a `HEAD` or `devel` spec"
+      if @core_tap && formula.devel
+        problem "Formulae should not have a `devel` spec"
+      end
+
+      if @core_tap && formula.head
+        head_spec_message = "Formulae should not have a `HEAD` spec"
         if @new_formula
-          new_formula_problem unstable_spec_message
+          new_formula_problem head_spec_message
         elsif @versioned_formula
-          versioned_unstable_spec = %w[
+          versioned_head_spec = %w[
             bash-completion@2
             imagemagick@6
             python@2
           ]
-          problem unstable_spec_message unless versioned_unstable_spec.include?(formula.name)
+          problem head_spec_message unless versioned_head_spec.include?(formula.name)
         end
       end
 
