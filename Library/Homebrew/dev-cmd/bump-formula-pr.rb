@@ -36,9 +36,6 @@
 #:    If `--quiet` is passed, don't output replacement messages or warn about
 #:    duplicate pull requests.
 #:
-#:    If `--no-fork` is passed, create a pull request from a branch in the tap
-#:    repository rather than a fork.
-#:
 #:    Note that this command cannot be used to transition a formula from a
 #:    URL-and-sha256 style specification into a tag-and-revision style
 #:    specification, nor vice versa. It must use whichever style specification
@@ -82,8 +79,6 @@ module Homebrew
         description: "Run `brew audit --strict` before opening the PR."
       switch "--no-browse",
         description: "Output the pull request URL instead of opening in a browser"
-      switch "--no-fork",
-        description: "Create pull request directly from tap repo, not a fork"
       flag "--url=",
         description: "Provide new <URL> for the formula. If a <URL> is specified, the <sha-256> "\
                      "checksum of the new download must also be specified."
@@ -350,7 +345,7 @@ module Homebrew
       shallow = !git_dir.empty? && File.exist?("#{git_dir}/shallow")
 
       if args.dry_run?
-        ohai "fork repository with GitHub API" unless args.no_fork?
+        ohai "try to fork repository with GitHub API"
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} " \
@@ -360,18 +355,10 @@ module Homebrew
         ohai "git checkout -"
       else
 
-        if args.no_fork?
-          remote_url = Utils.popen_read("git remote get-url --push origin").chomp
-          username = remote_url.match(%r{\A(?:\w+://.*/|[^/]*:)(.*)/})[1]
-        else
-          begin
-            response = GitHub.create_fork(formula.tap.full_name)
-            # GitHub API responds immediately but fork takes a few seconds to be ready.
-            sleep 3
-          rescue *GitHub.api_errors => e
-            formula.path.atomic_write(backup_file) unless args.dry_run?
-            odie "Unable to fork: #{e.message}!"
-          end
+        begin
+          response = GitHub.create_fork(formula.tap.full_name)
+          # GitHub API responds immediately but fork takes a few seconds to be ready.
+          sleep 3
 
           if system("git", "config", "--local", "--get-regexp", "remote\..*\.url", "git@github.com:.*")
             remote_url = response.fetch("ssh_url")
@@ -379,6 +366,18 @@ module Homebrew
             remote_url = response.fetch("clone_url")
           end
           username = response.fetch("owner").fetch("login")
+        rescue *GitHub.api_errors
+          # If the repository is private, forking might be disabled.
+          # Create branches in the repository itself instead.
+          remote_url = Utils.popen_read("git remote get-url --push origin").chomp
+          username = formula.tap.user
+          repo_name = "homebrew-#{formula.tap.repo}"
+          unless GitHub.repository(username, repo_name).fetch("private")
+            raise
+          end
+        rescue *GitHub.api_errors => e
+          formula.path.atomic_write(backup_file) unless args.dry_run?
+          odie "Unable to fork: #{e.message}!"
         end
 
         safe_system "git", "fetch", "--unshallow", "origin" if shallow
