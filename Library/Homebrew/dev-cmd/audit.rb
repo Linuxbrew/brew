@@ -260,8 +260,8 @@ module Homebrew
       @except = options[:except]
       # Accept precomputed style offense results, for efficiency
       @style_offenses = options[:style_offenses]
-      # Allow the actual official-ness of a formula to be overridden, for testing purposes
-      @official_tap = formula.tap&.official? || options[:official_tap]
+      # Allow the formula tap to be set as `core`, for testing purposes
+      @core_tap = formula.tap&.core_tap? || options[:core_tap]
       @problems = []
       @new_formula_problems = []
       @text = FormulaText.new(formula.path)
@@ -338,7 +338,7 @@ module Homebrew
         end
         valid_alias_names = [alias_name_major, alias_name_major_minor]
 
-        unless formula.tap&.core_tap?
+        unless @core_tap
           versioned_aliases.map! { |a| "#{formula.tap}/#{a}" }
           valid_alias_names.map! { |a| "#{formula.tap}/#{a}" }
         end
@@ -374,8 +374,7 @@ module Homebrew
 
     def audit_formula_name
       return unless @strict
-      # skip for non-official taps
-      return unless @official_tap
+      return unless @core_tap
 
       name = formula.name
 
@@ -432,7 +431,7 @@ module Homebrew
 
           if @new_formula && dep_f.keg_only_reason &&
              !["openssl", "apr", "apr-util"].include?(dep.name) &&
-             (!["openblas"].include?(dep.name) || @official_tap) &&
+             (!["openblas"].include?(dep.name) || @core_tap) &&
              dep_f.keg_only_reason.reason == :provided_by_macos
             new_formula_problem(
               "Dependency '#{dep.name}' may be unnecessary as it is provided " \
@@ -462,7 +461,7 @@ module Homebrew
           end
 
           next unless @new_formula
-          next unless @official_tap
+          next unless @core_tap
 
           if dep.tags.include?(:recommended) || dep.tags.include?(:optional)
             new_formula_problem options_message
@@ -470,7 +469,7 @@ module Homebrew
         end
 
         next unless @new_formula
-        next unless @official_tap
+        next unless @core_tap
 
         if spec.requirements.map(&:recommended?).any? || spec.requirements.map(&:optional?).any?
           new_formula_problem options_message
@@ -556,7 +555,7 @@ module Homebrew
         ]
         return if bottle_disabled_whitelist.include?(formula.name)
 
-        problem "Formulae should not use `bottle :disabled`" if @official_tap
+        problem "Formulae should not use `bottle :disabled`" if @core_tap
       end
     end
 
@@ -580,7 +579,7 @@ module Homebrew
       return if metadata.nil?
 
       new_formula_problem "GitHub fork (not canonical repository)" if metadata["fork"]
-      if formula&.tap&.core_tap? &&
+      if @core_tap &&
          (metadata["forks_count"] < 30) && (metadata["subscribers_count"] < 30) &&
          (metadata["stargazers_count"] < 75)
         new_formula_problem "GitHub repository not notable enough (<30 forks, <30 watchers and <75 stars)"
@@ -643,7 +642,7 @@ module Homebrew
         end
       end
 
-      if @official_tap && (formula.head || formula.devel)
+      if @core_tap && (formula.head || formula.devel)
         unstable_spec_message = "Formulae should not have a `HEAD` or `devel` spec"
         if @new_formula
           new_formula_problem unstable_spec_message
@@ -867,8 +866,8 @@ module Homebrew
 
       return unless @strict
 
-      if @official_tap && line.include?("env :std")
-        problem "`env :std` in official tap formulae is deprecated"
+      if @core_tap && line.include?("env :std")
+        problem "`env :std` in `core` formulae is deprecated"
       end
 
       if line.include?("env :userpaths")
@@ -899,9 +898,9 @@ module Homebrew
     end
 
     def audit_reverse_migration
-      # Only enforce for new formula being re-added to core and official taps
+      # Only enforce for new formula being re-added to core
       return unless @strict
-      return unless @official_tap
+      return unless @core_tap
       return unless formula.tap.tap_migrations.key?(formula.name)
 
       problem <<~EOS
@@ -923,13 +922,13 @@ module Homebrew
     end
 
     def audit_url_is_not_binary
-      return unless @official_tap
+      return unless @core_tap
 
       urls = @specs.map(&:url)
 
       urls.each do |url|
         if url =~ /darwin/i && (url =~ /x86_64/i || url =~ /amd64/i)
-          problem "#{url} looks like a binary package, not a source archive. Official taps are source-only."
+          problem "#{url} looks like a binary package, not a source archive. The `core` tap is source-only."
         end
       end
     end
