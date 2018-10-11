@@ -4,6 +4,7 @@ jobs:
     vmImage: xcode9-macos10.13
   steps:
     - bash: |
+        sudo xcode-select --switch /Applications/Xcode_10.app/Contents/Developer
         HOMEBREW_REPOSITORY="$(brew --repo)"
         mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library"
         sudo rm -rf "$HOMEBREW_REPOSITORY"
