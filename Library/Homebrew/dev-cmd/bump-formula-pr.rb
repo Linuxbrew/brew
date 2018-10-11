@@ -366,15 +366,12 @@ module Homebrew
             remote_url = response.fetch("clone_url")
           end
           username = response.fetch("owner").fetch("login")
-        rescue *GitHub.api_errors
+        rescue GitHub::AuthenticationFailedError => e
+          raise unless e.github_message =~ /forking is disabled/
           # If the repository is private, forking might be disabled.
           # Create branches in the repository itself instead.
           remote_url = Utils.popen_read("git remote get-url --push origin").chomp
           username = formula.tap.user
-          repo_name = "homebrew-#{formula.tap.repo}"
-          unless GitHub.repository(username, repo_name).fetch("private")
-            raise
-          end
         rescue *GitHub.api_errors => e
           formula.path.atomic_write(backup_file) unless args.dry_run?
           odie "Unable to fork: #{e.message}!"
