@@ -345,7 +345,7 @@ module Homebrew
       shallow = !git_dir.empty? && File.exist?("#{git_dir}/shallow")
 
       if args.dry_run?
-        ohai "fork repository with GitHub API"
+        ohai "try to fork repository with GitHub API"
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} " \
@@ -359,17 +359,23 @@ module Homebrew
           response = GitHub.create_fork(formula.tap.full_name)
           # GitHub API responds immediately but fork takes a few seconds to be ready.
           sleep 3
+
+          if system("git", "config", "--local", "--get-regexp", "remote\..*\.url", "git@github.com:.*")
+            remote_url = response.fetch("ssh_url")
+          else
+            remote_url = response.fetch("clone_url")
+          end
+          username = response.fetch("owner").fetch("login")
+        rescue GitHub::AuthenticationFailedError => e
+          raise unless e.github_message =~ /forking is disabled/
+          # If the repository is private, forking might be disabled.
+          # Create branches in the repository itself instead.
+          remote_url = Utils.popen_read("git remote get-url --push origin").chomp
+          username = formula.tap.user
         rescue *GitHub.api_errors => e
           formula.path.atomic_write(backup_file) unless args.dry_run?
           odie "Unable to fork: #{e.message}!"
         end
-
-        if system("git", "config", "--local", "--get-regexp", "remote\..*\.url", "git@github.com:.*")
-          remote_url = response.fetch("ssh_url")
-        else
-          remote_url = response.fetch("clone_url")
-        end
-        username = response.fetch("owner").fetch("login")
 
         safe_system "git", "fetch", "--unshallow", "origin" if shallow
         safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
