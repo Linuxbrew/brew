@@ -158,6 +158,8 @@ shared_examples "#uninstall_phase or #zap_phase" do
       let(:glob_path1) { Pathname.new("#{dir}/glob_path1") }
       let(:glob_path2) { Pathname.new("#{dir}/glob_path2") }
       let(:paths) { [absolute_path, path_with_tilde, glob_path1, glob_path2] }
+      let(:fake_system_command) { NeverSudoSystemCommand }
+      let(:cask) { Cask::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-#{directive}")) }
 
       around(:each) do |example|
         begin
@@ -170,9 +172,6 @@ shared_examples "#uninstall_phase or #zap_phase" do
           FileUtils.rm_f paths
         end
       end
-
-      let(:fake_system_command) { NeverSudoSystemCommand }
-      let(:cask) { Cask::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-#{directive}")) }
 
       before(:each) do
         allow_any_instance_of(Cask::Artifact::AbstractUninstall).to receive(:trash_paths)
