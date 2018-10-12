@@ -33,7 +33,7 @@ module GitHub
         GitHub API Error: #{github_message}
         Try again in #{pretty_ratelimit_reset(reset)}, or create a personal access token:
           #{ALL_SCOPES_URL}
-        and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
+        #{Utils::Shell.set_variable_in_profile("HOMEBREW_GITHUB_API_TOKEN", "your_token_here")}
       EOS
     end
 
@@ -58,7 +58,7 @@ module GitHub
             printf "protocol=https\\nhost=github.com\\n" | git credential-osxkeychain erase
           Or create a personal access token:
             #{ALL_SCOPES_URL}
-          and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
+          #{Utils::Shell.set_variable_in_profile("HOMEBREW_GITHUB_API_TOKEN", "your_token_here")}
         EOS
       end
       super message
@@ -124,7 +124,7 @@ module GitHub
             Scopes they need: #{needed_human_scopes}
             Scopes they have: #{credentials_scopes}
             Create a personal access token: #{ALL_SCOPES_URL}
-            and then set HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
+            #{Utils::Shell.set_variable_in_profile("HOMEBREW_GITHUB_API_TOKEN", "your_token_here")}
           EOS
         when :environment
           onoe <<~EOS
@@ -132,7 +132,7 @@ module GitHub
             Scopes they need: #{needed_human_scopes}
             Scopes it has: #{credentials_scopes}
             Create a new personal access token: #{ALL_SCOPES_URL}
-            and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
+            #{Utils::Shell.set_variable_in_profile("HOMEBREW_GITHUB_API_TOKEN", "your_token_here")}
           EOS
         end
       end
