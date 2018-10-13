@@ -79,9 +79,9 @@ class LinkageChecker
     keg_files_dylibs = nil
 
     if rebuild_cache
-      store&.flush_cache!
+      store&.delete!
     else
-      keg_files_dylibs = store&.fetch_type(:keg_files_dylibs)
+      keg_files_dylibs = store&.fetch(:keg_files_dylibs)
     end
 
     keg_files_dylibs_was_empty = false

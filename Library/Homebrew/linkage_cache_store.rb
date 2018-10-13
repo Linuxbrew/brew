@@ -41,7 +41,7 @@ class LinkageCacheStore < CacheStore
   # @param  [Symbol] the type to fetch from the `LinkageCacheStore`
   # @raise  [TypeError] error if the type is not in `HASH_LINKAGE_TYPES`
   # @return [Hash]
-  def fetch_type(type)
+  def fetch(type)
     unless HASH_LINKAGE_TYPES.include?(type)
       raise TypeError, <<~EOS
         Can't fetch types that are not defined for the linkage store
@@ -53,8 +53,10 @@ class LinkageCacheStore < CacheStore
     fetch_hash_values(type)
   end
 
+  # Delete the keg from the `LinkageCacheStore`
+  #
   # @return [nil]
-  def flush_cache!
+  def delete!
     database.delete(@keg_path)
   end
 

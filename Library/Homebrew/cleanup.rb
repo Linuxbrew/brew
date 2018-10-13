@@ -161,7 +161,7 @@ module Homebrew
         cleanup_portable_ruby
         return if dry_run?
 
-        cleanup_linkage_db
+        cleanup_old_cache_db
         rm_ds_store
       else
         args.each do |arg|
@@ -325,8 +325,12 @@ module Homebrew
       end
     end
 
-    def cleanup_linkage_db
-      FileUtils.rm_rf [cache/"linkage.db", cache/"linkage.db.db"]
+    def cleanup_old_cache_db
+      FileUtils.rm_rf [
+        cache/"desc_cache.json",
+        cache/"linkage.db",
+        cache/"linkage.db.db",
+      ]
     end
 
     def rm_ds_store(dirs = nil)
