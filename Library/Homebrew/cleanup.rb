@@ -152,13 +152,13 @@ module Homebrew
 
     def clean!
       if args.empty?
-        cleanup_lockfiles
         Formula.installed.sort_by(&:name).each do |formula|
           cleanup_formula(formula)
         end
         cleanup_cache
         cleanup_logs
         cleanup_portable_ruby
+        cleanup_lockfiles
         return if dry_run?
 
         cleanup_old_cache_db
@@ -221,14 +221,27 @@ module Homebrew
       return if dry_run?
       return unless (cache/"downloads").directory?
 
-      # We can't use `.reject(&:incomplete?) here due to the refinement scope.
-      downloads = (cache/"downloads").children.reject { |path| path.incomplete? } # rubocop:disable Style/SymbolProc
+      downloads = (cache/"downloads").children
+
       referenced_downloads = [cache, cache/"Cask"].select(&:directory?)
                                                   .flat_map(&:children)
                                                   .select(&:symlink?)
                                                   .map(&:resolved_path)
 
-      (downloads - referenced_downloads).each(&:unlink)
+      (downloads - referenced_downloads).each do |download|
+        if download.incomplete?
+          begin
+            LockFile.new(download.basename).with_lock do
+              download.unlink
+            end
+          rescue OperationInProgressError
+            # Skip incomplete downloads which are still in progress.
+            next
+          end
+        else
+          download.unlink
+        end
+      end
     end
 
     def cleanup_cache(entries = nil)
