@@ -183,9 +183,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
       end
 
       it "is supported" do
-        paths.each do |path|
-          expect(path).to exist
-        end
+        expect(paths).to all(exist)
 
         subject
 

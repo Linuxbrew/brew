@@ -79,11 +79,6 @@ RSpec/InstanceVariable:
     - 'version_spec.rb'
 
 # Offense count: 1
-RSpec/IteratedExpectation:
-  Exclude:
-    - 'cask/artifact/uninstall_zap_shared_examples.rb'
-
-# Offense count: 1
 # Cop supports --auto-correct.
 RSpec/LeadingSubject:
   Exclude:
