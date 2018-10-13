@@ -1,5 +1,6 @@
 require "extend/cachable"
 require "readall"
+require "description_cache_store"
 
 # a {Tap} is used to extend the formulae provided by Homebrew core.
 # Usually, it's synced with a remote git repository. And it's likely
@@ -299,7 +300,10 @@ class Tap
 
     formatted_contents = contents.presence&.to_sentence&.dup&.prepend(" ")
     puts "Tapped#{formatted_contents} (#{path.abv})." unless quiet
-    Descriptions.cache_formulae(formula_names)
+    CacheStoreDatabase.use(:descriptions) do |db|
+      DescriptionCacheStore.new(db)
+                           .update_from_formula_names!(formula_names)
+    end
 
     return if options[:clone_target]
     return unless private?
@@ -331,7 +335,10 @@ class Tap
     formatted_contents = contents.presence&.to_sentence&.dup&.prepend(" ")
 
     unpin if pinned?
-    Descriptions.uncache_formulae(formula_names)
+    CacheStoreDatabase.use(:descriptions) do |db|
+      DescriptionCacheStore.new(db)
+                           .delete_from_formula_names!(formula_names)
+    end
     Utils::Link.unlink_manpages(path)
     Utils::Link.unlink_completions(path)
     path.rmtree

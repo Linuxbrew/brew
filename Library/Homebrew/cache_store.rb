@@ -49,6 +49,28 @@ class CacheStoreDatabase
     cache_path.exist?
   end
 
+  # Returns the modification time of the cache file (if it already exists).
+  #
+  # @return [Time]
+  def mtime
+    return unless created?
+    cache_path.mtime
+  end
+
+  # Performs a `select` on the underlying database.
+  #
+  # @return [Array]
+  def select(&block)
+    db.select(&block)
+  end
+
+  # Returns `true` if the cache is empty.
+  #
+  # @return [Boolean]
+  def empty?
+    db.empty?
+  end
+
   private
 
   # Lazily loaded database in read/write mode. If this method is called, a
@@ -105,14 +127,14 @@ class CacheStore
   # stored
   #
   # @abstract
-  def fetch_type(*)
+  def fetch(*)
     raise NotImplementedError
   end
 
   # Deletes data from the cache based on a condition defined in a concrete class
   #
   # @abstract
-  def flush_cache!
+  def delete!(*)
     raise NotImplementedError
   end
 

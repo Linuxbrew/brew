@@ -10,6 +10,7 @@
 
 require "descriptions"
 require "search"
+require "description_cache_store"
 
 module Homebrew
   module_function
@@ -21,23 +22,27 @@ module Homebrew
     search_type << :either if ARGV.flag? "--search"
     search_type << :name   if ARGV.flag? "--name"
     search_type << :desc   if ARGV.flag? "--description"
+    if search_type.size > 1
+      odie "Pick one, and only one, of -s/--search, -n/--name, or -d/--description."
+    elsif search_type.present? && ARGV.named.empty?
+      odie "You must provide a search term."
+    end
 
-    if search_type.empty?
+    results = if search_type.empty?
       raise FormulaUnspecifiedError if ARGV.named.empty?
 
       desc = {}
       ARGV.formulae.each { |f| desc[f.full_name] = f.desc }
-      results = Descriptions.new(desc)
-      results.print
-    elsif search_type.size > 1
-      odie "Pick one, and only one, of -s/--search, -n/--name, or -d/--description."
-    elsif !ARGV.named.empty?
+      Descriptions.new(desc)
+    else
       arg = ARGV.named.join(" ")
       string_or_regex = query_regexp(arg)
-      results = Descriptions.search(string_or_regex, search_type.first)
-      results.print
-    else
-      odie "You must provide a search term."
+      CacheStoreDatabase.use(:descriptions) do |db|
+        cache_store = DescriptionCacheStore.new(db)
+        Descriptions.search(string_or_regex, search_type.first, cache_store)
+      end
     end
+
+    results.print
   end
 end

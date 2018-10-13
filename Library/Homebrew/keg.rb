@@ -303,7 +303,7 @@ class Keg
     CacheStoreDatabase.use(:linkage) do |db|
       break unless db.created?
 
-      LinkageCacheStore.new(path, db).flush_cache!
+      LinkageCacheStore.new(path, db).delete!
     end
 
     path.rmtree
