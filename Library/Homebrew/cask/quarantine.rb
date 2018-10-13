@@ -136,7 +136,15 @@ module Cask
 
       resolved_paths = Pathname.glob(to/"**/*", File::FNM_DOTMATCH)
 
-      system_command!("/bin/chmod", args: ["-R", "u+w", to])
+      system_command!("/usr/bin/xargs",
+                      args: [
+                        "-0",
+                        "--",
+                        "/bin/chmod",
+                        "-h",
+                        "u+w",
+                      ],
+                      input: resolved_paths.join("\0"))
 
       quarantiner = system_command("/usr/bin/xargs",
                                    args: [
