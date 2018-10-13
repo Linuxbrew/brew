@@ -39,6 +39,7 @@ class CacheStoreDatabase
   # Closes the underlying database (if it is created and open).
   def close_if_open!
     return unless @db
+    cache_path.dirname.mkpath
     cache_path.atomic_write(JSON.dump(@db))
   end
 
