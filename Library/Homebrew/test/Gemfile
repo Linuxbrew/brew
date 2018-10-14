@@ -8,7 +8,6 @@ gem "rspec-its", require: false
 gem "rspec-retry", require: false
 gem "rspec-wait", require: false
 gem "rubocop", HOMEBREW_RUBOCOP_VERSION
-gem "rubocop-rspec", require: false
 
 group :development do
   gem "ronn", require: false
