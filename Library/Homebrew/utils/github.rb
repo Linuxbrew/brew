@@ -123,7 +123,8 @@ module GitHub
             Your macOS keychain GitHub credentials do not have sufficient scope!
             Scopes they need: #{needed_human_scopes}
             Scopes they have: #{credentials_scopes}
-            Create a personal access token: #{ALL_SCOPES_URL}
+            Create a personal access token:
+              #{ALL_SCOPES_URL}
             #{Utils::Shell.set_variable_in_profile("HOMEBREW_GITHUB_API_TOKEN", "your_token_here")}
           EOS
         when :environment
@@ -131,7 +132,8 @@ module GitHub
             Your HOMEBREW_GITHUB_API_TOKEN does not have sufficient scope!
             Scopes they need: #{needed_human_scopes}
             Scopes it has: #{credentials_scopes}
-            Create a new personal access token: #{ALL_SCOPES_URL}
+            Create a new personal access token:
+              #{ALL_SCOPES_URL}
             #{Utils::Shell.set_variable_in_profile("HOMEBREW_GITHUB_API_TOKEN", "your_token_here")}
           EOS
         end

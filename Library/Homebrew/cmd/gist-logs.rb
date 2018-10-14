@@ -42,7 +42,7 @@ module Homebrew
     if GitHub.api_credentials_type == :none
       puts <<~EOS
         You can create a new personal access token:
-         #{GitHub::ALL_SCOPES_URL}
+          #{GitHub::ALL_SCOPES_URL}
         #{Utils::Shell.set_variable_in_profile("HOMEBREW_GITHUB_API_TOKEN", "your_token_here")}
 
       EOS
