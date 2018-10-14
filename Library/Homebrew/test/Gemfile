@@ -17,4 +17,5 @@ end
 group :coverage do
   gem "codecov", require: false
   gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
 end
