@@ -5,7 +5,7 @@ AllCops:
     - '**/vendor/**/*'
   DisplayCopNames: false
 
-require: 
+require:
   - ./Homebrew/rubocops.rb
   - rubocop-rspec
 
@@ -102,7 +102,7 @@ Metrics/ParameterLists:
 
 # GitHub diff UI wraps beyond 118 characters (so that's the goal)
 Metrics/LineLength:
-  Max: 189
+  Max: 170
   # ignore manpage comments and long single-line strings
   IgnoredPatterns: ['#: ', ' url "', ' mirror "', ' plist_options :']
 
