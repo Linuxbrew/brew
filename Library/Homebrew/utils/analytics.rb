@@ -83,7 +83,7 @@ module Utils
         return if exception.formula.tap.private?
 
         action = exception.formula.full_name
-        if (options = exception.options)
+        if (options = exception.options&.to_a&.join(" "))
           action = "#{action} #{options}".strip
         end
         report_event("BuildError", action)
