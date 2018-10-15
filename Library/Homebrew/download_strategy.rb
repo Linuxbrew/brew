@@ -277,6 +277,9 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
   end
 
   def fetch
+    download_lock = LockFile.new(temporary_path.basename)
+    download_lock.lock
+
     urls = [url, *mirrors]
 
     begin
@@ -308,6 +311,8 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       puts "Trying a mirror..."
       retry
     end
+  ensure
+    download_lock.unlock
   end
 
   def clear_cache
