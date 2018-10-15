@@ -223,15 +223,16 @@ module Homebrew
   end
 
   def generate_option_doc(short, long, desc)
-    "* #{format_short_opt(short)}#{format_long_opt(long)}:" + "\n  " + desc + "\n"
+    comma = (short && long) ? ", " : ""
+    "* #{format_short_opt(short)}" + comma + "#{format_long_opt(long)}:" + "\n  " + desc + "\n"
   end
 
   def format_short_opt(opt)
-    "`#{opt}`, " unless opt.nil?
+    "`#{opt}`" unless opt.nil?
   end
 
   def format_long_opt(opt)
-    "`#{opt}`"
+    "`#{opt}`" unless opt.nil?
   end
 
   def format_usage_banner(usage_banner)
