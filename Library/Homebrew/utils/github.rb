@@ -45,7 +45,7 @@ module GitHub
   class AuthenticationFailedError < Error
     def initialize(github_message)
       @github_message = github_message
-      message = "GitHub #{github_message}\n"
+      message = "GitHub #{github_message}:"
       if ENV["HOMEBREW_GITHUB_API_TOKEN"]
         message << <<~EOS
           HOMEBREW_GITHUB_API_TOKEN may be invalid or expired; check:
@@ -62,6 +62,18 @@ module GitHub
         EOS
       end
       super message
+    end
+  end
+
+  class ValidationFailedError < Error
+    def initialize(github_message, errors)
+      @github_message = if errors.empty?
+        github_message
+      else
+        "#{github_message}: #{errors}"
+      end
+
+      super(@github_message)
     end
   end
 
@@ -231,6 +243,9 @@ module GitHub
       raise AuthenticationFailedError, message
     when "404"
       raise HTTPNotFoundError, message
+    when "422"
+      errors = json&.[]("errors") || []
+      raise ValidationFailedError.new(message, errors)
     else
       raise Error, message
     end
