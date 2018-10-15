@@ -24,7 +24,7 @@ module Homebrew
   def tests_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `tests` [<options>]:
+        `tests` [<options>]
 
         Run Homebrew's unit and integration tests.
       EOS

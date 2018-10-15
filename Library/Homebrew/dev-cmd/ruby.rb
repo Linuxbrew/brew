@@ -11,7 +11,7 @@ module Homebrew
   def ruby_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `ruby` [<ruby options>]:
+        `ruby` [<ruby options>]
 
         Run a Ruby instance with Homebrew's libraries loaded.
 

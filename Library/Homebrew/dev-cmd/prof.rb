@@ -9,7 +9,7 @@ module Homebrew
   def prof_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `prof` [<ruby options>]:
+        `prof` [<ruby options>]
 
         Run Homebrew with the Ruby profiler.
 

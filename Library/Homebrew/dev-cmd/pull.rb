@@ -74,7 +74,7 @@ module Homebrew
   def pull_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `pull` [<options>] <patch sources>:
+        `pull` [<options>] <patch sources>
 
         Get a patch from a GitHub commit or pull request and apply it to Homebrew.
         Optionally, publish updated bottles for the formulae changed by the patch.

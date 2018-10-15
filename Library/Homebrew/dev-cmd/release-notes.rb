@@ -13,7 +13,7 @@ module Homebrew
   def release_notes_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `release-notes` [<options>] [<previous_tag>] [<end_ref>]:
+        `release-notes` [<options>] [<previous_tag>] [<end_ref>]
 
         Print the merged pull requests on Homebrew/brew between two Git refs.
         If no <previous_tag> is provided it defaults to the latest tag.

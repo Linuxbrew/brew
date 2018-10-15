@@ -99,7 +99,7 @@ module Homebrew
   def extract_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `extract` [<options>] <formula> <tap>:
+        `extract` [<options>] <formula> <tap>
 
         Look through repository history to find the most recent version of <formula> and
         create a copy in <tap>`/Formula/`<formula>`@`<version>`.rb`. If the tap is not

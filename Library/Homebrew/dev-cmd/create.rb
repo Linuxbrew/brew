@@ -30,7 +30,7 @@ module Homebrew
   def create_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `create` [<options>] <URL>:
+        `create` [<options>] <URL>
 
         Generate a formula for the downloadable file at <URL> and open it in the editor.
         Homebrew will attempt to automatically derive the formula name and version, but

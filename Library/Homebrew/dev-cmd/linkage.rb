@@ -20,7 +20,7 @@ module Homebrew
   def linkage_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `linkage` [<options>] [<formulae>]:
+        `linkage` [<options>] [<formulae>]
 
         Check the library links for kegs of installed formulae.
         Raises an error if run on uninstalled formulae.
