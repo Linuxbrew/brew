@@ -25,6 +25,7 @@ describe DescriptionCacheStore do
     let(:report) { double(select_formula: [], empty?: false) }
 
     it "reads from the report" do
+      expect(database).to receive(:empty?).at_least(:once).and_return(false)
       cache_store.update_from_report!(report)
     end
   end
@@ -36,6 +37,7 @@ describe DescriptionCacheStore do
         desc "desc"
       end
       expect(Formulary).to receive(:factory).with(f.name).and_return(f)
+      expect(database).to receive(:empty?).and_return(false)
       expect(database).to receive(:set).with(f.name, f.desc)
       cache_store.update_from_formula_names!([f.name])
     end
@@ -43,6 +45,7 @@ describe DescriptionCacheStore do
 
   describe "#delete_from_formula_names!" do
     it "deletes the formulae descriptions" do
+      expect(database).to receive(:empty?).and_return(false)
       expect(database).to receive(:delete).with(formula_name)
       cache_store.delete_from_formula_names!([formula_name])
     end
