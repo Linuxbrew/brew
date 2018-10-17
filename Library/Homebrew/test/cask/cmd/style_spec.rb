@@ -106,7 +106,10 @@ describe Cask::Cmd::Style, :cask do
       end
 
       it "treats all tokens as paths" do
-        expect(subject).to eq(tokens)
+        expect(subject).to eq [
+          Pathname("adium").expand_path,
+          Pathname("Casks/dropbox.rb").expand_path,
+        ]
       end
     end
 

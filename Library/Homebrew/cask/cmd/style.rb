@@ -31,7 +31,7 @@ module Cask
         @cask_paths ||= if args.empty?
           Tap.map(&:cask_dir).select(&:directory?)
         elsif args.any? { |file| File.exist?(file) }
-          args
+          args.map { |path| Pathname(path).expand_path }
         else
           casks.map(&:sourcefile_path)
         end
