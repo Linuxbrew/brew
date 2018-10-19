@@ -4,8 +4,8 @@ class MacOSRequirement < Requirement
   fatal true
 
   def initialize(tags = [])
-    @version = MacOS::Version.from_symbol(tags.first) unless tags.empty?
-    super
+    @version = MacOS::Version.from_symbol(tags.shift) unless tags.empty?
+    super(tags)
   end
 
   def minimum_version_specified?
