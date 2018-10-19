@@ -72,8 +72,8 @@ class AbstractDownloadStrategy
   end
   private :chdir
 
-  # @!attribute [r]
-  # return most recent modified time for all files in the current working directory after stage.
+  # @!attribute [r] source_modified_time
+  # Returns the most recent modified time for all files in the current working directory after stage.
   def source_modified_time
     Pathname.pwd.to_enum(:find).select(&:file?).map(&:mtime).max
   end
@@ -405,7 +405,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
   end
 end
 
-# Detect and download from Apache Mirror
+# Detect and download from Apache Mirror.
 class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
   def mirrors
     return @combined_mirrors if defined?(@combined_mirrors)
@@ -440,7 +440,7 @@ class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
 end
 
 # Download via an HTTP POST.
-# Query parameters on the URL are converted into POST parameters
+# Query parameters on the URL are converted into POST parameters.
 class CurlPostDownloadStrategy < CurlDownloadStrategy
   private
 
@@ -477,7 +477,7 @@ end
 # S3DownloadStrategy downloads tarballs from AWS S3.
 # To use it, add `:using => :s3` to the URL section of your
 # formula.  This download strategy uses AWS access tokens (in the
-# environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
+# environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`)
 # to sign the request.  This strategy is good in a corporate setting,
 # because it lets you use a private S3 bucket as a repo for internal
 # distribution.  (It will work for public buckets as well.)
@@ -510,7 +510,7 @@ end
 # Private Repository. To use it, add
 # `:using => :github_private_repo` to the URL section of
 # your formula. This download strategy uses GitHub access tokens (in the
-# environment variables HOMEBREW_GITHUB_API_TOKEN) to sign the request.  This
+# environment variables `HOMEBREW_GITHUB_API_TOKEN`) to sign the request.  This
 # strategy is suitable for corporate use just like S3DownloadStrategy, because
 # it lets you use a private GitHub repository for internal distribution.  It
 # works with public one, but in that case simply use CurlDownloadStrategy.
@@ -568,7 +568,7 @@ end
 # GitHubPrivateRepositoryReleaseDownloadStrategy downloads tarballs from GitHub
 # Release assets. To use it, add `:using => :github_private_release` to the URL section
 # of your formula. This download strategy uses GitHub access tokens (in the
-# environment variables HOMEBREW_GITHUB_API_TOKEN) to sign the request.
+# environment variables `HOMEBREW_GITHUB_API_TOKEN`) to sign the request.
 class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDownloadStrategy
   def parse_url_pattern
     url_pattern = %r{https://github.com/([^/]+)/([^/]+)/releases/download/([^/]+)/(\S+)}
@@ -615,8 +615,7 @@ end
 # authentication. If a public/private keypair is configured, it will not
 # prompt for a password.
 #
-# Usage:
-#
+# @example
 #   class Abc < Formula
 #     url "scp://example.com/src/abc.1.0.tar.gz"
 #     ...

@@ -61,10 +61,10 @@ class Resource
     downloader.clear_cache
   end
 
-  # Verifies download and unpacks it
+  # Verifies download and unpacks it.
   # The block may call `|resource,staging| staging.retain!` to retain the staging
   # directory. Subclasses that override stage should implement the tmp
-  # dir using Resource#mktemp so that works with all subtypes.
+  # dir using {Mktemp} so that works with all subtypes.
   def stage(target = nil, &block)
     unless target || block
       raise ArgumentError, "target directory or block is required"
@@ -91,8 +91,8 @@ class Resource
   end
 
   # If a target is given, unpack there; else unpack to a temp folder.
-  # If block is given, yield to that block with |stage|, where stage
-  # is a ResourceStagingContext.
+  # If block is given, yield to that block with `|stage|`, where stage
+  # is a {ResourceStageContext}.
   # A target or a block must be given, but not both.
   def unpack(target = nil)
     mktemp(download_name) do |staging|
@@ -210,15 +210,15 @@ class Resource
   end
 end
 
-# The context in which a Resource.stage() occurs. Supports access to both
-# the Resource and associated Mktemp in a single block argument. The interface
-# is back-compatible with Resource itself as used in that context.
+# The context in which a {Resource.stage} occurs. Supports access to both
+# the {Resource} and associated {Mktemp} in a single block argument. The interface
+# is back-compatible with {Resource} itself as used in that context.
 class ResourceStageContext
   extend Forwardable
 
-  # The Resource that is being staged
+  # The {Resource} that is being staged
   attr_reader :resource
-  # The Mktemp in which @resource is staged
+  # The {Mktemp} in which {#resource} is staged
   attr_reader :staging
 
   def_delegators :@resource, :version, :url, :mirrors, :specs, :using, :source_modified_time

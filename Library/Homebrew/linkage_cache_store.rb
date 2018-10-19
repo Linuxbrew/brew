@@ -3,11 +3,11 @@ require "cache_store"
 
 #
 # `LinkageCacheStore` provides methods to fetch and mutate linkage-specific data used
-# by the `brew linkage` command
+# by the `brew linkage` command.
 #
 class LinkageCacheStore < CacheStore
-  # @param  [String] keg_path
-  # @param  [CacheStoreDatabase] database
+  # @param keg_path [String]
+  # @param database [CacheStoreDatabase]
   # @return [nil]
   def initialize(keg_path, database)
     @keg_path = keg_path
@@ -24,7 +24,7 @@ class LinkageCacheStore < CacheStore
   # Inserts dylib-related information into the cache if it does not exist or
   # updates data into the linkage cache if it does exist
   #
-  # @param  [Hash] hash_values:  hash containing KVPs of { :type => Hash }
+  # @param hash_values [Hash] hash containing KVPs of { :type => Hash }
   # @return [nil]
   def update!(hash_values)
     hash_values.each_key do |type|
@@ -38,7 +38,7 @@ class LinkageCacheStore < CacheStore
     database.set @keg_path, hash_values
   end
 
-  # @param  [Symbol] the type to fetch from the `LinkageCacheStore`
+  # @param type [Symbol] the type to fetch from the `LinkageCacheStore`
   # @raise  [TypeError] error if the type is not in `HASH_LINKAGE_TYPES`
   # @return [Hash]
   def fetch(type)
@@ -64,7 +64,7 @@ class LinkageCacheStore < CacheStore
 
   HASH_LINKAGE_TYPES = [:keg_files_dylibs].freeze
 
-  # @param  [Symbol] type
+  # @param type [Symbol]
   # @return [Hash]
   def fetch_hash_values(type)
     keg_cache = database.get(@keg_path)

@@ -91,8 +91,8 @@ module Homebrew
   def upgrade_formulae(formulae_to_install)
     return if formulae_to_install.empty?
 
-    # Sort keg_only before non-keg_only formulae to avoid any needless conflicts
-    # with outdated, non-keg_only versions of formulae being upgraded.
+    # Sort keg-only before non-keg-only formulae to avoid any needless conflicts
+    # with outdated, non-keg-only versions of formulae being upgraded.
     formulae_to_install.sort! do |a, b|
       if !a.keg_only? && b.keg_only?
         1

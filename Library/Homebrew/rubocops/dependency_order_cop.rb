@@ -3,7 +3,7 @@ require "rubocops/extend/formula_cop"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop checks for correct order of `depends_on` in a Formula
+      # This cop checks for correct order of `depends_on` in Formulae.
       #
       # precedence order:
       # build-time > run-time > normal > recommended > optional

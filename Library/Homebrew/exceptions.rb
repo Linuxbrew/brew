@@ -436,9 +436,9 @@ class BuildError < RuntimeError
   end
 end
 
-# raised by FormulaInstaller.check_dependencies_bottled and
-# FormulaInstaller.install if the formula or its dependencies are not bottled
-# and are being installed on a system without necessary build tools
+# Raised by {FormulaInstaller#check_dependencies_bottled} and
+# {FormulaInstaller#install} if the formula or its dependencies are not bottled
+# and are being installed on a system without necessary build tools.
 class BuildToolsError < RuntimeError
   def initialize(formulae)
     super <<~EOS
@@ -450,9 +450,9 @@ class BuildToolsError < RuntimeError
   end
 end
 
-# raised by Homebrew.install, Homebrew.reinstall, and Homebrew.upgrade
+# Raised by Homebrew.install, Homebrew.reinstall, and Homebrew.upgrade
 # if the user passes any flags/environment that would case a bottle-only
-# installation on a system without build tools to fail
+# installation on a system without build tools to fail.
 class BuildFlagsError < RuntimeError
   def initialize(flags, bottled: true)
     if flags.length > 1
@@ -478,8 +478,8 @@ class BuildFlagsError < RuntimeError
   end
 end
 
-# raised by CompilerSelector if the formula fails with all of
-# the compilers available on the user's system
+# Raised by {CompilerSelector} if the formula fails with all of
+# the compilers available on the user's system.
 class CompilerSelectionError < RuntimeError
   def initialize(formula)
     super <<~EOS
@@ -489,7 +489,7 @@ class CompilerSelectionError < RuntimeError
   end
 end
 
-# Raised in Resource.fetch
+# Raised in {Resource#fetch}.
 class DownloadError < RuntimeError
   def initialize(resource, cause)
     super <<~EOS
@@ -500,7 +500,7 @@ class DownloadError < RuntimeError
   end
 end
 
-# raised in CurlDownloadStrategy.fetch
+# Raised in {CurlDownloadStrategy#fetch}.
 class CurlDownloadStrategyError < RuntimeError
   def initialize(url)
     case url
@@ -512,14 +512,14 @@ class CurlDownloadStrategyError < RuntimeError
   end
 end
 
-# raised in ScpDownloadStrategy.fetch
+# Raised in {ScpDownloadStrategy#fetch}.
 class ScpDownloadStrategyError < RuntimeError
   def initialize(cause)
     super "Download failed: #{cause}"
   end
 end
 
-# raised by safe_system in utils.rb
+# Raised by {#safe_system} in `utils.rb`.
 class ErrorDuringExecution < RuntimeError
   attr_reader :cmd
   attr_reader :status
@@ -556,10 +556,10 @@ class ErrorDuringExecution < RuntimeError
   end
 end
 
-# raised by Pathname#verify_checksum when "expected" is nil or empty
+# Raised by {Pathname#verify_checksum} when "expected" is nil or empty.
 class ChecksumMissingError < ArgumentError; end
 
-# raised by Pathname#verify_checksum when verification fails
+# Raised by {Pathname#verify_checksum} when verification fails.
 class ChecksumMismatchError < RuntimeError
   attr_reader :expected, :hash_type
 
@@ -589,7 +589,7 @@ class DuplicateResourceError < ArgumentError
   end
 end
 
-# raised when a single patch file is not found and apply hasn't been specified
+# Raised when a single patch file is not found and apply hasn't been specified.
 class MissingApplyError < RuntimeError; end
 
 class BottleFormulaUnavailableError < RuntimeError

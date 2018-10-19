@@ -221,9 +221,9 @@ module Cask
       end
     end
 
-    # TODO: move dependencies to a separate class
-    #       dependencies should also apply for "brew cask stage"
-    #       override dependencies with --force or perhaps --force-deps
+    # TODO: move dependencies to a separate class,
+    #       dependencies should also apply for `brew cask stage`,
+    #       override dependencies with `--force` or perhaps `--force-deps`
     def satisfy_dependencies
       return unless @cask.depends_on
 

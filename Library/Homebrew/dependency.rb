@@ -71,7 +71,7 @@ class Dependency
 
   class << self
     # Expand the dependencies of dependent recursively, optionally yielding
-    # [dependent, dep] pairs to allow callers to apply arbitrary filters to
+    # `[dependent, dep]` pairs to allow callers to apply arbitrary filters to
     # the list.
     # The default filter, which is applied when a block is not given, omits
     # optionals and recommendeds based on what the dependent has asked for.
