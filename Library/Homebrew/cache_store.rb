@@ -2,7 +2,7 @@ require "json"
 
 #
 # `CacheStoreDatabase` acts as an interface to a persistent storage mechanism
-# residing in the `HOMEBREW_CACHE`
+# residing in the `HOMEBREW_CACHE`.
 #
 class CacheStoreDatabase
   # Yields the cache store database.
@@ -107,7 +107,7 @@ end
 
 #
 # `CacheStore` provides methods to mutate and fetch data from a persistent
-# storage mechanism
+# storage mechanism.
 #
 class CacheStore
   # @param  [CacheStoreDatabase] database

@@ -3,7 +3,7 @@ require "rubocops/extend/formula_cop"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop audits `homepage` url in Formulae
+      # This cop audits the `homepage` URL in Formulae.
       class Homepage < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
           homepage_node = find_node_method_by_name(body_node, :homepage)

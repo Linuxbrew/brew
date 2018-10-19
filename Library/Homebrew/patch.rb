@@ -162,7 +162,7 @@ class ExternalPatch
   end
 end
 
-# Legacy patches have no checksum and are not cached
+# Legacy patches have no checksum and are not cached.
 class LegacyPatch < ExternalPatch
   def initialize(strip, url)
     super(strip)

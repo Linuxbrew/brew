@@ -303,7 +303,7 @@ def safe_system(cmd, *args, **options)
   raise(ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS))
 end
 
-# prints no output
+# Prints no output
 def quiet_system(cmd, *args)
   Homebrew._system(cmd, *args) do
     # Redirect output streams to `/dev/null` instead of closing as some programs
@@ -504,9 +504,9 @@ end
 # Calls the given block with the passed environment variables
 # added to ENV, then restores ENV afterwards.
 # Example:
-# with_env(PATH: "/bin") do
+# <pre>with_env(PATH: "/bin") do
 #   system "echo $PATH"
-# end
+# end</pre>
 #
 # Note that this method is *not* thread-safe - other threads
 # which happen to be scheduled during the block will also

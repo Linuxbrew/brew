@@ -4,7 +4,7 @@ require "extend/string"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop audits patches in Formulae
+      # This cop audits patches in Formulae.
       class Patches < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body)
           external_patches = find_all_blocks(body, :patch)

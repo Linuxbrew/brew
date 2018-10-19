@@ -3,7 +3,7 @@ require "rubocops/extend/formula_cop"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop audits urls and mirrors in Formulae
+      # This cop audits URLs and mirrors in Formulae.
       class Urls < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
           urls = find_every_func_call_by_name(body_node, :url)

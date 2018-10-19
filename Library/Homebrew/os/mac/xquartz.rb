@@ -60,8 +60,8 @@ module OS
         "2.7.11"
       end
 
-      # https://xquartz.macosforge.org/trac/wiki
-      # https://xquartz.macosforge.org/trac/wiki/Releases
+      # - https://xquartz.macosforge.org/trac/wiki
+      # - https://xquartz.macosforge.org/trac/wiki/Releases
       def latest_version
         case MacOS.version
         when "10.5"
@@ -114,8 +114,8 @@ module OS
       end
 
       # This should really be private, but for compatibility reasons it must
-      # remain public. New code should use MacOS::X11.bin, MacOS::X11.lib and
-      # MacOS::X11.include instead, as that accounts for Xcode-only systems.
+      # remain public. New code should use `MacOS::X11.bin`, `MacOS::X11.lib` and
+      # `MacOS::X11.include` instead, as that accounts for Xcode-only systems.
       def prefix
         @prefix ||= if Pathname.new("/opt/X11/lib/libpng.dylib").exist?
           Pathname.new("/opt/X11")
@@ -139,10 +139,10 @@ module OS
       end
 
       # If XQuartz and/or the CLT are installed, headers will be found under
-      # /opt/X11/include or /usr/X11/include. For Xcode-only systems, they are
-      # found in the SDK, so we use sdk_path for both the headers and libraries.
+      # `/opt/X11/include` or `/usr/X11/include`. For Xcode-only systems, they are
+      # found in the SDK, so we use {.sdk_path} for both the headers and libraries.
       # Confusingly, executables (e.g. config scripts) are only found under
-      # /opt/X11/bin or /usr/X11/bin in all cases.
+      # `/opt/X11/bin` or `/usr/X11/bin` in all cases.
       def effective_prefix
         if provided_by_apple? && Xcode.without_clt?
           Pathname.new("#{OS::Mac.sdk_path}/usr/X11")

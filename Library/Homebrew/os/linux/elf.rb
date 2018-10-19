@@ -1,5 +1,5 @@
+# @see https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header
 module ELFShim
-  # See: https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header
   MAGIC_NUMBER_OFFSET = 0
   MAGIC_NUMBER_ASCII = "\x7fELF".freeze
 

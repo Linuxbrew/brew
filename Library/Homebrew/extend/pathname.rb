@@ -145,7 +145,7 @@ class Pathname
   # @private
   alias old_write write
 
-  # we assume this pathname object is a file obviously
+  # We assume this pathname object is a file, obviously
   def write(content, *open_args)
     raise "Will not overwrite #{self}" if exist?
 
@@ -196,7 +196,7 @@ class Pathname
   # @private
   alias extname_old extname
 
-  # extended to support common double extensions
+  # Extended to support common double extensions
   def extname(path = to_s)
     basename = File.basename(path)
 
@@ -212,7 +212,7 @@ class Pathname
     File.extname(basename)
   end
 
-  # for filetypes we support, basename without extension
+  # For filetypes we support, basename without extension
   def stem
     File.basename((path = to_s), extname(path))
   end
@@ -351,7 +351,7 @@ class Pathname
     end
   end
 
-  # Writes an exec script that invokes a java jar
+  # Writes an exec script that invokes a Java jar
   def write_jar_script(target_jar, script_name, java_opts = "", java_version: nil)
     mkpath
     java_home = if java_version

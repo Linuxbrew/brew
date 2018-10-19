@@ -453,9 +453,9 @@ module Homebrew
     { files: files, formulae: formulae, others: others }
   end
 
-  # Get current formula versions without loading formula definition in this process
-  # Returns info as a hash (type => version), for pull.rb's internal use
-  # Uses special key :nonexistent => true for nonexistent formulae
+  # Get current formula versions without loading formula definition in this process.
+  # Returns info as a hash (type => version), for pull.rb's internal use.
+  # Uses special key `:nonexistent => true` for nonexistent formulae.
   def current_versions_from_info_external(formula_name)
     info = FormulaInfoFromJson.lookup(formula_name)
     versions = {}
@@ -540,7 +540,7 @@ module Homebrew
     false
   end
 
-  # Formula info drawn from an external "brew info --json" call
+  # Formula info drawn from an external `brew info --json` call
   class FormulaInfoFromJson
     # The whole info structure parsed from the JSON
     attr_accessor :info
@@ -549,8 +549,8 @@ module Homebrew
       @info = info
     end
 
-    # Looks up formula on disk and reads its info
-    # Returns nil if formula is absent or if there was an error reading it
+    # Looks up formula on disk and reads its info.
+    # Returns nil if formula is absent or if there was an error reading it.
     def self.lookup(name)
       json = Utils.popen_read(HOMEBREW_BREW_FILE, "info", "--json=v1", name)
 
@@ -600,11 +600,11 @@ module Homebrew
     end
   end
 
-  # Bottle info as used internally by pull, with alternate platform support
+  # Bottle info as used internally by pull, with alternate platform support.
   class BottleInfo
     # URL of bottle as string
     attr_accessor :url
-    # Expected SHA256 as string
+    # Expected SHA-256 as string
     attr_accessor :sha256
 
     def initialize(url, sha256)

@@ -4,7 +4,7 @@ require "extend/string"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop audits versioned Formulae for `conflicts_with`
+      # This cop audits versioned Formulae for `conflicts_with`.
       class Conflicts < FormulaCop
         MSG = "Versioned formulae should not use `conflicts_with`. " \
               "Use `keg_only :versioned_formula` instead.".freeze

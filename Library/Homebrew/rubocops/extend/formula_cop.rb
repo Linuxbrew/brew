@@ -30,7 +30,7 @@ module RuboCop
       end
 
       # Checks for regex match of pattern in the node and
-      # Sets the appropriate instance variables to report the match
+      # sets the appropriate instance variables to report the match
       def regex_match_group(node, pattern)
         string_repr = string_content(node)
         match_object = string_repr.match(pattern)
@@ -51,9 +51,9 @@ module RuboCop
         match_object
       end
 
-      # Yields to block when there is a match
-      # Parameters: urls : Array of url/mirror method call nodes
-      #             regex: regex pattern to match urls
+      # Yields to block when there is a match.
+      # @param urls [Array] url/mirror method call nodes
+      # @param regex [Regexp] pattern to match urls
       def audit_urls(urls, regex)
         urls.each do |url_node|
           url_string_node = parameters(url_node).first
@@ -104,8 +104,8 @@ module RuboCop
         node.each_child_node(:send).select { |method_node| method_name == method_node.method_name }
       end
 
-      # Returns an array of method call nodes matching method_name in every descendant of node
-      # Returns every method call if no method_name is passed
+      # Returns an array of method call nodes matching method_name in every descendant of node.
+      # Returns every method call if no method_name is passed.
       def find_every_method_call_by_name(node, method_name = nil)
         return if node.nil?
 
@@ -115,10 +115,11 @@ module RuboCop
         end
       end
 
-      # Returns array of function call nodes matching func_name in every descendant of node
-      #           Ex. function call:  foo(*args, **kwargs)
-      # Does not match method calls:  foo.bar(*args, **kwargs)
-      # Returns every function calls if no func_name is passed
+      # Returns array of function call nodes matching func_name in every descendant of node.
+      #
+      # - matches function call:  `foo(*args, **kwargs)`
+      # - does not match method calls:  `foo.bar(*args, **kwargs)`
+      # - returns every function calls if no func_name is passed
       def find_every_func_call_by_name(node, func_name = nil)
         return if node.nil?
 
@@ -139,12 +140,13 @@ module RuboCop
         end
       end
 
-      # Matches a method with a receiver,
-      # EX: to match `Formula.factory(name)`
-      # call `find_instance_method_call(node, "Formula", :factory)`
-      # EX: to match `build.head?`
-      # call `find_instance_method_call(node, :build, :head?)`
-      # yields to a block with matching method node
+      # Matches a method with a receiver.
+      #
+      # - e.g. to match `Formula.factory(name)`
+      #   call `find_instance_method_call(node, "Formula", :factory)`
+      # - e.g. to match `build.head?`
+      #   call `find_instance_method_call(node, :build, :head?)`
+      # - yields to a block with matching method node
       def find_instance_method_call(node, instance, method_name)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
@@ -160,10 +162,11 @@ module RuboCop
         end
       end
 
-      # Matches receiver part of method,
-      # EX: to match `ARGV.<whatever>()`
-      # call `find_instance_call(node, "ARGV")`
-      # yields to a block with parent node of receiver
+      # Matches receiver part of method.
+      #
+      # - e.g. to match `ARGV.<whatever>()`
+      #   call `find_instance_call(node, "ARGV")`
+      # - yields to a block with parent node of receiver
       def find_instance_call(node, name)
         node.each_descendant(:send) do |method_node|
           next if method_node.receiver.nil?
@@ -178,8 +181,8 @@ module RuboCop
         end
       end
 
-      # Returns nil if does not depend on dependency_name
-      # args: node - dependency_name - dependency's name
+      # Returns nil if does not depend on dependency_name.
+      # @param dependency_name dependency's name
       def depends_on?(dependency_name, *types)
         types = [:any] if types.empty?
         dependency_nodes = find_every_method_call_by_name(@body, :depends_on)
@@ -192,7 +195,7 @@ module RuboCop
         @offensive_node = dependency_nodes[idx]
       end
 
-      # Returns true if given dependency name and dependency type exist in given dependency method call node
+      # Returns true if given dependency name and dependency type exist in given dependency method call node.
       # TODO: Add case where key of hash is an array
       def depends_on_name_type?(node, name = nil, type = :required)
         if name
@@ -223,8 +226,8 @@ module RuboCop
         type_match && name_match
       end
 
-      # Find CONSTANTs in the source
-      # if block given, yield matching nodes
+      # Find CONSTANTs in the source.
+      # If block given, yield matching nodes.
       def find_const(node, const_name)
         return if node.nil?
 
@@ -284,7 +287,7 @@ module RuboCop
         node.each_child_node(:block).select { |block_node| block_name == block_node.method_name }
       end
 
-      # Returns an array of block nodes of any depth below node in AST
+      # Returns an array of block nodes of any depth below node in AST.
       # If a block is given then yields matching block node to the block!
       def find_all_blocks(node, block_name)
         return if node.nil?
@@ -298,8 +301,8 @@ module RuboCop
         end
       end
 
-      # Returns a method definition node with method_name
-      # Returns first method def if method_name is nil
+      # Returns a method definition node with method_name.
+      # Returns first method def if method_name is nil.
       def find_method_def(node, method_name = nil)
         return if node.nil?
 
@@ -332,8 +335,8 @@ module RuboCop
         false
       end
 
-      # Check if method_name is called among the direct children nodes in the given node
-      # Check if the node itself is the method
+      # Check if method_name is called among the direct children nodes in the given node.
+      # Check if the node itself is the method.
       def method_called?(node, method_name)
         if node.send_type? && node.method_name == method_name
           offending_node(node)
@@ -400,8 +403,8 @@ module RuboCop
       end
 
       # Returns true if the given parameters are present in method call
-      # and sets the method call as the offending node
-      # params can be string, symbol, array, hash, matching regex
+      # and sets the method call as the offending node.
+      # Params can be string, symbol, array, hash, matching regex.
       def parameters_passed?(method_node, *params)
         method_params = parameters(method_node)
         @offensive_node = method_node

@@ -3,7 +3,7 @@ require "rubocops/extend/formula_cop"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop checks for various miscellaneous Homebrew coding styles
+      # This cop checks for various miscellaneous Homebrew coding styles.
       class Lines < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, _body_node)
           [:automake, :ant, :autoconf, :emacs, :expat, :libtool, :mysql, :perl,

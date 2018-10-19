@@ -94,7 +94,7 @@ module Hardware
       # Determines whether the current CPU and macOS combination
       # can run an executable of the specified architecture.
       # `arch` is a symbol in the same format returned by
-      # Hardware::CPU.family
+      # {Hardware::CPU.family}.
       def can_run?(arch)
         if Hardware::CPU.intel?
           intel_can_run? arch
