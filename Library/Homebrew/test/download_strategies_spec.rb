@@ -46,8 +46,8 @@ describe VCSDownloadStrategy do
   end
 end
 
-describe GitHubPrivateRepositoryDownloadStrategy do
-  subject { described_class.new(url, "foo", version) }
+describe "GitHubPrivateRepositoryDownloadStrategy", :needs_compat do
+  subject { GitHubPrivateRepositoryDownloadStrategy.new(url, "foo", version) }
 
   let(:url) { "https://github.com/owner/repo/archive/1.1.5.tar.gz" }
   let(:version) { nil }
@@ -70,8 +70,8 @@ describe GitHubPrivateRepositoryDownloadStrategy do
   its(:download_url) { is_expected.to eq("https://token@github.com/owner/repo/archive/1.1.5.tar.gz") }
 end
 
-describe GitHubPrivateRepositoryReleaseDownloadStrategy do
-  subject { described_class.new(url, "foo", version) }
+describe "GitHubPrivateRepositoryReleaseDownloadStrategy", :needs_compat do
+  subject { GitHubPrivateRepositoryReleaseDownloadStrategy.new(url, "foo", version) }
 
   let(:url) { "https://github.com/owner/repo/releases/download/tag/foo_v0.1.0_darwin_amd64.tar.gz" }
   let(:version) { nil }
@@ -200,8 +200,8 @@ describe GitDownloadStrategy do
   end
 end
 
-describe S3DownloadStrategy do
-  subject { described_class.new(url, name, version) }
+describe "S3DownloadStrategy", :needs_compat do
+  subject { S3DownloadStrategy.new(url, name, version) }
 
   let(:name) { "foo" }
   let(:url) { "https://bucket.s3.amazonaws.com/foo.tar.gz" }
@@ -427,8 +427,8 @@ describe CurlPostDownloadStrategy do
   end
 end
 
-describe ScpDownloadStrategy do
-  subject { described_class.new(url, name, version) }
+describe "ScpDownloadStrategy", :needs_compat do
+  subject { ScpDownloadStrategy.new(url, name, version) }
 
   let(:name) { "foo" }
   let(:url) { "scp://example.com/foo.tar.gz" }
@@ -565,7 +565,7 @@ describe DownloadStrategyDetector do
       it { is_expected.to eq(GitHubGitDownloadStrategy) }
     end
 
-    context "when given an S3 URL" do
+    context "when given an S3 URL", :needs_compat do
       let(:url) { "s3://bucket/homebrew/brew.tar.gz" }
 
       it "returns S3DownloadStrategy" do
@@ -574,7 +574,7 @@ describe DownloadStrategyDetector do
       end
     end
 
-    context "when given strategy = S3DownloadStrategy" do
+    context "when given strategy = S3DownloadStrategy", :needs_compat do
       let(:url) { "https://bkt.s3.amazonaws.com/key.tar.gz" }
       let(:strategy) { S3DownloadStrategy }
 
@@ -584,7 +584,7 @@ describe DownloadStrategyDetector do
       end
     end
 
-    context "when given an scp URL" do
+    context "when given an scp URL", :needs_compat do
       let(:url) { "scp://example.com/brew.tar.gz" }
 
       it { is_expected.to eq(ScpDownloadStrategy) }
