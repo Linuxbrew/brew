@@ -187,7 +187,7 @@ RSpec::Matchers.define :a_json_string do
     begin
       JSON.parse(actual)
       true
-    rescue JSON::ParseError
+    rescue JSON::ParserError
       false
     end
   end

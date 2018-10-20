@@ -208,11 +208,21 @@ Open \fIformula\fR\'s homepage in a browser\.
 Display brief statistics for your Homebrew installation\.
 .
 .TP
-\fBinfo\fR \fIformula\fR [\fB\-\-verbose\fR]
+\fBinfo\fR \fB\-\-analytics\fR [\fB\-\-days=\fR\fIdays\fR] [\fB\-\-category=\fR\fIcategory\fR]
+Display Homebrew analytics data (provided neither \fBHOMEBREW_NO_ANALYTICS\fR or \fBHOMEBREW_NO_GITHUB_API\fR are set)
+.
+.IP
+The value for \fBdays\fR must be \fB30\fR, \fB90\fR or \fB365\fR\. The default is \fB30\fR\.
+.
+.IP
+The value for \fBcategory\fR must be \fBinstall\fR, \fBinstall\-on\-request\fR, \fBbuild\-error\fR or \fBos\-version\fR\. The default is \fBinstall\fR\.
+.
+.TP
+\fBinfo\fR \fIformula\fR [\fB\-\-analytics\fR]
 Display information about \fIformula\fR and analytics data (provided neither \fBHOMEBREW_NO_ANALYTICS\fR or \fBHOMEBREW_NO_GITHUB_API\fR are set)
 .
 .IP
-Pass \fB\-\-verbose\fR to see more detailed analytics data\.
+Pass \fB\-\-analytics\fR to see more detailed analytics data\.
 .
 .TP
 \fBinfo\fR \fB\-\-github\fR \fIformula\fR
