@@ -7,6 +7,11 @@ describe Utils::Shell do
       expect(subject.profile).to eq("~/.bash_profile")
     end
 
+    it "returns ~/.bash_profile by default" do
+      ENV["SHELL"] = "/bin/sh"
+      expect(subject.profile).to eq("~/.bash_profile")
+    end
+
     it "returns ~/.bash_profile for Bash" do
       ENV["SHELL"] = "/bin/bash"
       expect(subject.profile).to eq("~/.bash_profile")
