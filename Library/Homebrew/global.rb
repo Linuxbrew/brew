@@ -54,7 +54,7 @@ HOMEBREW_USER_AGENT_FAKE_SAFARI =
 # `HOMEBREW_BOTTLE_DEFAULT_DOMAIN` isn't set.
 HOMEBREW_BOTTLE_DEFAULT_DOMAIN = if ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"]
   ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"]
-elsif OS.mac?
+elsif OS.mac? || ENV["HOMEBREW_FORCE_HOMEBREW_ON_LINUX"]
   "https://homebrew.bintray.com".freeze
 else
   "https://linuxbrew.bintray.com".freeze
