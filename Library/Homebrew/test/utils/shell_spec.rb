@@ -7,8 +7,8 @@ describe Utils::Shell do
       expect(subject.profile).to eq("~/.bash_profile")
     end
 
-    it "returns ~/.bash_profile for Sh" do
-      ENV["SHELL"] = "/bin/another_shell"
+    it "returns ~/.bash_profile for sh" do
+      ENV["SHELL"] = "/bin/sh"
       expect(subject.profile).to eq("~/.bash_profile")
     end
 
