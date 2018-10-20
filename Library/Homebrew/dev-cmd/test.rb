@@ -1,8 +1,7 @@
-#:  * `test` [`--devel`|`--HEAD`] [`--debug`] [`--keep-tmp`] <formula>:
-#:    Most formulae provide a test method. `brew test` <formula> runs this
-#:    test method. There is no standard output or return code, but it should
-#:    generally indicate to the user if something is wrong with the installed
-#:    formula.
+#:  * `test` [`--devel`|`--HEAD`] [`--debug`] [`--keep-tmp`] <formulae>:
+#:    Run the test method provided by a formula.
+#:    There is no standard output or return code, but generally it should notify the
+#:    user if something is wrong with the installed formula.
 #:
 #:    To test the development or head version of a formula, use `--devel` or
 #:    `--HEAD`.
@@ -13,7 +12,7 @@
 #:    If `--keep-tmp` is passed, the temporary files created for the test are
 #:    not deleted.
 #:
-#:    Example: `brew install jruby && brew test jruby`
+#:    *Example:* `brew install jruby && brew test jruby`
 
 require "extend/ENV"
 require "formula_assertions"
@@ -22,6 +21,28 @@ require "timeout"
 
 module Homebrew
   module_function
+
+  def test_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `test` [<options>] <formulae>
+
+        Run the test method provided by an installed formula.
+        There is no standard output or return code, but generally it should notify the
+        user if something is wrong with the installed formula.
+
+        *Example:* `brew install jruby && brew test jruby`
+      EOS
+      switch "--devel",
+        description: "Test the development version of a formula."
+      switch "--HEAD",
+        description: "Test the head version of a formula."
+      switch "--keep-tmp",
+        description: "Keep the temporary files created for the test."
+      switch :verbose
+      switch :debug
+    end
+  end
 
   def test
     raise FormulaUnspecifiedError if ARGV.named.empty?
