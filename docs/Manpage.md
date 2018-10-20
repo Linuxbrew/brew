@@ -199,11 +199,20 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `info`:
     Display brief statistics for your Homebrew installation.
 
-  * `info` *`formula`* [`--verbose`]:
+  * `info` `--analytics` [`--days=`*`days`*] [`--category=`*`category`*]:
+    Display Homebrew analytics data (provided neither `HOMEBREW_NO_ANALYTICS`
+    or `HOMEBREW_NO_GITHUB_API` are set)
+
+    The value for `days` must be `30`, `90` or `365`. The default is `30`.
+
+    The value for `category` must be `install`, `install-on-request`,
+    `build-error` or `os-version`. The default is `install`.
+
+  * `info` *`formula`* [`--analytics`]:
     Display information about *`formula`* and analytics data (provided neither
     `HOMEBREW_NO_ANALYTICS` or `HOMEBREW_NO_GITHUB_API` are set)
 
-    Pass `--verbose` to see more detailed analytics data.
+    Pass `--analytics` to see more detailed analytics data.
 
   * `info` `--github` *`formula`*:
     Open a browser to the GitHub History page for *`formula`*.
