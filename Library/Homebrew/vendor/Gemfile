@@ -5,3 +5,8 @@ gem "concurrent-ruby"
 gem "backports"
 gem "plist"
 gem "ruby-macho"
+gem "rubocop-rspec"
+
+# not actually vendored but used to ensure the version matches here.
+require_relative "../constants"
+gem "rubocop", HOMEBREW_RUBOCOP_VERSION

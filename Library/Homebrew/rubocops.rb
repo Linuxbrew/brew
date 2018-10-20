@@ -1,5 +1,6 @@
 require_relative "load_path"
 
+require "rubocop-rspec"
 require "rubocops/formula_desc_cop"
 require "rubocops/components_order_cop"
 require "rubocops/components_redundancy_cop"
