@@ -1246,6 +1246,9 @@ Note that environment variables must have a value set to be detected. For exampl
   * `HOMEBREW_UPGRADE_CLEANUP`:
     If set, `brew upgrade` always assumes `--cleanup` has been passed.
 
+  * `HOMEBREW_INSTALL_CLEANUP`:
+    If set, `brew upgrade` always assumes `--cleanup` has been passed.
+
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.
 
