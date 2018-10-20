@@ -27,6 +27,13 @@ class S3DownloadStrategy < CurlDownloadStrategy
     ENV["AWS_SECRET_ACCESS_KEY"] = ENV["HOMEBREW_AWS_SECRET_ACCESS_KEY"]
 
     begin
+      require "aws-sdk-s3"
+    rescue LoadError
+      Homebrew.install_gem! "aws-sdk-s3", "~> 1.8"
+      require "aws-sdk-s3"
+    end
+
+    begin
       signer = Aws::S3::Presigner.new
       s3url = signer.presigned_url :get_object, bucket: bucket, key: key
     rescue Aws::Sigv4::Errors::MissingCredentialsError
@@ -204,12 +211,6 @@ end
 class DownloadStrategyDetector
   class << self
     module Compat
-      def detect(url, using = nil)
-        strategy = super
-        require_aws_sdk if strategy == S3DownloadStrategy
-        strategy
-      end
-
       def detect_from_url(url)
         case url
         when %r{^s3://}
