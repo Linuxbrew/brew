@@ -253,7 +253,8 @@ module Homebrew
 
     def initialize(formula, options = {})
       @formula = formula
-      @new_formula = options[:new_formula] && !formula.versioned_formula?
+      @versioned_formula = formula.versioned_formula?
+      @new_formula = options[:new_formula] && !@versioned_formula
       @strict = options[:strict]
       @online = options[:online]
       @display_cop_names = options[:display_cop_names]
@@ -274,7 +275,7 @@ module Homebrew
 
       @style_offenses.each do |offense|
         if offense.cop_name.start_with?("NewFormulaAudit")
-          next if formula.versioned_formula?
+          next if @versioned_formula
 
           new_formula_problem offense.to_s(display_cop_name: @display_cop_names)
           next
@@ -308,7 +309,7 @@ module Homebrew
 
       problem "File should end with a newline" unless text.trailing_newline?
 
-      if formula.versioned_formula?
+      if @versioned_formula
         unversioned_formula = begin
           # build this ourselves as we want e.g. homebrew/core to be present
           full_name = if formula.tap
@@ -527,7 +528,7 @@ module Homebrew
     end
 
     def audit_versioned_keg_only
-      return unless formula.versioned_formula?
+      return unless @versioned_formula
       return unless @core_tap
 
       return if formula.keg_only? && formula.keg_only_reason.reason == :versioned_formula
@@ -666,7 +667,7 @@ module Homebrew
         unstable_spec_message = "Formulae should not have a `HEAD` or `devel` spec"
         if @new_formula
           new_formula_problem unstable_spec_message
-        elsif formula.versioned_formula?
+        elsif @versioned_formula
           versioned_unstable_spec = %w[
             bash-completion@2
             imagemagick@6
