@@ -38,7 +38,7 @@ describe DependencyCollector do
     end
 
     specify "requirement tags" do
-      subject.add x11: "2.5.1"
+      subject.add :x11
       subject.add xcode: :build
       expect(find_requirement(X11Requirement).tags).to be_empty
       expect(find_requirement(XcodeRequirement)).to be_a_build_requirement

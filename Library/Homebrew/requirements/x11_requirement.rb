@@ -10,13 +10,6 @@ class X11Requirement < Requirement
 
   env { ENV.x11 }
 
-  def initialize(name = "x11", tags = [])
-    @name = name
-    # no-op on version specified as a tag argument
-    tags.shift if /(\d\.)+\d/ =~ tags.first
-    super(tags)
-  end
-
   def min_version
     "1.12.2"
   end
@@ -51,7 +44,7 @@ class X11Requirement < Requirement
   end
 
   def inspect
-    "#<#{self.class.name}: #{name.inspect} #{tags.inspect}>"
+    "#<#{self.class.name}: #{tags.inspect}>"
   end
 end
 

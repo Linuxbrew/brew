@@ -798,7 +798,7 @@ describe Formula do
     stub_formula_loader(f1)
 
     java = JavaRequirement.new
-    x11 = X11Requirement.new("x11", [:recommended])
+    x11 = X11Requirement.new([:recommended])
     xcode = XcodeRequirement.new(["1.0", :optional])
 
     expect(Set.new(f1.recursive_requirements)).to eq(Set[java, x11])
