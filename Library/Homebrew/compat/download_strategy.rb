@@ -10,7 +10,7 @@ require "download_strategy"
 class S3DownloadStrategy < CurlDownloadStrategy
   def initialize(url, name, version, **meta)
     odeprecated("S3DownloadStrategy",
-      "maintaining S3DownloadStrategy in your own formula or tap")
+      "a vendored S3DownloadStrategy in your own formula or tap (using require_relative)")
     super
   end
 
@@ -59,7 +59,7 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
 
   def initialize(url, name, version, **meta)
     odeprecated("GitHubPrivateRepositoryDownloadStrategy",
-      "maintaining GitHubPrivateRepositoryDownloadStrategy in your own formula or tap")
+      "a vendored GitHubPrivateRepositoryDownloadStrategy in your own formula or tap (using require_relative)")
     super
     parse_url_pattern
     set_github_token
@@ -113,7 +113,7 @@ end
 class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDownloadStrategy
   def initialize(url, name, version, **meta)
     odeprecated("GitHubPrivateRepositoryReleaseDownloadStrategy",
-      "maintaining GitHubPrivateRepositoryReleaseDownloadStrategy in your own formula or tap")
+      "a vendored GitHubPrivateRepositoryReleaseDownloadStrategy in your own formula or tap (using require_relative)")
     super
   end
 
@@ -169,7 +169,7 @@ end
 class ScpDownloadStrategy < AbstractFileDownloadStrategy
   def initialize(url, name, version, **meta)
     odeprecated("ScpDownloadStrategy",
-      "maintaining ScpDownloadStrategy in your own formula or tap")
+      "a vendored ScpDownloadStrategy in your own formula or tap (using require_relative)")
     super
     parse_url_pattern
   end
@@ -215,11 +215,11 @@ class DownloadStrategyDetector
         case url
         when %r{^s3://}
           odeprecated("s3://",
-            "maintaining S3DownloadStrategy in your own formula or tap")
+            "a vendored S3DownloadStrategy in your own formula or tap (using require_relative)")
           S3DownloadStrategy
         when %r{^scp://}
           odeprecated("scp://",
-            "maintaining ScpDownloadStrategy in your own formula or tap")
+            "a vendored ScpDownloadStrategy in your own formula or tap (using require_relative)")
           ScpDownloadStrategy
         else
           super(url)
@@ -230,19 +230,20 @@ class DownloadStrategyDetector
         case symbol
         when :github_private_repo
           odeprecated(":github_private_repo",
-            "maintaining GitHubPrivateRepositoryDownloadStrategy in your own formula or tap")
+            "a vendored GitHubPrivateRepositoryDownloadStrategy in your own formula or tap (using require_relative)")
           GitHubPrivateRepositoryDownloadStrategy
         when :github_private_release
           odeprecated(":github_private_repo",
-            "maintaining GitHubPrivateRepositoryReleaseDownloadStrategy in your own formula or tap")
+            "a vendored GitHubPrivateRepositoryReleaseDownloadStrategy in your own formula or tap "\
+            "(using require_relative)")
           GitHubPrivateRepositoryReleaseDownloadStrategy
         when :s3
           odeprecated(":s3",
-            "maintaining S3DownloadStrategy in your own formula or tap")
+            "a vendored S3DownloadStrategy in your own formula or tap (using require_relative)")
           S3DownloadStrategy
         when :scp
           odeprecated(":scp",
-            "maintaining ScpDownloadStrategy in your own formula or tap")
+            "a vendored ScpDownloadStrategy in your own formula or tap (using require_relative)")
           ScpDownloadStrategy
         else
           super(symbol)
