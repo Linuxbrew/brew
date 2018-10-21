@@ -1,5 +1,7 @@
 language: ruby
 rvm: system
+os: osx
+osx_image: xcode10
 
 cache:
   directories:
@@ -11,34 +13,14 @@ branches:
   only:
     - master
 
-matrix:
-  fast_finish: true
-  include:
-    - os: osx
-      osx_image: xcode10
-    - os: linux
-      sudo: false
-
 before_install:
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      MACOS="1";
-      HOMEBREW_REPOSITORY="$(brew --repo)";
-      sudo chown -R "$USER" "$HOMEBREW_REPOSITORY";
-    else
-      LINUX="1";
-      export PATH="$PWD/bin:/usr/bin:/bin:/usr/local/bin";
-    fi
-  # umask 022 fixes Linux `brew tests` failures;
-  - if [ "$LINUX" ]; then
-      umask 022;
-    fi
+  - HOMEBREW_REPOSITORY="$(brew --repo)"
+  - sudo chown -R "$USER" "$HOMEBREW_REPOSITORY"
   # trigger vendored ruby installation
   - brew help
-  - if [ "$MACOS" ]; then
-      mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library";
-      sudo rm -rf "$HOMEBREW_REPOSITORY";
-      sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
-    fi
+  - mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library"
+  - sudo rm -rf "$HOMEBREW_REPOSITORY"
+  - sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY"
   - travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
 
 script:
