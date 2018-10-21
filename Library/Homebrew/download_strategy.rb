@@ -352,8 +352,9 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       end
     end
 
-    filenames = lines.map { |line| line[/^Content\-Disposition:\s*attachment;\s*filename=(["']?)([^;]+)\1/i, 2] }
-                     .compact
+    filenames =
+      lines.map { |line| line[/^Content\-Disposition:\s*(?:inline|attachment);\s*filename=(["']?)([^;]+)\1/i, 2] }
+           .compact
 
     basename = filenames.last || parse_basename(redirect_url)
 
