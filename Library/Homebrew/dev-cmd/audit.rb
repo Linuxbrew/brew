@@ -684,7 +684,6 @@ module Homebrew
       throttled = %w[
         aws-sdk-cpp 10
         awscli 10
-        heroku 10
         quicktype 10
         vim 50
       ]
