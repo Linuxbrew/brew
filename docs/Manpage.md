@@ -212,7 +212,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Display information about *`formula`* and analytics data (provided neither
     `HOMEBREW_NO_ANALYTICS` or `HOMEBREW_NO_GITHUB_API` are set)
 
-    Pass `--analytics` to see more detailed analytics data.
+    Pass `--verbose` to see more verbose analytics data.
+
+    Pass `--analytics` to see only more verbose analytics data instead of
+    formula information.
 
   * `info` `--github` *`formula`*:
     Open a browser to the GitHub History page for *`formula`*.

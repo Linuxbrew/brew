@@ -14,7 +14,10 @@
 #:    Display information about <formula> and analytics data (provided neither
 #:    `HOMEBREW_NO_ANALYTICS` or `HOMEBREW_NO_GITHUB_API` are set)
 #:
-#:    Pass `--analytics` to see more detailed analytics data.
+#:    Pass `--verbose` to see more verbose analytics data.
+#:
+#:    Pass `--analytics` to see only more verbose analytics data instead of
+#:    formula information.
 #:
 #:  * `info` `--github` <formula>:
 #:    Open a browser to the GitHub History page for <formula>.
@@ -66,12 +69,21 @@ module Homebrew
       ARGV.named.each_with_index do |f, i|
         puts unless i.zero?
         begin
-          if f.include?("/") || File.exist?(f)
-            info_formula Formulary.factory(f)
+          formula = if f.include?("/") || File.exist?(f)
+            Formulary.factory(f)
           else
-            info_formula Formulary.find_with_priority(f)
+            Formulary.find_with_priority(f)
+          end
+          if ARGV.include?("--analytics")
+            output_formula_analytics(formula)
+          else
+            info_formula(formula)
           end
         rescue FormulaUnavailableError => e
+          if ARGV.include?("--analytics")
+            output_analytics(filter: f)
+            next
+          end
           ofail e.message
           # No formula with this name, try a missing formula lookup
           if (reason = MissingFormula.reason(f))
@@ -295,7 +307,7 @@ module Homebrew
          "#{formatted_total_count_footer} | #{formatted_total_percent_footer}%"
   end
 
-  def output_analytics
+  def output_analytics(filter: nil)
     days = ARGV.value("days") || "30"
     valid_days = %w[30 90 365]
     unless valid_days.include?(days)
@@ -319,8 +331,17 @@ module Homebrew
       else
         item["formula"]
       end
+      if filter.present?
+        next if key != filter && !key.start_with?("#{filter} ")
+      end
       results[key] = item["count"].tr(",", "").to_i
     end
+
+    if filter.present? && results.blank?
+      onoe "No results matching `#{filter}` found!"
+      return
+    end
+
     analytics_table(category, days, results, os_version: os_version)
   end
 
