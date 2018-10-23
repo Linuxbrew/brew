@@ -24,7 +24,7 @@ before_install:
   - travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
 
 script:
-  - brew test-bot
+  - travis_wait 60 brew test-bot
 
 notifications:
   slack: machomebrew:1XNF7p1JRCdBUuKaeSwsWEc1
