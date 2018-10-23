@@ -180,7 +180,7 @@ If \fB\-\-build\-from\-source\fR (or \fB\-s\fR) is passed, download the source r
 If \fB\-\-force\-bottle\fR is passed, download a bottle if it exists for the current or newest version of macOS, even if it would not be used during installation\.
 .
 .TP
-\fBgist\-logs\fR [\fB\-\-new\-issue\fR|\fB\-n\fR] \fIformula\fR
+\fBgist\-logs\fR [\fB\-\-new\-issue\fR|\fB\-n\fR] [\fB\-\-private\fR|\fB\-p\fR] \fIformula\fR
 Upload logs for a failed build of \fIformula\fR to a new Gist\.
 .
 .IP
@@ -191,6 +191,9 @@ If \fB\-\-with\-hostname\fR is passed, include the hostname in the Gist\.
 .
 .IP
 If \fB\-\-new\-issue\fR is passed, automatically create a new issue in the appropriate GitHub repository as well as creating the Gist\.
+.
+.IP
+If \fB\-\-private\fR is passed, the Gist will be marked private and will not appear in listings but will be accessible with the link\.
 .
 .IP
 If no logs are found, an error message is presented\.
@@ -1173,25 +1176,31 @@ Install macOS applications distributed as binaries\.
 Integrates Homebrew formulae with macOS\' \fBlaunchctl\fR manager\.
 .
 .IP
-[\fIsudo\fR] \fBbrew services list\fR List all running services for the current user (or \fIroot\fR)
+[\fBsudo\fR] \fBbrew services list\fR
+    List all running services for the current user (or root)\.
 .
 .IP
-[\fIsudo\fR] \fBbrew services run\fR \fIformula|\-\-all\fR Run the service \fIformula\fR without starting at login (or boot)\.
+[\fBsudo\fR] \fBbrew services run\fR (\fIformula\fR|\fB\-\-all\fR)
+    Run the service \fIformula\fR without registering to launch at login (or boot)\.
 .
 .IP
-[\fIsudo\fR] \fBbrew services\fR \fBstart\fR \fIformula|\-\-all\fR Start the service \fIformula\fR immediately and register it to launch at login (or \fIboot\fR)\.
+[\fBsudo\fR] \fBbrew services start\fR (\fIformula\fR|\fB\-\-all\fR)
+    Start the service \fIformula\fR immediately and register it to launch at login (or boot)\.
 .
 .IP
-[\fIsudo\fR] \fBbrew services\fR \fBstop\fR \fIformula|\-\-all\fR Stop the service \fIformula\fR immediately and unregister it from launching at login (or \fIboot\fR)\.
+[\fBsudo\fR] \fBbrew services stop\fR (\fIformula\fR|\fB\-\-all\fR)
+    Stop the service \fIformula\fR immediately and unregister it from launching at login (or boot)\.
 .
 .IP
-[\fIsudo\fR] \fBbrew services\fR \fBrestart\fR \fIformula|\-\-all\fR Stop (if necessary) and start the service immediately and register it to launch at login (or \fIboot\fR)\.
+[\fBsudo\fR] \fBbrew services restart\fR (\fIformula\fR|\fB\-\-all\fR)
+    Stop (if necessary) and start the service \fIformula\fR immediately and register it to launch at login (or boot)\.
 .
 .IP
-[\fIsudo\fR] \fBbrew services\fR \fBcleanup\fR Remove all unused services\.
+[\fBsudo\fR] \fBbrew services cleanup\fR
+    Remove all unused services\.
 .
 .IP
-If \fBsudo\fR is passed, operate on \fB/Library/LaunchDaemons\fR (started at boot)\. Otherwise, operate on \fB~/Library/LaunchAgents (started at login)\fR\.
+If \fBsudo\fR is passed, operate on \fB/Library/LaunchDaemons\fR (started at boot)\. Otherwise, operate on \fB~/Library/LaunchAgents\fR (started at login)\.
 .
 .IP
 \fBHomebrew/homebrew\-services\fR
