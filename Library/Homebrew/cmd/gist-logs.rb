@@ -80,7 +80,7 @@ module Homebrew
     s
   end
 
-  # Hack for ruby < 1.9.3
+  # Causes some terminals to display secure password entry indicators
   def noecho_gets
     system "stty -echo"
     result = $stdin.gets
