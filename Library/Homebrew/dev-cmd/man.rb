@@ -189,6 +189,7 @@ module Homebrew
   def generate_cmd_manpages(glob)
     cmd_paths = Pathname.glob(glob).sort
     man_page_lines = []
+    man_args = Homebrew.args
     cmd_paths.each do |cmd_path|
       begin
         cmd_parser = Homebrew.send(cmd_arg_parser(cmd_path))
@@ -197,6 +198,7 @@ module Homebrew
         man_page_lines << path_glob_commands(cmd_path.to_s).first
       end
     end
+    Homebrew.args = man_args
     man_page_lines
   end
 
