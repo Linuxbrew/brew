@@ -177,7 +177,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     current or newest version of macOS, even if it would not be used during
     installation.
 
-  * `gist-logs` [`--new-issue`|`-n`] *`formula`*:
+  * `gist-logs` [`--new-issue`|`-n`] [`--private`|`-p`] *`formula`*:
     Upload logs for a failed build of *`formula`* to a new Gist.
 
     *`formula`* is usually the name of the formula to install, but it can be specified
@@ -187,6 +187,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--new-issue` is passed, automatically create a new issue in the appropriate
     GitHub repository as well as creating the Gist.
+
+    If `--private` is passed, the Gist will be marked private and will not
+    appear in listings but will be accessible with the link.
 
     If no logs are found, an error message is presented.
 
@@ -1044,26 +1047,26 @@ These options are applicable across all sub-commands.
   * `services` *`command`*:
     Integrates Homebrew formulae with macOS' `launchctl` manager.
 
-    [*`sudo`*] `brew services list`
-    List all running services for the current user (or *`root`*)
+    [`sudo`] `brew services list`:
+    List all running services for the current user (or root).
 
-    [*`sudo`*] `brew services run` *`formula|--all`*
-    Run the service *`formula`* without starting at login (or boot).
+    [`sudo`] `brew services run` (*`formula`*|`--all`):
+    Run the service *`formula`* without registering to launch at login (or boot).
 
-    [*`sudo`*] `brew services` `start` *`formula|--all`*
-    Start the service *`formula`* immediately and register it to launch at login (or *`boot`*).
+    [`sudo`] `brew services start` (*`formula`*|`--all`):
+    Start the service *`formula`* immediately and register it to launch at login (or boot).
 
-    [*`sudo`*] `brew services` `stop` *`formula|--all`*
-    Stop the service *`formula`* immediately and unregister it from launching at login (or *`boot`*).
+    [`sudo`] `brew services stop` (*`formula`*|`--all`):
+    Stop the service *`formula`* immediately and unregister it from launching at login (or boot).
 
-    [*`sudo`*] `brew services` `restart` *`formula|--all`*
-    Stop (if necessary) and start the service immediately and register it to launch at login (or *`boot`*).
+    [`sudo`] `brew services restart` (*`formula`*|`--all`):
+    Stop (if necessary) and start the service *`formula`* immediately and register it to launch at login (or boot).
 
-    [*`sudo`*] `brew services` `cleanup`
+    [`sudo`] `brew services cleanup`:
     Remove all unused services.
 
     If `sudo` is passed, operate on `/Library/LaunchDaemons` (started at boot).
-    Otherwise, operate on `~/Library/LaunchAgents (started at login)`.
+    Otherwise, operate on `~/Library/LaunchAgents` (started at login).
 
     **Homebrew/homebrew-services**: <https://github.com/Homebrew/homebrew-services>
 
