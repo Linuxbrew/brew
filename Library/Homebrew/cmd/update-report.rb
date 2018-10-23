@@ -8,6 +8,7 @@ require "formulary"
 require "descriptions"
 require "cleanup"
 require "update_migrator"
+require "description_cache_store"
 
 module Homebrew
   module_function
@@ -127,7 +128,10 @@ module Homebrew
         hub.dump
         hub.reporters.each(&:migrate_tap_migration)
         hub.reporters.each(&:migrate_formula_rename)
-        Descriptions.update_cache(hub)
+        CacheStoreDatabase.use(:descriptions) do |db|
+          DescriptionCacheStore.new(db)
+                               .update_from_report!(hub)
+        end
       end
       puts if ARGV.include?("--preinstall")
     end

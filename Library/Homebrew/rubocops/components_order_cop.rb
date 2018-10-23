@@ -3,9 +3,9 @@ require "rubocops/extend/formula_cop"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop checks for correct order of components in a Formula
+      # This cop checks for correct order of components in Formulae.
       #
-      # - component_precedence_list has component hierarchy in a nested list
+      # - `component_precedence_list` has component hierarchy in a nested list
       #   where each sub array contains components' details which are at same precedence level
       class ComponentsOrder < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
@@ -96,9 +96,9 @@ module RuboCop
           end
         end
 
-        # Reorder two nodes in the source, using the corrector instance in autocorrect method
-        # Components of same type are grouped together when rewriting the source
-        # Linebreaks are introduced if components are of two different methods/blocks/multilines
+        # Reorder two nodes in the source, using the corrector instance in autocorrect method.
+        # Components of same type are grouped together when rewriting the source.
+        # Linebreaks are introduced if components are of two different methods/blocks/multilines.
         def reorder_components(corrector, node1, node2)
           # order_idx : node1's index in component_precedence_list
           # curr_p_idx: node1's index in preceding_comp_arr

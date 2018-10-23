@@ -11,7 +11,9 @@ module Cask
         install_rubocop
         cache_env = { "XDG_CACHE_HOME" => "#{HOMEBREW_CACHE}/style" }
         hide_warnings = debug? ? [] : [ENV["HOMEBREW_RUBY_PATH"], "-W0", "-S"]
-        system(cache_env, *hide_warnings, "rubocop", *rubocop_args, "--", *cask_paths)
+        Dir.mktmpdir do |tmpdir|
+          system(cache_env, *hide_warnings, "rubocop", *rubocop_args, "--", *cask_paths, chdir: tmpdir)
+        end
         raise CaskError, "style check failed" unless $CHILD_STATUS.success?
       end
 
@@ -29,7 +31,7 @@ module Cask
         @cask_paths ||= if args.empty?
           Tap.map(&:cask_dir).select(&:directory?)
         elsif args.any? { |file| File.exist?(file) }
-          args
+          args.map { |path| Pathname(path).expand_path }
         else
           casks.map(&:sourcefile_path)
         end

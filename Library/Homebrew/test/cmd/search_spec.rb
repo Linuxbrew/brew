@@ -34,7 +34,7 @@ describe "brew search", :integration_test do
   end
 
   describe "--desc" do
-    let(:desc_cache) { HOMEBREW_CACHE/"desc_cache.json" }
+    let(:desc_cache) { HOMEBREW_CACHE/"descriptions.json" }
 
     it "supports searching in descriptions and creates a description cache" do
       expect(desc_cache).not_to exist

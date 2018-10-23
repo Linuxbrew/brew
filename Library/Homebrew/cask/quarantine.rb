@@ -20,7 +20,7 @@ module Cask
     def check_quarantine_support
       odebug "Checking quarantine support"
 
-      if !system_command!(xattr).success?
+      if !system_command(xattr, print_stderr: false).success?
         odebug "There's not a working version of xattr."
         :xattr_broken
       elsif swift.nil?
@@ -136,7 +136,15 @@ module Cask
 
       resolved_paths = Pathname.glob(to/"**/*", File::FNM_DOTMATCH)
 
-      system_command!("/bin/chmod", args: ["-R", "u+w", to])
+      system_command!("/usr/bin/xargs",
+                      args: [
+                        "-0",
+                        "--",
+                        "/bin/chmod",
+                        "-h",
+                        "u+w",
+                      ],
+                      input: resolved_paths.join("\0"))
 
       quarantiner = system_command("/usr/bin/xargs",
                                    args: [

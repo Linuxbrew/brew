@@ -360,7 +360,7 @@ class BottleSpecification
     cellar == :any || cellar == :any_skip_relocation || cellar == HOMEBREW_CELLAR.to_s
   end
 
-  # Does the Bottle this BottleSpecification belongs to need to be relocated?
+  # Does the {Bottle} this BottleSpecification belongs to need to be relocated?
   def skip_relocation?
     # Relocation is always required on Linux to locate glibc.
     return false if OS.linux?

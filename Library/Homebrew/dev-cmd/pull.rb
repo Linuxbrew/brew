@@ -1,6 +1,6 @@
 #:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=`<bintray-org>] [`--test-bot-user=`<test-bot-user>] <patch-source> [<patch-source>]:
-#:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
-#:    Optionally, installs the formulae changed by the patch.
+#:    Get a patch from a GitHub commit or pull request and apply it to Homebrew.
+#:    Optionally, publish updated bottles for the formulae changed by the patch.
 #:
 #:    Each <patch-source> may be one of:
 #:
@@ -41,11 +41,11 @@
 #:    If `--warn-on-publish-failure` was passed, do not exit if there's a
 #:    failure publishing bottles on Bintray.
 #:
-#:    If `--bintray-org=`<bintray-org> is passed, publish at the given Bintray
+#:    If `--bintray-org=`<bintray-org> is passed, publish at the provided Bintray
 #:    organisation.
 #:
 #:    If `--test-bot-user=`<test-bot-user> is passed, pull the bottle block
-#:    commit from the specified user on GitHub.
+#:    commit from the provided user on GitHub.
 
 require "net/http"
 require "net/https"
@@ -74,12 +74,12 @@ module Homebrew
   def pull_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `pull` [<options>] <formula>:
+        `pull` [<options>] <patch sources>
 
-        Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
-        Optionally, installs the formulae changed by the patch.
+        Get a patch from a GitHub commit or pull request and apply it to Homebrew.
+        Optionally, publish updated bottles for the formulae changed by the patch.
 
-        Each <patch-source> may be one of:
+        Each <patch source> may be one of:
 
           ~ The ID number of a PR (pull request) in the homebrew/core GitHub
             repository
@@ -112,9 +112,9 @@ module Homebrew
       switch "--warn-on-publish-failure",
         description: "Do not exit if there's a failure publishing bottles on Bintray."
       flag   "--bintray-org=",
-        description: "Publish at the given Bintray organisation."
+        description: "Publish bottles at the provided Bintray <organisation>."
       flag   "--test-bot-user=",
-        description: "Pull the bottle block commit from the specified user on GitHub."
+        description: "Pull the bottle block commit from the provided <user> on GitHub."
       flag   "--tap=",
         description: "Apply the PR to the specified tap."
       switch :verbose
@@ -493,9 +493,9 @@ module Homebrew
     { files: files, formulae: formulae, others: others }
   end
 
-  # Get current formula versions without loading formula definition in this process
-  # Returns info as a hash (type => version), for pull.rb's internal use
-  # Uses special key :nonexistent => true for nonexistent formulae
+  # Get current formula versions without loading formula definition in this process.
+  # Returns info as a hash (type => version), for pull.rb's internal use.
+  # Uses special key `:nonexistent => true` for nonexistent formulae.
   def current_versions_from_info_external(formula_name)
     info = FormulaInfoFromJson.lookup(formula_name)
     versions = {}
@@ -580,7 +580,7 @@ module Homebrew
     false
   end
 
-  # Formula info drawn from an external "brew info --json" call
+  # Formula info drawn from an external `brew info --json` call
   class FormulaInfoFromJson
     # The whole info structure parsed from the JSON
     attr_accessor :info
@@ -589,8 +589,8 @@ module Homebrew
       @info = info
     end
 
-    # Looks up formula on disk and reads its info
-    # Returns nil if formula is absent or if there was an error reading it
+    # Looks up formula on disk and reads its info.
+    # Returns nil if formula is absent or if there was an error reading it.
     def self.lookup(name)
       json = Utils.popen_read(HOMEBREW_BREW_FILE, "info", "--json=v1", name)
 
@@ -640,11 +640,11 @@ module Homebrew
     end
   end
 
-  # Bottle info as used internally by pull, with alternate platform support
+  # Bottle info as used internally by pull, with alternate platform support.
   class BottleInfo
     # URL of bottle as string
     attr_accessor :url
-    # Expected SHA256 as string
+    # Expected SHA-256 as string
     attr_accessor :sha256
 
     def initialize(url, sha256)

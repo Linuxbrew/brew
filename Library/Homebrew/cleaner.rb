@@ -1,8 +1,9 @@
 # Cleans a newly installed keg.
 # By default:
-# * removes .la files
-# * removes perllocal.pod files
-# * removes .packlist files
+#
+# * removes `.la` files
+# * removes `perllocal.pod` files
+# * removes `.packlist` files
 # * removes empty directories
 # * sets permissions on executables
 # * removes unresolved symlinks

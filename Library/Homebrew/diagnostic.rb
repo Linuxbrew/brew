@@ -59,8 +59,8 @@ module Homebrew
 
     class Checks
       ############# HELPERS
-      # Finds files in HOMEBREW_PREFIX *and* /usr/local.
-      # Specify paths relative to a prefix eg. "include/foo.h".
+      # Finds files in `HOMEBREW_PREFIX` *and* /usr/local.
+      # Specify paths relative to a prefix e.g. "include/foo.h".
       # Sets @found for your convenience.
       def find_relative_paths(*relative_paths)
         @found = [HOMEBREW_PREFIX, "/usr/local"].uniq.reduce([]) do |found, prefix|

@@ -10,14 +10,9 @@ describe X11Requirement do
   end
 
   describe "#eql?" do
-    it "returns true if the names are equal" do
-      other = described_class.new(default_name)
+    it "returns true if the requirements are equal" do
+      other = described_class.new
       expect(subject).to eql(other)
-    end
-
-    it "and returns false if the names differ" do
-      other = described_class.new("foo")
-      expect(subject).not_to eql(other)
     end
   end
 

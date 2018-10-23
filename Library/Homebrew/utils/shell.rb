@@ -35,7 +35,7 @@ module Utils
       end
     end
 
-    # return the shell profile file based on users' preferred shell
+    # return the shell profile file based on user's preferred shell
     def profile
       SHELL_PROFILE_MAP.fetch(preferred, "~/.bash_profile")
     end

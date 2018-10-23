@@ -1,5 +1,5 @@
-#:  * `formula` <formula>:
-#:    Display the path where <formula> is located.
+#:  * `formula` <formulae>:
+#:    Display the path where a formula is located.
 
 require "formula"
 require "cli_parser"
@@ -10,12 +10,12 @@ module Homebrew
   def formula_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `formula` <formula>:
+        `formula` <formulae>
 
-        Display the path where <formula> is located.
+        Display the path where a formula is located.
       EOS
-      switch :debug
       switch :verbose
+      switch :debug
     end
   end
 

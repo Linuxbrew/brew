@@ -42,7 +42,7 @@ module Cask
       end
 
       # This could be done by calling into Homebrew, but the situation
-      # where "doctor" is needed is precisely the situation where such
+      # where `brew doctor` is needed is precisely the situation where such
       # things are less dependable.
       def check_install_location
         ohai "Homebrew Cask Install Location"

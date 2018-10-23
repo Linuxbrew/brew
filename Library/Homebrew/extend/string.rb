@@ -18,7 +18,7 @@ class NilClass
   def chuzzle; end
 end
 
-# used by the inreplace function (in utils.rb)
+# Used by the inreplace function (in `utils.rb`).
 module StringInreplaceExtension
   attr_accessor :errors
 

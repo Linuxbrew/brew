@@ -68,7 +68,7 @@ module RuboCop
     end
 
     module FormulaAuditStrict
-      # - `test do ..end` should be meaningfully defined in the formula
+      # - `test do ..end` should be meaningfully defined in the formula.
       class Test < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
           test = find_block(body_node, :test)

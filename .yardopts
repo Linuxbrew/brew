@@ -7,7 +7,4 @@
 --exclude Library/Homebrew/compat/
 Library/Homebrew/**/*.rb
 -
-share/doc/homebrew/*.html
-Library/Homebrew/*.md
-share/doc/homebrew/*.md
 *.md

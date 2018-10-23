@@ -1,7 +1,7 @@
 require "digest/md5"
 require "extend/cachable"
 
-# The Formulary is responsible for creating instances of Formula.
+# The Formulary is responsible for creating instances of {Formula}.
 # It is not meant to be used directly from formulae.
 
 module Formulary
@@ -175,7 +175,7 @@ module Formulary
     end
   end
 
-  # Loads formulae from disk using a path
+  # Loads formulae from disk using a path.
   class FromPathLoader < FormulaLoader
     def initialize(path)
       path = Pathname.new(path).expand_path
@@ -183,7 +183,7 @@ module Formulary
     end
   end
 
-  # Loads formulae from URLs
+  # Loads formulae from URLs.
   class FromUrlLoader < FormulaLoader
     attr_reader :url
 
@@ -280,7 +280,7 @@ module Formulary
     end
   end
 
-  # Load formulae directly from their contents
+  # Load formulae directly from their contents.
   class FormulaContentsLoader < FormulaLoader
     # The formula's contents
     attr_reader :contents
@@ -298,7 +298,8 @@ module Formulary
   end
 
   # Return a Formula instance for the given reference.
-  # `ref` is string containing:
+  # `ref` is a string containing:
+  #
   # * a formula name
   # * a formula pathname
   # * a formula URL

@@ -111,9 +111,8 @@ class Keg
   ].freeze
 
   # Given an array of kegs, this method will try to find some other kegs
-  # that depend on them.
+  # that depend on them. If it does, it returns:
   #
-  # If it does, it returns:
   # - some kegs in the passed array that have installed dependents
   # - some installed dependents of those kegs.
   #
@@ -303,7 +302,7 @@ class Keg
     CacheStoreDatabase.use(:linkage) do |db|
       break unless db.created?
 
-      LinkageCacheStore.new(path, db).flush_cache!
+      LinkageCacheStore.new(path, db).delete!
     end
 
     path.rmtree

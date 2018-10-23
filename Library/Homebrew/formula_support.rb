@@ -1,4 +1,4 @@
-# Used to track formulae that cannot be installed at the same time
+# Used to track formulae that cannot be installed at the same time.
 FormulaConflict = Struct.new(:name, :reason)
 
 # Used to annotate formulae that duplicate macOS provided software
@@ -39,7 +39,7 @@ class KegOnlyReason
   end
 end
 
-# Used to annotate formulae that don't require compiling or cannot build bottle.
+# Used to annotate formulae that don't require compiling or cannot build a bottle.
 class BottleDisableReason
   SUPPORTED_TYPES = [:unneeded, :disable].freeze
 

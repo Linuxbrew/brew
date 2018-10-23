@@ -27,7 +27,7 @@ class JavaRequirement < Requirement
 
   def initialize(tags = [])
     @version = tags.shift if /(\d+\.)+\d/ =~ tags.first
-    super
+    super(tags)
   end
 
   def message
@@ -39,7 +39,7 @@ class JavaRequirement < Requirement
   end
 
   def inspect
-    "#<#{self.class.name}: #{name.inspect} #{tags.inspect} version=#{@version.inspect}>"
+    "#<#{self.class.name}: #{tags.inspect} version=#{@version.inspect}>"
   end
 
   def display_s

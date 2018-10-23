@@ -53,10 +53,10 @@ HOMEBREW_USER_AGENT_FAKE_SAFARI =
   "(KHTML, like Gecko) Version/10.0.3 Safari/602.4.8".freeze
 
 # Bintray fallback is here for people auto-updating from a version where
-# HOMEBREW_BOTTLE_DEFAULT_DOMAIN isn't set.
+# `HOMEBREW_BOTTLE_DEFAULT_DOMAIN` isn't set.
 HOMEBREW_BOTTLE_DEFAULT_DOMAIN = if ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"]
   ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"]
-elsif OS.mac?
+elsif OS.mac? || ENV["HOMEBREW_FORCE_HOMEBREW_ON_LINUX"]
   "https://homebrew.bintray.com".freeze
 else
   "https://linuxbrew.bintray.com".freeze

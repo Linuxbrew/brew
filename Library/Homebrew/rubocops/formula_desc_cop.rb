@@ -4,7 +4,7 @@ require "extend/string"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop audits `desc` in Formulae
+      # This cop audits `desc` in Formulae.
       #
       # - Checks for existence of `desc`
       # - Checks if size of `desc` > 80
@@ -37,7 +37,7 @@ module RuboCop
     end
 
     module FormulaAuditStrict
-      # This cop audits `desc` in Formulae
+      # This cop audits `desc` in Formulae.
       #
       # - Checks for leading/trailing whitespace in `desc`
       # - Checks if `desc` begins with an article
