@@ -10,16 +10,39 @@
 #     `--list-checks` lists all audit methods
 
 require "diagnostic"
+require "cli_parser"
 
 module Homebrew
   module_function
 
+  def doctor_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `doctor` [<options>]
+
+        Check your system for potential problems. Doctor exits with a non-zero status
+        if any potential problems are found. Please note that these warnings are just
+        used to help the Homebrew maintainers with debugging if you file an issue. If
+        everything you use Homebrew for is working fine: please don't worry or file
+        an issue; just ignore this.
+      EOS
+      switch "--list-checks",
+        description: "List all audit methods."
+      switch "-D", "--audit-debug",
+        description: "Enable debugging and profiling of audit methods."
+      switch :verbose
+      switch :debug
+    end
+  end
+
   def doctor
-    inject_dump_stats!(Diagnostic::Checks, /^check_*/) if ARGV.switch? "D"
+    doctor_args.parse
+
+    inject_dump_stats!(Diagnostic::Checks, /^check_*/) if args.audit_debug?
 
     checks = Diagnostic::Checks.new
 
-    if ARGV.include? "--list-checks"
+    if args.list_checks?
       puts checks.all.sort
       exit
     end
@@ -36,7 +59,7 @@ module Homebrew
 
     first_warning = true
     methods.each do |method|
-      $stderr.puts "Checking #{method}" if ARGV.debug?
+      $stderr.puts "Checking #{method}" if args.debug?
       unless checks.respond_to?(method)
         Homebrew.failed = true
         puts "No check available by the name: #{method}"
