@@ -254,6 +254,7 @@ module Homebrew
     def initialize(formula, options = {})
       @formula = formula
       @versioned_formula = formula.versioned_formula?
+      @new_formula_inclusive = options[:new_formula]
       @new_formula = options[:new_formula] && !@versioned_formula
       @strict = options[:strict]
       @online = options[:online]
@@ -561,6 +562,18 @@ module Homebrew
                                   strict: @strict)
         problem http_content_problem
       end
+    end
+
+    def audit_bottle_spec
+      # special case: new versioned formulae should be audited
+      return unless @new_formula_inclusive
+      return unless @core_tap
+
+      return if formula.bottle_disabled?
+
+      return unless formula.bottle_defined?
+
+      new_formula_problem "New formulae should not have a `bottle do` block"
     end
 
     def audit_bottle_disabled
