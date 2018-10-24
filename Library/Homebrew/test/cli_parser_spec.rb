@@ -46,6 +46,11 @@ describe Homebrew::CLI::Parser do
       parser.parse([])
       expect(Homebrew.args.pry?).to be true
     end
+
+    it ":verbose with custom description" do
+      _, _, _, desc = parser.processed_options.find { |short, _| short == "-v" }
+      expect(desc).to eq "Flag for verbosity"
+    end
   end
 
   describe "test long flag options" do
