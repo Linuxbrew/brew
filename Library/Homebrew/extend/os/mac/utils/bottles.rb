@@ -42,6 +42,10 @@ module Utils
         altivec_tag if key?(altivec_tag)
       end
 
+      def tag_without_or_later(tag)
+        tag
+      end
+
       # Find a bottle built for a previous version of macOS.
       def find_older_compatible_tag(tag)
         begin
@@ -51,13 +55,12 @@ module Utils
         end
 
         keys.find do |key|
-          # TODO: move to compat?
-          key_tag_version = if key.to_s.end_with?("_or_later")
-            key.to_s[/(\w+)_or_later$/, 1].to_sym
-          else
-            key
+          key_tag_version = tag_without_or_later(key)
+          begin
+            MacOS::Version.from_symbol(key_tag_version) <= tag_version
+          rescue ArgumentError
+            false
           end
-          MacOS::Version.from_symbol(key_tag_version) <= tag_version
         end
       end
     end
