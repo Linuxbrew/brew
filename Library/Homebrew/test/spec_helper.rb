@@ -98,7 +98,10 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :needs_svn) do
-    skip "subversion not installed." unless which "svn"
+    homebrew_bin = File.dirname HOMEBREW_BREW_FILE
+    unless %W[/usr/bin/svn #{homebrew_bin}/svn].map { |x| File.executable?(x) }.any?
+      skip "subversion not installed."
+    end
   end
 
   config.before(:each, :needs_unzip) do
