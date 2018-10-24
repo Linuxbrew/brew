@@ -2532,7 +2532,6 @@ class Formula
     #   version '4.8.1'
     # end</pre>
     def fails_with(compiler, &block)
-      odisabled "fails_with :llvm" if compiler == :llvm
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
 
