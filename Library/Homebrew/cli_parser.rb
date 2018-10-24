@@ -42,8 +42,12 @@ module Homebrew
 
       def switch(*names, description: nil, env: nil, required_for: nil, depends_on: nil)
         global_switch = names.first.is_a?(Symbol)
-        names, env, description = common_switch(*names) if global_switch
-        description = option_to_description(*names) if description.nil?
+        names, env, default_description = common_switch(*names) if global_switch
+        if description.nil? && global_switch
+          description = default_description
+        elsif description.nil?
+          description = option_to_description(*names)
+        end
         process_option(*names, description)
         @parser.on(*names, *wrap_option_desc(description)) do
           enable_switch(*names)
