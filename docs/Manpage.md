@@ -1,5 +1,5 @@
 brew(1) -- The missing package manager for macOS
-===============================================
+================================================
 
 ## SYNOPSIS
 
@@ -1100,6 +1100,7 @@ can take several different forms:
     The formula file will be cached for later use.
 
 ## ENVIRONMENT
+
 Note that environment variables must have a value set to be detected. For example, `export HOMEBREW_NO_INSECURE_REDIRECT=1` rather than just `export HOMEBREW_NO_INSECURE_REDIRECT`.
 
   * `HOMEBREW_ARTIFACT_DOMAIN`:
@@ -1175,22 +1176,16 @@ Note that environment variables must have a value set to be detected. For exampl
     editors will do strange things in this case.
 
   * `HOMEBREW_FORCE_BREWED_CURL`:
-    If set, Homebrew will use a Homebrew-installed `curl` rather than the
-    system version.
+    If set, Homebrew will always use a Homebrew-installed `curl` rather than the
+    system version. Automatically set if the system version of `curl` is too old.
 
   * `HOMEBREW_FORCE_VENDOR_RUBY`:
     If set, Homebrew will always use its vendored, relocatable Ruby version
     even if the system version of Ruby is new enough.
 
-  * `HOMEBREW_GIT`:
-    When using Git, Homebrew will use `GIT` if set,
-    a Homebrew-built Git if installed, or the system-provided binary.
-
-    Set this to force Homebrew to use a particular git binary.
-
   * `HOMEBREW_FORCE_BREWED_GIT`:
-    If set, Homebrew will use a Homebrew-installed `git` rather than the
-    system version.
+    If set, Homebrew will always use a Homebrew-installed `git` rather than the
+    system version. Automatically set if the system version of `git` is too old.
 
   * `HOMEBREW_GITHUB_API_TOKEN`:
     A personal access token for the GitHub API, which you can create at

@@ -1297,22 +1297,15 @@ If set, Homebrew will use this editor when editing a single formula, or several 
 .
 .TP
 \fBHOMEBREW_FORCE_BREWED_CURL\fR
-If set, Homebrew will use a Homebrew\-installed \fBcurl\fR rather than the system version\.
+If set, Homebrew will always use a Homebrew\-installed \fBcurl\fR rather than the system version\. Automatically set if the system version of \fBcurl\fR is too old\.
 .
 .TP
 \fBHOMEBREW_FORCE_VENDOR_RUBY\fR
 If set, Homebrew will always use its vendored, relocatable Ruby version even if the system version of Ruby is new enough\.
 .
 .TP
-\fBHOMEBREW_GIT\fR
-When using Git, Homebrew will use \fBGIT\fR if set, a Homebrew\-built Git if installed, or the system\-provided binary\.
-.
-.IP
-Set this to force Homebrew to use a particular git binary\.
-.
-.TP
 \fBHOMEBREW_FORCE_BREWED_GIT\fR
-If set, Homebrew will use a Homebrew\-installed \fBgit\fR rather than the system version\.
+If set, Homebrew will always use a Homebrew\-installed \fBgit\fR rather than the system version\. Automatically set if the system version of \fBgit\fR is too old\.
 .
 .TP
 \fBHOMEBREW_GITHUB_API_TOKEN\fR
