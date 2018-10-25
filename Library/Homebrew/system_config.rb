@@ -123,7 +123,6 @@ class SystemConfig
         HOMEBREW_CACHE: "#{ENV["HOME"]}/Library/Caches/Homebrew",
         HOMEBREW_TEMP: ENV["HOMEBREW_SYSTEM_TEMP"],
         HOMEBREW_RUBY_WARNINGS: "-W0",
-        HOMEBREW_GIT: "git",
       }.freeze
       boring_keys = %w[
         HOMEBREW_BROWSER
@@ -137,6 +136,7 @@ class SystemConfig
         HOMEBREW_BREW_FILE
         HOMEBREW_COMMAND_DEPTH
         HOMEBREW_CURL
+        HOMEBREW_GIT
         HOMEBREW_GIT_CONFIG_FILE
         HOMEBREW_LIBRARY
         HOMEBREW_MACOS_VERSION
@@ -167,9 +167,6 @@ class SystemConfig
       end
       if defaults_hash[:HOMEBREW_RUBY_WARNINGS] != ENV["HOMEBREW_RUBY_WARNINGS"].to_s
         f.puts "HOMEBREW_RUBY_WARNINGS: #{ENV["HOMEBREW_RUBY_WARNINGS"]}"
-      end
-      if defaults_hash[:HOMEBREW_GIT] != ENV["HOMEBREW_GIT"].to_s
-        f.puts "HOMEBREW_GIT: #{ENV["HOMEBREW_GIT"]}"
       end
       unless ENV["HOMEBREW_ENV"]
         ENV.sort.each do |key, value|
