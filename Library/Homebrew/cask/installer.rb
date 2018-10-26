@@ -424,7 +424,7 @@ module Cask
         next unless artifact.respond_to?(:uninstall_phase)
 
         odebug "Un-installing artifact of class #{artifact.class}"
-        artifact.uninstall_phase(command: @command, verbose: verbose?, skip: clear, force: force?)
+        artifact.uninstall_phase(command: @command, verbose: verbose?, skip: clear, force: force?, upgrade: upgrade?)
       end
     end
 
