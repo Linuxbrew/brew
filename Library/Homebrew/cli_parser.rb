@@ -76,20 +76,24 @@ module Homebrew
         end
       end
 
-      def flag(name, description: nil, required_for: nil, depends_on: nil)
-        if name.end_with? "="
+      def flag(*names, description: nil, required_for: nil, depends_on: nil)
+        if names.any? { |name| name.end_with? "=" }
           required = OptionParser::REQUIRED_ARGUMENT
-          name.chomp! "="
         else
           required = OptionParser::OPTIONAL_ARGUMENT
         end
-        description = option_to_description(name) if description.nil?
-        process_option(name, description)
-        @parser.on(name, *wrap_option_desc(description), required) do |option_value|
-          Homebrew.args[option_to_name(name)] = option_value
+        names.map! { |name| name.chomp "=" }
+        description = option_to_description(*names) if description.nil?
+        process_option(*names, description)
+        @parser.on(*names, *wrap_option_desc(description), required) do |option_value|
+          names.each do |name|
+            Homebrew.args[option_to_name(name)] = option_value
+          end
         end
 
-        set_constraints(name, required_for: required_for, depends_on: depends_on)
+        names.each do |name|
+          set_constraints(name, required_for: required_for, depends_on: depends_on)
+        end
       end
 
       def conflicts(*options)

@@ -76,6 +76,20 @@ describe Homebrew::CLI::Parser do
     end
   end
 
+  describe "test short flag options" do
+    subject(:parser) {
+      described_class.new do
+        flag "-f", "--filename=", description: "Name of the file"
+      end
+    }
+
+    it "parses a short flag option with its argument" do
+      parser.parse(["--filename=random.txt"])
+      expect(Homebrew.args.filename).to eq "random.txt"
+      expect(Homebrew.args.f).to eq "random.txt"
+    end
+  end
+
   describe "test constraints for flag options" do
     subject(:parser) {
       described_class.new do
