@@ -55,6 +55,12 @@ git() {
   "$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" "$@"
 }
 
+numeric() {
+  # Condense the exploded argument into a single return value.
+  # shellcheck disable=SC2086,SC2183
+  printf "%01d%02d%02d%02d" ${1//./ }
+}
+
 HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty --abbrev=7 2>/dev/null)"
 HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
 if [[ -z "$HOMEBREW_VERSION" ]]
@@ -114,6 +120,25 @@ else
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
 
+  # Ensure the system Curl is a version that supports modern HTTPS certificates.
+  HOMEBREW_MINIMUM_CURL_VERSION="7.41.0"
+  system_curl_version_output="$($(command -v curl) --version 2>/dev/null)"
+  system_curl_name_and_version="${system_curl_version_output%% (*}"
+  if [[ $(numeric "${system_curl_name_and_version##* }") -lt $(numeric "$HOMEBREW_MINIMUM_CURL_VERSION") ]]
+  then
+    HOMEBREW_SYSTEM_CURL_TOO_OLD="1"
+    HOMEBREW_FORCE_BREWED_CURL="1"
+  fi
+
+  # Ensure the system Git is at or newer than the minimum required version.
+  # Git 2.7.4 is the version of git on Ubuntu 16.04 LTS (Xenial Xerus).
+  HOMEBREW_MINIMUM_GIT_VERSION="2.7.0"
+  system_git_version_output="$($(command -v git) --version 2>/dev/null)"
+  if [[ $(numeric "${system_git_version_output##* }") -lt $(numeric "$HOMEBREW_MINIMUM_GIT_VERSION") ]]
+  then
+    HOMEBREW_FORCE_BREWED_GIT="1"
+  fi
+
   CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
   HOMEBREW_CACHE="${HOMEBREW_CACHE:-${CACHE_HOME}/Homebrew}"
   HOMEBREW_SYSTEM_TEMP="/tmp"
@@ -153,8 +178,9 @@ else
 fi
 
 HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_USER_AGENT_VERSION)"
-HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | awk '{print $1"/"$2}')"
-HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
+curl_version_output="$("$HOMEBREW_CURL" --version 2>/dev/null)"
+curl_name_and_version="${curl_version_output%% (*}"
+HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT ${curl_name_and_version// //}"
 
 # Declared in bin/brew
 export HOMEBREW_BREW_FILE
