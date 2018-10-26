@@ -15,3 +15,5 @@ require "rubocops/options"
 require "rubocops/urls"
 require "rubocops/lines"
 require "rubocops/class"
+
+require "rubocops/rubocop-cask"
