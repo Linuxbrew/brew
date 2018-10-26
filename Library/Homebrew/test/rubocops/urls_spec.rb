@@ -1,4 +1,4 @@
-require "rubocops/urls_cop"
+require "rubocops/urls"
 
 describe RuboCop::Cop::FormulaAudit::Urls do
   subject(:cop) { described_class.new }

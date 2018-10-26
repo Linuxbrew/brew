@@ -1,4 +1,4 @@
-require "rubocops/lines_cop"
+require "rubocops/lines"
 
 describe RuboCop::Cop::FormulaAudit::Lines do
   subject(:cop) { described_class.new }
@@ -565,7 +565,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       RUBY
     end
 
-    it "hardcoded gcc compiler" do
+    it "hardcoded gcc compiler system" do
       expect_offense(<<~'RUBY')
         class Foo < Formula
           desc "foo"
@@ -578,7 +578,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       RUBY
     end
 
-    it "hardcoded g++ compiler" do
+    it "hardcoded g++ compiler system" do
       expect_offense(<<~'RUBY')
         class Foo < Formula
           desc "foo"
@@ -591,7 +591,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       RUBY
     end
 
-    it "hardcoded llvm-g++ compiler" do
+    it "hardcoded llvm-g++ compiler COMPILER_PATH" do
       expect_offense(<<~'RUBY')
         class Foo < Formula
           desc "foo"
@@ -604,7 +604,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       RUBY
     end
 
-    it "hardcoded gcc compiler" do
+    it "hardcoded gcc compiler COMPILER_PATH" do
       expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"

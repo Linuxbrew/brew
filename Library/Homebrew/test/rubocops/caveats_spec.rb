@@ -1,4 +1,4 @@
-require "rubocops/caveats_cop"
+require "rubocops/caveats"
 
 describe RuboCop::Cop::FormulaAudit::Caveats do
   subject(:cop) { described_class.new }

@@ -1,4 +1,4 @@
-require "rubocops/options_cop"
+require "rubocops/options"
 
 describe RuboCop::Cop::FormulaAudit::Options do
   subject(:cop) { described_class.new }

@@ -1,4 +1,4 @@
-require "rubocops/checksum_cop"
+require "rubocops/checksum"
 
 describe RuboCop::Cop::FormulaAudit::Checksum do
   subject(:cop) { described_class.new }

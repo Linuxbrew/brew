@@ -1,4 +1,4 @@
-require "rubocops/extend/formula_cop"
+require "rubocops/extend/formula"
 
 module RuboCop
   module Cop

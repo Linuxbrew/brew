@@ -1,4 +1,4 @@
-require "rubocops/components_redundancy_cop"
+require "rubocops/components_redundancy"
 
 describe RuboCop::Cop::FormulaAudit::ComponentsRedundancy do
   subject(:cop) { described_class.new }

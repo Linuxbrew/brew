@@ -1,4 +1,4 @@
-require "rubocops/dependency_order_cop"
+require "rubocops/dependency_order"
 
 describe RuboCop::Cop::FormulaAudit::DependencyOrder do
   subject(:cop) { described_class.new }
@@ -40,7 +40,7 @@ describe RuboCop::Cop::FormulaAudit::DependencyOrder do
       RUBY
     end
 
-    it "wrong conditional depends_on order" do
+    it "wrong conditional depends_on order with block" do
       expect_offense(<<~RUBY)
         class Foo < Formula
           homepage "https://example.com"
