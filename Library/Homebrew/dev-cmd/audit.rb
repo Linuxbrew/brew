@@ -496,7 +496,6 @@ module Homebrew
     end
 
     def audit_keg_only_style
-      return unless @strict
       return unless formula.keg_only?
 
       whitelist = %w[
