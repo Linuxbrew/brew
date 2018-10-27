@@ -759,8 +759,8 @@ formula already uses.
   Print what would be done rather than doing it.
 * `--write`:
   When passed along with `--dry-run`, perform a not-so-dry run by making the expected file modifications but not taking any Git actions.
-* `--audit`:
-  Run `brew audit` before opening the PR.
+* `--no-audit`:
+  Don't run `brew audit` before opening the PR.
 * `--strict`:
   Run `brew audit --strict` before opening the PR.
 * `--no-browse`:
