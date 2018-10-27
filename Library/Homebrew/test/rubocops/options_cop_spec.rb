@@ -3,21 +3,17 @@ require "rubocops/options_cop"
 describe RuboCop::Cop::FormulaAudit::Options do
   subject(:cop) { described_class.new }
 
-  it "reports an offense when using the 32-bit option" do
-    expect_offense(<<~RUBY)
-      class Foo < Formula
-        url 'https://example.com/foo-1.0.tgz'
-        option "32-bit", "with 32-bit"
-                ^^^^^^ macOS has been 64-bit only since 10.6 so 32-bit options are deprecated.
-      end
-    RUBY
-  end
-end
+  context "When auditing options" do
+    it "reports an offense when using the 32-bit option" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          url 'https://example.com/foo-1.0.tgz'
+          option "with-32-bit"
+                       ^^^^^^ macOS has been 64-bit only since 10.6 so 32-bit options are deprecated.
+        end
+      RUBY
+    end
 
-describe RuboCop::Cop::FormulaAuditStrict::Options do
-  subject(:cop) { described_class.new }
-
-  context "When auditing options strictly" do
     it "with universal" do
       expect_offense(<<~RUBY)
         class Foo < Formula
