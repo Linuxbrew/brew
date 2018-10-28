@@ -105,7 +105,8 @@ then
     HOMEBREW_FORCE_BREWED_CURL="1"
   fi
 
-  # The system Git is too old for some Homebrew functionality we rely on.
+  # The system Git on macOS versions before Sierra is too old for some Homebrew functionality we rely on.
+  HOMEBREW_MINIMUM_GIT_VERSION="2.14.3"
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "101200" ]]
   then
     HOMEBREW_FORCE_BREWED_GIT="1"
@@ -198,6 +199,7 @@ export HOMEBREW_SYSTEM
 export HOMEBREW_CURL
 export HOMEBREW_SYSTEM_CURL_TOO_OLD
 export HOMEBREW_GIT
+export HOMEBREW_MINIMUM_GIT_VERSION
 export HOMEBREW_PROCESSOR
 export HOMEBREW_PRODUCT
 export HOMEBREW_OS_VERSION
