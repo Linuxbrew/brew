@@ -126,6 +126,7 @@ module Homebrew
         remaining_args = @parser.parse(cmdline_args)
         check_constraint_violations
         Homebrew.args[:remaining] = remaining_args
+        Homebrew.args.freeze
         @parser
       end
 
