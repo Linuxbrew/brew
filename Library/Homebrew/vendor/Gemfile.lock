@@ -6,16 +6,35 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
+    ast (2.4.0)
     backports (3.11.4)
     concurrent-ruby (1.0.5)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
+    jaro_winkler (1.5.1)
     minitest (5.11.3)
+    parallel (1.12.1)
+    parser (2.5.1.2)
+      ast (~> 2.4.0)
     plist (3.4.0)
+    powerpack (0.1.2)
+    rainbow (3.0.0)
+    rubocop (0.59.1)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.5, != 2.5.1.1)
+      powerpack (~> 0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.0, >= 1.0.1)
+    rubocop-rspec (1.30.0)
+      rubocop (>= 0.58.0)
     ruby-macho (2.1.0)
+    ruby-progressbar (1.10.0)
     thread_safe (0.3.6)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
+    unicode-display_width (1.4.0)
 
 PLATFORMS
   ruby
@@ -25,7 +44,9 @@ DEPENDENCIES
   backports
   concurrent-ruby
   plist
+  rubocop (= 0.59.1)
+  rubocop-rspec
   ruby-macho
 
 BUNDLED WITH
-   1.16.4
+   1.16.6

@@ -3,9 +3,9 @@ require "requirement"
 class ArchRequirement < Requirement
   fatal true
 
-  def initialize(arch)
-    @arch = arch.pop
-    super
+  def initialize(tags)
+    @arch = tags.shift
+    super(tags)
   end
 
   satisfy(build_env: false) do

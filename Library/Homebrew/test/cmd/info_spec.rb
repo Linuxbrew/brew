@@ -23,6 +23,13 @@ end
 describe Homebrew do
   let(:remote) { "https://github.com/Homebrew/homebrew-core" }
 
+  specify "::analytics_table" do
+    results = { ack: 10, wget: 100 }
+    expect { subject.analytics_table("install", "30", results) }
+      .to output(/110 |  100.00%/).to_stdout
+      .and not_to_output.to_stderr
+  end
+
   specify "::github_remote_path" do
     expect(subject.github_remote_path(remote, "Formula/git.rb"))
       .to eq("https://github.com/Homebrew/homebrew-core/blob/master/Formula/git.rb")

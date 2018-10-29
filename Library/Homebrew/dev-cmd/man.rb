@@ -16,14 +16,17 @@ require "dev-cmd/bottle"
 require "dev-cmd/bump-formula-pr"
 require "dev-cmd/create"
 require "dev-cmd/edit"
+require "dev-cmd/extract"
 require "dev-cmd/formula"
 require "dev-cmd/irb"
 require "dev-cmd/linkage"
 require "dev-cmd/mirror"
+require "dev-cmd/prof"
 require "dev-cmd/pull"
-require "dev-cmd/extract"
 require "dev-cmd/release-notes"
+require "dev-cmd/ruby"
 require "dev-cmd/tap-new"
+require "dev-cmd/test"
 require "dev-cmd/tests"
 require "dev-cmd/update-test"
 
@@ -37,7 +40,7 @@ module Homebrew
   def man_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `man` [<options>]:
+        `man` [<options>]
 
         Generate Homebrew's manpages.
       EOS
@@ -47,7 +50,7 @@ module Homebrew
                      "the date used in new manpages will match those in the existing manpages (to allow "\
                      "comparison without factoring in the date)."
       switch "--link",
-        description: "It is now done automatically by `brew update`."
+        description: "This is now done automatically by `brew update`."
     end
   end
 
@@ -186,6 +189,7 @@ module Homebrew
   def generate_cmd_manpages(glob)
     cmd_paths = Pathname.glob(glob).sort
     man_page_lines = []
+    man_args = Homebrew.args
     cmd_paths.each do |cmd_path|
       begin
         cmd_parser = Homebrew.send(cmd_arg_parser(cmd_path))
@@ -194,6 +198,7 @@ module Homebrew
         man_page_lines << path_glob_commands(cmd_path.to_s).first
       end
     end
+    Homebrew.args = man_args
     man_page_lines
   end
 
@@ -220,15 +225,16 @@ module Homebrew
   end
 
   def generate_option_doc(short, long, desc)
-    "* #{format_short_opt(short)} #{format_long_opt(long)}:" + "\n" + desc + "\n"
+    comma = (short && long) ? ", " : ""
+    "* #{format_short_opt(short)}" + comma + "#{format_long_opt(long)}:" + "\n  " + desc + "\n"
   end
 
   def format_short_opt(opt)
-    "`#{opt}`, " unless opt.nil?
+    "`#{opt}`" unless opt.nil?
   end
 
   def format_long_opt(opt)
-    "`#{opt}`"
+    "`#{opt}`" unless opt.nil?
   end
 
   def format_usage_banner(usage_banner)

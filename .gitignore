@@ -23,7 +23,9 @@
 **/.bundle/cache
 **/vendor/bundle
 **/vendor/ruby
+**/vendor/bundle-standalone/ruby/*/bin
 **/vendor/bundle-standalone/ruby/*/cache
+**/vendor/bundle-standalone/ruby/*/extensions
 **/vendor/bundle-standalone/ruby/*/gems/*/*
 **/vendor/bundle-standalone/ruby/*/specifications
 
@@ -38,6 +40,17 @@
 **/vendor/bundle-standalone/ruby/*/gems/minitest-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/thread_safe-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/tzinfo-*/lib
+
+# Ignore rubocop dependencies we don't wish to vendor
+**/vendor/bundle-standalone/ruby/*/gems/ast-*/
+**/vendor/bundle-standalone/ruby/*/gems/jaro_winkler-*/
+**/vendor/bundle-standalone/ruby/*/gems/parallel-*/
+**/vendor/bundle-standalone/ruby/*/gems/parser-*/
+**/vendor/bundle-standalone/ruby/*/gems/powerpack-*/
+**/vendor/bundle-standalone/ruby/*/gems/rainbow-*/
+**/vendor/bundle-standalone/ruby/*/gems/rubocop-*/
+**/vendor/bundle-standalone/ruby/*/gems/ruby-progressbar-*/
+**/vendor/bundle-standalone/ruby/*/gems/unicode-display_width-*/
 
 # Ignore `bin` contents (again).
 /bin
@@ -64,6 +77,8 @@
 !/CHANGELOG.md
 !/CODE_OF_CONDUCT.md
 !/CONTRIBUTING.md
+!/Dockerfile
+!/Dockerfile.test.yml
 !/LICENSE.txt
 !/README.md
 

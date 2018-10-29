@@ -13,9 +13,9 @@ GEM
     json (2.1.0)
     mustache (1.1.0)
     parallel (1.12.1)
-    parallel_tests (2.23.0)
+    parallel_tests (2.26.0)
       parallel
-    parser (2.5.1.2)
+    parser (2.5.3.0)
       ast (~> 2.4.0)
     powerpack (0.1.2)
     rainbow (3.0.0)
@@ -52,8 +52,6 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
-    rubocop-rspec (1.30.0)
-      rubocop (>= 0.58.0)
     ruby-progressbar (1.10.0)
     simplecov (0.16.1)
       docile (~> 1.1)
@@ -77,7 +75,6 @@ DEPENDENCIES
   rspec-retry
   rspec-wait
   rubocop (= 0.59.1)
-  rubocop-rspec
   simplecov
   simplecov-cobertura
 

@@ -5,7 +5,7 @@ module UnpackStrategy
     using Magic
 
     def self.extensions
-      [".compress"]
+      [".Z"]
     end
 
     def self.can_extract?(path)

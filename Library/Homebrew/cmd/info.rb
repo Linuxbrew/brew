@@ -1,11 +1,23 @@
 #:  * `info`:
 #:    Display brief statistics for your Homebrew installation.
 #:
-#:  * `info` <formula> [`--verbose`]:
+#:  * `info` `--analytics` [`--days=`<days>] [`--category=`<category>]:
+#:    Display Homebrew analytics data (provided neither `HOMEBREW_NO_ANALYTICS`
+#:    or `HOMEBREW_NO_GITHUB_API` are set)
+#:
+#:    The value for `days` must be `30`, `90` or `365`. The default is `30`.
+#:
+#:    The value for `category` must be `install`, `install-on-request`,
+#:    `build-error` or `os-version`. The default is `install`.
+#:
+#:  * `info` <formula> [`--analytics`]:
 #:    Display information about <formula> and analytics data (provided neither
 #:    `HOMEBREW_NO_ANALYTICS` or `HOMEBREW_NO_GITHUB_API` are set)
 #:
-#:    Pass `--verbose` to see more detailed analytics data.
+#:    Pass `--verbose` to see more verbose analytics data.
+#:
+#:    Pass `--analytics` to see only more verbose analytics data instead of
+#:    formula information.
 #:
 #:  * `info` `--github` <formula>:
 #:    Open a browser to the GitHub History page for <formula>.
@@ -47,7 +59,9 @@ module Homebrew
 
   def print_info
     if ARGV.named.empty?
-      if HOMEBREW_CELLAR.exist?
+      if ARGV.include?("--analytics")
+        output_analytics
+      elsif HOMEBREW_CELLAR.exist?
         count = Formula.racks.length
         puts "#{count} #{"keg".pluralize(count)}, #{HOMEBREW_CELLAR.abv}"
       end
@@ -55,12 +69,21 @@ module Homebrew
       ARGV.named.each_with_index do |f, i|
         puts unless i.zero?
         begin
-          if f.include?("/") || File.exist?(f)
-            info_formula Formulary.factory(f)
+          formula = if f.include?("/") || File.exist?(f)
+            Formulary.factory(f)
           else
-            info_formula Formulary.find_with_priority(f)
+            Formulary.find_with_priority(f)
+          end
+          if ARGV.include?("--analytics")
+            output_formula_analytics(formula)
+          else
+            info_formula(formula)
           end
         rescue FormulaUnavailableError => e
+          if ARGV.include?("--analytics")
+            output_analytics(filter: f)
+            next
+          end
           ofail e.message
           # No formula with this name, try a missing formula lookup
           if (reason = MissingFormula.reason(f))
@@ -184,42 +207,165 @@ module Homebrew
     caveats = Caveats.new(f)
     ohai "Caveats", caveats.to_s unless caveats.empty?
 
-    output_analytics(f)
+    output_formula_analytics(f)
   end
 
-  def output_analytics(f)
-    return if ENV["HOMEBREW_NO_ANALYTICS"]
-    return if ENV["HOMEBREW_NO_GITHUB_API"]
+  def formulae_api_json(endpoint)
+    return if ENV["HOMEBREW_NO_ANALYTICS"] || ENV["HOMEBREW_NO_GITHUB_API"]
 
-    formulae_json_url = "https://formulae.brew.sh/api/formula/#{f}.json"
-    output, = curl_output("--max-time", "3", formulae_json_url)
-    return if output.empty?
+    output, = curl_output("--max-time", "3",
+      "https://formulae.brew.sh/api/#{endpoint}")
+    return if output.blank?
 
-    json = begin
-      JSON.parse(output)
-    rescue JSON::ParserError
-      nil
+    JSON.parse(output)
+  rescue JSON::ParserError
+    nil
+  end
+
+  def analytics_table(category, days, results, os_version: false)
+    oh1 "#{category} (#{days} days)"
+    total_count = results.values.inject("+")
+    formatted_total_count = format_count(total_count)
+    formatted_total_percent = format_percent(100)
+
+    index_header = "Index"
+    count_header = "Count"
+    percent_header = "Percent"
+    name_with_options_header = if os_version
+      "macOS Version"
+    else
+      "Name (with options)"
     end
-    return if json.nil? || json.empty? || json["analytics"].empty?
 
-    ohai "Analytics"
-    if ARGV.verbose?
-      json["analytics"].each do |category, value|
-        value.each do |range, results|
-          oh1 "#{category} (#{range})"
-          results.each do |name_with_options, count|
-            puts "#{name_with_options}: #{number_readable(count)}"
-          end
-        end
+    total_index_footer = "Total"
+    max_index_width = results.length.to_s.length
+    index_width = [
+      index_header.length,
+      total_index_footer.length,
+      max_index_width,
+    ].max
+    count_width = [
+      count_header.length,
+      formatted_total_count.length,
+    ].max
+    percent_width = [
+      percent_header.length,
+      formatted_total_percent.length,
+    ].max
+    name_with_options_width = Tty.width -
+                              index_width -
+                              count_width -
+                              percent_width -
+                              10 # spacing and lines
+
+    formatted_index_header =
+      format "%#{index_width}s", index_header
+    formatted_name_with_options_header =
+      format "%-#{name_with_options_width}s",
+             name_with_options_header[0..name_with_options_width-1]
+    formatted_count_header =
+      format "%#{count_width}s", count_header
+    formatted_percent_header =
+      format "%#{percent_width}s", percent_header
+    puts "#{formatted_index_header} | #{formatted_name_with_options_header} | "\
+         "#{formatted_count_header} |  #{formatted_percent_header}"
+
+    columns_line = "#{"-"*index_width}:|-#{"-"*name_with_options_width}-|-"\
+                   "#{"-"*count_width}:|-#{"-"*percent_width}:"
+    puts columns_line
+
+    index = 0
+    results.each do |name_with_options, count|
+      index += 1
+      formatted_index = format "%0#{max_index_width}d", index
+      formatted_index = format "%-#{index_width}s", formatted_index
+      formatted_name_with_options =
+        format "%-#{name_with_options_width}s",
+               name_with_options[0..name_with_options_width-1]
+      formatted_count = format "%#{count_width}s", format_count(count)
+      formatted_percent = if total_count.zero?
+        format "%#{percent_width}s", format_percent(0)
+      else
+        format "%#{percent_width}s",
+               format_percent((count.to_i * 100) / total_count.to_f)
       end
+      puts "#{formatted_index} | #{formatted_name_with_options} | " \
+           "#{formatted_count} | #{formatted_percent}%"
+      next if index > 10
+    end
+    return unless results.length > 1
+
+    formatted_total_footer =
+      format "%-#{index_width}s", total_index_footer
+    formatted_blank_footer =
+      format "%-#{name_with_options_width}s", ""
+    formatted_total_count_footer =
+      format "%#{count_width}s", formatted_total_count
+    formatted_total_percent_footer =
+      format "%#{percent_width}s", formatted_total_percent
+    puts "#{formatted_total_footer} | #{formatted_blank_footer} | "\
+         "#{formatted_total_count_footer} | #{formatted_total_percent_footer}%"
+  end
+
+  def output_analytics(filter: nil)
+    days = ARGV.value("days") || "30"
+    valid_days = %w[30 90 365]
+    unless valid_days.include?(days)
+      raise ArgumentError("Days must be one of #{valid_days.join(", ")}!")
+    end
+
+    category = ARGV.value("category") || "install"
+    valid_categories = %w[install install-on-request build-error os-version]
+    unless valid_categories.include?(category)
+      raise ArgumentError("Categories must be one of #{valid_categories.join(", ")}")
+    end
+
+    json = formulae_api_json("analytics/#{category}/#{days}d.json")
+    return if json.blank? || json["items"].blank?
+
+    os_version = category == "os-version"
+    results = {}
+    json["items"].each do |item|
+      key = if os_version
+        item["os_version"]
+      else
+        item["formula"]
+      end
+      if filter.present?
+        next if key != filter && !key.start_with?("#{filter} ")
+      end
+      results[key] = item["count"].tr(",", "").to_i
+    end
+
+    if filter.present? && results.blank?
+      onoe "No results matching `#{filter}` found!"
       return
     end
 
+    analytics_table(category, days, results, os_version: os_version)
+  end
+
+  def output_formula_analytics(f)
+    json = formulae_api_json("formula/#{f}.json")
+    return if json.blank? || json["analytics"].blank?
+
+    full_analytics = ARGV.include?("--analytics") || ARGV.verbose?
+
+    ohai "Analytics"
     json["analytics"].each do |category, value|
-      analytics = value.map do |range, results|
-        "#{number_readable(results.values.inject("+"))} (#{range})"
+      analytics = []
+
+      value.each do |days, results|
+        days = days.to_i
+        if full_analytics
+          analytics_table(category, days, results)
+        else
+          total_count = results.values.inject("+")
+          analytics << "#{number_readable(total_count)} (#{days} days)"
+        end
       end
-      puts "#{category}: #{analytics.join(", ")}"
+
+      puts "#{category}: #{analytics.join(", ")}" unless full_analytics
     end
   end
 
@@ -246,5 +392,13 @@ module Homebrew
     return dep.name if dep.option_tags.empty?
 
     "#{dep.name} #{dep.option_tags.map { |o| "--#{o}" }.join(" ")}"
+  end
+
+  def format_count(count)
+    count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
+  end
+
+  def format_percent(percent)
+    format "%.2f", percent
   end
 end

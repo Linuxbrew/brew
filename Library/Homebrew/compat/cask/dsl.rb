@@ -1,8 +1,11 @@
 module Cask
   class DSL
     module Compat
+      # TODO: can't delete this code until the merge of
+      # https://github.com/Homebrew/brew/pull/4730 or an equivalent.
+
       def gpg(*)
-        odeprecated "the `gpg` stanza", disable_on: Time.new(2018, 12, 31)
+        odisabled "the `gpg` stanza"
       end
 
       def license(*)
@@ -10,7 +13,7 @@ module Cask
       end
 
       def accessibility_access(*)
-        odeprecated "the `accessibility_access` stanza"
+        odisabled "the `accessibility_access` stanza"
       end
     end
 

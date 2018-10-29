@@ -121,17 +121,6 @@ RSpec/RepeatedDescription:
     - 'rubocops/lines_cop_spec.rb'
     - 'tab_spec.rb'
 
-# Offense count: 10
-RSpec/RepeatedExample:
-  Exclude:
-    - 'compiler_selector_spec.rb'
-    - 'utils/shell_spec.rb'
-
-# Offense count: 2
-RSpec/ScatteredLet:
-  Exclude:
-    - 'cask/artifact/uninstall_zap_shared_examples.rb'
-
 # Offense count: 31
 RSpec/SubjectStub:
   Exclude:

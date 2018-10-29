@@ -2,16 +2,12 @@ require "fileutils"
 
 module FileUtils
   module Compat
-    def ruby(*args)
-      odeprecated "ruby", 'system "ruby"'
-      system RUBY_PATH, *args
+    def ruby(*)
+      odisabled "ruby", 'system "ruby"'
     end
 
-    def mktemp(prefix = name, opts = {})
-      odeprecated("FileUtils.mktemp", "mktemp")
-      Mktemp.new(prefix, opts).run do |staging|
-        yield staging
-      end
+    def mktemp(*)
+      odisabled("FileUtils.mktemp", "mktemp")
     end
     module_function :mktemp
   end

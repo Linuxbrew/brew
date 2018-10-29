@@ -169,7 +169,9 @@ module Cask
         end
       end
 
-      def uninstall_login_item(*login_items, command: nil, **_)
+      def uninstall_login_item(*login_items, command: nil, upgrade: false, **_)
+        return if upgrade
+
         login_items.each do |name|
           ohai "Removing login item #{name}"
           command.run!(

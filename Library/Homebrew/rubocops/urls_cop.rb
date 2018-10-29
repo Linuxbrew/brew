@@ -43,6 +43,7 @@ module RuboCop
                                                  %r{^http://code\.google\.com/},
                                                  %r{^http://fossies\.org/},
                                                  %r{^http://mirrors\.kernel\.org/},
+                                                 %r{^http://mirrors\.ocf\.berkeley\.edu/},
                                                  %r{^http://(?:[^/]*\.)?bintray\.com/},
                                                  %r{^http://tools\.ietf\.org/},
                                                  %r{^http://launchpad\.net/},
@@ -125,8 +126,17 @@ module RuboCop
             problem <<~EOS
               Please use a secure mirror for Debian URLs.
               We recommend:
-                https://mirrors.ocf.berkeley.edu/debian/#{match[1]}
+                https://deb.debian.org/debian/#{match[1]}
             EOS
+          end
+
+          # Check to use canonical urls for Debian packages
+          noncanon_deb_pattern =
+            Regexp.union([%r{^https://mirrors\.kernel\.org/debian/},
+                          %r{^https://mirrors\.ocf\.berkeley\.edu/debian/},
+                          %r{^https://(?:[^/]*\.)?mirrorservice\.org/sites/ftp\.debian\.org/debian/}])
+          audit_urls(urls, noncanon_deb_pattern) do |_, url|
+            problem "Please use https://deb.debian.org/debian/ for #{url}"
           end
 
           # Check for new-url Google Code download urls, https:// is preferred

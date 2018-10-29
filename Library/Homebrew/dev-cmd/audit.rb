@@ -1,6 +1,7 @@
 #:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method>] [`--only-cops=`<cops>|`--except-cops=`<cops>] [<formulae>]:
-#:    Check <formulae> for Homebrew coding style violations. This should be
-#:    run before submitting a new formula.
+#:    Check <formulae> for Homebrew coding style violations. This should be run
+#:    before submitting a new formula. Will exit with a non-zero status if any errors
+#:    are found, which can be useful for implementing pre-commit hooks.
 #:
 #:    If no <formulae> are provided, all of them are checked.
 #:
@@ -23,16 +24,13 @@
 #:    If `--display-filename` is passed, every line of output is prefixed with the
 #:    name of the file or formula being audited, to make the output easy to grep.
 #:
-#:    Passing `--only=`<method> will run only the methods named `audit_<method>`,
-#:    while `--except=`<method> will skip the methods named `audit_<method>`.
+#:    Specifying `--only=`<method> will run only the methods named `audit_`<method>,
+#:    while `--except=`<method> will skip the methods named `audit_`<method>.
 #:    For either option <method> should be a comma-separated list.
 #:
-#:    Passing `--only-cops=`<cops> will check for violations of only the listed
+#:    Specifying `--only-cops=`<cops> will check for violations of only the listed
 #:    RuboCop <cops>, while `--except-cops=`<cops> will skip checking the listed
 #:    <cops>. For either option <cops> should be a comma-separated list of cop names.
-#:
-#:    `audit` exits with a non-zero status if any errors are found. This is useful,
-#:    for instance, for implementing pre-commit hooks.
 
 # Undocumented options:
 #     `-D` activates debugging and profiling of the audit methods (not the same as `--debug`)
@@ -55,14 +53,15 @@ module Homebrew
   def audit_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `audit` [<options>] <formulae>:
+        `audit` [<options>] <formulae>
 
-        Check <formulae> for Homebrew coding style violations. This should be
-        run before submitting a new formula.
+        Check <formulae> for Homebrew coding style violations. This should be run before
+        submitting a new formula. Will exit with a non-zero status if any errors are
+        found, which can be useful for implementing pre-commit hooks.
         If no <formulae> are provided, all of them are checked.
       EOS
       switch "--strict",
-        description: "Run additional style checks, including Rubocop style checks."
+        description: "Run additional style checks, including RuboCop style checks."
       switch "--online",
         description: "Run additional slower style checks that require a network connection."
       switch "--new-formula",
@@ -74,24 +73,26 @@ module Homebrew
       switch "--display-cop-names",
         description: "Include the RuboCop cop name for each violation in the output."
       switch "--display-filename",
-        description: "Prefix everyline of output with name of the file or formula being audited, to "\
+        description: "Prefix every line of output with name of the file or formula being audited, to "\
                      "make output easy to grep."
       switch "-D", "--audit-debug",
-        description: "Activates debugging and profiling"
+        description: "Enable debugging and profiling of audit methods."
       comma_array "--only",
-        description: "Passing `--only=`<method> will run only the methods named audit_<method>. "\
-                     "<method> should be a comma-separated list."
+        description: "Specify a comma-separated <method> list to only run the methods named "\
+                     "`audit_`<method>."
       comma_array "--except",
-        description: "Passing `--except=`<method> will run only the methods named audit_<method>, "\
-                     "<method> should be a comma-separated list."
+        description: "Specify a comma-separated <method> list to skip running the methods named "\
+                     "`audit_`<method>."
       comma_array "--only-cops",
-        description: "Passing `--only-cops=`<cops> will check for violations of only the listed "\
-                     "RuboCop cops. <cops> should be a comma-separated list of cop names."
+        description: "Specify a comma-separated <cops> list to check for violations of only the listed "\
+                     "RuboCop cops."
       comma_array "--except-cops",
-        description: "Passing `--except-cops=`<cops> will skip checking the listed RuboCop cops "\
-                     "violations. <cops> should be a comma-separated list of cop names."
+        description: "Specify a comma-separated <cops> list to skip checking for violations of the listed "\
+                     "RuboCop cops."
       switch :verbose
       switch :debug
+      conflicts "--only", "--except"
+      conflicts "--only-cops", "--except-cops"
     end
   end
 
@@ -126,7 +127,7 @@ module Homebrew
     if only_cops && except_cops
       odie "--only-cops and --except-cops cannot be used simultaneously!"
     elsif (only_cops || except_cops) && (strict || args.only)
-      odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously"
+      odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously!"
     end
 
     options = { fix: args.fix?, realpath: true }
@@ -252,7 +253,9 @@ module Homebrew
 
     def initialize(formula, options = {})
       @formula = formula
-      @new_formula = options[:new_formula] && !formula.versioned_formula?
+      @versioned_formula = formula.versioned_formula?
+      @new_formula_inclusive = options[:new_formula]
+      @new_formula = options[:new_formula] && !@versioned_formula
       @strict = options[:strict]
       @online = options[:online]
       @display_cop_names = options[:display_cop_names]
@@ -273,7 +276,7 @@ module Homebrew
 
       @style_offenses.each do |offense|
         if offense.cop_name.start_with?("NewFormulaAudit")
-          next if formula.versioned_formula?
+          next if @versioned_formula
 
           new_formula_problem offense.to_s(display_cop_name: @display_cop_names)
           next
@@ -307,7 +310,7 @@ module Homebrew
 
       problem "File should end with a newline" unless text.trailing_newline?
 
-      if formula.versioned_formula?
+      if @versioned_formula
         unversioned_formula = begin
           # build this ourselves as we want e.g. homebrew/core to be present
           full_name = if formula.tap
@@ -493,7 +496,6 @@ module Homebrew
     end
 
     def audit_keg_only_style
-      return unless @strict
       return unless formula.keg_only?
 
       whitelist = %w[
@@ -526,7 +528,7 @@ module Homebrew
     end
 
     def audit_versioned_keg_only
-      return unless formula.versioned_formula?
+      return unless @versioned_formula
       return unless @core_tap
 
       return if formula.keg_only? && formula.keg_only_reason.reason == :versioned_formula
@@ -559,6 +561,18 @@ module Homebrew
                                   strict: @strict)
         problem http_content_problem
       end
+    end
+
+    def audit_bottle_spec
+      # special case: new versioned formulae should be audited
+      return unless @new_formula_inclusive
+      return unless @core_tap
+
+      return if formula.bottle_disabled?
+
+      return unless formula.bottle_defined?
+
+      new_formula_problem "New formulae should not have a `bottle do` block"
     end
 
     def audit_bottle_disabled
@@ -661,24 +675,27 @@ module Homebrew
         end
       end
 
-      if @core_tap && (formula.head || formula.devel)
-        unstable_spec_message = "Formulae should not have a `HEAD` or `devel` spec"
+      if @core_tap && formula.devel
+        problem "Formulae should not have a `devel` spec"
+      end
+
+      if @core_tap && formula.head
+        head_spec_message = "Formulae should not have a `HEAD` spec"
         if @new_formula
-          new_formula_problem unstable_spec_message
-        elsif formula.versioned_formula?
-          versioned_unstable_spec = %w[
+          new_formula_problem head_spec_message
+        elsif @versioned_formula
+          versioned_head_spec = %w[
             bash-completion@2
             imagemagick@6
             python@2
           ]
-          problem unstable_spec_message unless versioned_unstable_spec.include?(formula.name)
+          problem head_spec_message unless versioned_head_spec.include?(formula.name)
         end
       end
 
       throttled = %w[
         aws-sdk-cpp 10
         awscli 10
-        heroku 10
         quicktype 10
         vim 50
       ]
@@ -687,14 +704,13 @@ module Homebrew
         next if formula.stable.nil?
 
         version = formula.stable.version.to_s.split(".").last.to_i
-        if @strict && a == formula.name && version.modulo(b.to_i).nonzero?
+        if a == formula.name && version.modulo(b.to_i).nonzero?
           problem "should only be updated every #{b} releases on multiples of #{b}"
         end
       end
 
       unstable_whitelist = %w[
         aalib 1.4rc5
-        angolmois 2.0.0alpha2
         automysqlbackup 3.0-rc6
         aview 1.3.0rc1
         distcc 3.2rc1
@@ -703,10 +719,8 @@ module Homebrew
         hidapi 0.8.0-rc1
         libcaca 0.99b19
         nethack4 4.3.0-beta2
-        opensyobon 1.0rc2
         premake 4.4-beta5
         pwnat 0.3-beta
-        pxz 4.999.9
         recode 3.7-beta2
         speexdsp 1.2rc3
         sqoop 1.4.6

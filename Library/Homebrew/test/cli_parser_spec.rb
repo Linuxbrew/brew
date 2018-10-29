@@ -46,6 +46,11 @@ describe Homebrew::CLI::Parser do
       parser.parse([])
       expect(Homebrew.args.pry?).to be true
     end
+
+    it ":verbose with custom description" do
+      _, _, _, desc = parser.processed_options.find { |short, _| short == "-v" }
+      expect(desc).to eq "Flag for verbosity"
+    end
   end
 
   describe "test long flag options" do
@@ -68,6 +73,20 @@ describe Homebrew::CLI::Parser do
     it "parses a comma array flag option" do
       parser.parse(["--files=random1.txt,random2.txt"])
       expect(Homebrew.args.files).to eq %w[random1.txt random2.txt]
+    end
+  end
+
+  describe "test short flag options" do
+    subject(:parser) {
+      described_class.new do
+        flag "-f", "--filename=", description: "Name of the file"
+      end
+    }
+
+    it "parses a short flag option with its argument" do
+      parser.parse(["--filename=random.txt"])
+      expect(Homebrew.args.filename).to eq "random.txt"
+      expect(Homebrew.args.f).to eq "random.txt"
     end
   end
 
@@ -156,6 +175,20 @@ describe Homebrew::CLI::Parser do
     it "raises no exception for optional dependency" do
       parser.parse(["--switch-b"])
       expect(Homebrew.args.switch_b?).to be true
+    end
+  end
+
+  describe "test immutability of args" do
+    subject(:parser) {
+      described_class.new do
+        switch "-a", "--switch-a"
+        switch "-b", "--switch-b"
+      end
+    }
+
+    it "raises exception upon Homebrew.args mutation" do
+      parser.parse(["--switch-a"])
+      expect { parser.parse(["--switch-b"]) }.to raise_error(RuntimeError, /can't modify frozen OpenStruct/)
     end
   end
 end
