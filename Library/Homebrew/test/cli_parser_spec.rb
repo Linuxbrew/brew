@@ -177,4 +177,18 @@ describe Homebrew::CLI::Parser do
       expect(Homebrew.args.switch_b?).to be true
     end
   end
+
+  describe "test immutability of args" do
+    subject(:parser) {
+      described_class.new do
+        switch "-a", "--switch-a"
+        switch "-b", "--switch-b"
+      end
+    }
+
+    it "raises exception upon Homebrew.args mutation" do
+      parser.parse(["--switch-a"])
+      expect { parser.parse(["--switch-b"]) }.to raise_error(RuntimeError, /can't modify frozen OpenStruct/)
+    end
+  end
 end
