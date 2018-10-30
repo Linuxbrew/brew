@@ -5,7 +5,7 @@
 #:    at the end of the run.
 #:
 #:    If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
-#:    of upgraded <formulae>.
+#:    of upgraded <formulae> as well as the HOMEBREW_CACHE for that formula.
 
 require "formula_installer"
 require "development_tools"

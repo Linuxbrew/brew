@@ -311,6 +311,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--git` (or `-g`) is passed, Homebrew will create a Git repository, useful for
     creating patches to the software.
 
+    If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
+    of upgraded *`formulae`* as well as the HOMEBREW_CACHE for that formula.
+
   * `leaves`:
     Show installed formulae that are not dependencies of another installed formula.
 
@@ -427,6 +430,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--display-times` is passed, install times for each formula are printed
     at the end of the run.
+
+    If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
+    of upgraded *`formulae`* as well as the HOMEBREW_CACHE for that formula.
 
   * `search`, `-S`:
     Display all locally available formulae (including tapped ones).
@@ -601,7 +607,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     Options for the `install` command are also valid here.
 
-    If `--cleanup` is specified or `HOMEBREW_UPGRADE_CLEANUP` is set then remove
+    If `--cleanup` is specified or `HOMEBREW_INSTALL_CLEANUP` is set then remove
     previously installed version(s) of upgraded *`formulae`*.
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
@@ -1255,10 +1261,8 @@ Note that environment variables must have a value set to be detected. For exampl
     This issue typically occurs when using FileVault or custom SSD
     configurations.
 
-  * `HOMEBREW_INSTALL_CLEANUP`:
+  * `HOMEBREW_UPGRADE_CLEANUP`:
     If set, `brew upgrade` always assumes `--cleanup` has been passed.
-    Additionally, `brew install` and `brew reinstall` will clean up associated
-    formulae.
 
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.

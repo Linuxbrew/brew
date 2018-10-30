@@ -75,7 +75,7 @@
 #:    creating patches to the software.
 #:
 #:    If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
-#:    of upgraded <formulae>.
+#:    of upgraded <formulae> as well as the HOMEBREW_CACHE for that formula.
 
 require "missing_formula"
 require "formula_installer"
