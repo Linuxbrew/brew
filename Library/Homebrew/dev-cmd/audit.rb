@@ -134,7 +134,6 @@ module Homebrew
 
     if only_cops
       options[:only_cops] = only_cops
-      args.only = ["style"]
     elsif args.new_formula?
       nil
     elsif strict
@@ -151,7 +150,8 @@ module Homebrew
 
     new_formula_problem_lines = []
     ff.sort.each do |f|
-      options = { new_formula: new_formula, strict: strict, online: online, only: args.only, except: args.except }
+      only = only_cops ? ["style"] : args.only
+      options = { new_formula: new_formula, strict: strict, online: online, only: only, except: args.except }
       options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
