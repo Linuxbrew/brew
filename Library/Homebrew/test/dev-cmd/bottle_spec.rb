@@ -12,6 +12,11 @@ describe "brew bottle", :integration_test do
         .and not_to_output.to_stdout
         .and be_a_failure
 
+      expect { brew "bottle", "--root-url" }
+        .to output(/missing argument: --root-url/).to_stderr
+        .and not_to_output.to_stdout
+        .and be_a_failure
+
       setup_test_formula "testball"
 
       # `brew bottle` should not fail with dead symlink
