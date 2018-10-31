@@ -312,7 +312,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       retry
     end
   ensure
-    download_lock.unlock
+    download_lock&.unlock
   end
 
   def clear_cache
