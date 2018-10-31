@@ -912,6 +912,8 @@ Each *`patch source`* may be one of:
   Publish bottles at the provided Bintray *`organisation`*.
 * `--test-bot-user`:
   Pull the bottle block commit from the provided *`user`* on GitHub.
+* `--tap`:
+  Apply the PR to the specified tap.
 
 ### `release-notes` [*`options`*] [*`previous_tag`*] [*`end_ref`*]
 
