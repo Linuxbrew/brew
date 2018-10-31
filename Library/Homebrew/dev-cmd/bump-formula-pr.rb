@@ -1,4 +1,4 @@
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run` [`--write`]] [`--audit`|`--strict`] [`--no-browse] [`--mirror=`<URL>] [`--version=`<version>] [`--message=`<message>] (`--url=`<URL> `--sha256=`<SHA-256>|`--tag=`<tag> `--revision=`<revision>) [<formula>]:
+#:  * `bump-formula-pr` [`--devel`] [`--dry-run` [`--write`]] [`--no-audit`|`--strict`] [`--no-browse] [`--mirror=`<URL>] [`--version=`<version>] [`--message=`<message>] (`--url=`<URL> `--sha256=`<SHA-256>|`--tag=`<tag> `--revision=`<revision>) [<formula>]:
 #:    Create a pull request to update a formula with a new URL or a new tag.
 #:
 #:    If a <URL> is specified, the <SHA-256> checksum of the new download should
@@ -16,7 +16,7 @@
 #:    If `--write` is passed along with `--dry-run`, perform a not-so-dry run by
 #:    making the expected file modifications but not taking any Git actions.
 #:
-#:    If `--audit` is passed, run `brew audit` before opening the PR.
+#:    If `--no-audit` is passed, don't run `brew audit` before opening the PR.
 #:
 #:    If `--strict` is passed, run `brew audit --strict` before opening the PR.
 #:
@@ -74,8 +74,8 @@ module Homebrew
         depends_on: "--dry-run",
         description: "When passed along with `--dry-run`, perform a not-so-dry run by making the expected "\
                      "file modifications but not taking any Git actions."
-      switch "--audit",
-        description: "Run `brew audit` before opening the PR."
+      switch "--no-audit",
+        description: "Don't run `brew audit` before opening the PR."
       switch "--strict",
         description: "Run `brew audit --strict` before opening the PR."
       switch "--no-browse",
@@ -320,17 +320,21 @@ module Homebrew
     end
 
     if args.dry_run?
-      if args.strict?
+      if args.no_audit?
+        ohai "Skipping `brew audit`"
+      elsif args.strict?
         ohai "brew audit --strict #{formula.path.basename}"
-      elsif args.audit?
+      else
         ohai "brew audit #{formula.path.basename}"
       end
     else
       failed_audit = false
-      if args.strict?
+      if args.no_audit?
+        ohai "Skipping `brew audit`"
+      elsif args.strict?
         system HOMEBREW_BREW_FILE, "audit", "--strict", formula.path
         failed_audit = !$CHILD_STATUS.success?
-      elsif args.audit?
+      else
         system HOMEBREW_BREW_FILE, "audit", formula.path
         failed_audit = !$CHILD_STATUS.success?
       end
