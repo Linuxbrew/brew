@@ -22,18 +22,7 @@ module Cask
       end
 
       def run
-        odeprecated "`brew cask cleanup`", "`brew cleanup`", disable_on: Time.new(2018, 9, 30)
-
-        cleanup = Homebrew::Cleanup.new
-
-        casks(alternative: -> { Cask.to_a }).each do |cask|
-          cleanup.cleanup_cask(cask)
-        end
-
-        return if cleanup.disk_cleanup_size.zero?
-
-        disk_space = disk_usage_readable(cleanup.disk_cleanup_size)
-        ohai "This operation has freed approximately #{disk_space} of disk space."
+        odisabled "`brew cask cleanup`", "`brew cleanup`"
       end
     end
   end

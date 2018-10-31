@@ -37,8 +37,8 @@ begin
   homebrew_path = PATH.new(ENV["HOMEBREW_PATH"])
 
   # Add SCM wrappers.
-  path.append(HOMEBREW_SHIMS_PATH/"scm")
-  homebrew_path.append(HOMEBREW_SHIMS_PATH/"scm")
+  path.prepend(HOMEBREW_SHIMS_PATH/"scm")
+  homebrew_path.prepend(HOMEBREW_SHIMS_PATH/"scm")
 
   ENV["PATH"] = path
 

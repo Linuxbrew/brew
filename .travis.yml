@@ -13,6 +13,9 @@ branches:
   only:
     - master
 
+env:
+  - HOMEBREW_FORCE_HOMEBREW_ON_LINUX=1
+
 before_install:
   - HOMEBREW_REPOSITORY="$(brew --repo)"
   - sudo chown -R "$USER" "$HOMEBREW_REPOSITORY"
@@ -24,7 +27,7 @@ before_install:
   - travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
 
 script:
-  - brew test-bot
+  - travis_wait 60 brew test-bot
 
 notifications:
   slack:

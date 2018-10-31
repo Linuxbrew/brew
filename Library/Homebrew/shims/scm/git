@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script because we support $GIT, $HOMEBREW_SVN, etc., Xcode-only and
+# This script because we support $HOMEBREW_GIT, $HOMEBREW_SVN, etc., Xcode-only and
 # no Xcode/CLT configurations. Order is careful to be what the user would want.
 
 set +o posix

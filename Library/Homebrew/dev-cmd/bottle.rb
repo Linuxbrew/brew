@@ -106,7 +106,7 @@ module Homebrew
         depends_on: "--write",
         description: "When passed with `--write`, a new commit will not generated after writing changes "\
                      "to the formula file."
-      flag   "--root-url",
+      flag   "--root-url=",
         description: "Use the specified <URL> as the root of the bottle's URL instead of Homebrew's default."
       switch :verbose
       switch :debug

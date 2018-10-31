@@ -42,8 +42,12 @@ module Homebrew
 
       def switch(*names, description: nil, env: nil, required_for: nil, depends_on: nil)
         global_switch = names.first.is_a?(Symbol)
-        names, env, description = common_switch(*names) if global_switch
-        description = option_to_description(*names) if description.nil?
+        names, env, default_description = common_switch(*names) if global_switch
+        if description.nil? && global_switch
+          description = default_description
+        elsif description.nil?
+          description = option_to_description(*names)
+        end
         process_option(*names, description)
         @parser.on(*names, *wrap_option_desc(description)) do
           enable_switch(*names)
@@ -72,20 +76,24 @@ module Homebrew
         end
       end
 
-      def flag(name, description: nil, required_for: nil, depends_on: nil)
-        if name.end_with? "="
+      def flag(*names, description: nil, required_for: nil, depends_on: nil)
+        if names.any? { |name| name.end_with? "=" }
           required = OptionParser::REQUIRED_ARGUMENT
-          name.chomp! "="
         else
           required = OptionParser::OPTIONAL_ARGUMENT
         end
-        description = option_to_description(name) if description.nil?
-        process_option(name, description)
-        @parser.on(name, *wrap_option_desc(description), required) do |option_value|
-          Homebrew.args[option_to_name(name)] = option_value
+        names.map! { |name| name.chomp "=" }
+        description = option_to_description(*names) if description.nil?
+        process_option(*names, description)
+        @parser.on(*names, *wrap_option_desc(description), required) do |option_value|
+          names.each do |name|
+            Homebrew.args[option_to_name(name)] = option_value
+          end
         end
 
-        set_constraints(name, required_for: required_for, depends_on: depends_on)
+        names.each do |name|
+          set_constraints(name, required_for: required_for, depends_on: depends_on)
+        end
       end
 
       def conflicts(*options)
@@ -118,6 +126,7 @@ module Homebrew
         remaining_args = @parser.parse(cmdline_args)
         check_constraint_violations
         Homebrew.args[:remaining] = remaining_args
+        Homebrew.args.freeze
         @parser
       end
 

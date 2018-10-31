@@ -213,7 +213,6 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
-    odisabled "fails_with :llvm" if compiler == :llvm
     compiler_failures << CompilerFailure.create(compiler, &block)
   end
 

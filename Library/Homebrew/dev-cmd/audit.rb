@@ -134,7 +134,6 @@ module Homebrew
 
     if only_cops
       options[:only_cops] = only_cops
-      args.only = ["style"]
     elsif args.new_formula?
       nil
     elsif strict
@@ -151,7 +150,8 @@ module Homebrew
 
     new_formula_problem_lines = []
     ff.sort.each do |f|
-      options = { new_formula: new_formula, strict: strict, online: online, only: args.only, except: args.except }
+      only = only_cops ? ["style"] : args.only
+      options = { new_formula: new_formula, strict: strict, online: online, only: only, except: args.except }
       options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
@@ -254,6 +254,7 @@ module Homebrew
     def initialize(formula, options = {})
       @formula = formula
       @versioned_formula = formula.versioned_formula?
+      @new_formula_inclusive = options[:new_formula]
       @new_formula = options[:new_formula] && !@versioned_formula
       @strict = options[:strict]
       @online = options[:online]
@@ -495,7 +496,6 @@ module Homebrew
     end
 
     def audit_keg_only_style
-      return unless @strict
       return unless formula.keg_only?
 
       whitelist = %w[
@@ -561,6 +561,18 @@ module Homebrew
                                   strict: @strict)
         problem http_content_problem
       end
+    end
+
+    def audit_bottle_spec
+      # special case: new versioned formulae should be audited
+      return unless @new_formula_inclusive
+      return unless @core_tap
+
+      return if formula.bottle_disabled?
+
+      return unless formula.bottle_defined?
+
+      new_formula_problem "New formulae should not have a `bottle do` block"
     end
 
     def audit_bottle_disabled
@@ -692,14 +704,13 @@ module Homebrew
         next if formula.stable.nil?
 
         version = formula.stable.version.to_s.split(".").last.to_i
-        if @strict && a == formula.name && version.modulo(b.to_i).nonzero?
+        if a == formula.name && version.modulo(b.to_i).nonzero?
           problem "should only be updated every #{b} releases on multiples of #{b}"
         end
       end
 
       unstable_whitelist = %w[
         aalib 1.4rc5
-        angolmois 2.0.0alpha2
         automysqlbackup 3.0-rc6
         aview 1.3.0rc1
         distcc 3.2rc1
@@ -708,10 +719,8 @@ module Homebrew
         hidapi 0.8.0-rc1
         libcaca 0.99b19
         nethack4 4.3.0-beta2
-        opensyobon 1.0rc2
         premake 4.4-beta5
         pwnat 0.3-beta
-        pxz 4.999.9
         recode 3.7-beta2
         speexdsp 1.2rc3
         sqoop 1.4.6

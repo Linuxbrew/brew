@@ -150,10 +150,6 @@ class Requirement
     attr_reader :env_proc, :build
     attr_rw :fatal, :cask, :download
 
-    def default_formula(_val = nil)
-      odisabled "Requirement.default_formula"
-    end
-
     def satisfy(options = nil, &block)
       return @satisfied if options.nil? && !block_given?
 

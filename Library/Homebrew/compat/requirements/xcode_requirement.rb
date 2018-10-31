@@ -8,8 +8,7 @@ class XcodeRequirement < Requirement
       else
         tags.find do |tag|
           next unless tag.to_s.match?(/(\d\.)+\d/)
-          # TODO: deprecate when Homebrew/homebrew-core is fixed.
-          # odeprecated('depends_on :xcode => [..., "X.Y.Z"]')
+          odeprecated('depends_on :xcode => [..., "X.Y.Z"]')
           tags.delete(tag)
         end
       end

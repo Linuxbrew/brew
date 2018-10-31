@@ -76,8 +76,32 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "msg" => <<~EOS,
           Please use a secure mirror for Debian URLs.
           We recommend:
-            https://mirrors.ocf.berkeley.edu/debian/dists/foo/
+            https://deb.debian.org/debian/dists/foo/
         EOS
+        "col" => 2,
+      }, {
+        "url" => "https://mirrors.kernel.org/debian/pool/main/n/nc6/foo.tar.gz",
+        "msg" => "Please use " \
+                 "https://deb.debian.org/debian/ for " \
+                 "https://mirrors.kernel.org/debian/pool/main/n/nc6/foo.tar.gz",
+        "col" => 2,
+      }, {
+        "url" => "https://mirrors.ocf.berkeley.edu/debian/pool/main/m/mkcue/foo.tar.gz",
+        "msg" => "Please use " \
+                 "https://deb.debian.org/debian/ for " \
+                 "https://mirrors.ocf.berkeley.edu/debian/pool/main/m/mkcue/foo.tar.gz",
+        "col" => 2,
+      }, {
+        "url" => "https://mirrorservice.org/sites/ftp.debian.org/debian/pool/main/n/netris/foo.tar.gz",
+        "msg" => "Please use " \
+                 "https://deb.debian.org/debian/ for " \
+                 "https://mirrorservice.org/sites/ftp.debian.org/debian/pool/main/n/netris/foo.tar.gz",
+        "col" => 2,
+      }, {
+        "url" => "https://www.mirrorservice.org/sites/ftp.debian.org/debian/pool/main/n/netris/foo.tar.gz",
+        "msg" => "Please use " \
+                 "https://deb.debian.org/debian/ for " \
+                 "https://www.mirrorservice.org/sites/ftp.debian.org/debian/pool/main/n/netris/foo.tar.gz",
         "col" => 2,
       }, {
         "url" => "http://foo.googlecode.com/files/foo-1.0.zip",

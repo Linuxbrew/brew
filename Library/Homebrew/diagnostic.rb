@@ -489,8 +489,7 @@ module Homebrew
       end
 
       def check_git_version
-        # System Git version on macOS Sierra.
-        minimum_version = (OS.mac? ? "2.14.3" : "2.7.0").freeze
+        minimum_version = ENV["HOMEBREW_MINIMUM_GIT_VERSION"].freeze
         return unless Utils.git_available?
         return if Version.create(Utils.git_version) >= Version.create(minimum_version)
 

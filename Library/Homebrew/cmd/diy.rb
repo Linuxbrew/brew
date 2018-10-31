@@ -25,8 +25,10 @@ module Homebrew
       puts "-DCMAKE_INSTALL_PREFIX=#{prefix}"
     elsif File.file? "configure"
       puts "--prefix=#{prefix}"
+    elsif File.file? "meson.build"
+      puts "-Dprefix=#{prefix}"
     else
-      raise "Couldn't determine build system"
+      raise "Couldn't determine build system. You can manually put files into #{prefix}"
     end
   end
 
