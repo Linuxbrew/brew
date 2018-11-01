@@ -19,9 +19,10 @@ it does it too. And you have to confirm everything it will do before it starts.
 
 ## Alternative Installs
 
-### OS X Lion 10.7 and below
+### OS X Mountain Lion (10.8) and below
+Because GitHub now only allows clients that support TLS 1.2 to access repositories over HTTPS, the Homebrew installer will use the GIT protocol when run on systems older than OS X Mavericks (10.9). This requires the availability of a `git` binary, which can be provided by pre-installing the [Command Line Tools or Xcode](https://developer.apple.com/download/more/) on Lion or Mountain Lion, or a [prepackaged installer](https://code.google.com/archive/p/git-osx-installer/downloads) on Leopard or Snow Leopard. Homebrew will also require the Command Line Tools or Xcode in order to automatically compile and install a newer `curl` and `git` with support for TLS 1.2.
 
-Using the instructions on https://brew.sh or below whenever you call `curl` you must pass `--insecure` as an argument. This is because your system `curl` is too old to speak to GitHub using HTTPS. Don't worry, on the first `brew update` Homebrew will install a newer, more secure `curl` for your machine.
+Also note that when installing on OS X Leopard (10.5), you need to bypass its outdated built-in certificates by adding `--insecure` to the [installation command](https://brew.sh/#install)'s list of `curl` flags.
 
 ### Untar anywhere
 Just extract (or `git clone`) Homebrew wherever you want. Just avoid:
