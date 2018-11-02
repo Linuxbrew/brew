@@ -50,7 +50,7 @@ module Homebrew
       end
 
       def check_umask_not_zero
-        return unless File.umask() == 0
+        return unless File.umask == 0
 
         <<~EOS
           Umask is currently set to 000, directories created by Homebrew cannot
