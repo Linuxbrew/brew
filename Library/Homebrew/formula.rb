@@ -327,7 +327,7 @@ class Formula
     active_spec == head
   end
 
-  delegate [
+  delegate [ # rubocop:disable Layout/AlignHash
     :bottle_unneeded?,
     :bottle_disabled?,
     :bottle_disable_reason,
@@ -335,7 +335,7 @@ class Formula
     :bottled?,
     :bottle_specification,
     :downloader,
-  ]                                                                                                                                                                         => :active_spec
+  ] => :active_spec
 
   # The Bottle object for the currently active {SoftwareSpec}.
   # @private
@@ -1615,10 +1615,20 @@ class Formula
       "bottle"                   => {},
       "keg_only"                 => keg_only?,
       "options"                  => [],
-      "build_dependencies"       => dependencies.select(&:build?).map(&:name).uniq,
-      "dependencies"             => dependencies.reject(&:optional?).reject(&:recommended?).reject(&:build?).map(&:name).uniq,
-      "recommended_dependencies" => dependencies.select(&:recommended?).map(&:name).uniq,
-      "optional_dependencies"    => dependencies.select(&:optional?).map(&:name).uniq,
+      "build_dependencies"       => dependencies.select(&:build?)
+                                                .map(&:name)
+                                                .uniq,
+      "dependencies"             => dependencies.reject(&:optional?)
+                                                .reject(&:recommended?)
+                                                .reject(&:build?)
+                                                .map(&:name)
+                                                .uniq,
+      "recommended_dependencies" => dependencies.select(&:recommended?)
+                                                .map(&:name)
+                                                .uniq,
+      "optional_dependencies"    => dependencies.select(&:optional?)
+                                                .map(&:name)
+                                                .uniq,
       "requirements"             => [],
       "conflicts_with"           => conflicts.map(&:name),
       "caveats"                  => caveats,
@@ -1641,9 +1651,10 @@ class Formula
       }
       bottle_info["files"] = {}
       bottle_spec.collector.keys.each do |os|
+        bottle_url = "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild).bintray}"
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
-          "url"                   => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild).bintray}",
+          "url"                   => bottle_url,
           checksum.hash_type.to_s => checksum.hexdigest,
         }
       end

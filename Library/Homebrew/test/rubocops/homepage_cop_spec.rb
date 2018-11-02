@@ -32,11 +32,12 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
         end
       RUBY
 
-      expected_offenses = [{  message:  "The homepage should start with http or https (URL is ftp://example.com/foo).",
-                              severity: :convention,
-                              line:     2,
-                              column:   2,
-                              source:   source }]
+      expected_offenses = [{ message:  "The homepage should start with http or " \
+                                        "https (URL is ftp://example.com/foo).",
+                             severity: :convention,
+                             line:     2,
+                             column:   2,
+                             source:   source }]
 
       inspect_source(source)
 
