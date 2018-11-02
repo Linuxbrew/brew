@@ -66,8 +66,8 @@ module UnpackStrategy
 
   def self.from_type(type)
     type = {
-      naked: :uncompressed,
-      nounzip: :uncompressed,
+      naked:     :uncompressed,
+      nounzip:   :uncompressed,
       seven_zip: :p7zip,
     }.fetch(type, type)
 

@@ -19,9 +19,9 @@ module Cask
 
       def audit(cask)
         odebug "Auditing Cask #{cask}"
-        Auditor.audit(cask, audit_download: download?,
+        Auditor.audit(cask, audit_download:        download?,
                             check_token_conflicts: token_conflicts?,
-                            quarantine: quarantine?)
+                            quarantine:            quarantine?)
       end
     end
   end

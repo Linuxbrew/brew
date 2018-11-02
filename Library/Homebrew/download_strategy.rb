@@ -53,9 +53,9 @@ class AbstractDownloadStrategy
     UnpackStrategy.detect(cached_location,
                           extension_only: true,
                           ref_type: @ref_type, ref: @ref)
-                  .extract_nestedly(basename: basename,
+                  .extract_nestedly(basename:       basename,
                                     extension_only: true,
-                                    verbose: ARGV.verbose? && !shutup)
+                                    verbose:        ARGV.verbose? && !shutup)
     chdir
   end
 
@@ -99,8 +99,8 @@ class AbstractDownloadStrategy
       *args,
       print_stdout: !shutup,
       print_stderr: !shutup,
-      verbose: ARGV.verbose? && !shutup,
-      env: env,
+      verbose:      ARGV.verbose? && !shutup,
+      env:          env,
       **options,
     )
   end
@@ -464,7 +464,7 @@ class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
     UnpackStrategy::Uncompressed.new(cached_location)
                                 .extract(basename: basename,
-                                         verbose: ARGV.verbose? && !shutup)
+                                         verbose:  ARGV.verbose? && !shutup)
   end
 end
 
@@ -666,10 +666,10 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def config_repo
     system_command! "git",
-                    args: ["config", "remote.origin.url", @url],
+                    args:  ["config", "remote.origin.url", @url],
                     chdir: cached_location
     system_command! "git",
-                    args: ["config", "remote.origin.fetch", refspec],
+                    args:  ["config", "remote.origin.fetch", refspec],
                     chdir: cached_location
   end
 
@@ -678,11 +678,11 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
     if !shallow_clone? && shallow_dir?
       system_command! "git",
-                      args: ["fetch", "origin", "--unshallow"],
+                      args:  ["fetch", "origin", "--unshallow"],
                       chdir: cached_location
     else
       system_command! "git",
-                      args: ["fetch", "origin"],
+                      args:  ["fetch", "origin"],
                       chdir: cached_location
     end
   end
@@ -691,7 +691,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
     system_command! "git", args: clone_args
 
     system_command! "git",
-                    args: ["config", "homebrew.cacheversion", cache_version],
+                    args:  ["config", "homebrew.cacheversion", cache_version],
                     chdir: cached_location
     checkout
     update_submodules if submodules?
@@ -711,16 +711,16 @@ class GitDownloadStrategy < VCSDownloadStrategy
     end
 
     system_command! "git",
-                    args: ["reset", "--hard", *ref],
+                    args:  ["reset", "--hard", *ref],
                     chdir: cached_location
   end
 
   def update_submodules
     system_command! "git",
-                    args: ["submodule", "foreach", "--recursive", "git submodule sync"],
+                    args:  ["submodule", "foreach", "--recursive", "git submodule sync"],
                     chdir: cached_location
     system_command! "git",
-                    args: ["submodule", "update", "--init", "--recursive"],
+                    args:  ["submodule", "update", "--init", "--recursive"],
                     chdir: cached_location
     fix_absolute_submodule_gitdir_references!
   end
@@ -734,7 +734,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
   # See https://github.com/Homebrew/homebrew-core/pull/1520 for an example.
   def fix_absolute_submodule_gitdir_references!
     submodule_dirs = system_command!("git",
-                                     args: ["submodule", "--quiet", "foreach", "--recursive", "pwd"],
+                                     args:  ["submodule", "--quiet", "foreach", "--recursive", "pwd"],
                                      chdir: cached_location).stdout
 
     submodule_dirs.lines.map(&:chomp).each do |submodule_dir|
@@ -867,13 +867,13 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     system_command! "cvs", args: [*quiet_flag, "-d", @url, "login"] if @url.include? "pserver"
 
     system_command! "cvs",
-                    args: [*quiet_flag, "-d", @url, "checkout", "-d", cached_location.basename, @module],
+                    args:  [*quiet_flag, "-d", @url, "checkout", "-d", cached_location.basename, @module],
                     chdir: cached_location.dirname
   end
 
   def update
     system_command! "cvs",
-                    args: [*quiet_flag, "update"],
+                    args:  [*quiet_flag, "update"],
                     chdir: cached_location
   end
 
@@ -958,7 +958,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
 
   def env
     {
-      "PATH" => PATH.new(Formula["bazaar"].opt_bin, ENV["PATH"]),
+      "PATH"     => PATH.new(Formula["bazaar"].opt_bin, ENV["PATH"]),
       "BZR_HOME" => HOMEBREW_TEMP,
     }
   end
@@ -979,7 +979,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
 
   def update
     system_command! "bzr",
-                    args: ["update"],
+                    args:  ["update"],
                     chdir: cached_location
   end
 end

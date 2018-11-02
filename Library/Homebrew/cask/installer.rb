@@ -322,10 +322,10 @@ module Cask
       not_installed.each do |cask|
         Installer.new(
           cask,
-          binaries: binaries?,
-          verbose: verbose?,
+          binaries:                binaries?,
+          verbose:                 verbose?,
           installed_as_dependency: true,
-          force: false,
+          force:                   false,
         ).install
       end
     end

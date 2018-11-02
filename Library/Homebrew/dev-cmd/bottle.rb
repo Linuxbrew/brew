@@ -99,11 +99,11 @@ module Homebrew
                      "formula file. Instead of a formula name, requires a JSON file generated with "\
                      "`brew bottle --json` <formula>."
       switch "--write",
-        depends_on: "--merge",
+        depends_on:  "--merge",
         description: "Write the changes to the formula file. A new commit will be generated unless "\
                      "`--no-commit` is passed."
       switch "--no-commit",
-        depends_on: "--write",
+        depends_on:  "--write",
         description: "When passed with `--write`, a new commit will not generated after writing changes "\
                      "to the formula file."
       flag   "--root-url=",
@@ -420,23 +420,23 @@ module Homebrew
       f.full_name => {
         "formula" => {
           "pkg_version" => f.pkg_version.to_s,
-          "path" => f.path.to_s.delete_prefix("#{HOMEBREW_REPOSITORY}/"),
+          "path"        => f.path.to_s.delete_prefix("#{HOMEBREW_REPOSITORY}/"),
         },
-        "bottle" => {
+        "bottle"  => {
           "root_url" => bottle.root_url,
-          "prefix" => bottle.prefix,
-          "cellar" => bottle.cellar.to_s,
-          "rebuild" => bottle.rebuild,
-          "tags" => {
+          "prefix"   => bottle.prefix,
+          "cellar"   => bottle.cellar.to_s,
+          "rebuild"  => bottle.rebuild,
+          "tags"     => {
             tag => {
-              "filename" => filename.bintray,
+              "filename"       => filename.bintray,
               "local_filename" => filename.to_s,
-              "sha256" => sha256,
+              "sha256"         => sha256,
             },
           },
         },
         "bintray" => {
-          "package" => Utils::Bottles::Bintray.package(f.name),
+          "package"    => Utils::Bottles::Bintray.package(f.name),
           "repository" => Utils::Bottles::Bintray.repository(tap),
         },
       },

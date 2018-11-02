@@ -58,14 +58,14 @@ module UnpackStrategy
 
         if tries > 1
           system_command! "diskutil",
-                          args: ["eject", path],
+                          args:         ["eject", path],
                           print_stderr: false,
-                          verbose: verbose
+                          verbose:      verbose
         else
           system_command! "diskutil",
-                          args: ["unmount", "force", path],
+                          args:         ["unmount", "force", path],
                           print_stderr: false,
-                          verbose: verbose
+                          verbose:      verbose
         end
       rescue ErrorDuringExecution => e
         raise e if (tries -= 1).zero?
@@ -85,12 +85,12 @@ module UnpackStrategy
             filelist.close
 
             system_command! "mkbom",
-                            args: ["-s", "-i", filelist.path, "--", bomfile.path],
+                            args:    ["-s", "-i", filelist.path, "--", bomfile.path],
                             verbose: verbose
           end
 
           system_command! "ditto",
-                          args: ["--bom", bomfile.path, "--", path, unpack_dir],
+                          args:    ["--bom", bomfile.path, "--", path, unpack_dir],
                           verbose: verbose
 
           FileUtils.chmod "u+w", Pathname.glob(unpack_dir/"**/*", File::FNM_DOTMATCH).reject(&:symlink?)
@@ -105,7 +105,7 @@ module UnpackStrategy
 
     def self.can_extract?(path)
       imageinfo = system_command("hdiutil",
-                                 args: ["imageinfo", path],
+                                 args:         ["imageinfo", path],
                                  print_stderr: false).stdout
 
       !imageinfo.empty?
@@ -129,13 +129,13 @@ module UnpackStrategy
 
         without_eula = system_command(
           "hdiutil",
-          args: [
+          args:         [
             "attach", "-plist", "-nobrowse", "-readonly", "-noidme",
             "-mountrandom", mount_dir, path
           ],
-          input: "qn\n",
+          input:        "qn\n",
           print_stderr: false,
-          verbose: verbose,
+          verbose:      verbose,
         )
 
         # If mounting without agreeing to EULA succeeded, there is none.
@@ -148,7 +148,7 @@ module UnpackStrategy
 
           system_command!(
             "hdiutil",
-            args: [
+            args:    [
               "convert", *quiet_flag, "-format", "UDTO", "-o", cdr_path, path
             ],
             verbose: verbose,
@@ -156,7 +156,7 @@ module UnpackStrategy
 
           with_eula = system_command!(
             "hdiutil",
-            args: [
+            args:    [
               "attach", "-plist", "-nobrowse", "-readonly", "-noidme",
               "-mountrandom", mount_dir, cdr_path
             ],

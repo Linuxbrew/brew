@@ -37,9 +37,9 @@ module Homebrew
 
       matches = begin
         GitHub.search_code(
-          user: "Homebrew",
-          path: ["Formula", "Casks", "."],
-          filename: query,
+          user:      "Homebrew",
+          path:      ["Formula", "Casks", "."],
+          filename:  query,
           extension: "rb",
         )
       rescue GitHub::Error => error

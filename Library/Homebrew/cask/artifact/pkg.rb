@@ -52,8 +52,8 @@ module Cask
         with_choices_file do |choices_path|
           args << "-applyChoiceChangesXML" << choices_path if choices_path
           env = {
-            "LOGNAME" => User.current,
-            "USER" => User.current,
+            "LOGNAME"  => User.current,
+            "USER"     => User.current,
             "USERNAME" => User.current,
           }
           command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true, env: env)

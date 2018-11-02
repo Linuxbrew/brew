@@ -71,7 +71,7 @@ module Homebrew
       switch "-n", "--dry-run",
         description: "Print what would be done rather than doing it."
       switch "--write",
-        depends_on: "--dry-run",
+        depends_on:  "--dry-run",
         description: "When passed along with `--dry-run`, perform a not-so-dry run by making the expected "\
                      "file modifications but not taking any Git actions."
       switch "--no-audit",
@@ -92,13 +92,13 @@ module Homebrew
         description: "Specify the <URL> for the new download. If a <URL> is specified, the <SHA-256> "\
                      "checksum of the new download should also be specified."
       flag   "--sha256=",
-        depends_on: "--url=",
+        depends_on:  "--url=",
         description: "Specify the <SHA-256> checksum of the new download."
       flag   "--tag=",
         description: "Specify the new git commit <tag> for the formula."
       flag   "--revision=",
         required_for: "--tag=",
-        description: "Specify the new git commit <revision> corresponding to a specified <tag>."
+        description:  "Specify the new git commit <revision> corresponding to a specified <tag>."
 
       switch :force
       switch :quiet

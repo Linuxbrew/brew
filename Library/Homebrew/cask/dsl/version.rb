@@ -8,9 +8,9 @@ module Cask
         "/" => :slashes,
       }.freeze
 
-      DIVIDER_REGEX = /(#{DIVIDERS.keys.map { |v| Regexp.quote(v) }.join('|')})/
+      DIVIDER_REGEX = /(#{DIVIDERS.keys.map { |v| Regexp.quote(v) }.join('|')})/.freeze
 
-      MAJOR_MINOR_PATCH_REGEX = /^(\d+)(?:\.(\d+)(?:\.(\d+))?)?/
+      MAJOR_MINOR_PATCH_REGEX = /^(\d+)(?:\.(\d+)(?:\.(\d+))?)?/.freeze
 
       class << self
         private
