@@ -144,10 +144,12 @@ module UnpackStrategy
         else
           cdr_path = mount_dir/path.basename.sub_ext(".cdr")
 
+          quiet_flag = "-quiet" unless verbose
+
           system_command!(
             "hdiutil",
             args: [
-              "convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path
+              "convert", *quiet_flag, "-format", "UDTO", "-o", cdr_path, path
             ],
             verbose: verbose,
           )
