@@ -48,6 +48,19 @@ module Homebrew
             #{Utils::Shell.prepend_variable_in_profile("XDG_DATA_DIRS", HOMEBREW_PREFIX/"share")}
         EOS
       end
+
+      def check_umask_not_zero
+        return unless File.umask() == 0
+
+        <<~EOS
+          Umask is currently set to 000, directories created by Homebrew cannot
+          be world-writable. There is a known issue in Windows Subsytem for
+          Linux where this occurs. This can be resolved by adding umask 002 to
+          your #{shell_profile},
+          For example:
+            echo 'umask 002' >> #{shell_profile}
+        EOS
+      end
     end
   end
 end
