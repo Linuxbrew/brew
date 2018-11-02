@@ -581,7 +581,7 @@ module Homebrew
     end
 
     def any_bottle_tag
-      tag = Utils::Bottles.tag
+      tag = Utils::Bottles.tag.to_s
       # Prefer native bottles as a convenience for download caching
       bottle_tags.include?(tag) ? tag : bottle_tags.first
     end
@@ -640,7 +640,7 @@ module Homebrew
           opoo "Cannot publish bottle: Failed reading info for formula #{f.full_name}"
           next
         end
-        bottle_info = jinfo.bottle_info(jinfo.bottle_tags.first)
+        bottle_info = jinfo.bottle_info_any
         unless bottle_info
           opoo "No bottle defined in formula #{f.full_name}"
           next
