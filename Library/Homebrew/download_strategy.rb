@@ -287,12 +287,18 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
       ohai "Downloading #{url}"
 
-      if cached_location.exist?
+      resolved_url, _, url_time = resolve_url_basename_time(url)
+
+      fresh = if cached_location.exist? && url_time
+        url_time <= cached_location.mtime
+      else
+        true
+      end
+
+      if cached_location.exist? && fresh
         puts "Already downloaded: #{cached_location}"
       else
         begin
-          resolved_url, = resolve_url_and_basename(url)
-
           _fetch(url: url, resolved_url: resolved_url)
         rescue ErrorDuringExecution
           raise CurlDownloadStrategyError, url
@@ -324,11 +330,11 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   def resolved_url_and_basename
     return @resolved_url_and_basename if defined?(@resolved_url_and_basename)
-
-    @resolved_url_and_basename = resolve_url_and_basename(url)
+    resolved_url, basename, = resolve_url_basename_time(url)
+    @resolved_url_and_basename = [resolved_url, basename]
   end
 
-  def resolve_url_and_basename(url)
+  def resolve_url_basename_time(url)
     if ENV["HOMEBREW_ARTIFACT_DOMAIN"]
       url = url.sub(%r{^((ht|f)tps?://)?}, ENV["HOMEBREW_ARTIFACT_DOMAIN"].chomp("/") + "/")
     end
@@ -356,9 +362,15 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       lines.map { |line| line[/^Content\-Disposition:\s*(?:inline|attachment);\s*filename=(["']?)([^;]+)\1/i, 2] }
            .compact
 
+    time =
+      lines.map { |line| line[/^Last\-Modified:\s*(.+)/i, 1] }
+           .compact
+           .map(&Time.public_method(:parse))
+           .last
+
     basename = filenames.last || parse_basename(redirect_url)
 
-    [redirect_url, basename]
+    [redirect_url, basename, time]
   end
 
   def _fetch(url:, resolved_url:)
@@ -419,12 +431,9 @@ class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
 
   private
 
-  def resolve_url_and_basename(url)
+  def resolve_url_basename_time(url)
     if url == self.url
-      [
-        "#{apache_mirrors["preferred"]}#{apache_mirrors["path_info"]}",
-        File.basename(apache_mirrors["path_info"]),
-      ]
+      super("#{apache_mirrors["preferred"]}#{apache_mirrors["path_info"]}")
     else
       super
     end
