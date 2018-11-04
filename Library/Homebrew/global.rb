@@ -104,8 +104,10 @@ module Homebrew
   end
 end
 
-HOMEBREW_PULL_API_REGEX = %r{https://api\.github\.com/repos/([\w-]+)/([\w-]+)?/pulls/(\d+)}
-HOMEBREW_PULL_OR_COMMIT_URL_REGEX = %r[https://github\.com/([\w-]+)/([\w-]+)?/(?:pull/(\d+)|commit/[0-9a-fA-F]{4,40})]
+HOMEBREW_PULL_API_REGEX =
+  %r{https://api\.github\.com/repos/([\w-]+)/([\w-]+)?/pulls/(\d+)}.freeze
+HOMEBREW_PULL_OR_COMMIT_URL_REGEX =
+  %r[https://github\.com/([\w-]+)/([\w-]+)?/(?:pull/(\d+)|commit/[0-9a-fA-F]{4,40})].freeze
 
 require "forwardable"
 require "PATH"
@@ -120,22 +122,22 @@ ORIGINAL_PATHS = PATH.new(ENV["HOMEBREW_PATH"]).map do |p|
 end.compact.freeze
 
 HOMEBREW_INTERNAL_COMMAND_ALIASES = {
-  "ls" => "list",
-  "homepage" => "home",
-  "-S" => "search",
-  "up" => "update",
-  "ln" => "link",
-  "instal" => "install", # gem does the same
-  "uninstal" => "uninstall",
-  "rm" => "uninstall",
-  "remove" => "uninstall",
-  "configure" => "diy",
-  "abv" => "info",
-  "dr" => "doctor",
-  "--repo" => "--repository",
+  "ls"          => "list",
+  "homepage"    => "home",
+  "-S"          => "search",
+  "up"          => "update",
+  "ln"          => "link",
+  "instal"      => "install", # gem does the same
+  "uninstal"    => "uninstall",
+  "rm"          => "uninstall",
+  "remove"      => "uninstall",
+  "configure"   => "diy",
+  "abv"         => "info",
+  "dr"          => "doctor",
+  "--repo"      => "--repository",
   "environment" => "--env",
-  "--config" => "config",
-  "-v" => "--version",
+  "--config"    => "config",
+  "-v"          => "--version",
 }.freeze
 
 require "set"

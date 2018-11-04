@@ -32,9 +32,9 @@ describe GitHub do
   describe "::search_issues", :needs_network do
     it "queries GitHub issues with the passed parameters" do
       results = subject.search_issues("brew search",
-                                      repo: "Homebrew/legacy-homebrew",
+                                      repo:   "Homebrew/legacy-homebrew",
                                       author: "MikeMcQuaid",
-                                      is: "closed")
+                                      is:     "closed")
       expect(results).not_to be_empty
       expect(results.first["title"]).to eq("Shall we run `brew update` automatically?")
     end

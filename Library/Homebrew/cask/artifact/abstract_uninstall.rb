@@ -269,9 +269,9 @@ module Cask
           puts path
           command.run!(
             "/usr/bin/xargs",
-            args: ["-0", "--", "/bin/rm", "-r", "-f", "--"],
+            args:  ["-0", "--", "/bin/rm", "-r", "-f", "--"],
             input: resolved_paths.join("\0"),
-            sudo: true,
+            sudo:  true,
           )
         end
       end

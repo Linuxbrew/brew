@@ -11,8 +11,8 @@ describe CompilerSelector do
     double(
       gcc_4_0_build_version: Version::NULL,
       gcc_4_2_build_version: Version.create("5666"),
-      llvm_build_version: Version::NULL,
-      clang_build_version: Version.create("425"),
+      llvm_build_version:    Version::NULL,
+      clang_build_version:   Version.create("425"),
     )
   end
 

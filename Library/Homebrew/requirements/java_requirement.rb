@@ -58,7 +58,7 @@ class JavaRequirement < Requirement
   private
 
   JAVA_CASK_MAP = {
-    "1.8" => "homebrew/cask-versions/java8",
+    "1.8"  => "homebrew/cask-versions/java8",
     "11.0" => "java",
   }.freeze
 

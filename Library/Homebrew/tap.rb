@@ -531,16 +531,16 @@ class Tap
 
   def to_hash
     hash = {
-      "name" => name,
-      "user" => user,
-      "repo" => repo,
-      "path" => path.to_s,
-      "installed" => installed?,
-      "official" => official?,
+      "name"          => name,
+      "user"          => user,
+      "repo"          => repo,
+      "path"          => path.to_s,
+      "installed"     => installed?,
+      "official"      => official?,
       "formula_names" => formula_names,
       "formula_files" => formula_files.map(&:to_s),
       "command_files" => command_files.map(&:to_s),
-      "pinned" => pinned?,
+      "pinned"        => pinned?,
     }
 
     if installed?

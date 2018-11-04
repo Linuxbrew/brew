@@ -117,11 +117,11 @@ class SystemConfig
         f.puts "Core tap: N/A"
       end
       defaults_hash = {
-        HOMEBREW_PREFIX: Homebrew::DEFAULT_PREFIX,
-        HOMEBREW_REPOSITORY: Homebrew::DEFAULT_REPOSITORY,
-        HOMEBREW_CELLAR: Homebrew::DEFAULT_CELLAR,
-        HOMEBREW_CACHE: "#{ENV["HOME"]}/Library/Caches/Homebrew",
-        HOMEBREW_TEMP: ENV["HOMEBREW_SYSTEM_TEMP"],
+        HOMEBREW_PREFIX:        Homebrew::DEFAULT_PREFIX,
+        HOMEBREW_REPOSITORY:    Homebrew::DEFAULT_REPOSITORY,
+        HOMEBREW_CELLAR:        Homebrew::DEFAULT_CELLAR,
+        HOMEBREW_CACHE:         "#{ENV["HOME"]}/Library/Caches/Homebrew",
+        HOMEBREW_TEMP:          ENV["HOMEBREW_SYSTEM_TEMP"],
         HOMEBREW_RUBY_WARNINGS: "-W0",
       }.freeze
       boring_keys = %w[

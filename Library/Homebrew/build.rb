@@ -104,8 +104,8 @@ class Build
 
     new_env = {
       "TMPDIR" => HOMEBREW_TEMP,
-      "TEMP" => HOMEBREW_TEMP,
-      "TMP" => HOMEBREW_TEMP,
+      "TEMP"   => HOMEBREW_TEMP,
+      "TMP"    => HOMEBREW_TEMP,
     }
 
     with_env(new_env) do

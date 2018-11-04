@@ -55,7 +55,7 @@ class Version
   NULL_TOKEN = NullToken.new
 
   class StringToken < Token
-    PATTERN = /[a-z]+[0-9]*/i
+    PATTERN = /[a-z]+[0-9]*/i.freeze
 
     def initialize(value)
       @value = value.to_s
@@ -72,7 +72,7 @@ class Version
   end
 
   class NumericToken < Token
-    PATTERN = /[0-9]+/i
+    PATTERN = /[0-9]+/i.freeze
 
     def initialize(value)
       @value = value.to_i
@@ -101,7 +101,7 @@ class Version
   end
 
   class AlphaToken < CompositeToken
-    PATTERN = /alpha[0-9]*|a[0-9]+/i
+    PATTERN = /alpha[0-9]*|a[0-9]+/i.freeze
 
     def <=>(other)
       case other
@@ -116,7 +116,7 @@ class Version
   end
 
   class BetaToken < CompositeToken
-    PATTERN = /beta[0-9]*|b[0-9]+/i
+    PATTERN = /beta[0-9]*|b[0-9]+/i.freeze
 
     def <=>(other)
       case other
@@ -133,7 +133,7 @@ class Version
   end
 
   class PreToken < CompositeToken
-    PATTERN = /pre[0-9]*/i
+    PATTERN = /pre[0-9]*/i.freeze
 
     def <=>(other)
       case other
@@ -150,7 +150,7 @@ class Version
   end
 
   class RCToken < CompositeToken
-    PATTERN = /rc[0-9]*/i
+    PATTERN = /rc[0-9]*/i.freeze
 
     def <=>(other)
       case other
@@ -167,7 +167,7 @@ class Version
   end
 
   class PatchToken < CompositeToken
-    PATTERN = /p[0-9]*/i
+    PATTERN = /p[0-9]*/i.freeze
 
     def <=>(other)
       case other

@@ -1,7 +1,7 @@
 # @private
 module CompilerConstants
   GNU_GCC_VERSIONS = %w[4.4 4.5 4.6 4.7 4.8 4.9 5 6 7 8].freeze
-  GNU_GCC_REGEXP = /^gcc-(4\.[4-9]|[5-8])$/
+  GNU_GCC_REGEXP = /^gcc-(4\.[4-9]|[5-8])$/.freeze
   COMPILER_SYMBOL_MAP = {
     "gcc"        => :gcc,
     "gcc-4.0"    => :gcc_4_0,
@@ -67,7 +67,7 @@ class CompilerFailure
   end
 
   COLLECTIONS = {
-    cxx11: [
+    cxx11:  [
       create(:gcc_4_0),
       create(:gcc_4_2),
       create(:clang) { build 425 },
@@ -75,7 +75,7 @@ class CompilerFailure
       create(gcc: "4.5"),
       create(gcc: "4.6"),
     ],
-    cxx14: [
+    cxx14:  [
       create(:clang) { build 600 },
       create(:gcc_4_0),
       create(:gcc_4_2),
@@ -97,10 +97,10 @@ class CompilerSelector
   Compiler = Struct.new(:name, :version)
 
   COMPILER_PRIORITY = {
-    clang: [:clang, :gcc_4_2, :gnu, :gcc_4_0, :llvm_clang],
+    clang:   [:clang, :gcc_4_2, :gnu, :gcc_4_0, :llvm_clang],
     gcc_4_2: [:gcc_4_2, :gnu, :clang, :gcc_4_0],
     gcc_4_0: [:gcc_4_0, :gcc_4_2, :gnu, :clang],
-    gcc: [:gnu, :gcc, :llvm_clang, :clang, :gcc_4_2, :gcc_4_0],
+    gcc:     [:gnu, :gcc, :llvm_clang, :clang, :gcc_4_2, :gcc_4_0],
   }.freeze
 
   def self.select_for(formula, compilers = self.compilers)

@@ -236,10 +236,10 @@ shared_examples "#uninstall_phase or #zap_phase" do
 
         expect(fake_system_command).to receive(:run).with(
           cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool"),
-          args: ["--please"],
+          args:         ["--please"],
           must_succeed: true,
           print_stdout: true,
-          sudo: false,
+          sudo:         false,
         )
 
         InstallHelper.install_without_artifacts(cask)

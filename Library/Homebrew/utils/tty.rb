@@ -19,22 +19,22 @@ module Tty
   end
 
   COLOR_CODES = {
-    red: 31,
-    green: 32,
-    yellow: 33,
-    blue: 34,
+    red:     31,
+    green:   32,
+    yellow:  33,
+    blue:    34,
     magenta: 35,
-    cyan: 36,
+    cyan:    36,
     default: 39,
   }.freeze
 
   STYLE_CODES = {
-    reset: 0,
-    bold: 1,
-    italic: 3,
-    underline: 4,
+    reset:         0,
+    bold:          1,
+    italic:        3,
+    underline:     4,
     strikethrough: 9,
-    no_underline: 24,
+    no_underline:  24,
   }.freeze
 
   CODES = COLOR_CODES.merge(STYLE_CODES).freeze

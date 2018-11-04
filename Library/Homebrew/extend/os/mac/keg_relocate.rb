@@ -111,7 +111,7 @@ class Keg
 
   # Matches framework references like `XXX.framework/Versions/YYY/XXX` and
   # `XXX.framework/XXX`, both with or without a slash-delimited prefix.
-  FRAMEWORK_RX = %r{(?:^|/)(([^/]+)\.framework/(?:Versions/[^/]+/)?\2)$}
+  FRAMEWORK_RX = %r{(?:^|/)(([^/]+)\.framework/(?:Versions/[^/]+/)?\2)$}.freeze
 
   def find_dylib_suffix_from(bad_name)
     if (framework = bad_name.match(FRAMEWORK_RX))

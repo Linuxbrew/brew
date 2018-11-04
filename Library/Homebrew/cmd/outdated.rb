@@ -87,11 +87,11 @@ module Homebrew
         f.pkg_version.to_s
       end
 
-      json << { name: f.full_name,
+      json << { name:               f.full_name,
                 installed_versions: outdated_versions.map(&:to_s),
-                current_version: current_version,
-                pinned: f.pinned?,
-                pinned_version: f.pinned_version }
+                current_version:    current_version,
+                pinned:             f.pinned?,
+                pinned_version:     f.pinned_version }
     end
     puts JSON.generate(json)
 

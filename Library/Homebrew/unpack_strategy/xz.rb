@@ -22,8 +22,8 @@ module UnpackStrategy
       FileUtils.cp path, unpack_dir/basename, preserve: true
       quiet_flags = verbose ? [] : ["-q"]
       system_command! "unxz",
-                      args: [*quiet_flags, "-T0", "--", unpack_dir/basename],
-                      env: { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) },
+                      args:    [*quiet_flags, "-T0", "--", unpack_dir/basename],
+                      env:     { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) },
                       verbose: verbose
     end
   end

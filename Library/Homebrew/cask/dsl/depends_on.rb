@@ -13,9 +13,9 @@ module Cask
       ].freeze
 
       VALID_ARCHES = {
-        intel:    { type: :intel, bits: 64 },
+        intel:  { type: :intel, bits: 64 },
         # specific
-        x86_64:   { type: :intel, bits: 64 },
+        x86_64: { type: :intel, bits: 64 },
       }.freeze
 
       attr_accessor :java

@@ -36,10 +36,8 @@
 **/vendor/bundle-standalone/ruby/*/gems/activesupport-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/concurrent-ruby-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/backports-*/lib
-**/vendor/bundle-standalone/ruby/*/gems/i18n-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/minitest-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/thread_safe-*/lib
-**/vendor/bundle-standalone/ruby/*/gems/tzinfo-*/lib
 
 # Ignore rubocop dependencies we don't wish to vendor
 **/vendor/bundle-standalone/ruby/*/gems/ast-*/
@@ -48,7 +46,7 @@
 **/vendor/bundle-standalone/ruby/*/gems/parser-*/
 **/vendor/bundle-standalone/ruby/*/gems/powerpack-*/
 **/vendor/bundle-standalone/ruby/*/gems/rainbow-*/
-**/vendor/bundle-standalone/ruby/*/gems/rubocop-*/
+**/vendor/bundle-standalone/ruby/*/gems/rubocop-0*/
 **/vendor/bundle-standalone/ruby/*/gems/ruby-progressbar-*/
 **/vendor/bundle-standalone/ruby/*/gems/unicode-display_width-*/
 
