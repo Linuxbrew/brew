@@ -1306,7 +1306,7 @@ Homebrew's lead maintainer is Mike McQuaid.
 
 Homebrew's project leadership committee is Mike McQuaid, JCount, Misty De Meo and Markus Reiter.
 
-Homebrew/brew's other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, commitay, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff.
+Homebrew/brew's other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, Vitor Galvao, JCount, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff.
 
 Homebrew/brew's Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman.
 
