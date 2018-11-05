@@ -18,13 +18,13 @@ module OS
         when "10.10" then "7.2.1"
         when "10.11" then "8.2.1"
         when "10.12" then "9.2"
-        when "10.13" then "10.0"
-        when "10.14" then "10.0"
+        when "10.13" then "10.1"
+        when "10.14" then "10.1"
         else
           raise "macOS '#{MacOS.version}' is invalid" unless OS::Mac.prerelease?
 
           # Default to newest known version of Xcode for unreleased macOS versions.
-          "10.0"
+          "10.1"
         end
       end
 
@@ -190,8 +190,8 @@ module OS
         when 81      then "8.3"
         when 90      then "9.2"
         when 91      then "9.4"
-        when 100     then "10.0"
-        else              "10.0"
+        when 100     then "10.1"
+        else              "10.1"
         end
       end
 
