@@ -107,25 +107,26 @@ module Cask
             next unless Pathname(service).exist?
 
             command.run!("/bin/launchctl", args: ["unload", "-w", "--", service], sudo: with_sudo)
-            command.run!("/bin/rm",        args: ["-f", "--", service], sudo: with_sudo)
+            command.run!("/bin/rm", args: ["-f", "--", service], sudo: with_sudo)
             sleep 1
           end
         end
       end
 
-      def running_processes(bundle_id, command: nil)
-        command.run!("/bin/launchctl", args: ["list"]).stdout.lines
-               .map { |line| line.chomp.split("\t") }
-               .map { |pid, state, id| [pid.to_i, state.to_i, id] }
-               .select do |(pid, _, id)|
-                 pid.nonzero? && id.match?(/^#{Regexp.escape(bundle_id)}($|\.\d+)/)
-               end
+      def running_processes(bundle_id)
+        system_command!("/bin/launchctl", args: ["list"])
+          .stdout.lines
+          .map { |line| line.chomp.split("\t") }
+          .map { |pid, state, id| [pid.to_i, state.to_i, id] }
+          .select do |(pid, _, id)|
+            pid.nonzero? && id.match?(/^#{Regexp.escape(bundle_id)}($|\.\d+)/)
+          end
       end
 
       # :quit/:signal must come before :kext so the kext will not be in use by a running process
       def uninstall_quit(*bundle_ids, command: nil, **_)
         bundle_ids.each do |bundle_id|
-          next if running_processes(bundle_id, command: command).empty?
+          next if running_processes(bundle_id).empty?
 
           unless User.current.gui?
             ohai "Not logged into a GUI; skipping quitting application ID '#{bundle_id}'."
@@ -138,7 +139,7 @@ module Cask
             Timeout.timeout(10) do
               Kernel.loop do
                 next unless quit(bundle_id).success?
-                if running_processes(bundle_id, command: command).empty?
+                if running_processes(bundle_id).empty?
                   puts "Application '#{bundle_id}' quit successfully."
                   break
                 end
@@ -187,7 +188,7 @@ module Cask
 
           signal, bundle_id = pair
           ohai "Signalling '#{signal}' to application ID '#{bundle_id}'"
-          pids = running_processes(bundle_id, command: command).map(&:first)
+          pids = running_processes(bundle_id).map(&:first)
           next unless pids.any?
 
           # Note that unlike :quit, signals are sent from the current user (not
@@ -207,13 +208,12 @@ module Cask
 
         login_items.each do |name|
           ohai "Removing login item #{name}"
-          command.run!(
+          system_command!(
             "osascript",
             args: [
               "-e",
               %Q(tell application "System Events" to delete every login item whose name is "#{name}"),
             ],
-            sudo: false,
           )
           sleep 1
         end
@@ -223,14 +223,14 @@ module Cask
       def uninstall_kext(*kexts, command: nil, **_)
         kexts.each do |kext|
           ohai "Unloading kernel extension #{kext}"
-          is_loaded = command.run!("/usr/sbin/kextstat", args: ["-l", "-b", kext], sudo: true).stdout
+          is_loaded = system_command!("/usr/sbin/kextstat", args: ["-l", "-b", kext], sudo: true).stdout
           if is_loaded.length > 1
-            command.run!("/sbin/kextunload", args: ["-b", kext], sudo: true)
+            system_command!("/sbin/kextunload", args: ["-b", kext], sudo: true)
             sleep 1
           end
-          command.run!("/usr/sbin/kextfind", args: ["-b", kext], sudo: true).stdout.chomp.lines.each do |kext_path|
+          system_command!("/usr/sbin/kextfind", args: ["-b", kext], sudo: true).stdout.chomp.lines.each do |kext_path|
             ohai "Removing kernel extension #{kext_path}"
-            command.run!("/bin/rm", args: ["-rf", kext_path], sudo: true)
+            system_command!("/bin/rm", args: ["-rf", kext_path], sudo: true)
           end
         end
       end
