@@ -94,8 +94,10 @@ module Cask
               command.run!("/bin/launchctl", args: ["remove", service], sudo: with_sudo)
               sleep 1
             end
-            paths = ["/Library/LaunchAgents/#{service}.plist",
-                     "/Library/LaunchDaemons/#{service}.plist"]
+            paths = [
+              "/Library/LaunchAgents/#{service}.plist",
+              "/Library/LaunchDaemons/#{service}.plist",
+            ]
             paths.each { |elt| elt.prepend(ENV["HOME"]) } unless with_sudo
             paths = paths.map { |elt| Pathname(elt) }.select(&:exist?)
             paths.each do |path|
@@ -130,20 +132,51 @@ module Cask
             next
           end
 
-          ohai "Quitting application ID '#{bundle_id}'."
-          command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{bundle_id}" to quit)], sudo: true)
+          ohai "Quitting application '#{bundle_id}'..."
 
           begin
-            Timeout.timeout(3) do
+            Timeout.timeout(10) do
               Kernel.loop do
-                break if running_processes(bundle_id, command: command).empty?
+                next unless quit(bundle_id).success?
+                if running_processes(bundle_id, command: command).empty?
+                  puts "Application '#{bundle_id}' quit successfully."
+                  break
+                end
               end
             end
           rescue Timeout::Error
+            opoo "Application '#{bundle_id}' did not quit."
             next
           end
         end
       end
+
+      def quit(bundle_id)
+        script = <<~JAVASCRIPT
+          'use strict';
+
+          ObjC.import('stdlib')
+
+          function run(argv) {
+            var app = Application(argv[0])
+
+            try {
+              app.quit()
+            } catch (err) {
+              if (app.running()) {
+                $.exit(1)
+              }
+            }
+
+            $.exit(0)
+          }
+        JAVASCRIPT
+
+        system_command "osascript", args:         ["-l", "JavaScript", "-e", script, bundle_id],
+                                    print_stderr: false,
+                                    sudo:         true
+      end
+      private :quit
 
       # :signal should come after :quit so it can be used as a backup when :quit fails
       def uninstall_signal(*signals, command: nil, **_)
@@ -175,7 +208,7 @@ module Cask
         login_items.each do |name|
           ohai "Removing login item #{name}"
           command.run!(
-            "/usr/bin/osascript",
+            "osascript",
             args: [
               "-e",
               %Q(tell application "System Events" to delete every login item whose name is "#{name}"),
@@ -287,7 +320,7 @@ module Cask
       end
 
       def trash_paths(*paths, command: nil, **_)
-        result = command.run!("/usr/bin/osascript", args: ["-e", <<~APPLESCRIPT, *paths])
+        result = command.run!("osascript", args: ["-e", <<~APPLESCRIPT, *paths])
           on run argv
             repeat with i from 1 to (count argv)
               set item i of argv to (item i of argv as POSIX file)

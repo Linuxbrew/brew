@@ -253,8 +253,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
 
     it "is supported" do
       FakeSystemCommand.expects_command(
-        ["/usr/bin/osascript", "-e", 'tell application "System Events" to delete every login ' \
-                                     'item whose name is "Fancy"'],
+        ["osascript", "-e", 'tell application "System Events" to delete every login item whose name is "Fancy"'],
       )
 
       subject
