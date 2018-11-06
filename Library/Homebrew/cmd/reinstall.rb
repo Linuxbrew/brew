@@ -3,6 +3,9 @@
 #:
 #:    If `--display-times` is passed, install times for each formula are printed
 #:    at the end of the run.
+#:
+#:    If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
+#:    of upgraded <formulae> as well as the HOMEBREW_CACHE for that formula.
 
 require "formula_installer"
 require "development_tools"
@@ -24,6 +27,7 @@ module Homebrew
       end
       Migrator.migrate_if_needed(f)
       reinstall_formula(f)
+      Cleanup.new.cleanup_formula(f) if ENV["HOMEBREW_INSTALL_CLEANUP"]
     end
     Homebrew.messages.display_messages
   end

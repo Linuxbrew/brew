@@ -315,6 +315,9 @@ If \fB\-\-interactive\fR (or \fB\-i\fR) is passed, download and patch \fIformula
 .IP
 If \fB\-\-git\fR (or \fB\-g\fR) is passed, Homebrew will create a Git repository, useful for creating patches to the software\.
 .
+.IP
+If \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed versions of upgraded \fIformulae\fR as well as the HOMEBREW_CACHE for that formula\.
+.
 .TP
 \fBleaves\fR
 Show installed formulae that are not dependencies of another installed formula\.
@@ -437,6 +440,9 @@ Uninstall and then install \fIformula\fR (with existing install options)\.
 .
 .IP
 If \fB\-\-display\-times\fR is passed, install times for each formula are printed at the end of the run\.
+.
+.IP
+If \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed versions of upgraded \fIformulae\fR as well as the HOMEBREW_CACHE for that formula\.
 .
 .TP
 \fBsearch\fR, \fB\-S\fR
@@ -614,7 +620,7 @@ Upgrade outdated, unpinned brews (with existing install options)\.
 Options for the \fBinstall\fR command are also valid here\.
 .
 .IP
-If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_UPGRADE_CLEANUP\fR is set then remove previously installed version(s) of upgraded \fIformulae\fR\.
+If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed version(s) of upgraded \fIformulae\fR\.
 .
 .IP
 If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if the HEAD installation of the formula is outdated\. Otherwise, the repository\'s HEAD will be checked for updates when a new stable or devel version has been released\.

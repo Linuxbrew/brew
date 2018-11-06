@@ -3,7 +3,7 @@
 #:
 #:    Options for the `install` command are also valid here.
 #:
-#:    If `--cleanup` is specified or `HOMEBREW_UPGRADE_CLEANUP` is set then remove
+#:    If `--cleanup` is specified or `HOMEBREW_INSTALL_CLEANUP` is set then remove
 #:    previously installed version(s) of upgraded <formulae>.
 #:
 #:    If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
@@ -107,7 +107,7 @@ module Homebrew
       Migrator.migrate_if_needed(f)
       begin
         upgrade_formula(f)
-        next if !ARGV.include?("--cleanup") && !ENV["HOMEBREW_UPGRADE_CLEANUP"]
+        next if !ARGV.include?("--cleanup") && !ENV["HOMEBREW_UPGRADE_CLEANUP"] && !ENV["HOMEBREW_INSTALL_CLEANUP"]
         next unless f.installed?
 
         Cleanup.new.cleanup_formula(f)
