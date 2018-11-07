@@ -149,7 +149,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
         }.to output(/Application 'my.fancy.package.app' did not quit\./).to_stderr
       end
 
-      expect(time.real).to be_within(0.5).of(10)
+      expect(time.real).to be_within(3).of(10)
     end
   end
 
