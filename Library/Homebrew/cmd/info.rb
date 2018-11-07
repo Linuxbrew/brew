@@ -36,6 +36,7 @@
 
 require "missing_formula"
 require "caveats"
+require "cli_parser"
 require "options"
 require "formula"
 require "keg"
@@ -45,12 +46,49 @@ require "json"
 module Homebrew
   module_function
 
+  def info_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `info [<formulae>]`
+
+        Display brief statistics for your Homebrew installation.
+      EOS
+      switch "--analytics",
+        description: "Display Homebrew analytics data (provided neither `HOMEBREW_NO_ANALYTICS` "\
+                     "or `HOMEBREW_NO_GITHUB_API` are set)."
+      flag   "--days",
+        depends_on:  "--analytics",
+        description: "The value for `days` must be `30`, `90` or `365`. The default is `30`."
+      flag   "--category",
+        depends_on:  "--analytics",
+        description: "The value for `category` must be `install`, `install-on-request`, "\
+                     "`build-error` or `os-version`. The default is `install`."
+      switch "--github",
+        description: "Open a browser to the GitHub History page for provided <formula>. "\
+                     "To view formula history locally: `brew log -p` <formula>"
+      flag "--json=",
+        description: "Print a JSON representation of <formulae>. Currently the only accepted "\
+                     "value for <version> is `v1`. See the docs for examples of using the JSON "\
+                     "output: <https://docs.brew.sh/Querying-Brew>"
+      switch "--all",
+        depends_on:  "--json",
+        description: "Get information on all formulae."
+      switch "--installed",
+        depends_on:  "--json",
+        description: "Get information on all installed formulae."
+      switch :verbose,
+        description: "See more verbose analytics data."
+      switch :debug
+    end
+  end
+
   def info
+    info_args.parse
     # eventually we'll solidify an API, but we'll keep old versions
     # awhile around for compatibility
-    if ARGV.json == "v1"
+    if args.json == "v1"
       print_json
-    elsif ARGV.flag? "--github"
+    elsif args.github?
       exec_browser(*ARGV.formulae.map { |f| github_info(f) })
     else
       print_info
@@ -59,7 +97,7 @@ module Homebrew
 
   def print_info
     if ARGV.named.empty?
-      if ARGV.include?("--analytics")
+      if args.analytics?
         output_analytics
       elsif HOMEBREW_CELLAR.exist?
         count = Formula.racks.length
@@ -74,13 +112,13 @@ module Homebrew
           else
             Formulary.find_with_priority(f)
           end
-          if ARGV.include?("--analytics")
+          if args.analytics?
             output_formula_analytics(formula)
           else
             info_formula(formula)
           end
         rescue FormulaUnavailableError => e
-          if ARGV.include?("--analytics")
+          if args.analytics?
             output_analytics(filter: f)
             next
           end
@@ -95,9 +133,9 @@ module Homebrew
   end
 
   def print_json
-    ff = if ARGV.include? "--all"
+    ff = if args.all?
       Formula.sort
-    elsif ARGV.include? "--installed"
+    elsif args.installed?
       Formula.installed.sort
     else
       ARGV.formulae
@@ -308,13 +346,13 @@ module Homebrew
   end
 
   def output_analytics(filter: nil)
-    days = ARGV.value("days") || "30"
+    days = args.days || "30"
     valid_days = %w[30 90 365]
     unless valid_days.include?(days)
       raise ArgumentError("Days must be one of #{valid_days.join(", ")}!")
     end
 
-    category = ARGV.value("category") || "install"
+    category = args.category || "install"
     valid_categories = %w[install install-on-request build-error os-version]
     unless valid_categories.include?(category)
       raise ArgumentError("Categories must be one of #{valid_categories.join(", ")}")
@@ -349,7 +387,7 @@ module Homebrew
     json = formulae_api_json("formula/#{f}.json")
     return if json.blank? || json["analytics"].blank?
 
-    full_analytics = ARGV.include?("--analytics") || ARGV.verbose?
+    full_analytics = args.analytics? || args.verbose?
 
     ohai "Analytics"
     json["analytics"].each do |category, value|
