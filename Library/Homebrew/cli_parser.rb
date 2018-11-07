@@ -110,7 +110,7 @@ module Homebrew
         if name.length == 1
           "-#{name}"
         else
-          "--#{name}"
+          "--#{name.tr("_", "-")}"
         end
       end
 
