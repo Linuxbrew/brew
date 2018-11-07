@@ -104,7 +104,7 @@ graphical user interface.
     Ruby regular expression.
 
   * `style` [--fix] [ <token> ... ]:
-    Check the given Casks for correct style using [RuboCop Cask](https://github.com/Homebrew/rubocop-cask).
+    Check the given Casks for correct style using RuboCop (with custom Cask cops).
     If no tokens are given on the command line, all Casks are checked.
     With `--fix`, auto-correct any style errors if possible.
 

@@ -20,7 +20,7 @@ module Cask
       def install_rubocop
         capture_stderr do
           begin
-            Homebrew.install_gem_setup_path! "rubocop-cask", HOMEBREW_RUBOCOP_CASK_VERSION, "rubocop"
+            Homebrew.install_gem_setup_path! "rubocop"
           rescue SystemExit
             raise CaskError, Tty.strip_ansi($stderr.string).chomp.sub(/\AError: /, "")
           end
@@ -43,8 +43,8 @@ module Cask
 
       def default_args
         [
-          "--require", "rubocop-cask",
-          "--force-default-config",
+          "--force-exclusion",
+          "--config", "#{HOMEBREW_LIBRARY}/.rubocop.yml",
           "--format", "simple"
         ]
       end
