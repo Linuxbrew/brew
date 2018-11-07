@@ -360,8 +360,8 @@ class BuildError < RuntimeError
     @cmd = cmd
     @args = args
     @env = env
-    pretty_args = args.map { |arg| arg.to_s.gsub " ", "\\ " }.join(" ")
-    super "Failed executing: #{cmd} #{pretty_args}"
+    pretty_args = Array(args).map { |arg| arg.to_s.gsub " ", "\\ " }.join(" ")
+    super "Failed executing: #{cmd} #{pretty_args}".strip
   end
 
   def issues
