@@ -11,12 +11,6 @@ Homebrew Cask is a tool for installing precompiled macOS binaries (such as
 Applications) from the command line. The user is never required to use the
 graphical user interface.
 
-## ALPHA-QUALITY SOFTWARE
-
-Homebrew Cask works robustly enough that we welcome new users, but the
-project is still in early development. That means command names, option
-names, and other aspects of this manual are still subject to change.
-
 ## FREQUENTLY USED COMMANDS
 
   * `install` [--force] [--skip-cask-deps] [--require-sha] [--no-quarantine] [--language=<iso-language>[,<iso-language> ... ]] <token> [ <token> ... ]:
