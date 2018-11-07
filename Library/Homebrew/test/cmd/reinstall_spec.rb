@@ -22,9 +22,8 @@ describe "brew reinstall", :integration_test do
 
   it "reinstalls a Formula even when one of the options is invalid" do
     expect { brew "reinstall", "testball", "--with-fo" }
-      .to output(/Reinstalling testball --with-foo/).to_stdout
-      .and output(/testball: this formula has no \-\-with-fo option so it will be ignored!/).to_stderr
-      .and be_a_success
+      .to output(/Error: invalid option: --with-fo/).to_stderr
+      .and be_a_failure
   end
 
   it "refuses to reinstall a pinned Formula, but doesn't fail" do
