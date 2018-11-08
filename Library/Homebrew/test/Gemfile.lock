@@ -74,7 +74,7 @@ DEPENDENCIES
   rspec-its
   rspec-retry
   rspec-wait
-  rubocop (= 0.60.0)
+  rubocop
   simplecov
   simplecov-cobertura
 

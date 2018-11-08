@@ -1,13 +1,11 @@
 source "https://rubygems.org"
 
-require_relative "../constants"
-
 gem "parallel_tests"
 gem "rspec"
 gem "rspec-its", require: false
 gem "rspec-retry", require: false
 gem "rspec-wait", require: false
-gem "rubocop", HOMEBREW_RUBOCOP_VERSION
+gem "rubocop"
 
 group :development do
   gem "ronn", require: false

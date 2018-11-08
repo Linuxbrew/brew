@@ -17,7 +17,7 @@ module Homebrew
     def check_style_impl(files, output_type, options = {})
       fix = options[:fix]
 
-      Homebrew.install_gem_setup_path! "rubocop", HOMEBREW_RUBOCOP_VERSION
+      Homebrew.install_gem_setup_path! "rubocop"
       Homebrew.install_gem! "rubocop-rspec"
       require "rubocop"
       require "rubocops"
@@ -80,11 +80,11 @@ module Homebrew
         args << "--debug" if ARGV.debug?
         args << "--display-cop-names" if ARGV.include? "--display-cop-names"
         args << "--format" << "simple" if files
-        system(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", *args)
+        system(cache_env, "rubocop", *args)
         rubocop_success = $CHILD_STATUS.success?
       when :json
         json, err, status =
-          Open3.capture3(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_",
+          Open3.capture3(cache_env, "rubocop",
                          "--format", "json", *args)
         # exit status of 1 just means violations were found; other numbers mean
         # execution errors.
