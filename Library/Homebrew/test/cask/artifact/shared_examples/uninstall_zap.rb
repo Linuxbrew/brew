@@ -1,9 +1,11 @@
+require "benchmark"
+
 shared_examples "#uninstall_phase or #zap_phase" do
+  subject { artifact }
+
   let(:artifact_dsl_key) { described_class.dsl_key }
   let(:artifact) { cask.artifacts.find { |a| a.is_a?(described_class) } }
   let(:fake_system_command) { FakeSystemCommand }
-
-  subject { artifact.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command) }
 
   context "using :launchctl" do
     let(:cask) { Cask::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-launchctl")) }
@@ -38,7 +40,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
 
       FakeSystemCommand.expects_command(launchctl_remove_cmd)
 
-      subject
+      subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
     end
 
     it "works when job is owned by system" do
@@ -54,7 +56,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
 
       FakeSystemCommand.expects_command(sudo(launchctl_remove_cmd))
 
-      subject
+      subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
     end
   end
 
@@ -80,7 +82,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
       expect(main_pkg).to receive(:uninstall)
       expect(agent_pkg).to receive(:uninstall)
 
-      subject
+      subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
     end
   end
 
@@ -89,43 +91,65 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:kext_id) { "my.fancy.package.kernelextension" }
 
     it "is supported" do
-      FakeSystemCommand.stubs_command(
-        sudo(%W[/usr/sbin/kextstat -l -b #{kext_id}]), "loaded"
-      )
+      allow(subject).to receive(:system_command!)
+        .with("/usr/sbin/kextstat", args: ["-l", "-b", kext_id], sudo: true)
+        .and_return(instance_double("SystemCommand::Result", stdout: "loaded"))
 
-      FakeSystemCommand.expects_command(
-        sudo(%W[/sbin/kextunload -b #{kext_id}]),
-      )
+      expect(subject).to receive(:system_command!)
+        .with("/sbin/kextunload", args: ["-b", kext_id], sudo: true)
+        .and_return(instance_double("SystemCommand::Result"))
 
-      FakeSystemCommand.expects_command(
-        sudo(%W[/usr/sbin/kextfind -b #{kext_id}]), "/Library/Extensions/FancyPackage.kext\n"
-      )
+      expect(subject).to receive(:system_command!)
+        .with("/usr/sbin/kextfind", args: ["-b", kext_id], sudo: true)
+        .and_return(instance_double("SystemCommand::Result", stdout: "/Library/Extensions/FancyPackage.kext\n"))
 
-      FakeSystemCommand.expects_command(
-        sudo(["/bin/rm", "-rf", "/Library/Extensions/FancyPackage.kext"]),
-      )
+      expect(subject).to receive(:system_command!)
+        .with("/bin/rm", args: ["-rf", "/Library/Extensions/FancyPackage.kext"], sudo: true)
 
-      subject
+      subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
     end
   end
 
   context "using :quit" do
     let(:cask) { Cask::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-quit")) }
     let(:bundle_id) { "my.fancy.package.app" }
-    let(:quit_application_script) do
-      %Q(tell application id "#{bundle_id}" to quit)
+
+    it "is skipped when the user is not a GUI user" do
+      allow(User.current).to receive(:gui?).and_return false
+      allow(subject).to receive(:running_processes).with(bundle_id).and_return([[0, "", bundle_id]])
+
+      expect {
+        subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
+      }.to output(/Not logged into a GUI; skipping quitting application ID 'my.fancy.package.app'\./).to_stdout
     end
 
-    it "is supported" do
-      FakeSystemCommand.stubs_command(
-        %w[/bin/launchctl list], "999\t0\t#{bundle_id}\n"
-      )
+    it "quits a running application" do
+      allow(User.current).to receive(:gui?).and_return true
 
-      FakeSystemCommand.stubs_command(
-        %w[/bin/launchctl list],
-      )
+      expect(subject).to receive(:running_processes).with(bundle_id).ordered.and_return([[0, "", bundle_id]])
+      expect(subject).to receive(:quit).with(bundle_id)
+                                       .and_return(instance_double("SystemCommand::Result", success?: true))
+      expect(subject).to receive(:running_processes).with(bundle_id).ordered.and_return([])
 
-      subject
+      expect {
+        subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
+      }.to output(/Application 'my.fancy.package.app' quit successfully\./).to_stdout
+    end
+
+    it "tries to quit the application for 10 seconds" do
+      allow(User.current).to receive(:gui?).and_return true
+
+      allow(subject).to receive(:running_processes).with(bundle_id).and_return([[0, "", bundle_id]])
+      allow(subject).to receive(:quit).with(bundle_id)
+                                      .and_return(instance_double("SystemCommand::Result", success?: false))
+
+      time = Benchmark.measure do
+        expect {
+          subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
+        }.to output(/Application 'my.fancy.package.app' did not quit\./).to_stderr
+      end
+
+      expect(time.real).to be_within(3).of(10)
     end
   end
 
@@ -136,15 +160,14 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:unix_pids) { [12_345, 67_890] }
 
     it "is supported" do
-      FakeSystemCommand.stubs_command(
-        %w[/bin/launchctl list], unix_pids.map { |pid| [pid, 0, bundle_id].join("\t") }.join("\n")
-      )
+      allow(subject).to receive(:running_processes).with(bundle_id)
+                                                   .and_return(unix_pids.map { |pid| [pid, 0, bundle_id] })
 
       signals.each do |signal|
         expect(Process).to receive(:kill).with(signal, *unix_pids)
       end
 
-      subject
+      subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
     end
   end
 
@@ -161,7 +184,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
       let(:fake_system_command) { NeverSudoSystemCommand }
       let(:cask) { Cask::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-#{directive}")) }
 
-      around(:each) do |example|
+      around do |example|
         begin
           ENV["HOME"] = dir
 
@@ -173,18 +196,21 @@ shared_examples "#uninstall_phase or #zap_phase" do
         end
       end
 
-      before(:each) do
+      before do
+        # rubocop:disable RSpec/AnyInstance
         allow_any_instance_of(Cask::Artifact::AbstractUninstall).to receive(:trash_paths)
           .and_wrap_original do |method, *args|
-            result = method.call(*args)
-            FileUtils.rm_rf result.stdout.split("\0")
+            method.call(*args).tap do |result|
+              FileUtils.rm_rf result.stdout.split("\0")
+            end
           end
+        # rubocop:enable RSpec/AnyInstance
       end
 
       it "is supported" do
         expect(paths).to all(exist)
 
-        subject
+        subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
 
         paths.each do |path|
           expect(path).not_to exist
@@ -199,12 +225,12 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:empty_directory) { Pathname.new("#{TEST_TMPDIR}/empty_directory_path") }
     let(:ds_store) { empty_directory.join(".DS_Store") }
 
-    before(:each) do
+    before do
       empty_directory.mkdir
       FileUtils.touch ds_store
     end
 
-    after(:each) do
+    after do
       FileUtils.rm_rf empty_directory
     end
 
@@ -212,7 +238,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
       expect(empty_directory).to exist
       expect(ds_store).to exist
 
-      subject
+      subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
 
       expect(ds_store).not_to exist
       expect(empty_directory).not_to exist
@@ -243,7 +269,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
         )
 
         InstallHelper.install_without_artifacts(cask)
-        subject
+        subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
       end
     end
   end
@@ -252,12 +278,14 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:cask) { Cask::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-login-item")) }
 
     it "is supported" do
-      FakeSystemCommand.expects_command(
-        ["/usr/bin/osascript", "-e", 'tell application "System Events" to delete every login ' \
-                                     'item whose name is "Fancy"'],
+      expect(subject).to receive(:system_command!)
+        .with(
+          "osascript",
+        args: ["-e", 'tell application "System Events" to delete every login item whose name is "Fancy"'],
       )
+        .and_return(instance_double("SystemCommand::Result"))
 
-      subject
+      subject.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command)
     end
   end
 end
