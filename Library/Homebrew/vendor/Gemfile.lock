@@ -44,7 +44,7 @@ DEPENDENCIES
   backports
   concurrent-ruby
   plist
-  rubocop (= 0.60.0)
+  rubocop
   rubocop-rspec
   ruby-macho
 
