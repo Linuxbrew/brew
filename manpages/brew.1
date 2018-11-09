@@ -1230,8 +1230,8 @@ The fully\-qualified name of a tapped formula
 Sometimes a formula from a tapped repository may conflict with one in \fBhomebrew/core\fR\. You can still access these formulae by using a special syntax, e\.g\. \fBhomebrew/dupes/vim\fR or \fBhomebrew/versions/node4\fR\.
 .
 .TP
-An arbitrary URL
-Homebrew can install formulae via URL, e\.g\. \fBhttps://raw\.github\.com/Homebrew/homebrew\-core/master/Formula/git\.rb\fR\. The formula file will be cached for later use\.
+An arbitrary file or URL
+Homebrew can install formulae via URL, e\.g\. \fBhttps://raw\.github\.com/Homebrew/homebrew\-core/master/Formula/git\.rb\fR, or from a local path\. It could point to either a formula file or a bottle\. In the case of a URL, the downloaded file will be cached for later use\.
 .
 .SH "ENVIRONMENT"
 Note that environment variables must have a value set to be detected\. For example, \fBexport HOMEBREW_NO_INSECURE_REDIRECT=1\fR rather than just \fBexport HOMEBREW_NO_INSECURE_REDIRECT\fR\.
