@@ -1,3 +1,0 @@
-sut:
-  build: .
-  command: sh -c 'brew doctor && brew tests'
