@@ -568,6 +568,14 @@ class FormulaInstaller
       installed_keg.rename(tmp_keg)
     end
 
+    tab_tap = tab.source["tap"]
+    if df.tap.to_s != tab_tap
+      odie <<~EOS
+        #{df} is already installed from #{tab_tap}!
+        Please `brew uninstall #{df}` first."
+      EOS
+    end
+
     fi = FormulaInstaller.new(df)
     fi.options                |= tab.used_options
     fi.options                |= Tab.remap_deprecated_options(df.deprecated_options, dep.options)
