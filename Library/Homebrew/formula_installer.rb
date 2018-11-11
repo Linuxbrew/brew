@@ -922,7 +922,7 @@ class FormulaInstaller
   rescue Exception => e # rubocop:disable Lint/RescueException
     opoo "The post-install step did not complete successfully"
     puts "You can try again using `brew postinstall #{formula.full_name}`"
-    ohai e, e.backtrace if debug?
+    ohai e, e.backtrace if debug? || ARGV.homebrew_developer?
     Homebrew.failed = true
     @show_summary_heading = true
   end
