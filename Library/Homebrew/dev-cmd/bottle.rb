@@ -540,7 +540,7 @@ module Homebrew
                       (\n^\ {3}[\S\ ]+$)*                                        # options can be in multiple lines
                     )?|
                     (homepage|desc|sha1|sha256|version|mirror)\ ['"][\S\ ]+['"]| # specs with a string
-                    revision\ \d+                                                # revision with a number
+                    (revision|version_scheme)\ \d+                               # revision with a number
                   )\n+                                                           # multiple empty lines
                  )+
                /mx
