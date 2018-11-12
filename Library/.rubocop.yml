@@ -1,10 +1,4 @@
-AllCops:
-  TargetRubyVersion: 2.3
-  Exclude:
-    - '**/vendor/**/*'
-  DisplayCopNames: false
-
-require: ./Homebrew/rubocops.rb
+inherit_from: ./.rubocop_shared.yml
 
 # enable all formulae audits
 FormulaAudit:
@@ -12,10 +6,6 @@ FormulaAudit:
 
 # enable all formulae strict audits
 FormulaAuditStrict:
-  Enabled: true
-
-# enable all cask audits
-Cask:
   Enabled: true
 
 # disable all formulae strict audits by default

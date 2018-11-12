@@ -1,5 +1,4 @@
-inherit_from:
-  - ./.rubocop.yml
+inherit_from: ./.rubocop.yml
 
 NewFormulaAudit:
   Enabled: true
