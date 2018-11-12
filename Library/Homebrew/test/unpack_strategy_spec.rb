@@ -56,5 +56,25 @@ describe UnpackStrategy do
         expect(unpack_dir/"file.txt").to be_a_file
       end
     end
+
+    context "with HOMEBREW_TEMP" do
+      let(:basename) { "file.xyz" }
+      let(:path) {
+        (mktmpdir/basename).tap do |path|
+          mktmpdir do |dir|
+            FileUtils.touch dir/"file.txt"
+            system "tar", "-c", "-f", path, "-C", dir, "file.txt"
+          end
+        end
+      }
+
+      it "uses HOMEBREW_TEMP" do
+	ENV["HOMEBREW_TEMP"] = mktmpdir;
+        strategy.extract_nestedly(basename: basename)
+	f = Dir.glob(unpack_dir/"*/file.txt")[0]
+	expect(f).to be_a_file
+	end
+      end
+    end
   end
 end
