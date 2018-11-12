@@ -50,11 +50,11 @@ describe "brew search", :integration_test do
 
   {
     "macports" => "https://www.macports.org/ports.php?by=name&substr=testball",
-    "fink" => "http://pdb.finkproject.org/pdb/browse.php?summary=testball",
-    "debian" => "https://packages.debian.org/search?keywords=testball&searchon=names&suite=all&section=all",
+    "fink"     => "http://pdb.finkproject.org/pdb/browse.php?summary=testball",
+    "debian"   => "https://packages.debian.org/search?keywords=testball&searchon=names&suite=all&section=all",
     "opensuse" => "https://software.opensuse.org/search?q=testball",
-    "fedora" => "https://apps.fedoraproject.org/packages/s/testball",
-    "ubuntu" => "https://packages.ubuntu.com/search?keywords=testball&searchon=names&suite=all&section=all",
+    "fedora"   => "https://apps.fedoraproject.org/packages/s/testball",
+    "ubuntu"   => "https://packages.ubuntu.com/search?keywords=testball&searchon=names&suite=all&section=all",
   }.each do |flag, url|
     specify "--#{flag}" do
       expect { brew "search", "--#{flag}", "testball", "HOMEBREW_BROWSER" => "echo" }

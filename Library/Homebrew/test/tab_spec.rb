@@ -31,13 +31,13 @@ describe Tab do
       "stdlib"               => "libcxx",
       "runtime_dependencies" => [],
       "source"               => {
-        "tap" => CoreTap.instance.to_s,
-        "path" => CoreTap.instance.path.to_s,
-        "spec" => "stable",
+        "tap"      => CoreTap.instance.to_s,
+        "path"     => CoreTap.instance.path.to_s,
+        "spec"     => "stable",
         "versions" => {
           "stable" => "0.10",
-          "devel" => "0.14",
-          "head" => "HEAD-1111111",
+          "devel"  => "0.14",
+          "head"   => "HEAD-1111111",
         },
       },
     )

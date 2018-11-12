@@ -327,7 +327,7 @@ class Formula
     active_spec == head
   end
 
-  delegate [
+  delegate [ # rubocop:disable Layout/AlignHash
     :bottle_unneeded?,
     :bottle_disabled?,
     :bottle_disable_reason,
@@ -994,11 +994,11 @@ class Formula
     self.build = Tab.for_formula(self)
 
     new_env = {
-      "TMPDIR" => HOMEBREW_TEMP,
-      "TEMP" => HOMEBREW_TEMP,
-      "TMP" => HOMEBREW_TEMP,
+      "TMPDIR"        => HOMEBREW_TEMP,
+      "TEMP"          => HOMEBREW_TEMP,
+      "TMP"           => HOMEBREW_TEMP,
       "HOMEBREW_PATH" => nil,
-      "PATH" => ENV["HOMEBREW_PATH"],
+      "PATH"          => ENV["HOMEBREW_PATH"],
     }
 
     with_env(new_env) do
@@ -1569,7 +1569,7 @@ class Formula
   def runtime_formula_dependencies(read_from_tab: true, undeclared: true)
     runtime_dependencies(
       read_from_tab: read_from_tab,
-      undeclared: undeclared,
+      undeclared:    undeclared,
     ).map do |d|
       begin
         d.to_formula
@@ -1597,35 +1597,45 @@ class Formula
     dependencies = deps
 
     hsh = {
-      "name" => name,
-      "full_name" => full_name,
-      "oldname" => oldname,
-      "aliases" => aliases.sort,
-      "versioned_formulae" => versioned_formulae.map(&:name),
-      "desc" => desc,
-      "homepage" => homepage,
-      "versions" => {
+      "name"                     => name,
+      "full_name"                => full_name,
+      "oldname"                  => oldname,
+      "aliases"                  => aliases.sort,
+      "versioned_formulae"       => versioned_formulae.map(&:name),
+      "desc"                     => desc,
+      "homepage"                 => homepage,
+      "versions"                 => {
         "stable" => stable&.version&.to_s,
-        "devel" => devel&.version&.to_s,
-        "head" => head&.version&.to_s,
+        "devel"  => devel&.version&.to_s,
+        "head"   => head&.version&.to_s,
         "bottle" => !bottle_specification.checksums.empty?,
       },
-      "revision" => revision,
-      "version_scheme" => version_scheme,
-      "bottle" => {},
-      "keg_only" => keg_only?,
-      "options" => [],
-      "build_dependencies" => dependencies.select(&:build?).map(&:name).uniq,
-      "dependencies" => dependencies.reject(&:optional?).reject(&:recommended?).reject(&:build?).map(&:name).uniq,
-      "recommended_dependencies" => dependencies.select(&:recommended?).map(&:name).uniq,
-      "optional_dependencies" => dependencies.select(&:optional?).map(&:name).uniq,
-      "requirements" => [],
-      "conflicts_with" => conflicts.map(&:name),
-      "caveats" => caveats,
-      "installed" => [],
-      "linked_keg" => linked_version&.to_s,
-      "pinned" => pinned?,
-      "outdated" => outdated?,
+      "revision"                 => revision,
+      "version_scheme"           => version_scheme,
+      "bottle"                   => {},
+      "keg_only"                 => keg_only?,
+      "options"                  => [],
+      "build_dependencies"       => dependencies.select(&:build?)
+                                                .map(&:name)
+                                                .uniq,
+      "dependencies"             => dependencies.reject(&:optional?)
+                                                .reject(&:recommended?)
+                                                .reject(&:build?)
+                                                .map(&:name)
+                                                .uniq,
+      "recommended_dependencies" => dependencies.select(&:recommended?)
+                                                .map(&:name)
+                                                .uniq,
+      "optional_dependencies"    => dependencies.select(&:optional?)
+                                                .map(&:name)
+                                                .uniq,
+      "requirements"             => [],
+      "conflicts_with"           => conflicts.map(&:name),
+      "caveats"                  => caveats,
+      "installed"                => [],
+      "linked_keg"               => linked_version&.to_s,
+      "pinned"                   => pinned?,
+      "outdated"                 => outdated?,
     }
 
     %w[stable devel].each do |spec_sym|
@@ -1634,16 +1644,17 @@ class Formula
 
       bottle_spec = spec.bottle_specification
       bottle_info = {
-        "rebuild" => bottle_spec.rebuild,
-        "cellar" => (cellar = bottle_spec.cellar).is_a?(Symbol) ? cellar.inspect : cellar,
-        "prefix" => bottle_spec.prefix,
+        "rebuild"  => bottle_spec.rebuild,
+        "cellar"   => (cellar = bottle_spec.cellar).is_a?(Symbol) ? cellar.inspect : cellar,
+        "prefix"   => bottle_spec.prefix,
         "root_url" => bottle_spec.root_url,
       }
       bottle_info["files"] = {}
       bottle_spec.collector.keys.each do |os|
+        bottle_url = "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild).bintray}"
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
-          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild).bintray}",
+          "url"                   => bottle_url,
           checksum.hash_type.to_s => checksum.hexdigest,
         }
       end
@@ -1656,8 +1667,8 @@ class Formula
 
     hsh["requirements"] = requirements.map do |req|
       {
-        "name" => req.name,
-        "cask" => req.cask,
+        "name"     => req.name,
+        "cask"     => req.cask,
         "download" => req.download,
       }
     end
@@ -1666,13 +1677,13 @@ class Formula
       tab = Tab.for_keg keg
 
       hsh["installed"] << {
-        "version" => keg.version.to_s,
-        "used_options" => tab.used_options.as_flags,
-        "built_as_bottle" => tab.built_as_bottle,
-        "poured_from_bottle" => tab.poured_from_bottle,
-        "runtime_dependencies" => tab.runtime_dependencies,
+        "version"                 => keg.version.to_s,
+        "used_options"            => tab.used_options.as_flags,
+        "built_as_bottle"         => tab.built_as_bottle,
+        "poured_from_bottle"      => tab.poured_from_bottle,
+        "runtime_dependencies"    => tab.runtime_dependencies,
         "installed_as_dependency" => tab.installed_as_dependency,
-        "installed_on_request" => tab.installed_on_request,
+        "installed_on_request"    => tab.installed_on_request,
       }
     end
 
@@ -1696,16 +1707,16 @@ class Formula
     @prefix_returns_versioned_prefix = true
 
     test_env = {
-      CURL_HOME: ENV["CURL_HOME"] || ENV["HOME"],
-      TMPDIR: HOMEBREW_TEMP,
-      TEMP: HOMEBREW_TEMP,
-      TMP: HOMEBREW_TEMP,
-      TERM: "dumb",
-      PATH: PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"),
+      CURL_HOME:     ENV["CURL_HOME"] || ENV["HOME"],
+      TMPDIR:        HOMEBREW_TEMP,
+      TEMP:          HOMEBREW_TEMP,
+      TMP:           HOMEBREW_TEMP,
+      TERM:          "dumb",
+      PATH:          PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"),
       HOMEBREW_PATH: nil,
       _JAVA_OPTIONS: "#{ENV["_JAVA_OPTIONS"]} -Duser.home=#{HOMEBREW_CACHE}/java_cache",
-      GOCACHE: "#{HOMEBREW_CACHE}/go_cache",
-      CARGO_HOME: "#{HOMEBREW_CACHE}/cargo_cache",
+      GOCACHE:       "#{HOMEBREW_CACHE}/go_cache",
+      CARGO_HOME:    "#{HOMEBREW_CACHE}/cargo_cache",
     }
 
     ENV.clear_sensitive_environment!
@@ -1841,7 +1852,7 @@ class Formula
     @exec_count += 1
     logfn = format("#{logs}/#{active_log_prefix}%02<exec_count>d.%{cmd_base}",
                    exec_count: @exec_count,
-                   cmd_base: File.basename(cmd).split(" ").first)
+                   cmd_base:   File.basename(cmd).split(" ").first)
     logs.mkpath
 
     File.open(logfn, "w") do |log|

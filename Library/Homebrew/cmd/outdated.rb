@@ -19,17 +19,45 @@
 
 require "formula"
 require "keg"
+require "cli_parser"
 
 module Homebrew
   module_function
 
+  def outdated_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `outdated` [<options>]
+
+        Show formulae that have an updated version available.
+
+        By default, version information is displayed in interactive shells, and
+        suppressed otherwise.
+      EOS
+      switch :quiet,
+        description: "List only the names of outdated brews (takes precedence over `--verbose`)."
+      switch :verbose,
+        description: "Display detailed version information."
+      flag "--json=",
+        description: "Show output in JSON format for provided <version>. Currently the only "\
+                     "accepted value of <version> is `v1`."
+      switch "--fetch-HEAD",
+        description: "Fetch the upstream repository to detect if the HEAD installation of the "\
+                     "formula is outdated. Otherwise, the repository's HEAD will be checked for "\
+                     "updates when a new stable or devel version has been released."
+      switch :debug
+    end
+  end
+
   def outdated
+    outdated_args.parse
+
     formulae = if ARGV.resolved_formulae.empty?
       Formula.installed
     else
       ARGV.resolved_formulae
     end
-    if ARGV.json == "v1"
+    if args.json == "v1"
       outdated = print_outdated_json(formulae)
     else
       outdated = print_outdated(formulae)
@@ -38,8 +66,8 @@ module Homebrew
   end
 
   def print_outdated(formulae)
-    verbose = ($stdout.tty? || ARGV.verbose?) && !ARGV.flag?("--quiet")
-    fetch_head = ARGV.fetch_head?
+    verbose = ($stdout.tty? || args.verbose?) && !args.quiet?
+    fetch_head = args.fetch_HEAD?
 
     outdated_formulae = formulae.select { |f| f.outdated?(fetch_head: fetch_head) }
                                 .sort
@@ -76,7 +104,7 @@ module Homebrew
 
   def print_outdated_json(formulae)
     json = []
-    fetch_head = ARGV.fetch_head?
+    fetch_head = args.fetch_HEAD?
     outdated_formulae = formulae.select { |f| f.outdated?(fetch_head: fetch_head) }
 
     outdated = outdated_formulae.each do |f|
@@ -87,11 +115,11 @@ module Homebrew
         f.pkg_version.to_s
       end
 
-      json << { name: f.full_name,
+      json << { name:               f.full_name,
                 installed_versions: outdated_versions.map(&:to_s),
-                current_version: current_version,
-                pinned: f.pinned?,
-                pinned_version: f.pinned_version }
+                current_version:    current_version,
+                pinned:             f.pinned?,
+                pinned_version:     f.pinned_version }
     end
     puts JSON.generate(json)
 

@@ -3,7 +3,7 @@ require "version"
 class PkgVersion
   include Comparable
 
-  RX = /\A(.+?)(?:_(\d+))?\z/
+  RX = /\A(.+?)(?:_(\d+))?\z/.freeze
 
   attr_reader :version, :revision
 

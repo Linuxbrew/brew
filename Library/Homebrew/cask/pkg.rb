@@ -18,11 +18,11 @@ module Cask
         odebug "Deleting pkg files"
         @command.run!(
           "/usr/bin/xargs",
-          args: [
+          args:  [
             "-0", "--", "/bin/rm", "--"
           ],
           input: pkgutil_bom_files.join("\0"),
-          sudo: true,
+          sudo:  true,
         )
       end
 
@@ -30,11 +30,11 @@ module Cask
         odebug "Deleting pkg symlinks and special files"
         @command.run!(
           "/usr/bin/xargs",
-          args: [
+          args:  [
             "-0", "--", "/bin/rm", "--"
           ],
           input: pkgutil_bom_specials.join("\0"),
-          sudo: true,
+          sudo:  true,
         )
       end
 

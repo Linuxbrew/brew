@@ -99,11 +99,11 @@ describe "GitHubPrivateRepositoryReleaseDownloadStrategy", :needs_compat do
     release_metadata = {
       "assets" => [
         {
-          "id" => 123,
+          "id"   => 123,
           "name" => "foo_v0.1.0_linux_amd64.tar.gz",
         },
         {
-          "id" => 456,
+          "id"   => 456,
           "name" => "foo_v0.1.0_darwin_amd64.tar.gz",
         },
       ],

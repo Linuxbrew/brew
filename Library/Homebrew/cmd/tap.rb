@@ -45,10 +45,10 @@ module Homebrew
     else
       tap = Tap.fetch(ARGV.named.first)
       begin
-        tap.install clone_target: ARGV.named.second,
+        tap.install clone_target:      ARGV.named.second,
                     force_auto_update: force_auto_update?,
-                    full_clone: full_clone?,
-                    quiet: ARGV.quieter?
+                    full_clone:        full_clone?,
+                    quiet:             ARGV.quieter?
       rescue TapRemoteMismatchError => e
         odie e
       rescue TapAlreadyTappedError, TapAlreadyUnshallowError # rubocop:disable Lint/HandleExceptions

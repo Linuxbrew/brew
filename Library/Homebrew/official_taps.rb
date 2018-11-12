@@ -4,9 +4,9 @@ OFFICIAL_CASK_TAPS = %w[
 ].freeze
 
 OFFICIAL_CMD_TAPS = {
-  "homebrew/bundle" => ["bundle"],
+  "homebrew/bundle"                                      => ["bundle"],
   (OS.mac? ? "homebrew/test-bot" : "linuxbrew/test-bot") => ["test-bot"],
-  "homebrew/services" => ["services"],
+  "homebrew/services"                                    => ["services"],
 }.freeze
 
 DEPRECATED_OFFICIAL_TAPS = %w[

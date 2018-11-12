@@ -33,7 +33,7 @@ module Homebrew
       switch "--examples",
         description: "Show several examples."
       switch "--pry",
-        env: :pry,
+        env:         :pry,
         description: "Use Pry instead of IRB. Implied if `HOMEBREW_PRY` is set."
     end
   end

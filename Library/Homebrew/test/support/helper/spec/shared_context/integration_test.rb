@@ -72,13 +72,13 @@ RSpec.shared_context "integration test" do
     ].compact.join(File::PATH_SEPARATOR)
 
     env.merge!(
-      "PATH" => path,
-      "HOMEBREW_PATH" => path,
-      "HOMEBREW_BREW_FILE" => HOMEBREW_PREFIX/"bin/brew",
+      "PATH"                      => path,
+      "HOMEBREW_PATH"             => path,
+      "HOMEBREW_BREW_FILE"        => HOMEBREW_PREFIX/"bin/brew",
       "HOMEBREW_INTEGRATION_TEST" => command_id_from_args(args),
-      "HOMEBREW_TEST_TMPDIR" => TEST_TMPDIR,
-      "HOMEBREW_DEVELOPER" => ENV["HOMEBREW_DEVELOPER"],
-      "GEM_HOME" => nil,
+      "HOMEBREW_TEST_TMPDIR"      => TEST_TMPDIR,
+      "HOMEBREW_DEVELOPER"        => ENV["HOMEBREW_DEVELOPER"],
+      "GEM_HOME"                  => nil,
     )
 
     @ruby_args ||= begin

@@ -14,8 +14,8 @@ module UnpackStrategy
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
       system_command! "cabextract",
-                      args: ["-d", unpack_dir, "--", path],
-                      env: { "PATH" => PATH.new(Formula["cabextract"].opt_bin, ENV["PATH"]) },
+                      args:    ["-d", unpack_dir, "--", path],
+                      env:     { "PATH" => PATH.new(Formula["cabextract"].opt_bin, ENV["PATH"]) },
                       verbose: verbose
     end
 

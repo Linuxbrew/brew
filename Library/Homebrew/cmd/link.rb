@@ -14,17 +14,41 @@
 
 require "ostruct"
 require "caveats"
+require "cli_parser"
 
 module Homebrew
   module_function
 
+  def link_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `ln`, `link` <options> <formula>
+
+        Symlink all of <formula>'s installed files into the Homebrew prefix. This
+        is done automatically when you install formulae but can be useful for DIY
+        installations.
+      EOS
+      switch "--overwrite",
+        description: "Delete files already existing in the prefix while linking."
+      switch "-n", "--dry-run",
+        description: "List all files which would be linked or deleted by "\
+                     "`brew link --overwrite`, but will not actually link or delete any files."
+      switch :force,
+        description: "Allow only key-only formulae to be linked."
+      switch :verbose
+      switch :debug
+    end
+  end
+
   def link
+    link_args.parse
+
     raise KegUnspecifiedError if ARGV.named.empty?
 
     mode = OpenStruct.new
 
-    mode.overwrite = true if ARGV.include? "--overwrite"
-    mode.dry_run = true if ARGV.dry_run?
+    mode.overwrite = true if args.overwrite?
+    mode.dry_run = true if args.dry_run?
 
     ARGV.kegs.each do |keg|
       keg_only = Formulary.keg_only?(keg.rack)
@@ -78,7 +102,7 @@ module Homebrew
           end
         end
 
-        unless ARGV.force?
+        unless args.force?
           opoo "#{keg.name} is keg-only and must be linked with --force"
           puts_keg_only_path_message(keg)
           next
@@ -87,7 +111,7 @@ module Homebrew
 
       keg.lock do
         print "Linking #{keg}... "
-        puts if ARGV.verbose?
+        puts if args.verbose?
 
         begin
           n = keg.link(mode)

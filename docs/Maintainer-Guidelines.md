@@ -9,6 +9,10 @@ Maybe you were looking for the [Formula Cookbook](Formula-Cookbook.md)?
 
 This document is current practice. If you wish to change or discuss any of the below: open a PR to suggest a change.
 
+## Mission
+
+Homebrew aims to be the missing package manager for macOS. Its primary goal is to be useful to as many people as possible, while remaining maintainable to a professional, high standard by a small group of volunteers. Where possible and sensible, it should seek to use features of macOS to blend in with the macOS and Apple ecosystems.
+
 ## Quick checklist
 
 This is all that really matters:
