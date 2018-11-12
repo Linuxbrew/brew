@@ -1,0 +1,96 @@
+inherit_from: ./.rubocop_shared.yml
+
+# Cask Cops
+
+Cask/HomepageMatchesUrl:
+  Description: 'Ensure that the homepage and url match, otherwise add a comment. More info at https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/url.md#when-url-and-homepage-hostnames-differ-add-a-comment'
+  Enabled: true
+
+Cask/HomepageUrlTrailingSlash:
+  Description: 'Ensure that the homepage url has a slash after the domain name.'
+  Enabled: true
+
+Cask/NoDslVersion:
+  Description: 'Do not use the deprecated DSL version syntax in your cask header.'
+  Enabled: true
+
+Cask/StanzaGrouping:
+  Description: 'Ensure that cask stanzas are grouped correctly. More info at https://github.com/Homebrew/homebrew-cask/blob/master/CONTRIBUTING.md#stanza-order'
+  Enabled: true
+
+Cask/StanzaOrder:
+  Description: 'Ensure that cask stanzas are sorted correctly. More info at https://github.com/Homebrew/homebrew-cask/blob/master/CONTRIBUTING.md#stanza-order'
+  Enabled: true
+
+# Built-In Cops
+
+Layout/AlignHash:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+Layout/IndentArray:
+  EnforcedStyle: align_brackets
+
+Layout/IndentHash:
+  EnforcedStyle: align_braces
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/LineLength:
+  Enabled: false
+
+Naming/FileName:
+  Enabled: false
+
+Naming/HeredocDelimiterNaming:
+  Blacklist:
+    - END, EOD, EOF
+
+Performance/StringReplacement:
+  Enabled: false
+
+Style/BarePercentLiterals:
+  EnforcedStyle: percent_q
+
+Style/Documentation:
+  Enabled: false
+
+Style/EmptyElse:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    '%':  '{}'
+    '%i': '{}'
+    '%q': '{}'
+    '%Q': '{}'
+    '%r': '{}'
+    '%s': '()'
+    '%w': '[]'
+    '%W': '[]'
+    '%x': '()'
+
+Style/RegexpLiteral:
+  EnforcedStyle: percent_r
+
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/WordArray:
+  EnforcedStyle: brackets

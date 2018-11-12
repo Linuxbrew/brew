@@ -44,7 +44,7 @@ module Cask
       def default_args
         [
           "--force-exclusion",
-          "--config", "#{HOMEBREW_LIBRARY}/.rubocop.yml",
+          "--config", "#{HOMEBREW_LIBRARY}/.rubocop_cask.yml",
           "--format", "simple"
         ]
       end
