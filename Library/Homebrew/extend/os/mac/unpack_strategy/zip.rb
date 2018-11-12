@@ -13,8 +13,8 @@ module UnpackStrategy
           # Merge ._ files back into extended attributes.
           # ._ files inside volumes are automatically merged by ditto.
           system_command!("dot_clean",
-                          args: ["-mv", "--keep=dotbar", unpack_dir],
-                          verbose: verbose,
+                          args:         ["-mv", "--keep=dotbar", unpack_dir],
+                          verbose:      verbose,
                           print_stderr: false)
         end
 
@@ -26,7 +26,7 @@ module UnpackStrategy
           # `ditto` keeps Finder attributes intact and does not skip volume labels
           # like `unzip` does, which can prevent disk images from being unzipped.
           system_command! "ditto",
-                          args: ["-x", "-k", path, tmp_unpack_dir],
+                          args:    ["-x", "-k", path, tmp_unpack_dir],
                           verbose: verbose
 
           volumes.each do |volume|

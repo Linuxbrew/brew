@@ -1,4 +1,4 @@
-require "test/support/helper/spec/shared_examples/cask_dsl_base"
+require "test/cask/dsl/shared_examples/base"
 
 describe Cask::DSL::UninstallPostflight, :cask do
   let(:cask) { Cask::CaskLoader.load(cask_path("basic-cask")) }

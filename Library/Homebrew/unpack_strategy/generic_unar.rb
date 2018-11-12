@@ -20,11 +20,11 @@ module UnpackStrategy
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
       system_command! "unar",
-                      args: [
+                      args:    [
                         "-force-overwrite", "-quiet", "-no-directory",
                         "-output-directory", unpack_dir, "--", path
                       ],
-                      env: { "PATH" => PATH.new(Formula["unar"].opt_bin, ENV["PATH"]) },
+                      env:     { "PATH" => PATH.new(Formula["unar"].opt_bin, ENV["PATH"]) },
                       verbose: verbose
     end
   end

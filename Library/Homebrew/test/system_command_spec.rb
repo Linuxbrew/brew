@@ -3,10 +3,10 @@ describe SystemCommand do
     subject(:command) {
       described_class.new(
         "env",
-        args: env_args,
-        env: env,
+        args:         env_args,
+        env:          env,
         must_succeed: true,
-        sudo: sudo,
+        sudo:         sudo,
       )
     }
 

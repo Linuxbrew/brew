@@ -354,7 +354,7 @@ module Homebrew
       end
       dirs.select(&:directory?).each.parallel do |dir|
         system_command "find",
-          args: [dir, "-name", ".DS_Store", "-delete"],
+          args:         [dir, "-name", ".DS_Store", "-delete"],
           print_stderr: false
       end
     end

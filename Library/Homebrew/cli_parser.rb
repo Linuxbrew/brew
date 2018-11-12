@@ -13,10 +13,10 @@ module Homebrew
 
       def self.global_options
         {
-          quiet: [["-q", "--quiet"], :quiet, "Suppress any warnings."],
+          quiet:   [["-q", "--quiet"], :quiet, "Suppress any warnings."],
           verbose: [["-v", "--verbose"], :verbose, "Make some output more verbose."],
-          debug: [["-d", "--debug"], :debug, "Display any debugging information."],
-          force: [["-f", "--force"], :force, "Override warnings and enable potentially unsafe operations."],
+          debug:   [["-d", "--debug"], :debug, "Display any debugging information."],
+          force:   [["-f", "--force"], :force, "Override warnings and enable potentially unsafe operations."],
         }
       end
 

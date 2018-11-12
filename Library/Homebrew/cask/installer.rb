@@ -175,6 +175,8 @@ module Cask
           tmpdir = Pathname(tmpdir)
           primary_container.extract(to: tmpdir, basename: basename, verbose: verbose?)
 
+          FileUtils.chmod_R "+rw", tmpdir/nested_container, force: true, verbose: verbose?
+
           UnpackStrategy.detect(tmpdir/nested_container)
                         .extract_nestedly(to: @cask.staged_path, verbose: verbose?)
         end
@@ -322,10 +324,10 @@ module Cask
       not_installed.each do |cask|
         Installer.new(
           cask,
-          binaries: binaries?,
-          verbose: verbose?,
+          binaries:                binaries?,
+          verbose:                 verbose?,
           installed_as_dependency: true,
-          force: false,
+          force:                   false,
         ).install
       end
     end

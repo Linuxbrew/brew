@@ -19,6 +19,11 @@ FormulaAuditStrict:
 NewFormulaAudit:
   Enabled: false
 
+# make our hashes consistent
+Layout/AlignHash:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
 # `system` is a special case and aligns on second argument
 Layout/AlignParameters:
   Enabled: false

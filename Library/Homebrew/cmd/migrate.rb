@@ -6,11 +6,30 @@
 #:    like if they are from same taps and migrate them anyway.
 
 require "migrator"
+require "cli_parser"
 
 module Homebrew
   module_function
 
+  def migrate_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `migrate` [<options>] <formulae>
+
+        Migrate renamed packages to new name, where <formulae> are old names of
+        packages.
+      EOS
+      switch :force,
+        description: "Treat installed <formulae> and passed <formulae> like if they are from "\
+                     "same taps and migrate them anyway."
+      switch :verbose
+      switch :debug
+    end
+  end
+
   def migrate
+    migrate_args.parse
+
     raise FormulaUnspecifiedError if ARGV.named.empty?
 
     ARGV.resolved_formulae.each do |f|

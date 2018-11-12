@@ -149,11 +149,11 @@ describe RuboCop::Cop::FormulaAudit::Urls do
             url "#{formula["url"]}"
           end
         RUBY
-        expected_offenses = [{ message: formula["msg"],
+        expected_offenses = [{ message:  formula["msg"],
                                severity: :convention,
-                               line: 3,
-                               column: formula["col"],
-                               source: source }]
+                               line:     3,
+                               column:   formula["col"],
+                               source:   source }]
 
         inspect_source(source)
 

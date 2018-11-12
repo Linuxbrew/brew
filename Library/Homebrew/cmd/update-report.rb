@@ -84,8 +84,8 @@ module Homebrew
     end
 
     out, _, status = system_command("git",
-                                    args: ["describe", "--tags", "--abbrev=0", initial_revision],
-                                    chdir: HOMEBREW_REPOSITORY,
+                                    args:         ["describe", "--tags", "--abbrev=0", initial_revision],
+                                    chdir:        HOMEBREW_REPOSITORY,
                                     print_stderr: false)
 
     initial_version = Version.new(out) if status.success?

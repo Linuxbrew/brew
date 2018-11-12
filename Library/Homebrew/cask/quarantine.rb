@@ -28,7 +28,7 @@ module Cask
         :no_swift
       else
         api_check = system_command(swift,
-                                   args: [QUARANTINE_SCRIPT],
+                                   args:         [QUARANTINE_SCRIPT],
                                    print_stderr: false)
 
         case api_check.exit_status
@@ -87,7 +87,7 @@ module Cask
       odebug "Releasing #{download_path} from quarantine"
 
       quarantiner = system_command(xattr,
-                                   args: [
+                                   args:         [
                                      "-d",
                                      QUARANTINE_ATTRIBUTE,
                                      download_path,
@@ -107,7 +107,7 @@ module Cask
       odebug "Quarantining #{download_path}"
 
       quarantiner = system_command(swift,
-                                   args: [
+                                   args:         [
                                      QUARANTINE_SCRIPT,
                                      download_path,
                                      cask.url.to_s,
@@ -137,7 +137,7 @@ module Cask
       resolved_paths = Pathname.glob(to/"**/*", File::FNM_DOTMATCH)
 
       system_command!("/usr/bin/xargs",
-                      args: [
+                      args:  [
                         "-0",
                         "--",
                         "/bin/chmod",
@@ -147,7 +147,7 @@ module Cask
                       input: resolved_paths.join("\0"))
 
       quarantiner = system_command("/usr/bin/xargs",
-                                   args: [
+                                   args:         [
                                      "-0",
                                      "--",
                                      xattr,
@@ -156,7 +156,7 @@ module Cask
                                      QUARANTINE_ATTRIBUTE,
                                      quarantine_status,
                                    ],
-                                   input: resolved_paths.join("\0"),
+                                   input:        resolved_paths.join("\0"),
                                    print_stderr: false)
 
       return if quarantiner.success?

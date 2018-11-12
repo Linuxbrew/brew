@@ -556,9 +556,9 @@ module Homebrew
       return unless DevelopmentTools.curl_handles_most_https_certificates?
 
       if http_content_problem = curl_check_http_content(homepage,
-                                  user_agents: [:browser, :default],
+                                  user_agents:   [:browser, :default],
                                   check_content: true,
-                                  strict: @strict)
+                                  strict:        @strict)
         problem http_content_problem
       end
     end
