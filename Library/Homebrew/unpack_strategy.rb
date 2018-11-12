@@ -121,7 +121,9 @@ module UnpackStrategy
   end
 
   def extract_nestedly(to: nil, basename: nil, verbose: false, extension_only: false)
-    Dir.mktmpdir do |tmp_unpack_dir|
+
+    extract_dir = ENV["HOMEBREW_TEMP"]||"/tmp"
+    Dir.mktmpdir(nil,extract_dir) do |tmp_unpack_dir|
       tmp_unpack_dir = Pathname(tmp_unpack_dir)
 
       extract(to: tmp_unpack_dir, basename: basename, verbose: verbose)
