@@ -5,10 +5,10 @@ require "test/support/helper/cask/install_helper"
 require "test/support/helper/cask/never_sudo_system_command"
 
 HOMEBREW_CASK_DIRS = {
-  :appdir      => Pathname.new(TEST_TMPDIR).join("cask-appdir"),
-  :prefpanedir => Pathname.new(TEST_TMPDIR).join("cask-prefpanedir"),
-  :qlplugindir => Pathname.new(TEST_TMPDIR).join("cask-qlplugindir"),
-  :servicedir  => Pathname.new(TEST_TMPDIR).join("cask-servicedir"),
+  appdir:      Pathname.new(TEST_TMPDIR).join("cask-appdir"),
+  prefpanedir: Pathname.new(TEST_TMPDIR).join("cask-prefpanedir"),
+  qlplugindir: Pathname.new(TEST_TMPDIR).join("cask-qlplugindir"),
+  servicedir:  Pathname.new(TEST_TMPDIR).join("cask-servicedir"),
 }.freeze
 
 RSpec.shared_context "Homebrew Cask", :needs_macos do
