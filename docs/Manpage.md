@@ -1100,10 +1100,11 @@ can take several different forms:
     You can still access these formulae by using a special syntax, e.g.
     `homebrew/dupes/vim` or `homebrew/versions/node4`.
 
-  * An arbitrary URL:
+  * An arbitrary file or URL:
     Homebrew can install formulae via URL, e.g.
-    `https://raw.github.com/Homebrew/homebrew-core/master/Formula/git.rb`.
-    The formula file will be cached for later use.
+    `https://raw.github.com/Homebrew/homebrew-core/master/Formula/git.rb`,
+    or from a local path. It could point to either a formula file or a bottle.
+    In the case of a URL, the downloaded file will be cached for later use.
 
 ## ENVIRONMENT
 
