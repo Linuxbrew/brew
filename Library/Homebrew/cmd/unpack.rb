@@ -11,15 +11,39 @@
 
 require "stringio"
 require "formula"
+require "cli_parser"
 
 module Homebrew
   module_function
 
+  def unpack_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `usage` [<options>] <formulae>
+
+        Unpack the source files for <formulae> into subdirectories of the current
+        working directory.
+      EOS
+      flag "--destdir=",
+        description: "Create subdirectories in the directory named by <path> instead."
+      switch "--patch",
+        description: "Patches for <formulae> will be applied to the unpacked source."
+      switch "-g", "--git",
+        description: "Initialize a Git repository in the unpacked source. This is useful for creating "\
+                     "patches for the software."
+      switch :force
+      switch :verbose
+      switch :debug
+    end
+  end
+
   def unpack
+    unpack_args.parse
+
     formulae = ARGV.formulae
     raise FormulaUnspecifiedError if formulae.empty?
 
-    if dir = ARGV.value("destdir")
+    if dir = args.destdir
       unpack_dir = Pathname.new(dir).expand_path
       unpack_dir.mkpath
     else
@@ -32,7 +56,7 @@ module Homebrew
       stage_dir = unpack_dir/"#{f.name}-#{f.version}"
 
       if stage_dir.exist?
-        raise "Destination #{stage_dir} already exists!" unless ARGV.force?
+        raise "Destination #{stage_dir} already exists!" unless args.force?
 
         rm_rf stage_dir
       end
@@ -41,12 +65,12 @@ module Homebrew
 
       ENV["VERBOSE"] = "1" # show messages about tar
       f.brew do
-        f.patch if ARGV.flag?("--patch")
+        f.patch if args.patch?
         cp_r getwd, stage_dir, preserve: true
       end
       ENV["VERBOSE"] = nil
 
-      next unless ARGV.git?
+      next unless args.git?
 
       ohai "Setting up git repository"
       cd stage_dir
