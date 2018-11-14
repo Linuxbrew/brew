@@ -28,6 +28,7 @@ module Homebrew
       EOS
       switch "--display-times",
         description: "Print install times for each formula at the end of the run."
+      switch :verbose
       switch :debug
     end
   end
