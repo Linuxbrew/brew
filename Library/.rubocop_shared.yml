@@ -1,0 +1,7 @@
+AllCops:
+  TargetRubyVersion: 2.3
+  Exclude:
+    - '**/vendor/**/*'
+  DisplayCopNames: false
+
+require: ./Homebrew/rubocops.rb

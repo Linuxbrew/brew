@@ -130,7 +130,7 @@ module Homebrew
     if ARGV.include?("--annotate")
       str = "#{str}  [build]" if dep.build?
       str = "#{str}  [test]" if dep.test?
-      str = "#{str}  [optional" if dep.optional?
+      str = "#{str}  [optional]" if dep.optional?
       str = "#{str}  [recommended]" if dep.recommended?
     end
 

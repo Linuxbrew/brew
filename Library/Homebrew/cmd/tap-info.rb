@@ -15,11 +15,33 @@
 #:    See the docs for examples of using the JSON output:
 #:    <https://docs.brew.sh/Querying-Brew>
 
+require "cli_parser"
+
 module Homebrew
   module_function
 
+  def tap_info_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `tap-info` [<options>] [<taps>]
+
+        Display detailed information about one or more provided <taps>.
+        Display a brief summary of all installed taps if no <taps> are passed.
+      EOS
+      switch "--installed",
+        description: "Display information on all installed taps."
+      flag "--json=",
+        description: "Print a JSON representation of <taps>. Currently the only accepted value for "\
+                     "<version> is `v1`. See the docs for examples of using the JSON output: "\
+                     "<https://docs.brew.sh/Querying-Brew>"
+      switch :debug
+    end
+  end
+
   def tap_info
-    if ARGV.include? "--installed"
+    tap_info_args.parse
+
+    if args.installed?
       taps = Tap
     else
       taps = ARGV.named.sort.map do |name|
@@ -27,7 +49,7 @@ module Homebrew
       end
     end
 
-    if ARGV.json == "v1"
+    if args.json == "v1"
       print_tap_json(taps.sort_by(&:to_s))
     else
       print_tap_info(taps.sort_by(&:to_s))

@@ -153,7 +153,6 @@ require "active_support/core_ext/object/blank"
 require "active_support/core_ext/hash/deep_merge"
 require "active_support/core_ext/file/atomic"
 
-require "constants"
 require "exceptions"
 require "utils"
 

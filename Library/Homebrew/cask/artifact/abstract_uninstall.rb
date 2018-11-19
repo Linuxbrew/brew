@@ -94,8 +94,10 @@ module Cask
               command.run!("/bin/launchctl", args: ["remove", service], sudo: with_sudo)
               sleep 1
             end
-            paths = ["/Library/LaunchAgents/#{service}.plist",
-                     "/Library/LaunchDaemons/#{service}.plist"]
+            paths = [
+              "/Library/LaunchAgents/#{service}.plist",
+              "/Library/LaunchDaemons/#{service}.plist",
+            ]
             paths.each { |elt| elt.prepend(ENV["HOME"]) } unless with_sudo
             paths = paths.map { |elt| Pathname(elt) }.select(&:exist?)
             paths.each do |path|
@@ -105,45 +107,77 @@ module Cask
             next unless Pathname(service).exist?
 
             command.run!("/bin/launchctl", args: ["unload", "-w", "--", service], sudo: with_sudo)
-            command.run!("/bin/rm",        args: ["-f", "--", service], sudo: with_sudo)
+            command.run!("/bin/rm", args: ["-f", "--", service], sudo: with_sudo)
             sleep 1
           end
         end
       end
 
-      def running_processes(bundle_id, command: nil)
-        command.run!("/bin/launchctl", args: ["list"]).stdout.lines
-               .map { |line| line.chomp.split("\t") }
-               .map { |pid, state, id| [pid.to_i, state.to_i, id] }
-               .select do |(pid, _, id)|
-                 pid.nonzero? && id.match?(/^#{Regexp.escape(bundle_id)}($|\.\d+)/)
-               end
+      def running_processes(bundle_id)
+        system_command!("/bin/launchctl", args: ["list"])
+          .stdout.lines
+          .map { |line| line.chomp.split("\t") }
+          .map { |pid, state, id| [pid.to_i, state.to_i, id] }
+          .select do |(pid, _, id)|
+            pid.nonzero? && id.match?(/^#{Regexp.escape(bundle_id)}($|\.\d+)/)
+          end
       end
 
       # :quit/:signal must come before :kext so the kext will not be in use by a running process
       def uninstall_quit(*bundle_ids, command: nil, **_)
         bundle_ids.each do |bundle_id|
-          next if running_processes(bundle_id, command: command).empty?
+          next if running_processes(bundle_id).empty?
 
           unless User.current.gui?
             ohai "Not logged into a GUI; skipping quitting application ID '#{bundle_id}'."
             next
           end
 
-          ohai "Quitting application ID '#{bundle_id}'."
-          command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{bundle_id}" to quit)], sudo: true)
+          ohai "Quitting application '#{bundle_id}'..."
 
           begin
-            Timeout.timeout(3) do
+            Timeout.timeout(10) do
               Kernel.loop do
-                break if running_processes(bundle_id, command: command).empty?
+                next unless quit(bundle_id).success?
+                if running_processes(bundle_id).empty?
+                  puts "Application '#{bundle_id}' quit successfully."
+                  break
+                end
               end
             end
           rescue Timeout::Error
+            opoo "Application '#{bundle_id}' did not quit."
             next
           end
         end
       end
+
+      def quit(bundle_id)
+        script = <<~JAVASCRIPT
+          'use strict';
+
+          ObjC.import('stdlib')
+
+          function run(argv) {
+            var app = Application(argv[0])
+
+            try {
+              app.quit()
+            } catch (err) {
+              if (app.running()) {
+                $.exit(1)
+              }
+            }
+
+            $.exit(0)
+          }
+        JAVASCRIPT
+
+        system_command "osascript", args:         ["-l", "JavaScript", "-e", script, bundle_id],
+                                    print_stderr: false,
+                                    sudo:         true
+      end
+      private :quit
 
       # :signal should come after :quit so it can be used as a backup when :quit fails
       def uninstall_signal(*signals, command: nil, **_)
@@ -154,7 +188,7 @@ module Cask
 
           signal, bundle_id = pair
           ohai "Signalling '#{signal}' to application ID '#{bundle_id}'"
-          pids = running_processes(bundle_id, command: command).map(&:first)
+          pids = running_processes(bundle_id).map(&:first)
           next unless pids.any?
 
           # Note that unlike :quit, signals are sent from the current user (not
@@ -174,13 +208,12 @@ module Cask
 
         login_items.each do |name|
           ohai "Removing login item #{name}"
-          command.run!(
-            "/usr/bin/osascript",
+          system_command!(
+            "osascript",
             args: [
               "-e",
               %Q(tell application "System Events" to delete every login item whose name is "#{name}"),
             ],
-            sudo: false,
           )
           sleep 1
         end
@@ -190,14 +223,14 @@ module Cask
       def uninstall_kext(*kexts, command: nil, **_)
         kexts.each do |kext|
           ohai "Unloading kernel extension #{kext}"
-          is_loaded = command.run!("/usr/sbin/kextstat", args: ["-l", "-b", kext], sudo: true).stdout
+          is_loaded = system_command!("/usr/sbin/kextstat", args: ["-l", "-b", kext], sudo: true).stdout
           if is_loaded.length > 1
-            command.run!("/sbin/kextunload", args: ["-b", kext], sudo: true)
+            system_command!("/sbin/kextunload", args: ["-b", kext], sudo: true)
             sleep 1
           end
-          command.run!("/usr/sbin/kextfind", args: ["-b", kext], sudo: true).stdout.chomp.lines.each do |kext_path|
+          system_command!("/usr/sbin/kextfind", args: ["-b", kext], sudo: true).stdout.chomp.lines.each do |kext_path|
             ohai "Removing kernel extension #{kext_path}"
-            command.run!("/bin/rm", args: ["-rf", kext_path], sudo: true)
+            system_command!("/bin/rm", args: ["-rf", kext_path], sudo: true)
           end
         end
       end
@@ -287,7 +320,7 @@ module Cask
       end
 
       def trash_paths(*paths, command: nil, **_)
-        result = command.run!("/usr/bin/osascript", args: ["-e", <<~APPLESCRIPT, *paths])
+        result = command.run!("osascript", args: ["-e", <<~APPLESCRIPT, *paths])
           on run argv
             repeat with i from 1 to (count argv)
               set item i of argv to (item i of argv as POSIX file)

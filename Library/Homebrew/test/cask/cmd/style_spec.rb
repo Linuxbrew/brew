@@ -59,21 +59,6 @@ describe Cask::Cmd::Style, :cask do
         expect { subject }.to raise_error(Cask::CaskError)
       end
     end
-
-    specify "`rubocop-cask` supports `HOMEBREW_RUBOCOP_VERSION`", :needs_network do
-      stdout, status = Open3.capture2(
-        "gem", "dependency", "rubocop-cask",
-        "--version", HOMEBREW_RUBOCOP_CASK_VERSION, "--pipe", "--remote"
-      )
-
-      expect(status).to be_a_success
-
-      requirement = Gem::Requirement.new(stdout.scan(/rubocop --version '(.*)'/).flatten.first)
-      version = Gem::Version.new(HOMEBREW_RUBOCOP_VERSION)
-
-      expect(requirement).not_to be_none
-      expect(requirement).to be_satisfied_by(version)
-    end
   end
 
   describe "#cask_paths" do
@@ -150,7 +135,7 @@ describe Cask::Cmd::Style, :cask do
   describe "#default_args" do
     subject { cli.default_args }
 
-    it { is_expected.to include("--require", "rubocop-cask", "--format", "simple") }
+    it { is_expected.to include("--format", "simple") }
   end
 
   describe "#autocorrect_args" do

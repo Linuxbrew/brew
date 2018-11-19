@@ -1,4 +1,4 @@
-require_relative "uninstall_zap_shared_examples"
+require_relative "shared_examples/uninstall_zap"
 
 describe Cask::Artifact::Zap, :cask do
   describe "#zap_phase" do

@@ -310,7 +310,7 @@ module Homebrew
 
       problem "File should end with a newline" unless text.trailing_newline?
 
-      if @versioned_formula
+      if formula.core_formula? && @versioned_formula
         unversioned_formula = begin
           # build this ourselves as we want e.g. homebrew/core to be present
           full_name = if formula.tap

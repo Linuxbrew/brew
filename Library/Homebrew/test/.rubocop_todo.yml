@@ -117,8 +117,6 @@ RSpec/RepeatedDescription:
   Exclude:
     - 'inreplace_spec.rb'
     - 'migrator_spec.rb'
-    - 'rubocops/dependency_order_cop_spec.rb'
-    - 'rubocops/lines_cop_spec.rb'
     - 'tab_spec.rb'
 
 # Offense count: 31

@@ -319,6 +319,9 @@ If \fB\-\-interactive\fR (or \fB\-i\fR) is passed, download and patch \fIformula
 .IP
 If \fB\-\-git\fR (or \fB\-g\fR) is passed, Homebrew will create a Git repository, useful for creating patches to the software\.
 .
+.IP
+If \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed versions of upgraded \fIformulae\fR as well as the HOMEBREW_CACHE for that formula\.
+.
 .TP
 \fBleaves\fR
 Show installed formulae that are not dependencies of another installed formula\.
@@ -441,6 +444,9 @@ Uninstall and then install \fIformula\fR (with existing install options)\.
 .
 .IP
 If \fB\-\-display\-times\fR is passed, install times for each formula are printed at the end of the run\.
+.
+.IP
+If \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed versions of upgraded \fIformulae\fR as well as the HOMEBREW_CACHE for that formula\.
 .
 .TP
 \fBsearch\fR, \fB\-S\fR
@@ -618,7 +624,7 @@ Upgrade outdated, unpinned brews (with existing install options)\.
 Options for the \fBinstall\fR command are also valid here\.
 .
 .IP
-If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_UPGRADE_CLEANUP\fR is set then remove previously installed version(s) of upgraded \fIformulae\fR\.
+If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed version(s) of upgraded \fIformulae\fR\.
 .
 .IP
 If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if the HEAD installation of the formula is outdated\. Otherwise, the repository\'s HEAD will be checked for updates when a new stable or devel version has been released\.
@@ -1232,8 +1238,8 @@ The fully\-qualified name of a tapped formula
 Sometimes a formula from a tapped repository may conflict with one in \fBhomebrew/core\fR\. You can still access these formulae by using a special syntax, e\.g\. \fBhomebrew/dupes/vim\fR or \fBhomebrew/versions/node4\fR\.
 .
 .TP
-An arbitrary URL
-Homebrew can install formulae via URL, e\.g\. \fBhttps://raw\.github\.com/Homebrew/homebrew\-core/master/Formula/git\.rb\fR\. The formula file will be cached for later use\.
+An arbitrary file or URL
+Homebrew can install formulae via URL, e\.g\. \fBhttps://raw\.github\.com/Homebrew/homebrew\-core/master/Formula/git\.rb\fR, or from a local path\. It could point to either a formula file or a bottle\. In the case of a URL, the downloaded file will be cached for later use\.
 .
 .SH "ENVIRONMENT"
 Note that environment variables must have a value set to be detected\. For example, \fBexport HOMEBREW_NO_INSECURE_REDIRECT=1\fR rather than just \fBexport HOMEBREW_NO_INSECURE_REDIRECT\fR\.

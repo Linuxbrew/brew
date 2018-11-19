@@ -316,6 +316,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--git` (or `-g`) is passed, Homebrew will create a Git repository, useful for
     creating patches to the software.
 
+    If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
+    of upgraded *`formulae`* as well as the HOMEBREW_CACHE for that formula.
+
   * `leaves`:
     Show installed formulae that are not dependencies of another installed formula.
 
@@ -432,6 +435,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--display-times` is passed, install times for each formula are printed
     at the end of the run.
+
+    If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
+    of upgraded *`formulae`* as well as the HOMEBREW_CACHE for that formula.
 
   * `search`, `-S`:
     Display all locally available formulae (including tapped ones).
@@ -606,7 +612,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     Options for the `install` command are also valid here.
 
-    If `--cleanup` is specified or `HOMEBREW_UPGRADE_CLEANUP` is set then remove
+    If `--cleanup` is specified or `HOMEBREW_INSTALL_CLEANUP` is set then remove
     previously installed version(s) of upgraded *`formulae`*.
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
@@ -1101,10 +1107,11 @@ can take several different forms:
     You can still access these formulae by using a special syntax, e.g.
     `homebrew/dupes/vim` or `homebrew/versions/node4`.
 
-  * An arbitrary URL:
+  * An arbitrary file or URL:
     Homebrew can install formulae via URL, e.g.
-    `https://raw.github.com/Homebrew/homebrew-core/master/Formula/git.rb`.
-    The formula file will be cached for later use.
+    `https://raw.github.com/Homebrew/homebrew-core/master/Formula/git.rb`,
+    or from a local path. It could point to either a formula file or a bottle.
+    In the case of a URL, the downloaded file will be cached for later use.
 
 ## ENVIRONMENT
 
