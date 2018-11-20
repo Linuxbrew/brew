@@ -1,8 +1,4 @@
-#!/bin/sh
-if [ -z "$BASH_VERSION" ]
-then
-  exec bash "$0" "$@"
-fi
+#!/bin/bash
 set +o posix
 
 # Fail fast with concise message when cwd does not exist
