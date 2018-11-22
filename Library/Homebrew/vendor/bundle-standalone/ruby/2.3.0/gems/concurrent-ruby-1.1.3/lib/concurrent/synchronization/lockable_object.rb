@@ -5,18 +5,18 @@ module Concurrent
     # @!macro internal_implementation_note
     LockableObjectImplementation = case
                                    when Concurrent.on_cruby? && Concurrent.ruby_version(:<=, 1, 9, 3)
-                                     MriMonitorLockableObject
+                                     MonitorLockableObject
                                    when Concurrent.on_cruby? && Concurrent.ruby_version(:>, 1, 9, 3)
-                                     MriMutexLockableObject
+                                     MutexLockableObject
                                    when Concurrent.on_jruby?
                                      JRubyLockableObject
                                    when Concurrent.on_rbx?
                                      RbxLockableObject
-                                   when Concurrent.on_truffle?
-                                     MriMutexLockableObject
+                                   when Concurrent.on_truffleruby?
+                                     MutexLockableObject
                                    else
                                      warn 'Possibly unsupported Ruby implementation'
-                                     MriMonitorLockableObject
+                                     MonitorLockableObject
                                    end
     private_constant :LockableObjectImplementation
 
@@ -31,7 +31,7 @@ module Concurrent
     #     `Thread#sleep` and `Thread#wakeup` will work as expected but mixing `Synchronization::Object#wait` and
     #     `Thread#wakeup` will not work on all platforms.
     #
-    #   @see {Event} implementation as an example of this class use
+    #   @see Event implementation as an example of this class use
     #
     #   @example simple
     #     class AnClass < Synchronization::Object
