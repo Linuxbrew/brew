@@ -1,3 +1,5 @@
+# TODO: Try getting more rules in sync.
+
 require: ./Homebrew/rubocops.rb
 
 AllCops:
