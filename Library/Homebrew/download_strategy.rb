@@ -353,6 +353,9 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       elsif location.start_with?("/")
         uri = URI(current_url)
         "#{uri.scheme}://#{uri.host}#{location}"
+      elsif location.start_with?("./")
+        uri = URI(current_url)
+        "#{uri.scheme}://#{uri.host}#{Pathname(uri.path).dirname/location}"
       else
         location
       end
