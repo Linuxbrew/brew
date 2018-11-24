@@ -49,13 +49,15 @@ module Homebrew
                      "formulae if <formulae> are given. See also `pin`, `unpin`."
       # passed through to ls
       switch "-1",
-        description: "Option passed to `ls`"
+        description: "Force output to be one entry per line. " \
+                     "This is the default when output is not to a terminal."
       switch "-l",
-        description: "Option passed to `ls`"
-      switch "-t",
-        description: "Option passed to `ls`"
+        description: "List in long format. If the output is to a terminal, "\
+                     "a total sum for all the file sizes is output on a line before the long listing."
       switch "-r",
-        description: "Option passed to `ls`"
+        description: "Reverse the order of the sort to get the oldest entries first."
+      switch "-t",
+        description: "Sort by time modified (most recently modified first)."
       switch :verbose
       switch :debug
     end
