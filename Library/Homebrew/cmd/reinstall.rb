@@ -26,6 +26,8 @@ module Homebrew
         If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
         of upgraded <formulae> as well as the HOMEBREW_CACHE for that formula.
       EOS
+      switch "-s", "--build-from-source",
+        description: "Compile the formula> from source even if a bottle is available."
       switch "--display-times",
         description: "Print install times for each formula at the end of the run."
       switch :verbose
