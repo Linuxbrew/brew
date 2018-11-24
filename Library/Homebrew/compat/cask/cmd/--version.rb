@@ -16,9 +16,7 @@ module Cask
       end
 
       def run
-        odeprecated "`brew cask --version`", "`brew --version`", disable_on: Time.new(2018, 10, 31)
-        ARGV.clear
-        Homebrew.__version
+        odisabled "`brew cask --version`", "`brew --version`"
       end
 
       def self.help

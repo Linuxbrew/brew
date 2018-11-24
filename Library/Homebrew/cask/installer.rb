@@ -175,6 +175,8 @@ module Cask
           tmpdir = Pathname(tmpdir)
           primary_container.extract(to: tmpdir, basename: basename, verbose: verbose?)
 
+          FileUtils.chmod_R "+rw", tmpdir/nested_container, force: true, verbose: verbose?
+
           UnpackStrategy.detect(tmpdir/nested_container)
                         .extract_nestedly(to: @cask.staged_path, verbose: verbose?)
         end
@@ -221,9 +223,9 @@ module Cask
       end
     end
 
-    # TODO: move dependencies to a separate class
-    #       dependencies should also apply for "brew cask stage"
-    #       override dependencies with --force or perhaps --force-deps
+    # TODO: move dependencies to a separate class,
+    #       dependencies should also apply for `brew cask stage`,
+    #       override dependencies with `--force` or perhaps `--force-deps`
     def satisfy_dependencies
       return unless @cask.depends_on
 
@@ -322,10 +324,10 @@ module Cask
       not_installed.each do |cask|
         Installer.new(
           cask,
-          binaries: binaries?,
-          verbose: verbose?,
+          binaries:                binaries?,
+          verbose:                 verbose?,
           installed_as_dependency: true,
-          force: false,
+          force:                   false,
         ).install
       end
     end
@@ -424,7 +426,7 @@ module Cask
         next unless artifact.respond_to?(:uninstall_phase)
 
         odebug "Un-installing artifact of class #{artifact.class}"
-        artifact.uninstall_phase(command: @command, verbose: verbose?, skip: clear, force: force?)
+        artifact.uninstall_phase(command: @command, verbose: verbose?, skip: clear, force: force?, upgrade: upgrade?)
       end
     end
 

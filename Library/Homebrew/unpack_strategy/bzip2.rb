@@ -18,7 +18,7 @@ module UnpackStrategy
       FileUtils.cp path, unpack_dir/basename, preserve: true
       quiet_flags = verbose ? [] : ["-q"]
       system_command! "bunzip2",
-                      args: [*quiet_flags, unpack_dir/basename],
+                      args:    [*quiet_flags, unpack_dir/basename],
                       verbose: verbose
     end
   end

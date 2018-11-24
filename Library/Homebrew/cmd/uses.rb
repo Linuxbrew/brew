@@ -19,6 +19,7 @@
 #:    `--devel` or `--HEAD`.
 
 require "formula"
+require "cli_parser"
 
 # `brew uses foo bar` returns formulae that use both foo and bar
 # If you want the union, run the command twice and concatenate the results.
@@ -27,8 +28,44 @@ require "formula"
 module Homebrew
   module_function
 
+  def uses_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `uses` [<options>] <formulae>
+
+        Show the formulae that specify <formulae> as a dependency. When given
+        multiple formula arguments, show the intersection of formulae that use
+        <formulae>.
+
+        By default, `uses` shows all formulae that specify <formulae> as a required
+        or recommended dependency.
+
+        By default, `uses` shows usage of <formulae> by stable builds.
+      EOS
+      switch "--recursive",
+        description: "Resolve more than one level of dependencies."
+      switch "--installed",
+        description: "Only list installed formulae."
+      switch "--include-build",
+        description: "Include all formulae that specify <formulae> as `:build` type dependency."
+      switch "--include-test",
+        description: "Include all formulae that specify <formulae> as `:test` type dependency."
+      switch "--include-optional",
+        description: "Include all formulae that specify <formulae> as `:optional` type dependency."
+      switch "--skip-recommended",
+        description: "Skip all formulae that specify <formulae> as `:recommended` type dependency."
+      switch "--devel",
+        description: "Show usage of <formulae> by development build."
+      switch "--HEAD",
+        description: "Show usage of <formulae> by HEAD build."
+      switch :debug
+    end
+  end
+
   def uses
-    raise FormulaUnspecifiedError if ARGV.named.empty?
+    uses_args.parse
+
+    raise FormulaUnspecifiedError if args.remaining.empty?
 
     used_formulae_missing = false
     used_formulae = begin
@@ -40,13 +77,13 @@ module Homebrew
       ARGV.named.map { |name| OpenStruct.new name: name, full_name: name }
     end
 
-    formulae = ARGV.include?("--installed") ? Formula.installed : Formula
-    recursive = ARGV.flag? "--recursive"
-    only_installed_arg = ARGV.include?("--installed") &&
-                         !ARGV.include?("--include-build") &&
-                         !ARGV.include?("--include-test") &&
-                         !ARGV.include?("--include-optional") &&
-                         !ARGV.include?("--skip-recommended")
+    formulae = args.installed? ? Formula.installed : Formula
+    recursive = args.recursive?
+    only_installed_arg = args.installed? &&
+                         !args.include_build? &&
+                         !args.include_test? &&
+                         !args.include_optional? &&
+                         !args.skip_recommended?
 
     includes, ignores = argv_includes_ignores(ARGV)
 

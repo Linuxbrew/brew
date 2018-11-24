@@ -66,8 +66,8 @@ module UnpackStrategy
 
   def self.from_type(type)
     type = {
-      naked: :uncompressed,
-      nounzip: :uncompressed,
+      naked:     :uncompressed,
+      nounzip:   :uncompressed,
       seven_zip: :p7zip,
     }.fetch(type, type)
 
@@ -129,6 +129,8 @@ module UnpackStrategy
       children = tmp_unpack_dir.children
 
       if children.count == 1 && !children.first.directory?
+        FileUtils.chmod "+rw", children.first, verbose: verbose
+
         s = UnpackStrategy.detect(children.first, extension_only: extension_only)
 
         s.extract_nestedly(to: to, verbose: verbose, extension_only: extension_only)

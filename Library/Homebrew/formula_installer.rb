@@ -489,14 +489,20 @@ class FormulaInstaller
       end
     end
 
-    if pour_bottle && !Keg.relocation_formulae.include?(formula.name)
-      bottle_deps = Keg.relocation_formulae
-                       .map { |formula| Dependency.new(formula) }
-                       .reject do |dep|
+    if pour_bottle && !Keg.bottle_dependencies.empty?
+      bottle_deps = if !Keg.bottle_dependencies.include?(formula.name)
+        Keg.bottle_dependencies
+      elsif !Keg.relocation_formulae.include?(formula.name)
+        Keg.relocation_formulae
+      else
+        []
+      end
+      bottle_deps = bottle_deps.map { |formula| Dependency.new(formula) }
+                               .reject do |dep|
         inherited_options[dep.name] |= inherited_options_for(dep)
         dep.satisfied? inherited_options[dep.name]
       end
-      expanded_deps = Dependency.merge_repeats(bottle_deps + expanded_deps) unless bottle_deps.empty?
+      expanded_deps = Dependency.merge_repeats(bottle_deps + expanded_deps)
     end
 
     expanded_deps.map { |dep| [dep, inherited_options[dep.name]] }
@@ -560,6 +566,14 @@ class FormulaInstaller
       installed_keg = Keg.new(df.prefix)
       tmp_keg = Pathname.new("#{installed_keg}.tmp")
       installed_keg.rename(tmp_keg)
+    end
+
+    tab_tap = tab.source["tap"]
+    if df.tap.to_s != tab_tap
+      odie <<~EOS
+        #{df} is already installed from #{tab_tap}!
+        Please `brew uninstall #{df}` first."
+      EOS
     end
 
     fi = FormulaInstaller.new(df)
@@ -916,7 +930,7 @@ class FormulaInstaller
   rescue Exception => e # rubocop:disable Lint/RescueException
     opoo "The post-install step did not complete successfully"
     puts "You can try again using `brew postinstall #{formula.full_name}`"
-    ohai e, e.backtrace if debug?
+    ohai e, e.backtrace if debug? || ARGV.homebrew_developer?
     Homebrew.failed = true
     @show_summary_heading = true
   end

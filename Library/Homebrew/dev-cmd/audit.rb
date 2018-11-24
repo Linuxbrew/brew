@@ -1,6 +1,7 @@
 #:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method>] [`--only-cops=`<cops>|`--except-cops=`<cops>] [<formulae>]:
-#:    Check <formulae> for Homebrew coding style violations. This should be
-#:    run before submitting a new formula.
+#:    Check <formulae> for Homebrew coding style violations. This should be run
+#:    before submitting a new formula. Will exit with a non-zero status if any errors
+#:    are found, which can be useful for implementing pre-commit hooks.
 #:
 #:    If no <formulae> are provided, all of them are checked.
 #:
@@ -23,16 +24,13 @@
 #:    If `--display-filename` is passed, every line of output is prefixed with the
 #:    name of the file or formula being audited, to make the output easy to grep.
 #:
-#:    Passing `--only=`<method> will run only the methods named `audit_<method>`,
-#:    while `--except=`<method> will skip the methods named `audit_<method>`.
+#:    Specifying `--only=`<method> will run only the methods named `audit_`<method>,
+#:    while `--except=`<method> will skip the methods named `audit_`<method>.
 #:    For either option <method> should be a comma-separated list.
 #:
-#:    Passing `--only-cops=`<cops> will check for violations of only the listed
+#:    Specifying `--only-cops=`<cops> will check for violations of only the listed
 #:    RuboCop <cops>, while `--except-cops=`<cops> will skip checking the listed
 #:    <cops>. For either option <cops> should be a comma-separated list of cop names.
-#:
-#:    `audit` exits with a non-zero status if any errors are found. This is useful,
-#:    for instance, for implementing pre-commit hooks.
 
 # Undocumented options:
 #     `-D` activates debugging and profiling of the audit methods (not the same as `--debug`)
@@ -55,14 +53,15 @@ module Homebrew
   def audit_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `audit` [<options>] <formulae>:
+        `audit` [<options>] <formulae>
 
-        Check <formulae> for Homebrew coding style violations. This should be
-        run before submitting a new formula.
+        Check <formulae> for Homebrew coding style violations. This should be run before
+        submitting a new formula. Will exit with a non-zero status if any errors are
+        found, which can be useful for implementing pre-commit hooks.
         If no <formulae> are provided, all of them are checked.
       EOS
       switch "--strict",
-        description: "Run additional style checks, including Rubocop style checks."
+        description: "Run additional style checks, including RuboCop style checks."
       switch "--online",
         description: "Run additional slower style checks that require a network connection."
       switch "--new-formula",
@@ -74,24 +73,26 @@ module Homebrew
       switch "--display-cop-names",
         description: "Include the RuboCop cop name for each violation in the output."
       switch "--display-filename",
-        description: "Prefix everyline of output with name of the file or formula being audited, to "\
+        description: "Prefix every line of output with name of the file or formula being audited, to "\
                      "make output easy to grep."
       switch "-D", "--audit-debug",
-        description: "Activates debugging and profiling"
+        description: "Enable debugging and profiling of audit methods."
       comma_array "--only",
-        description: "Passing `--only=`<method> will run only the methods named audit_<method>. "\
-                     "<method> should be a comma-separated list."
+        description: "Specify a comma-separated <method> list to only run the methods named "\
+                     "`audit_`<method>."
       comma_array "--except",
-        description: "Passing `--except=`<method> will run only the methods named audit_<method>, "\
-                     "<method> should be a comma-separated list."
+        description: "Specify a comma-separated <method> list to skip running the methods named "\
+                     "`audit_`<method>."
       comma_array "--only-cops",
-        description: "Passing `--only-cops=`<cops> will check for violations of only the listed "\
-                     "RuboCop cops. <cops> should be a comma-separated list of cop names."
+        description: "Specify a comma-separated <cops> list to check for violations of only the listed "\
+                     "RuboCop cops."
       comma_array "--except-cops",
-        description: "Passing `--except-cops=`<cops> will skip checking the listed RuboCop cops "\
-                     "violations. <cops> should be a comma-separated list of cop names."
+        description: "Specify a comma-separated <cops> list to skip checking for violations of the listed "\
+                     "RuboCop cops."
       switch :verbose
       switch :debug
+      conflicts "--only", "--except"
+      conflicts "--only-cops", "--except-cops"
     end
   end
 
@@ -126,14 +127,13 @@ module Homebrew
     if only_cops && except_cops
       odie "--only-cops and --except-cops cannot be used simultaneously!"
     elsif (only_cops || except_cops) && (strict || args.only)
-      odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously"
+      odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously!"
     end
 
     options = { fix: args.fix?, realpath: true }
 
     if only_cops
       options[:only_cops] = only_cops
-      args.only = ["style"]
     elsif args.new_formula?
       nil
     elsif strict
@@ -150,7 +150,8 @@ module Homebrew
 
     new_formula_problem_lines = []
     ff.sort.each do |f|
-      options = { new_formula: new_formula, strict: strict, online: online, only: args.only, except: args.except }
+      only = only_cops ? ["style"] : args.only
+      options = { new_formula: new_formula, strict: strict, online: online, only: only, except: args.except }
       options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
@@ -252,7 +253,9 @@ module Homebrew
 
     def initialize(formula, options = {})
       @formula = formula
-      @new_formula = options[:new_formula] && !formula.versioned_formula?
+      @versioned_formula = formula.versioned_formula?
+      @new_formula_inclusive = options[:new_formula]
+      @new_formula = options[:new_formula] && !@versioned_formula
       @strict = options[:strict]
       @online = options[:online]
       @display_cop_names = options[:display_cop_names]
@@ -260,8 +263,8 @@ module Homebrew
       @except = options[:except]
       # Accept precomputed style offense results, for efficiency
       @style_offenses = options[:style_offenses]
-      # Allow the actual official-ness of a formula to be overridden, for testing purposes
-      @official_tap = formula.tap&.official? || options[:official_tap]
+      # Allow the formula tap to be set as `core`, for testing purposes
+      @core_tap = formula.tap&.core_tap? || options[:core_tap]
       @problems = []
       @new_formula_problems = []
       @text = FormulaText.new(formula.path)
@@ -273,7 +276,7 @@ module Homebrew
 
       @style_offenses.each do |offense|
         if offense.cop_name.start_with?("NewFormulaAudit")
-          next if formula.versioned_formula?
+          next if @versioned_formula
 
           new_formula_problem offense.to_s(display_cop_name: @display_cop_names)
           next
@@ -307,7 +310,7 @@ module Homebrew
 
       problem "File should end with a newline" unless text.trailing_newline?
 
-      if formula.versioned_formula?
+      if formula.core_formula? && @versioned_formula
         unversioned_formula = begin
           # build this ourselves as we want e.g. homebrew/core to be present
           full_name = if formula.tap
@@ -338,7 +341,7 @@ module Homebrew
         end
         valid_alias_names = [alias_name_major, alias_name_major_minor]
 
-        unless formula.tap&.core_tap?
+        unless @core_tap
           versioned_aliases.map! { |a| "#{formula.tap}/#{a}" }
           valid_alias_names.map! { |a| "#{formula.tap}/#{a}" }
         end
@@ -374,8 +377,7 @@ module Homebrew
 
     def audit_formula_name
       return unless @strict
-      # skip for non-official taps
-      return unless @official_tap
+      return unless @core_tap
 
       name = formula.name
 
@@ -432,7 +434,7 @@ module Homebrew
 
           if @new_formula && dep_f.keg_only_reason &&
              !["openssl", "apr", "apr-util"].include?(dep.name) &&
-             (!["openblas"].include?(dep.name) || @official_tap) &&
+             (!["openblas"].include?(dep.name) || @core_tap) &&
              dep_f.keg_only_reason.reason == :provided_by_macos
             new_formula_problem(
               "Dependency '#{dep.name}' may be unnecessary as it is provided " \
@@ -462,7 +464,7 @@ module Homebrew
           end
 
           next unless @new_formula
-          next unless @official_tap
+          next unless @core_tap
 
           if dep.tags.include?(:recommended) || dep.tags.include?(:optional)
             new_formula_problem options_message
@@ -470,7 +472,7 @@ module Homebrew
         end
 
         next unless @new_formula
-        next unless @official_tap
+        next unless @core_tap
 
         if spec.requirements.map(&:recommended?).any? || spec.requirements.map(&:optional?).any?
           new_formula_problem options_message
@@ -494,7 +496,6 @@ module Homebrew
     end
 
     def audit_keg_only_style
-      return unless @strict
       return unless formula.keg_only?
 
       whitelist = %w[
@@ -526,6 +527,25 @@ module Homebrew
       problem "keg_only reason should not end with a period."
     end
 
+    def audit_versioned_keg_only
+      return unless @versioned_formula
+      return unless @core_tap
+
+      return if formula.keg_only? && formula.keg_only_reason.reason == :versioned_formula
+
+      keg_only_whitelist = %w[
+        autoconf@2.13
+        bash-completion@2
+        gnupg@1.4
+        lua@5.1
+        python@2
+      ].freeze
+
+      return if keg_only_whitelist.include?(formula.name) || formula.name.start_with?("gcc@")
+
+      problem "Versioned formulae should use `keg_only :versioned_formula`"
+    end
+
     def audit_homepage
       homepage = formula.homepage
 
@@ -536,11 +556,23 @@ module Homebrew
       return unless DevelopmentTools.curl_handles_most_https_certificates?
 
       if http_content_problem = curl_check_http_content(homepage,
-                                  user_agents: [:browser, :default],
+                                  user_agents:   [:browser, :default],
                                   check_content: true,
-                                  strict: @strict)
+                                  strict:        @strict)
         problem http_content_problem
       end
+    end
+
+    def audit_bottle_spec
+      # special case: new versioned formulae should be audited
+      return unless @new_formula_inclusive
+      return unless @core_tap
+
+      return if formula.bottle_disabled?
+
+      return unless formula.bottle_defined?
+
+      new_formula_problem "New formulae should not have a `bottle do` block"
     end
 
     def audit_bottle_disabled
@@ -556,7 +588,7 @@ module Homebrew
         ]
         return if bottle_disabled_whitelist.include?(formula.name)
 
-        problem "Formulae should not use `bottle :disabled`" if @official_tap
+        problem "Formulae should not use `bottle :disabled`" if @core_tap
       end
     end
 
@@ -580,7 +612,7 @@ module Homebrew
       return if metadata.nil?
 
       new_formula_problem "GitHub fork (not canonical repository)" if metadata["fork"]
-      if formula&.tap&.core_tap? &&
+      if @core_tap &&
          (metadata["forks_count"] < 30) && (metadata["subscribers_count"] < 30) &&
          (metadata["stargazers_count"] < 75)
         new_formula_problem "GitHub repository not notable enough (<30 forks, <30 watchers and <75 stars)"
@@ -643,24 +675,27 @@ module Homebrew
         end
       end
 
-      if @official_tap && (formula.head || formula.devel)
-        unstable_spec_message = "Formulae should not have a `HEAD` or `devel` spec"
+      if @core_tap && formula.devel
+        problem "Formulae should not have a `devel` spec"
+      end
+
+      if @core_tap && formula.head
+        head_spec_message = "Formulae should not have a `HEAD` spec"
         if @new_formula
-          new_formula_problem unstable_spec_message
-        elsif formula.versioned_formula?
-          versioned_unstable_spec = %w[
+          new_formula_problem head_spec_message
+        elsif @versioned_formula
+          versioned_head_spec = %w[
             bash-completion@2
             imagemagick@6
             python@2
           ]
-          problem unstable_spec_message unless versioned_unstable_spec.include?(formula.name)
+          problem head_spec_message unless versioned_head_spec.include?(formula.name)
         end
       end
 
       throttled = %w[
         aws-sdk-cpp 10
         awscli 10
-        heroku 10
         quicktype 10
         vim 50
       ]
@@ -669,14 +704,13 @@ module Homebrew
         next if formula.stable.nil?
 
         version = formula.stable.version.to_s.split(".").last.to_i
-        if @strict && a == formula.name && version.modulo(b.to_i).nonzero?
+        if a == formula.name && version.modulo(b.to_i).nonzero?
           problem "should only be updated every #{b} releases on multiples of #{b}"
         end
       end
 
       unstable_whitelist = %w[
         aalib 1.4rc5
-        angolmois 2.0.0alpha2
         automysqlbackup 3.0-rc6
         aview 1.3.0rc1
         distcc 3.2rc1
@@ -685,10 +719,8 @@ module Homebrew
         hidapi 0.8.0-rc1
         libcaca 0.99b19
         nethack4 4.3.0-beta2
-        opensyobon 1.0rc2
         premake 4.4-beta5
         pwnat 0.3-beta
-        pxz 4.999.9
         recode 3.7-beta2
         speexdsp 1.2rc3
         sqoop 1.4.6
@@ -867,8 +899,8 @@ module Homebrew
 
       return unless @strict
 
-      if @official_tap && line.include?("env :std")
-        problem "`env :std` in official tap formulae is deprecated"
+      if @core_tap && line.include?("env :std")
+        problem "`env :std` in `core` formulae is deprecated"
       end
 
       if line.include?("env :userpaths")
@@ -899,9 +931,9 @@ module Homebrew
     end
 
     def audit_reverse_migration
-      # Only enforce for new formula being re-added to core and official taps
+      # Only enforce for new formula being re-added to core
       return unless @strict
-      return unless @official_tap
+      return unless @core_tap
       return unless formula.tap.tap_migrations.key?(formula.name)
 
       problem <<~EOS
@@ -923,13 +955,13 @@ module Homebrew
     end
 
     def audit_url_is_not_binary
-      return unless @official_tap
+      return unless @core_tap
 
       urls = @specs.map(&:url)
 
       urls.each do |url|
         if url =~ /darwin/i && (url =~ /x86_64/i || url =~ /amd64/i)
-          problem "#{url} looks like a binary package, not a source archive. Official taps are source-only."
+          problem "#{url} looks like a binary package, not a source archive. The `core` tap is source-only."
         end
       end
     end

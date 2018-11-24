@@ -1,17 +1,17 @@
-#:  * `create` <URL> [`--autotools`|`--cmake`|`--meson`] [`--no-fetch`] [`--set-name` <name>] [`--set-version` <version>] [`--tap` <user>`/`<repo>]:
+#:  * `create` [`--autotools`|`--cmake`|`--meson`] [`--no-fetch`] [`--set-name` <name>] [`--set-version` <version>] [`--tap` <user>`/`<repo>] <URL>:
 #:    Generate a formula for the downloadable file at <URL> and open it in the editor.
 #:    Homebrew will attempt to automatically derive the formula name
 #:    and version, but if it fails, you'll have to make your own template. The `wget`
-#:    formula serves as a simple example. For the complete API have a look at
-#:    <https://www.rubydoc.info/github/Homebrew/brew/master/Formula>.
+#:    formula serves as a simple example. For the complete API, see:
+#:    <https://www.rubydoc.info/github/Homebrew/brew/master/Formula>
 #:
 #:    If `--autotools` is passed, create a basic template for an Autotools-style build.
 #:    If `--cmake` is passed, create a basic template for a CMake-style build.
 #:    If `--meson` is passed, create a basic template for a Meson-style build.
 #:
 #:    If `--no-fetch` is passed, Homebrew will not download <URL> to the cache and
-#:    will thus not add the SHA256 to the formula for you. It will also not check
-#:    the GitHub API for GitHub projects (to fill out the description and homepage).
+#:    will thus not add the SHA-256 to the formula for you, nor will it check
+#:    the GitHub API for GitHub projects (to fill out its description and homepage).
 #:
 #:    The options `--set-name` and `--set-version` each take an argument and allow
 #:    you to explicitly set the name and version of the package you are creating.
@@ -30,13 +30,13 @@ module Homebrew
   def create_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `create` <URL> [<options>]:
+        `create` [<options>] <URL>
 
         Generate a formula for the downloadable file at <URL> and open it in the editor.
-        Homebrew will attempt to automatically derive the formula name
-        and version, but if it fails, you'll have to make your own template. The `wget`
-        formula serves as a simple example. For the complete API have a look at
-        <http://www.rubydoc.info/github/Homebrew/brew/master/Formula>.
+        Homebrew will attempt to automatically derive the formula name and version, but
+        if it fails, you'll have to make your own template. The `wget` formula serves as
+        a simple example. For the complete API, see:
+        <http://www.rubydoc.info/github/Homebrew/brew/master/Formula>
       EOS
       switch "--autotools",
         description: "Create a basic template for an Autotools-style build."
@@ -45,17 +45,17 @@ module Homebrew
       switch "--meson",
         description: "Create a basic template for a Meson-style build."
       switch "--no-fetch",
-        description: "Homebrew will not download <URL> to the cache and will thus not add the SHA256 to "\
-                     "the formula for you. It will also not check the GitHub API for GitHub projects "\
-                     "(to fill out the description and homepage)."
-      switch "--HEAD"
+        description: "Homebrew will not download <URL> to the cache and will thus not add the SHA-256 "\
+                     "to the formula for you, nor will it check the GitHub API for GitHub projects "\
+                     "(to fill out its description and homepage)."
+      switch "--HEAD",
+        description: "Indicate that <URL> points to the package's repository rather than a file."
       flag   "--set-name=",
-        description: "Set the provided name of the package you are creating."
+        description: "Set the name of the new formula to the provided <name>."
       flag   "--set-version=",
-        description: "Set the provided version of the package you are creating."
+        description: "Set the version of the new formula to the provided <version>."
       flag   "--tap=",
-        description: "Takes a tap [<user>`/`<repo>] as argument and generates the formula in the "\
-                     "specified tap."
+        description: "Generate the new formula in the provided tap, specified as <user>`/`<repo>."
       switch :force
       switch :verbose
       switch :debug

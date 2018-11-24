@@ -1,11 +1,4 @@
-AllCops:
-  TargetRubyVersion: 2.3
-  Exclude:
-    - '**/Casks/**/*'
-    - '**/vendor/**/*'
-  DisplayCopNames: false
-
-require: ./Homebrew/rubocops.rb
+inherit_from: ./.rubocop_shared.yml
 
 # enable all formulae audits
 FormulaAudit:
@@ -18,6 +11,11 @@ FormulaAuditStrict:
 # disable all formulae strict audits by default
 NewFormulaAudit:
   Enabled: false
+
+# make our hashes consistent
+Layout/AlignHash:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
 
 # `system` is a special case and aligns on second argument
 Layout/AlignParameters:
@@ -34,6 +32,8 @@ Layout/CaseIndentation:
 # this is a bit less "floaty"
 Layout/EndAlignment:
   EnforcedStyleAlignWith: start_of_line
+  Exclude:
+    - '**/Casks/**/*'
 
 # enforce use of <<~EOS
 Layout/IndentHeredoc:
@@ -100,13 +100,17 @@ Metrics/ParameterLists:
 
 # GitHub diff UI wraps beyond 118 characters (so that's the goal)
 Metrics/LineLength:
-  Max: 189
+  Max: 170
   # ignore manpage comments and long single-line strings
   IgnoredPatterns: ['#: ', ' url "', ' mirror "', ' plist_options :']
+  Exclude:
+    - '**/Casks/**/*'
 
 # dashes in filenames are typical
 Naming/FileName:
   Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
+  Exclude:
+    - '**/Casks/**/*'
 
 # implicitly allow EOS as we use it everywhere
 Naming/HeredocDelimiterNaming:
@@ -171,6 +175,7 @@ Style/HashSyntax:
     - '**/cmd/**/*'
     - '**/lib/**/*'
     - '**/spec/**/*'
+    - '**/Casks/**/*'
 
 # this doesn't make sense for wide lines below maximum line length
 # https://github.com/rubocop-hq/rubocop/issues/6149
@@ -201,10 +206,14 @@ Style/StderrPuts:
 # ruby style guide favorite
 Style/StringLiterals:
   EnforcedStyle: double_quotes
+  Exclude:
+    - '**/Casks/**/*'
 
 # consistency with above
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
+  Exclude:
+    - '**/Casks/**/*'
 
 # consistency helps readability and helps people who don't know Ruby
 Style/StringMethods:
@@ -217,6 +226,8 @@ Style/SymbolArray:
 # make things a bit easier to read
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
+  Exclude:
+    - '**/Casks/**/*'
 
 # messes with existing plist/caveats style
 Style/TrailingBodyOnMethodDefinition:
@@ -233,3 +244,32 @@ Style/TrailingCommaInHashLiteral:
 # a bit confusing to non-Rubyists but useful for longer arrays
 Style/WordArray:
   MinSize: 4
+  Exclude:
+    - '**/Casks/**/*'
+
+# exclude some styles for casks (for now)
+# TODO: make Homebrew/brew, casks and formulae more consistent
+Layout/ElseAlignment:
+  Exclude:
+    - '**/Casks/**/*'
+Layout/IndentArray:
+  Exclude:
+    - '**/Casks/**/*'
+Layout/IndentHash:
+  Exclude:
+    - '**/Casks/**/*'
+Layout/IndentationWidth:
+  Exclude:
+    - '**/Casks/**/*'
+Performance/StringReplacement:
+  Exclude:
+    - '**/Casks/**/*'
+Style/EmptyElse:
+  Exclude:
+    - '**/Casks/**/*'
+Style/PercentLiteralDelimiters:
+  Exclude:
+    - '**/Casks/**/*'
+Style/RegexpLiteral:
+  Exclude:
+    - '**/Casks/**/*'

@@ -40,7 +40,7 @@ module UnpackStrategy
         end
 
         system_command! "tar",
-                        args: ["xf", tar_path, "-C", unpack_dir],
+                        args:    ["xf", tar_path, "-C", unpack_dir],
                         verbose: verbose
       end
     end

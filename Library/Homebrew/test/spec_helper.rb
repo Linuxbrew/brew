@@ -8,6 +8,11 @@ if ENV["HOMEBREW_TESTS_COVERAGE"]
     ENV["CODECOV_TOKEN"] = ENV["HOMEBREW_CODECOV_TOKEN"]
   end
 
+  if ENV["HOMEBREW_AZURE_PIPELINES"]
+    require "simplecov-cobertura"
+    formatters << SimpleCov::Formatter::CoberturaFormatter
+  end
+
   SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new(formatters)
 end
 
@@ -93,7 +98,10 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :needs_svn) do
-    skip "subversion not installed." unless which "svn"
+    homebrew_bin = File.dirname HOMEBREW_BREW_FILE
+    unless %W[/usr/bin/svn #{homebrew_bin}/svn].map { |x| File.executable?(x) }.any?
+      skip "subversion not installed."
+    end
   end
 
   config.before(:each, :needs_unzip) do
@@ -182,7 +190,7 @@ RSpec::Matchers.define :a_json_string do
     begin
       JSON.parse(actual)
       true
-    rescue JSON::ParseError
+    rescue JSON::ParserError
       false
     end
   end

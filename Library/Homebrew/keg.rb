@@ -63,10 +63,10 @@ class Keg
   end
 
   # locale-specific directories have the form language[_territory][.codeset][@modifier]
-  LOCALEDIR_RX = %r{(locale|man)/([a-z]{2}|C|POSIX)(_[A-Z]{2})?(\.[a-zA-Z\-0-9]+(@.+)?)?}
-  INFOFILE_RX = %r{info/([^.].*?\.info|dir)$}
+  LOCALEDIR_RX = %r{(locale|man)/([a-z]{2}|C|POSIX)(_[A-Z]{2})?(\.[a-zA-Z\-0-9]+(@.+)?)?}.freeze
+  INFOFILE_RX = %r{info/([^.].*?\.info|dir)$}.freeze
   KEG_LINK_DIRECTORIES = %w[
-    bin etc include lib sbin share var Frameworks
+    bin etc include lib sbin share var
   ].freeze
   MUST_EXIST_SUBDIRECTORIES = (
     KEG_LINK_DIRECTORIES - %w[var] + %w[
@@ -111,9 +111,8 @@ class Keg
   ].freeze
 
   # Given an array of kegs, this method will try to find some other kegs
-  # that depend on them.
+  # that depend on them. If it does, it returns:
   #
-  # If it does, it returns:
   # - some kegs in the passed array that have installed dependents
   # - some installed dependents of those kegs.
   #
@@ -303,7 +302,7 @@ class Keg
     CacheStoreDatabase.use(:linkage) do |db|
       break unless db.created?
 
-      LinkageCacheStore.new(path, db).flush_cache!
+      LinkageCacheStore.new(path, db).delete!
     end
 
     path.rmtree
@@ -673,3 +672,5 @@ class Keg
     end
   end
 end
+
+require "extend/os/keg"

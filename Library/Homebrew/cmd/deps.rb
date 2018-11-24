@@ -60,12 +60,12 @@ module Homebrew
 
   def deps
     mode = OpenStruct.new(
-      installed?: ARGV.include?("--installed"),
-      tree?: ARGV.include?("--tree"),
-      all?: ARGV.include?("--all"),
+      installed?:  ARGV.include?("--installed"),
+      tree?:       ARGV.include?("--tree"),
+      all?:        ARGV.include?("--all"),
       topo_order?: ARGV.include?("-n"),
-      union?: ARGV.include?("--union"),
-      for_each?: ARGV.include?("--for-each"),
+      union?:      ARGV.include?("--union"),
+      for_each?:   ARGV.include?("--for-each"),
     )
 
     if mode.tree?
@@ -130,7 +130,7 @@ module Homebrew
     if ARGV.include?("--annotate")
       str = "#{str}  [build]" if dep.build?
       str = "#{str}  [test]" if dep.test?
-      str = "#{str}  [optional" if dep.optional?
+      str = "#{str}  [optional]" if dep.optional?
       str = "#{str}  [recommended]" if dep.recommended?
     end
 

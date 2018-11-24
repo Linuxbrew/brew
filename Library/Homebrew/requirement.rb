@@ -49,7 +49,7 @@ class Requirement
     s
   end
 
-  # Overriding #satisfied? is unsupported.
+  # Overriding {#satisfied?} is unsupported.
   # Pass a block or boolean to the satisfy DSL method instead.
   def satisfied?
     satisfy = self.class.satisfy
@@ -61,7 +61,7 @@ class Requirement
     true
   end
 
-  # Overriding #fatal? is unsupported.
+  # Overriding {#fatal?} is unsupported.
   # Pass a boolean to the fatal DSL method instead.
   def fatal?
     self.class.fatal || false
@@ -77,7 +77,7 @@ class Requirement
     parent
   end
 
-  # Overriding #modify_build_environment is unsupported.
+  # Overriding {#modify_build_environment} is unsupported.
   # Pass a block to the env DSL method instead.
   def modify_build_environment
     satisfied?
@@ -150,10 +150,6 @@ class Requirement
     attr_reader :env_proc, :build
     attr_rw :fatal, :cask, :download
 
-    def default_formula(_val = nil)
-      odisabled "Requirement.default_formula"
-    end
-
     def satisfy(options = nil, &block)
       return @satisfied if options.nil? && !block_given?
 
@@ -196,7 +192,7 @@ class Requirement
 
   class << self
     # Expand the requirements of dependent recursively, optionally yielding
-    # [dependent, req] pairs to allow callers to apply arbitrary filters to
+    # `[dependent, req]` pairs to allow callers to apply arbitrary filters to
     # the list.
     # The default filter, which is applied when a block is not given, omits
     # optionals and recommendeds based on what the dependent has asked for.

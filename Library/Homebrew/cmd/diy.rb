@@ -9,15 +9,36 @@
 #:    installing.
 
 require "formula"
+require "cli_parser"
 
 module Homebrew
   module_function
 
+  def diy_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `diy` [<options>]
+
+        Automatically determine the installation prefix for non-Homebrew software.
+        Using the output from this command, you can install your own software into
+        the Cellar and then link it into Homebrew's prefix with `brew link`.
+      EOS
+      flag "--name=",
+       description: "Explicitly set the provided <name> of the package being installed."
+      flag "--version=",
+       description: "Explicitly set the provided <version> of the package being installed."
+      switch :verbose
+      switch :debug
+    end
+  end
+
   def diy
+    diy_args.parse
+
     path = Pathname.getwd
 
-    version = ARGV.value("version") || detect_version(path)
-    name = ARGV.value("name") || detect_name(path, version)
+    version = args.version || detect_version(path)
+    name = args.name || detect_name(path, version)
 
     prefix = HOMEBREW_CELLAR/name/version
 
@@ -25,8 +46,10 @@ module Homebrew
       puts "-DCMAKE_INSTALL_PREFIX=#{prefix}"
     elsif File.file? "configure"
       puts "--prefix=#{prefix}"
+    elsif File.file? "meson.build"
+      puts "-Dprefix=#{prefix}"
     else
-      raise "Couldn't determine build system"
+      raise "Couldn't determine build system. You can manually put files into #{prefix}"
     end
   end
 

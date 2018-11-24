@@ -35,7 +35,7 @@ module Utils
       end
     end
 
-    # return the shell profile file based on users' preferred shell
+    # return the shell profile file based on user's preferred shell
     def profile
       SHELL_PROFILE_MAP.fetch(preferred, "~/.bash_profile")
     end
@@ -64,15 +64,15 @@ module Utils
 
     SHELL_PROFILE_MAP = {
       bash: "~/.bash_profile",
-      csh: "~/.cshrc",
+      csh:  "~/.cshrc",
       fish: "~/.config/fish/config.fish",
-      ksh: "~/.kshrc",
-      sh: "~/.bash_profile",
+      ksh:  "~/.kshrc",
+      sh:   "~/.bash_profile",
       tcsh: "~/.tcshrc",
-      zsh: "~/.zshrc",
+      zsh:  "~/.zshrc",
     }.freeze
 
-    UNSAFE_SHELL_CHAR = %r{([^A-Za-z0-9_\-.,:/@~\n])}
+    UNSAFE_SHELL_CHAR = %r{([^A-Za-z0-9_\-.,:/@~\n])}.freeze
 
     def csh_quote(str)
       # ruby's implementation of shell_escape

@@ -116,13 +116,13 @@ module Cask
 
     def to_h
       {
-        "name" => name,
-        "homepage" => homepage,
-        "url" => url,
-        "appcast" => appcast,
-        "version" => version,
-        "sha256" => sha256,
-        "artifacts" => artifacts.map do |a|
+        "name"           => name,
+        "homepage"       => homepage,
+        "url"            => url,
+        "appcast"        => appcast,
+        "version"        => version,
+        "sha256"         => sha256,
+        "artifacts"      => artifacts.map do |a|
           if a.respond_to? :to_h
             a.to_h
           elsif a.respond_to? :to_a
@@ -131,11 +131,11 @@ module Cask
             a
           end
         end,
-        "caveats" => caveats,
-        "depends_on" => depends_on,
+        "caveats"        => caveats,
+        "depends_on"     => depends_on,
         "conflicts_with" => conflicts_with.to_a,
-        "container" => container,
-        "auto_updates" => auto_updates,
+        "container"      => container,
+        "auto_updates"   => auto_updates,
       }
     end
   end

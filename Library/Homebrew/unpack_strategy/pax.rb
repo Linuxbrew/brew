@@ -16,8 +16,8 @@ module UnpackStrategy
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
       system_command! "pax",
-                      args: ["-rf", path],
-                      chdir: unpack_dir,
+                      args:    ["-rf", path],
+                      chdir:   unpack_dir,
                       verbose: verbose
     end
   end

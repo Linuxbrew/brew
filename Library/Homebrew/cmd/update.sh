@@ -24,7 +24,7 @@ git() {
 
 git_init_if_necessary() {
   BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
-  if [[ -n "$HOMEBREW_MACOS" ]] || [[ -n "$HOMEBREW_FORCE_HOMEBREW_ORG" ]]
+  if [[ -n "$HOMEBREW_MACOS" ]] || [[ -n "$HOMEBREW_FORCE_HOMEBREW_ON_LINUX" ]]
   then
     CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
   else
@@ -427,6 +427,15 @@ EOS
   rename_taps_dir_if_necessary
 
   safe_cd "$HOMEBREW_REPOSITORY"
+
+  # if an older system had a newer curl installed, change each repo's remote URL from GIT to HTTPS
+  if [[ -n "$HOMEBREW_SYSTEM_CURL_TOO_OLD" &&
+        -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" && 
+        "$(git config remote.origin.url)" =~ ^git:// ]]
+  then
+    git config remote.origin.url "$BREW_OFFICIAL_REMOTE"
+    git config -f "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core/.git/config" remote.origin.url "$CORE_OFFICIAL_REMOTE"
+  fi
 
   # kill all of subprocess on interrupt
   trap '{ /usr/bin/pkill -P $$; wait; exit 130; }' SIGINT

@@ -1,7 +1,7 @@
 require "options"
 
 module Dependable
-  # :run and :linked are no longer used but keep them here to avoid them being
+  # `:run` and `:linked` are no longer used but keep them here to avoid them being
   # misused in future.
   RESERVED_TAGS = [:build, :optional, :recommended, :run, :test, :linked].freeze
 

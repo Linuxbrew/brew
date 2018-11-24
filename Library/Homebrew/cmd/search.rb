@@ -33,10 +33,10 @@ module Homebrew
     fink:     ->(query) { "http://pdb.finkproject.org/pdb/browse.php?summary=#{query}" },
     opensuse: ->(query) { "https://software.opensuse.org/search?q=#{query}" },
     fedora:   ->(query) { "https://apps.fedoraproject.org/packages/s/#{query}" },
-    debian: lambda { |query|
+    debian:   lambda { |query|
       "https://packages.debian.org/search?keywords=#{query}&searchon=names&suite=all&section=all"
     },
-    ubuntu: lambda { |query|
+    ubuntu:   lambda { |query|
       "https://packages.ubuntu.com/search?keywords=#{query}&searchon=names&suite=all&section=all"
     },
   }.freeze

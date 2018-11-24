@@ -4,7 +4,7 @@ OFFICIAL_CASK_TAPS = %w[
 ].freeze
 
 OFFICIAL_CMD_TAPS = {
-  "homebrew/bundle" => ["bundle"],
+  "homebrew/bundle"   => ["bundle"],
   "homebrew/test-bot" => ["test-bot"],
   "homebrew/services" => ["services"],
 }.freeze

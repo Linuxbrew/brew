@@ -1,10 +1,10 @@
 #:  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--or-later`] [`--root-url=`<URL>] [`--force-core-tap`] [`--json`] <formulae>:
-#:    Generate a bottle (binary package) from a formula installed with
+#:    Generate a bottle (binary package) from a formula that was installed with
 #:    `--build-bottle`.
 #:
 #:    If the formula specifies a rebuild version, it will be incremented in the
-#:    generated DSL. Passing `--keep-old` will attempt to keep it at its
-#:    original value, while `--no-rebuild` will remove it.
+#:    generated DSL. Passing `--keep-old` will attempt to keep it at its original
+#:    value, while `--no-rebuild` will remove it.
 #:
 #:    If `--verbose` (or `-v`) is passed, print the bottling commands and any warnings
 #:    encountered.
@@ -15,7 +15,7 @@
 #:    If `--root-url` is passed, use the specified <URL> as the root of the
 #:    bottle's URL instead of Homebrew's default.
 #:
-#:    If `--or-later` is passed, append _or_later to the bottle tag.
+#:    If `--or-later` is passed, append `_or_later` to the bottle tag.
 #:
 #:    If `--force-core-tap` is passed, build a bottle even if <formula> is not
 #:    in homebrew/core or any installed taps.
@@ -72,13 +72,13 @@ module Homebrew
   def bottle_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `bottle` [<options>] <formulae>:
+        `bottle` [<options>] <formulae>
 
-        Generate a bottle (binary package) from a formula installed with
+        Generate a bottle (binary package) from a formula that was installed with
         `--build-bottle`.
         If the formula specifies a rebuild version, it will be incremented in the
-        generated DSL. Passing `--keep-old` will attempt to keep it at its
-        original value, while `--no-rebuild` will remove it.
+        generated DSL. Passing `--keep-old` will attempt to keep it at its original
+        value, while `--no-rebuild` will remove it.
       EOS
       switch "--skip-relocation",
         description: "Do not check if the bottle can be marked as relocatable."
@@ -87,28 +87,30 @@ module Homebrew
       switch "--force-core-tap",
         description: "Build a bottle even if <formula> is not in homebrew/core or any installed taps."
       switch "--no-rebuild",
-        description: "If the formula specifies a rebuild version, it will be removed in the generated DSL."
+        description: "If the formula specifies a rebuild version, remove it from the generated DSL."
       switch "--keep-old",
-        description: "If the formula specifies a rebuild version, it will attempted to be kept in the "\
-                     " generated DSL."
-      switch "--merge",
-        description: "Generate a bottle from a formula and print the new DSL merged into the "\
-                     "existing formula."
-      switch "--write",
-        description: "Changes will be written to the formula file. A new commit will be generated unless "\
-                     "`--no-commit` is passed."
-      switch "--no-commit",
-        description: "When passed with `--write`, a new commit will not generated while writing changes "\
-                     "to the formula file.",
-        depends_on: "--write"
+        description: "If the formula specifies a rebuild version, attempt to preserve its value in the "\
+                     "generated DSL."
       switch "--json",
         description: "Write bottle information to a JSON file, which can be used as the argument for "\
                      "`--merge`."
-      flag   "--root-url",
-        description: "Use the specified <URL> as the root of the bottle's URL instead of Homebrew's "\
-                     "default."
+      switch "--merge",
+        description: "Generate an updated bottle block for a formula and optionally merge it into the "\
+                     "formula file. Instead of a formula name, requires a JSON file generated with "\
+                     "`brew bottle --json` <formula>."
+      switch "--write",
+        depends_on:  "--merge",
+        description: "Write the changes to the formula file. A new commit will be generated unless "\
+                     "`--no-commit` is passed."
+      switch "--no-commit",
+        depends_on:  "--write",
+        description: "When passed with `--write`, a new commit will not generated after writing changes "\
+                     "to the formula file."
+      flag   "--root-url=",
+        description: "Use the specified <URL> as the root of the bottle's URL instead of Homebrew's default."
       switch :verbose
       switch :debug
+      conflicts "--no-rebuild", "--keep-old"
     end
   end
 
@@ -228,7 +230,7 @@ module Homebrew
 
     unless tap = f.tap
       unless args.force_core_tap?
-        return ofail "Formula not from core or any taps: #{f.full_name}"
+        return ofail "Formula not from core or any installed taps: #{f.full_name}"
       end
 
       tap = CoreTap.instance
@@ -418,23 +420,23 @@ module Homebrew
       f.full_name => {
         "formula" => {
           "pkg_version" => f.pkg_version.to_s,
-          "path" => f.path.to_s.delete_prefix("#{HOMEBREW_REPOSITORY}/"),
+          "path"        => f.path.to_s.delete_prefix("#{HOMEBREW_REPOSITORY}/"),
         },
-        "bottle" => {
+        "bottle"  => {
           "root_url" => bottle.root_url,
-          "prefix" => bottle.prefix,
-          "cellar" => bottle.cellar.to_s,
-          "rebuild" => bottle.rebuild,
-          "tags" => {
+          "prefix"   => bottle.prefix,
+          "cellar"   => bottle.cellar.to_s,
+          "rebuild"  => bottle.rebuild,
+          "tags"     => {
             tag => {
-              "filename" => filename.bintray,
+              "filename"       => filename.bintray,
               "local_filename" => filename.to_s,
-              "sha256" => sha256,
+              "sha256"         => sha256,
             },
           },
         },
         "bintray" => {
-          "package" => Utils::Bottles::Bintray.package(f.name),
+          "package"    => Utils::Bottles::Bintray.package(f.name),
           "repository" => Utils::Bottles::Bintray.repository(tap),
         },
       },
@@ -538,7 +540,7 @@ module Homebrew
                       (\n^\ {3}[\S\ ]+$)*                                        # options can be in multiple lines
                     )?|
                     (homepage|desc|sha1|sha256|version|mirror)\ ['"][\S\ ]+['"]| # specs with a string
-                    revision\ \d+                                                # revision with a number
+                    (revision|version_scheme)\ \d+                               # revision with a number
                   )\n+                                                           # multiple empty lines
                  )+
                /mx

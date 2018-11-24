@@ -212,7 +212,6 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
-    odisabled "fails_with :llvm" if compiler == :llvm
     compiler_failures << CompilerFailure.create(compiler, &block)
   end
 
@@ -359,7 +358,7 @@ class BottleSpecification
     cellar == :any || cellar == :any_skip_relocation || cellar == HOMEBREW_CELLAR.to_s
   end
 
-  # Does the Bottle this BottleSpecification belongs to need to be relocated?
+  # Does the {Bottle} this BottleSpecification belongs to need to be relocated?
   def skip_relocation?
     cellar == :any_skip_relocation
   end

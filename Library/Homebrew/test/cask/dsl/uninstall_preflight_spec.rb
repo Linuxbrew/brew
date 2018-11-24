@@ -1,5 +1,5 @@
-require "test/support/helper/spec/shared_examples/cask_dsl_base"
-require "test/support/helper/spec/shared_examples/cask_staged"
+require "test/cask/dsl/shared_examples/base"
+require "test/cask/dsl/shared_examples/staged"
 
 describe Cask::DSL::UninstallPreflight, :cask do
   let(:cask) { Cask::CaskLoader.load(cask_path("basic-cask")) }

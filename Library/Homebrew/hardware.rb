@@ -8,7 +8,7 @@ module Hardware
     class << self
       OPTIMIZATION_FLAGS = {
         core2: "-march=core2",
-        core: "-march=prescott",
+        core:  "-march=prescott",
         armv6: "-march=armv6",
         armv8: "-march=armv8-a",
       }.freeze

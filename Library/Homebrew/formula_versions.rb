@@ -92,7 +92,7 @@ class FormulaVersions
     attributes.each do |attribute|
       attributes_map[attribute] ||= {
         stable: {},
-        devel: {},
+        devel:  {},
       }
     end
 

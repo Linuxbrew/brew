@@ -13,10 +13,10 @@ module Homebrew
 
       def self.global_options
         {
-          quiet: [["-q", "--quiet"], :quiet, "Suppress any warnings."],
+          quiet:   [["-q", "--quiet"], :quiet, "Suppress any warnings."],
           verbose: [["-v", "--verbose"], :verbose, "Make some output more verbose."],
-          debug: [["-d", "--debug"], :debug, "Display any debugging information."],
-          force: [["-f", "--force"], :force, "Override warnings and enable potentially unsafe operations."],
+          debug:   [["-d", "--debug"], :debug, "Display any debugging information."],
+          force:   [["-f", "--force"], :force, "Override warnings and enable potentially unsafe operations."],
         }
       end
 
@@ -28,13 +28,13 @@ module Homebrew
         @constraints = []
         @conflicts = []
         @processed_options = []
-        @desc_line_length = 48
+        @desc_line_length = 43
         instance_eval(&block)
         post_initialize
       end
 
       def post_initialize
-        @parser.on_tail("-h", "--help", "Show this message") do
+        @parser.on_tail("-h", "--help", "Show this message.") do
           puts generate_help_text
           exit 0
         end
@@ -42,8 +42,12 @@ module Homebrew
 
       def switch(*names, description: nil, env: nil, required_for: nil, depends_on: nil)
         global_switch = names.first.is_a?(Symbol)
-        names, env, description = common_switch(*names) if global_switch
-        description = option_to_description(*names) if description.nil?
+        names, env, default_description = common_switch(*names) if global_switch
+        if description.nil? && global_switch
+          description = default_description
+        elsif description.nil?
+          description = option_to_description(*names)
+        end
         process_option(*names, description)
         @parser.on(*names, *wrap_option_desc(description)) do
           enable_switch(*names)
@@ -72,20 +76,24 @@ module Homebrew
         end
       end
 
-      def flag(name, description: nil, required_for: nil, depends_on: nil)
-        if name.end_with? "="
+      def flag(*names, description: nil, required_for: nil, depends_on: nil)
+        if names.any? { |name| name.end_with? "=" }
           required = OptionParser::REQUIRED_ARGUMENT
-          name.chomp! "="
         else
           required = OptionParser::OPTIONAL_ARGUMENT
         end
-        description = option_to_description(name) if description.nil?
-        process_option(name, description)
-        @parser.on(name, *wrap_option_desc(description), required) do |option_value|
-          Homebrew.args[option_to_name(name)] = option_value
+        names.map! { |name| name.chomp "=" }
+        description = option_to_description(*names) if description.nil?
+        process_option(*names, description)
+        @parser.on(*names, *wrap_option_desc(description), required) do |option_value|
+          names.each do |name|
+            Homebrew.args[option_to_name(name)] = option_value
+          end
         end
 
-        set_constraints(name, required_for: required_for, depends_on: depends_on)
+        names.each do |name|
+          set_constraints(name, required_for: required_for, depends_on: depends_on)
+        end
       end
 
       def conflicts(*options)
@@ -102,7 +110,7 @@ module Homebrew
         if name.length == 1
           "-#{name}"
         else
-          "--#{name}"
+          "--#{name.tr("_", "-")}"
         end
       end
 
@@ -118,6 +126,7 @@ module Homebrew
         remaining_args = @parser.parse(cmdline_args)
         check_constraint_violations
         Homebrew.args[:remaining] = remaining_args
+        Homebrew.args.freeze
         @parser
       end
 
@@ -127,9 +136,10 @@ module Homebrew
 
       def generate_help_text
         @parser.to_s.sub(/^/, "#{Tty.bold}Usage: brew#{Tty.reset} ")
-               .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
+               .gsub(/`(.*?)`/m, "#{Tty.bold}\\1#{Tty.reset}")
                .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
-               .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
+               .gsub(/<(.*?)>/m, "#{Tty.underline}\\1#{Tty.reset}")
+               .gsub(/\*(.*?)\*/m, "#{Tty.underline}\\1#{Tty.reset}")
       end
 
       private

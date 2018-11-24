@@ -1,4 +1,4 @@
-#:  * `gist-logs` [`--new-issue`|`-n`] <formula>:
+#:  * `gist-logs` [`--new-issue`|`-n`] [`--private`|`-p`] <formula>:
 #:    Upload logs for a failed build of <formula> to a new Gist.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
@@ -8,6 +8,9 @@
 #:
 #:    If `--new-issue` is passed, automatically create a new issue in the appropriate
 #:    GitHub repository as well as creating the Gist.
+#:
+#:    If `--private` is passed, the Gist will be marked private and will not
+#:    appear in listings but will be accessible with the link.
 #:
 #:    If no logs are found, an error message is presented.
 
@@ -42,8 +45,8 @@ module Homebrew
     if GitHub.api_credentials_type == :none
       puts <<~EOS
         You can create a new personal access token:
-         #{GitHub::ALL_SCOPES_URL}
-        and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method.
+          #{GitHub::ALL_SCOPES_URL}
+        #{Utils::Shell.set_variable_in_profile("HOMEBREW_GITHUB_API_TOKEN", "your_token_here")}
 
       EOS
       login!
@@ -77,7 +80,7 @@ module Homebrew
     s
   end
 
-  # Hack for ruby < 1.9.3
+  # Causes some terminals to display secure password entry indicators
   def noecho_gets
     system "stty -echo"
     result = $stdin.gets
@@ -110,9 +113,13 @@ module Homebrew
     logs
   end
 
+  def create_private?
+    ARGV.include?("--private") || ARGV.switch?("p")
+  end
+
   def create_gist(files, description)
     url = "https://api.github.com/gists"
-    data = { "public" => true, "files" => files, "description" => description }
+    data = { "public" => !create_private?, "files" => files, "description" => description }
     scopes = GitHub::CREATE_GIST_SCOPES
     GitHub.open_api(url, data: data, scopes: scopes)["html_url"]
   end

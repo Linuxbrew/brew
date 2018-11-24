@@ -26,8 +26,8 @@ class JavaRequirement < Requirement
   end
 
   def initialize(tags = [])
-    @version = tags.shift if /(\d+\.)+\d/ =~ tags.first
-    super
+    @version = tags.shift if /^\d/ =~ tags.first
+    super(tags)
   end
 
   def message
@@ -39,7 +39,7 @@ class JavaRequirement < Requirement
   end
 
   def inspect
-    "#<#{self.class.name}: #{name.inspect} #{tags.inspect} version=#{@version.inspect}>"
+    "#<#{self.class.name}: #{tags.inspect} version=#{@version.inspect}>"
   end
 
   def display_s
@@ -58,7 +58,7 @@ class JavaRequirement < Requirement
   private
 
   JAVA_CASK_MAP = {
-    "1.8" => "homebrew/cask-versions/java8",
+    "1.8"  => "homebrew/cask-versions/java8",
     "11.0" => "java",
   }.freeze
 
@@ -86,7 +86,7 @@ class JavaRequirement < Requirement
     javas = []
     javas << Pathname.new(ENV["JAVA_HOME"])/"bin/java" if ENV["JAVA_HOME"]
     jdk = begin
-      Formula["jdk"]
+      Formula["openjdk"]
     rescue FormulaUnavailableError
       nil
     end

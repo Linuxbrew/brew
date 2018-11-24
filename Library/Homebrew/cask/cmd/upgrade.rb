@@ -45,10 +45,10 @@ module Cask
           old_cask = CaskLoader.load(old_cask.installed_caskfile)
 
           old_cask_installer =
-            Installer.new(old_cask, binaries:  binaries?,
-                                    verbose:   verbose?,
-                                    force:     force?,
-                                    upgrade:   true)
+            Installer.new(old_cask, binaries: binaries?,
+                                    verbose:  verbose?,
+                                    force:    force?,
+                                    upgrade:  true)
 
           new_cask = CaskLoader.load(old_cask.to_s)
 

@@ -14,7 +14,7 @@ describe JavaRequirement do
   describe "#inspect" do
     subject { described_class.new(%w[1.7+]) }
 
-    its(:inspect) { is_expected.to eq('#<JavaRequirement: "java" [] version="1.7+">') }
+    its(:inspect) { is_expected.to eq('#<JavaRequirement: [] version="1.7+">') }
   end
 
   describe "#display_s" do

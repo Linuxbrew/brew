@@ -1,9 +1,9 @@
 #:  * `release-notes` [`--markdown`] [<previous_tag>] [<end_ref>]:
-#:    Output the merged pull requests on Homebrew/brew between two Git refs.
+#:    Print the merged pull requests on Homebrew/brew between two Git refs.
 #:    If no <previous_tag> is provided it defaults to the latest tag.
 #:    If no <end_ref> is provided it defaults to `origin/master`.
 #:
-#:    If `--markdown` is passed, output as a Markdown list.
+#:    If `--markdown` is passed, print as a Markdown list.
 
 require "cli_parser"
 
@@ -13,14 +13,14 @@ module Homebrew
   def release_notes_args
     Homebrew::CLI::Parser.new do
       usage_banner <<~EOS
-        `release-notes` [<options>] [<previous_tag>] [<end_ref>]:
+        `release-notes` [<options>] [<previous_tag>] [<end_ref>]
 
-        Output the merged pull requests on Homebrew/brew between two Git refs.
+        Print the merged pull requests on Homebrew/brew between two Git refs.
         If no <previous_tag> is provided it defaults to the latest tag.
         If no <end_ref> is provided it defaults to `origin/master`.
       EOS
       switch "--markdown",
-        description: "Output as a Markdown list."
+        description: "Print as a Markdown list."
     end
   end
 

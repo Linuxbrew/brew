@@ -1,5 +1,8 @@
 class Keg
   def relocate_dynamic_linkage(relocation)
+    # Patching the dynamic linker of glibc breaks it.
+    return if name == "glibc"
+
     # Patching patchelf using itself fails with "Text file busy" or SIGBUS.
     return if name == "patchelf"
 
@@ -82,5 +85,18 @@ class Keg
 
   def self.relocation_formulae
     ["patchelf"]
+  end
+
+  def self.bottle_dependencies
+    @bottle_dependencies ||= begin
+      formulae = relocation_formulae
+      gcc = Formula["gcc"]
+      if !ENV["HOMEBREW_FORCE_HOMEBREW_ON_LINUX"] &&
+         DevelopmentTools.non_apple_gcc_version("gcc") < gcc.version.to_i
+        formulae += gcc.recursive_dependencies.map(&:name)
+        formulae << gcc.name
+      end
+      formulae
+    end
   end
 end

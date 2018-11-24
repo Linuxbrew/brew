@@ -49,11 +49,11 @@ describe "brew outdated", :integration_test do
 
       expected_json = [
         {
-          name: "testball",
+          name:               "testball",
           installed_versions: ["0.0.1"],
-          current_version: "0.1",
-          pinned: true,
-          pinned_version: "0.0.1",
+          current_version:    "0.1",
+          pinned:             true,
+          pinned_version:     "0.0.1",
         },
       ].to_json
 
@@ -69,11 +69,11 @@ describe "brew outdated", :integration_test do
 
       expected_json = [
         {
-          name: "testball",
+          name:               "testball",
           installed_versions: ["0.0.1"],
-          current_version: "0.1",
-          pinned: false,
-          pinned_version: nil,
+          current_version:    "0.1",
+          pinned:             false,
+          pinned_version:     nil,
         },
       ].to_json
 

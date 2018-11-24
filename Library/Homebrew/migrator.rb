@@ -137,7 +137,7 @@ class Migrator
     @old_pin_link_record = old_pin_record.readlink if @pinned
   end
 
-  # Fix INSTALL_RECEIPTS for tap-migrated formula.
+  # Fix INSTALL_RECEIPTs for tap-migrated formula.
   def fix_tabs
     old_tabs.each do |tab|
       tab.tap = formula.tap
@@ -160,7 +160,7 @@ class Migrator
     if formula_tap_user == old_tap_user
       true
     # Homebrew didn't use to update tabs while performing tap-migrations,
-    # so there can be INSTALL_RECEIPT's containing wrong information about tap,
+    # so there can be INSTALL_RECEIPTs containing wrong information about tap,
     # so we check if there is an entry about oldname migrated to tap and if
     # newname's tap is the same as tap to which oldname migrated, then we
     # can perform migrations and the taps for oldname and newname are the same.

@@ -5,11 +5,13 @@ describe "brew style" do
     begin
       FileUtils.ln_s HOMEBREW_LIBRARY_PATH, HOMEBREW_LIBRARY/"Homebrew"
       FileUtils.ln_s HOMEBREW_LIBRARY_PATH.parent/".rubocop.yml", HOMEBREW_LIBRARY/".rubocop_audit.yml"
+      FileUtils.ln_s HOMEBREW_LIBRARY_PATH.parent/".rubocop_shared.yml", HOMEBREW_LIBRARY/".rubocop_shared.yml"
 
       example.run
     ensure
       FileUtils.rm_f HOMEBREW_LIBRARY/"Homebrew"
       FileUtils.rm_f HOMEBREW_LIBRARY/".rubocop_audit.yml"
+      FileUtils.rm_f HOMEBREW_LIBRARY/".rubocop_shared.yml"
     end
   end
 

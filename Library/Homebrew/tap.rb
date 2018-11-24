@@ -1,7 +1,8 @@
 require "extend/cachable"
 require "readall"
+require "description_cache_store"
 
-# a {Tap} is used to extend the formulae provided by Homebrew core.
+# A {Tap} is used to extend the formulae provided by Homebrew core.
 # Usually, it's synced with a remote git repository. And it's likely
 # a GitHub repository with the name of `user/homebrew-repo`. In such
 # case, `user/repo` will be used as the {#name} of this {Tap}, where
@@ -54,7 +55,7 @@ class Tap
   extend Enumerable
 
   # The user name of this {Tap}. Usually, it's the GitHub username of
-  # this #{Tap}'s remote repository.
+  # this {Tap}'s remote repository.
   attr_reader :user
 
   # The repository name of this {Tap} without leading `homebrew-`.
@@ -86,7 +87,7 @@ class Tap
     @alias_reverse_table = nil
   end
 
-  # clear internal cache
+  # Clear internal cache
   def clear_cache
     @remote = nil
     @repo_var = nil
@@ -152,7 +153,7 @@ class Tap
     path.git_short_head
   end
 
-  # time since git last commit for this {Tap}.
+  # Time since git last commit for this {Tap}.
   def git_last_commit
     raise TapUnavailableError, name unless installed?
 
@@ -223,7 +224,7 @@ class Tap
     false
   end
 
-  # install this {Tap}.
+  # Install this {Tap}.
   #
   # @param [Hash] options
   # @option options [String] :clone_target If passed, it will be used as the clone remote.
@@ -299,7 +300,10 @@ class Tap
 
     formatted_contents = contents.presence&.to_sentence&.dup&.prepend(" ")
     puts "Tapped#{formatted_contents} (#{path.abv})." unless quiet
-    Descriptions.cache_formulae(formula_names)
+    CacheStoreDatabase.use(:descriptions) do |db|
+      DescriptionCacheStore.new(db)
+                           .update_from_formula_names!(formula_names)
+    end
 
     return if options[:clone_target]
     return unless private?
@@ -320,7 +324,7 @@ class Tap
     Utils::Link.link_completions(path, command)
   end
 
-  # uninstall this {Tap}.
+  # Uninstall this {Tap}.
   def uninstall
     require "descriptions"
     raise TapUnavailableError, name unless installed?
@@ -331,7 +335,10 @@ class Tap
     formatted_contents = contents.presence&.to_sentence&.dup&.prepend(" ")
 
     unpin if pinned?
-    Descriptions.uncache_formulae(formula_names)
+    CacheStoreDatabase.use(:descriptions) do |db|
+      DescriptionCacheStore.new(db)
+                           .delete_from_formula_names!(formula_names)
+    end
     Utils::Link.unlink_manpages(path)
     Utils::Link.unlink_completions(path)
     path.rmtree
@@ -347,7 +354,7 @@ class Tap
     remote.casecmp(default_remote).nonzero?
   end
 
-  # path to the directory of all {Formula} files for this {Tap}.
+  # Path to the directory of all {Formula} files for this {Tap}.
   def formula_dir
     @formula_dir ||= potential_formula_dirs.find(&:directory?) || path/"Formula"
   end
@@ -356,7 +363,7 @@ class Tap
     @potential_formula_dirs ||= [path/"Formula", path/"HomebrewFormula", path].freeze
   end
 
-  # path to the directory of all {Cask} files for this {Tap}.
+  # Path to the directory of all {Cask} files for this {Tap}.
   def cask_dir
     @cask_dir ||= path/"Casks"
   end
@@ -379,7 +386,7 @@ class Tap
     contents
   end
 
-  # an array of all {Formula} files of this {Tap}.
+  # An array of all {Formula} files of this {Tap}.
   def formula_files
     @formula_files ||= if formula_dir.directory?
       formula_dir.children.select(&method(:ruby_file?))
@@ -388,7 +395,7 @@ class Tap
     end
   end
 
-  # an array of all {Cask} files of this {Tap}.
+  # An array of all {Cask} files of this {Tap}.
   def cask_files
     @cask_files ||= if cask_dir.directory?
       cask_dir.children.select(&method(:ruby_file?))
@@ -421,7 +428,7 @@ class Tap
     ruby_file?(file) && file.parent == cask_dir
   end
 
-  # an array of all {Formula} names of this {Tap}.
+  # An array of all {Formula} names of this {Tap}.
   def formula_names
     @formula_names ||= formula_files.map { |f| formula_file_to_name(f) }
   end
@@ -480,7 +487,7 @@ class Tap
       (file.executable? || file.extname == ".rb")
   end
 
-  # an array of all commands files of this {Tap}.
+  # An array of all commands files of this {Tap}.
   def command_files
     @command_files ||= if command_dir.directory?
       command_dir.children.select(&method(:command_file?))
@@ -502,7 +509,7 @@ class Tap
     @pinned = pinned_symlink_path.directory?
   end
 
-  # pin this {Tap}.
+  # Pin this {Tap}.
   def pin
     raise TapUnavailableError, name unless installed?
     raise TapPinStatusError.new(name, true) if pinned?
@@ -511,7 +518,7 @@ class Tap
     @pinned = true
   end
 
-  # unpin this {Tap}.
+  # Unpin this {Tap}.
   def unpin
     raise TapUnavailableError, name unless installed?
     raise TapPinStatusError.new(name, false) unless pinned?
@@ -524,16 +531,16 @@ class Tap
 
   def to_hash
     hash = {
-      "name" => name,
-      "user" => user,
-      "repo" => repo,
-      "path" => path.to_s,
-      "installed" => installed?,
-      "official" => official?,
+      "name"          => name,
+      "user"          => user,
+      "repo"          => repo,
+      "path"          => path.to_s,
+      "installed"     => installed?,
+      "official"      => official?,
       "formula_names" => formula_names,
       "formula_files" => formula_files.map(&:to_s),
       "command_files" => command_files.map(&:to_s),
-      "pinned" => pinned?,
+      "pinned"        => pinned?,
     }
 
     if installed?
@@ -584,12 +591,12 @@ class Tap
     end
   end
 
-  # an array of all installed {Tap} names.
+  # An array of all installed {Tap} names.
   def self.names
     map(&:name).sort
   end
 
-  # an array of all tap cmd directory {Pathname}s
+  # An array of all tap cmd directory {Pathname}s
   def self.cmd_directories
     Pathname.glob TAP_DIRECTORY/"*/*/cmd"
   end
@@ -626,7 +633,7 @@ class Tap
   end
 end
 
-# A specialized {Tap} class for the core formulae
+# A specialized {Tap} class for the core formulae.
 class CoreTap < Tap
   def default_remote
     "https://github.com/Homebrew/homebrew-core".freeze
@@ -715,7 +722,7 @@ class CoreTap < Tap
   end
 end
 
-# Permanent configuration per {Tap} using `git-config(1)`
+# Permanent configuration per {Tap} using `git-config(1)`.
 class TapConfig
   attr_reader :tap
 

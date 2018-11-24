@@ -2,7 +2,7 @@ require "json"
 
 #
 # `CacheStoreDatabase` acts as an interface to a persistent storage mechanism
-# residing in the `HOMEBREW_CACHE`
+# residing in the `HOMEBREW_CACHE`.
 #
 class CacheStoreDatabase
   # Yields the cache store database.
@@ -39,6 +39,7 @@ class CacheStoreDatabase
   # Closes the underlying database (if it is created and open).
   def close_if_open!
     return unless @db
+    cache_path.dirname.mkpath
     cache_path.atomic_write(JSON.dump(@db))
   end
 
@@ -47,6 +48,28 @@ class CacheStoreDatabase
   # @return [Boolean]
   def created?
     cache_path.exist?
+  end
+
+  # Returns the modification time of the cache file (if it already exists).
+  #
+  # @return [Time]
+  def mtime
+    return unless created?
+    cache_path.mtime
+  end
+
+  # Performs a `select` on the underlying database.
+  #
+  # @return [Array]
+  def select(&block)
+    db.select(&block)
+  end
+
+  # Returns `true` if the cache is empty.
+  #
+  # @return [Boolean]
+  def empty?
+    db.empty?
   end
 
   private
@@ -84,7 +107,7 @@ end
 
 #
 # `CacheStore` provides methods to mutate and fetch data from a persistent
-# storage mechanism
+# storage mechanism.
 #
 class CacheStore
   # @param  [CacheStoreDatabase] database
@@ -105,14 +128,14 @@ class CacheStore
   # stored
   #
   # @abstract
-  def fetch_type(*)
+  def fetch(*)
     raise NotImplementedError
   end
 
   # Deletes data from the cache based on a condition defined in a concrete class
   #
   # @abstract
-  def flush_cache!
+  def delete!(*)
     raise NotImplementedError
   end
 

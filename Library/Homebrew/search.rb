@@ -1,4 +1,5 @@
 require "searchable"
+require "description_cache_store"
 
 module Homebrew
   module Search
@@ -14,7 +15,10 @@ module Homebrew
 
     def search_descriptions(string_or_regex)
       ohai "Formulae"
-      Descriptions.search(string_or_regex, :desc).print
+      CacheStoreDatabase.use(:descriptions) do |db|
+        cache_store = DescriptionCacheStore.new(db)
+        Descriptions.search(string_or_regex, :desc, cache_store).print
+      end
     end
 
     def search_taps(query, silent: false)
@@ -33,9 +37,9 @@ module Homebrew
 
       matches = begin
         GitHub.search_code(
-          user: "Homebrew",
-          path: ["Formula", "Casks", "."],
-          filename: query,
+          user:      "Homebrew",
+          path:      ["Formula", "Casks", "."],
+          filename:  query,
           extension: "rb",
         )
       rescue GitHub::Error => error

@@ -28,7 +28,7 @@ module UnpackStrategy
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
       system_command! AIR_APPLICATION_INSTALLER,
-                      args: ["-silent", "-location", unpack_dir, path],
+                      args:    ["-silent", "-location", unpack_dir, path],
                       verbose: verbose
     end
   end

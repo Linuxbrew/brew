@@ -3,7 +3,7 @@
 #:
 #:    Options for the `install` command are also valid here.
 #:
-#:    If `--cleanup` is specified or `HOMEBREW_UPGRADE_CLEANUP` is set then remove
+#:    If `--cleanup` is specified or `HOMEBREW_INSTALL_CLEANUP` is set then remove
 #:    previously installed version(s) of upgraded <formulae>.
 #:
 #:    If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
@@ -91,8 +91,8 @@ module Homebrew
   def upgrade_formulae(formulae_to_install)
     return if formulae_to_install.empty?
 
-    # Sort keg_only before non-keg_only formulae to avoid any needless conflicts
-    # with outdated, non-keg_only versions of formulae being upgraded.
+    # Sort keg-only before non-keg-only formulae to avoid any needless conflicts
+    # with outdated, non-keg-only versions of formulae being upgraded.
     formulae_to_install.sort! do |a, b|
       if !a.keg_only? && b.keg_only?
         1
@@ -107,7 +107,7 @@ module Homebrew
       Migrator.migrate_if_needed(f)
       begin
         upgrade_formula(f)
-        next if !ARGV.include?("--cleanup") && !ENV["HOMEBREW_UPGRADE_CLEANUP"]
+        next if !ARGV.include?("--cleanup") && !ENV["HOMEBREW_UPGRADE_CLEANUP"] && !ENV["HOMEBREW_INSTALL_CLEANUP"]
         next unless f.installed?
 
         Cleanup.new.cleanup_formula(f)

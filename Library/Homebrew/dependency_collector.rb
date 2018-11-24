@@ -79,6 +79,10 @@ class DependencyCollector
     Dependency.new("bzip2", tags) unless which("bzip2")
   end
 
+  def java_dep_if_needed(tags)
+    JavaRequirement.new(tags)
+  end
+
   def ld64_dep_if_needed(*); end
 
   def self.tar_needs_xz_dependency?
@@ -116,15 +120,17 @@ class DependencyCollector
 
   def parse_symbol_spec(spec, tags)
     case spec
-    when :x11        then X11Requirement.new(spec.to_s, tags)
-    when :xcode      then XcodeRequirement.new(tags)
-    when :linux      then LinuxRequirement.new(tags)
-    when :macos      then MacOSRequirement.new(tags)
-    when :arch       then ArchRequirement.new(tags)
-    when :java       then JavaRequirement.new(tags)
-    when :osxfuse    then OsxfuseRequirement.new(tags)
-    when :tuntap     then TuntapRequirement.new(tags)
-    when :ld64       then ld64_dep_if_needed(tags)
+    when :arch          then ArchRequirement.new(tags)
+    when :codesign      then CodesignRequirement.new(tags)
+    when :java          then java_dep_if_needed(tags)
+    when :linux         then LinuxRequirement.new(tags)
+    when :macos         then MacOSRequirement.new(tags)
+    when :maximum_macos then MaximumMacOSRequirement.new(tags)
+    when :osxfuse       then OsxfuseRequirement.new(tags)
+    when :tuntap        then TuntapRequirement.new(tags)
+    when :x11           then X11Requirement.new(tags)
+    when :xcode         then XcodeRequirement.new(tags)
+    when :ld64          then ld64_dep_if_needed(tags)
     else
       raise ArgumentError, "Unsupported special dependency #{spec.inspect}"
     end

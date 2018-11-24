@@ -3,11 +3,25 @@
 
 require "formula"
 require "tab"
+require "cli_parser"
 
 module Homebrew
   module_function
 
+  def leaves_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `leaves`
+
+        Show installed formulae that are not dependencies of another installed formula.
+      EOS
+      switch :debug
+    end
+  end
+
   def leaves
+    leaves_args.parse
+
     installed = Formula.installed.sort
 
     deps_of_installed = installed.flat_map do |f|

@@ -8,7 +8,12 @@ describe "brew bottle", :integration_test do
       (HOMEBREW_CELLAR/"patchelf/1.0/bin").mkpath
 
       expect { brew "bottle", "--no-rebuild", testball }
-        .to output(/Formula not from core or any taps/).to_stderr
+        .to output(/Formula not from core or any installed taps/).to_stderr
+        .and not_to_output.to_stdout
+        .and be_a_failure
+
+      expect { brew "bottle", "--root-url" }
+        .to output(/missing argument: --root-url/).to_stderr
         .and not_to_output.to_stdout
         .and be_a_failure
 

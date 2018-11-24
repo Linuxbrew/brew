@@ -5,10 +5,10 @@ module Hardware
             features, sse4?
 
       PPC_OPTIMIZATION_FLAGS = {
-        g3: "-mcpu=750",
-        g4: "-mcpu=7400",
-        g4e: "-mcpu=7450",
-        g5: "-mcpu=970",
+        g3:    "-mcpu=750",
+        g4:    "-mcpu=7400",
+        g4e:   "-mcpu=7450",
+        g5:    "-mcpu=970",
         g5_64: "-mcpu=970 -arch ppc64",
       }.freeze
 
@@ -94,7 +94,7 @@ module Hardware
       # Determines whether the current CPU and macOS combination
       # can run an executable of the specified architecture.
       # `arch` is a symbol in the same format returned by
-      # Hardware::CPU.family
+      # {Hardware::CPU.family}.
       def can_run?(arch)
         if Hardware::CPU.intel?
           intel_can_run? arch

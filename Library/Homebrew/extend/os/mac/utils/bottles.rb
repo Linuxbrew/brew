@@ -26,7 +26,9 @@ module Utils
       alias generic_find_matching_tag find_matching_tag
 
       def find_matching_tag(tag)
-        generic_find_matching_tag(tag) || find_altivec_tag(tag) || find_or_later_tag(tag)
+        generic_find_matching_tag(tag) ||
+          find_altivec_tag(tag) ||
+          find_older_compatible_tag(tag)
       end
 
       # This allows generic Altivec PPC bottles to be supported in some
@@ -40,9 +42,12 @@ module Utils
         altivec_tag if key?(altivec_tag)
       end
 
-      # Allows a bottle tag to specify a specific OS or later,
-      # so the same bottle can target multiple OSs.
-      def find_or_later_tag(tag)
+      def tag_without_or_later(tag)
+        tag
+      end
+
+      # Find a bottle built for a previous version of macOS.
+      def find_older_compatible_tag(tag)
         begin
           tag_version = MacOS::Version.from_symbol(tag)
         rescue ArgumentError
@@ -50,26 +55,13 @@ module Utils
         end
 
         keys.find do |key|
-          if key.to_s.end_with?("_or_later")
-            later_tag = key.to_s[/(\w+)_or_later$/, 1].to_sym
-            MacOS::Version.from_symbol(later_tag) <= tag_version
-          elsif ARGV.force_bottle?
-            true
-          # Allow prerelease versions to act as if all bottles are `_or_later`
-          # so that they don't need to wait for us to bottle everything for the
-          # new release.
-          elsif install_older_prerelease_bottles?
-            true
+          key_tag_version = tag_without_or_later(key)
+          begin
+            MacOS::Version.from_symbol(key_tag_version) <= tag_version
+          rescue ArgumentError
+            false
           end
         end
-      end
-
-      def install_older_prerelease_bottles?
-        return false unless OS::Mac.prerelease?
-        return true if ENV["HOMEBREW_INSTALL_OLDER_PRERELEASE_BOTTLES"]
-        return false if ENV["HOMEBREW_NO_INSTALL_OLDER_PRERELEASE_BOTTLES"]
-
-        !ARGV.homebrew_developer?
       end
     end
   end

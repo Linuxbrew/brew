@@ -42,9 +42,9 @@ def curl(*args)
   # SSL_CERT_FILE can be incorrectly set by users or portable-ruby and screw
   # with SSL downloads so unset it here.
   system_command! curl_executable,
-                  args: curl_args(*args),
+                  args:         curl_args(*args),
                   print_stdout: true,
-                  env: { "SSL_CERT_FILE" => nil }
+                  env:          { "SSL_CERT_FILE" => nil }
 end
 
 def curl_download(*args, to: nil, **options)
@@ -65,7 +65,7 @@ end
 
 def curl_output(*args, **options)
   system_command(curl_executable,
-                 args: curl_args(*args, show_output: true, **options),
+                 args:         curl_args(*args, show_output: true, **options),
                  print_stderr: false)
 end
 
@@ -175,10 +175,10 @@ def curl_http_content_headers_and_checksum(url, hash_needed: false, user_agent: 
   {
     url: url,
     final_url: final_url,
-    status: status_code,
-    etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
+    status:         status_code,
+    etag:           headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
     content_length: headers[/Content-Length: (\d+)/, 1],
-    file_hash: output_hash,
-    file: output,
+    file_hash:      output_hash,
+    file:           output,
   }
 end

@@ -152,16 +152,16 @@ module Homebrew
 
     def clean!
       if args.empty?
-        cleanup_lockfiles
         Formula.installed.sort_by(&:name).each do |formula|
           cleanup_formula(formula)
         end
         cleanup_cache
         cleanup_logs
         cleanup_portable_ruby
+        cleanup_lockfiles
         return if dry_run?
 
-        cleanup_linkage_db
+        cleanup_old_cache_db
         rm_ds_store
       else
         args.each do |arg|
@@ -221,14 +221,27 @@ module Homebrew
       return if dry_run?
       return unless (cache/"downloads").directory?
 
-      # We can't use `.reject(&:incomplete?) here due to the refinement scope.
-      downloads = (cache/"downloads").children.reject { |path| path.incomplete? } # rubocop:disable Style/SymbolProc
+      downloads = (cache/"downloads").children
+
       referenced_downloads = [cache, cache/"Cask"].select(&:directory?)
                                                   .flat_map(&:children)
                                                   .select(&:symlink?)
                                                   .map(&:resolved_path)
 
-      (downloads - referenced_downloads).each(&:unlink)
+      (downloads - referenced_downloads).each do |download|
+        if download.incomplete?
+          begin
+            LockFile.new(download.basename).with_lock do
+              download.unlink
+            end
+          rescue OperationInProgressError
+            # Skip incomplete downloads which are still in progress.
+            next
+          end
+        else
+          download.unlink
+        end
+      end
     end
 
     def cleanup_cache(entries = nil)
@@ -325,8 +338,12 @@ module Homebrew
       end
     end
 
-    def cleanup_linkage_db
-      FileUtils.rm_rf [cache/"linkage.db", cache/"linkage.db.db"]
+    def cleanup_old_cache_db
+      FileUtils.rm_rf [
+        cache/"desc_cache.json",
+        cache/"linkage.db",
+        cache/"linkage.db.db",
+      ]
     end
 
     def rm_ds_store(dirs = nil)
@@ -337,7 +354,7 @@ module Homebrew
       end
       dirs.select(&:directory?).each.parallel do |dir|
         system_command "find",
-          args: [dir, "-name", ".DS_Store", "-delete"],
+          args:         [dir, "-name", ".DS_Store", "-delete"],
           print_stderr: false
       end
     end
