@@ -92,6 +92,11 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
     return "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
   end
 
+  if url.start_with?("https://") && ENV["HOMEBREW_NO_INSECURE_REDIRECT"] &&
+     !details[:final_url].start_with?("https://")
+    return "The URL #{url} redirects back to HTTP"
+  end
+
   return unless hash_needed
 
   secure_url = url.sub "http", "https"
@@ -110,7 +115,9 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
     details[:content_length] == secure_details[:content_length]
   file_match = details[:file_hash] == secure_details[:file_hash]
 
-  if etag_match || content_length_match || file_match
+  if (etag_match || content_length_match || file_match) &&
+     secure_details[:final_url].start_with?("https://") &&
+     url.start_with?("http://")
     return "The URL #{url} should use HTTPS rather than HTTP"
   end
 
@@ -121,7 +128,9 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
   secure_details[:file] = secure_details[:file].gsub(no_protocol_file_contents, "/")
 
   # Check for the same content after removing all protocols
-  if details[:file] == secure_details[:file]
+  if (details[:file] == secure_details[:file]) &&
+     secure_details[:final_url].start_with?("https://") &&
+     url.start_with?("http://")
     return "The URL #{url} should use HTTPS rather than HTTP"
   end
 
@@ -150,11 +159,16 @@ def curl_http_content_headers_and_checksum(url, hash_needed: false, user_agent: 
   while status_code == :unknown || status_code.to_s.start_with?("3")
     headers, _, output = output.partition("\r\n\r\n")
     status_code = headers[%r{HTTP\/.* (\d+)}, 1]
+    final_url = headers[/^Location:\s*(.*)$/i, 1]&.chomp
   end
 
   output_hash = Digest::SHA256.digest(output) if hash_needed
 
+  final_url ||= url
+
   {
+    url:            url,
+    final_url:      final_url,
     status:         status_code,
     etag:           headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
     content_length: headers[/Content-Length: (\d+)/, 1],

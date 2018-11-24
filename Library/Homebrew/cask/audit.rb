@@ -1,6 +1,7 @@
 require "cask/checkable"
 require "cask/download"
 require "digest"
+require "utils/curl"
 require "utils/git"
 
 module Cask
@@ -30,6 +31,7 @@ module Cask
       check_generic_artifacts
       check_token_conflicts
       check_download
+      check_https_availability
       check_single_pre_postflight
       check_single_uninstall_zap
       check_untrusted_pkg
@@ -316,6 +318,20 @@ module Cask
       Verify.all(cask, downloaded_path)
     rescue => e
       add_error "download not possible: #{e.message}"
+    end
+
+    def check_https_availability
+      return unless download
+      if !cask.url.blank? && !cask.url.using
+        check_url_for_https_availability(cask.url, user_agents: [cask.url.user_agent])
+      end
+      check_url_for_https_availability(cask.appcast) unless cask.appcast.blank?
+      check_url_for_https_availability(cask.homepage) unless cask.homepage.blank?
+    end
+
+    def check_url_for_https_availability(url_to_check, user_agents: [:default])
+      problem = curl_check_http_content(url_to_check.to_s, user_agents: user_agents)
+      add_error problem if problem
     end
   end
 end

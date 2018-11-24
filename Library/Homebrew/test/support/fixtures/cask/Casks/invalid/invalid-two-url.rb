@@ -4,7 +4,7 @@ cask 'invalid-two-url' do
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
   url 'https://example.com/caffeine.zip'
-  homepage 'https://example.com/local-caffeine'
+  homepage 'https://example.com'
 
   app 'Caffeine.app'
 end
