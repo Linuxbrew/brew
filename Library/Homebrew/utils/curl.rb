@@ -116,8 +116,9 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
   file_match = details[:file_hash] == secure_details[:file_hash]
 
   if (etag_match || content_length_match || file_match) &&
-     secure_details[:final_url].start_with?("https://")
-    return "The URL #{url} should use HTTPS rather than HTTP" if url.start_with?("http://")
+     secure_details[:final_url].start_with?("https://") &&
+     url.start_with?("http://")
+    return "The URL #{url} should use HTTPS rather than HTTP"
   end
 
   return unless check_content
@@ -128,8 +129,9 @@ def curl_check_http_content(url, user_agents: [:default], check_content: false, 
 
   # Check for the same content after removing all protocols
   if (details[:file] == secure_details[:file]) &&
-     secure_details[:final_url].start_with?("https://")
-    return "The URL #{url} should use HTTPS rather than HTTP" if url.start_with?("http://")
+     secure_details[:final_url].start_with?("https://") &&
+     url.start_with?("http://")
+    return "The URL #{url} should use HTTPS rather than HTTP"
   end
 
   return unless strict
@@ -157,8 +159,7 @@ def curl_http_content_headers_and_checksum(url, hash_needed: false, user_agent: 
   while status_code == :unknown || status_code.to_s.start_with?("3")
     headers, _, output = output.partition("\r\n\r\n")
     status_code = headers[%r{HTTP\/.* (\d+)}, 1]
-    location = headers[/^Location:\s*(.*)$/i, 1]
-    final_url = location.chomp if location
+    final_url = headers[/^Location:\s*(.*)$/i, 1]&.chomp
   end
 
   output_hash = Digest::SHA256.digest(output) if hash_needed

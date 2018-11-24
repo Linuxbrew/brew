@@ -322,7 +322,7 @@ module Cask
 
     def check_https_availability
       return unless download
-      unless cask.url.blank? || cask.url.using
+      if !cask.url.blank? && !cask.url.using
         check_url_for_https_availability(cask.url, user_agents: [cask.url.user_agent])
       end
       check_url_for_https_availability(cask.appcast) unless cask.appcast.blank?
@@ -331,7 +331,7 @@ module Cask
 
     def check_url_for_https_availability(url_to_check, user_agents: [:default])
       problem = curl_check_http_content(url_to_check.to_s, user_agents: user_agents)
-      add_error problem unless problem.nil?
+      add_error problem if problem
     end
   end
 end
