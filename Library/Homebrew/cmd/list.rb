@@ -25,20 +25,46 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def list
-    Homebrew::CLI::Parser.parse do
-      switch "--unbrewed"
-      switch "--pinned"
-      switch "--versions"
-      switch "--full-name"
-      switch "--multiple", depends_on: "--versions"
-      switch :verbose
+  def list_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `list`, `ls` [<options>] [`-1`] [`-l`] [`-t`] [`-r`]
+
+        List all installed formulae.
+      EOS
+      switch "--full-name",
+        description: "Print formulae with fully-qualified names.  If `--full-name` is not "\
+                     "passed, other options (i.e. `-1`, `-l`, `-t` and `-r`) are passed to `ls` "\
+                     "which produces the actual output."
+      switch "--unbrewed",
+        description: "List all files in the Homebrew prefix not installed by Homebrew."
+      switch "--versions",
+        description: "Show the version number for installed formulae, or only the specified "\
+                     "formulae if <formulae> are given."
+      switch "--multiple",
+        depends_on:  "--versions",
+        description: "Only show formulae with multiple versions installed."
+      switch "--pinned",
+        description: "Show the versions of pinned formulae, or only the specified (pinned) "\
+                     "formulae if <formulae> are given. See also `pin`, `unpin`."
       # passed through to ls
-      switch "-1"
-      switch "-l"
-      switch "-t"
-      switch "-r"
+      switch "-1",
+        description: "Force output to be one entry per line. " \
+                     "This is the default when output is not to a terminal."
+      switch "-l",
+        description: "List in long format. If the output is to a terminal, "\
+                     "a total sum for all the file sizes is output on a line before the long listing."
+      switch "-r",
+        description: "Reverse the order of the sort to get the oldest entries first."
+      switch "-t",
+        description: "Sort by time modified (most recently modified first)."
+      switch :verbose
+      switch :debug
     end
+  end
+
+  def list
+    list_args.parse
 
     # Use of exec means we don't explicitly exit
     list_unbrewed if args.unbrewed?

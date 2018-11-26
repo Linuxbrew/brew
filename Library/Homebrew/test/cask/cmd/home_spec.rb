@@ -8,13 +8,13 @@ describe Cask::Cmd::Home, :cask do
   it_behaves_like "a command that handles invalid options"
 
   it "opens the homepage for the specified Cask" do
-    expect(described_class).to receive(:open_url).with("https://example.com/local-caffeine")
+    expect(described_class).to receive(:open_url).with("https://example.com")
     described_class.run("local-caffeine")
   end
 
   it "works for multiple Casks" do
-    expect(described_class).to receive(:open_url).with("https://example.com/local-caffeine")
-    expect(described_class).to receive(:open_url).with("https://example.com/local-transmission")
+    expect(described_class).to receive(:open_url).with("https://example.com")
+    expect(described_class).to receive(:open_url).with("https://example.com")
     described_class.run("local-caffeine", "local-transmission")
   end
 

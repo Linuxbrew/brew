@@ -1,7 +1,5 @@
 inherit_from: ./.rubocop_shared.yml
 
-# Cask Cops
-
 Cask/HomepageMatchesUrl:
   Description: 'Ensure that the homepage and url match, otherwise add a comment. More info at https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/url.md#when-url-and-homepage-hostnames-differ-add-a-comment'
   Enabled: true
@@ -22,8 +20,6 @@ Cask/StanzaOrder:
   Description: 'Ensure that cask stanzas are sorted correctly. More info at https://github.com/Homebrew/homebrew-cask/blob/master/CONTRIBUTING.md#stanza-order'
   Enabled: true
 
-# Built-In Cops
-
 Layout/AlignHash:
   EnforcedHashRocketStyle: table
   EnforcedColonStyle: table
@@ -34,63 +30,34 @@ Layout/IndentArray:
 Layout/IndentHash:
   EnforcedStyle: align_braces
 
-Metrics/BlockLength:
-  Enabled: false
-
+# Casks often contain long URLs and file paths.
 Metrics/LineLength:
   Enabled: false
 
-Naming/FileName:
-  Enabled: false
-
-Naming/HeredocDelimiterNaming:
-  Blacklist:
-    - END, EOD, EOF
-
-Performance/StringReplacement:
-  Enabled: false
-
-Style/BarePercentLiterals:
-  EnforcedStyle: percent_q
-
+# Casks don't need documentation.
 Style/Documentation:
   Enabled: false
 
-Style/EmptyElse:
-  Enabled: false
-
+# These would only be distracting in casks.
 Style/FrozenStringLiteralComment:
-  Enabled: false
+  EnforcedStyle: never
 
+# Don't use hash rockets.
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
 
-Style/IfUnlessModifier:
-  Enabled: false
-
-Style/PercentLiteralDelimiters:
-  PreferredDelimiters:
-    '%':  '{}'
-    '%i': '{}'
-    '%q': '{}'
-    '%Q': '{}'
-    '%r': '{}'
-    '%s': '()'
-    '%w': '[]'
-    '%W': '[]'
-    '%x': '()'
-
+# This is more readable when the regex contains slashes.
 Style/RegexpLiteral:
   EnforcedStyle: percent_r
 
-Style/SymbolArray:
-  EnforcedStyle: brackets
-
-Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: comma
-
-Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: comma
-
+# Use consistent style for all arrays.
 Style/WordArray:
   EnforcedStyle: brackets
+
+# This makes multi-line arrays more readable and alignable.
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
+
+# This makes multi-line hashes more readable and alignable.
+Layout/FirstHashElementLineBreak:
+  Enabled: true
