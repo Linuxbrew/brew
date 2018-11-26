@@ -266,6 +266,11 @@ EOS
     then
       git checkout --force "$UPSTREAM_BRANCH" "${QUIET_ARGS[@]}"
     else
+      if [[ -n "$UPSTREAM_TAG" && "$UPSTREAM_BRANCH" != "master" ]]
+      then
+        git checkout --force -B "master" "origin/master" "${QUIET_ARGS[@]}"
+      fi
+
       git checkout --force -B "$UPSTREAM_BRANCH" "$REMOTE_REF" "${QUIET_ARGS[@]}"
     fi
   fi
