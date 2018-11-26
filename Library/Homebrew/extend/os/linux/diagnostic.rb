@@ -40,12 +40,13 @@ module Homebrew
         return if ENV["XDG_DATA_DIRS"].blank?
         return if ENV["XDG_DATA_DIRS"].split("/").include?(HOMEBREW_PREFIX/"share")
 
+        xdg_data_dirs = (HOMEBREW_PREFIX/"share").to_s + ":" + ENV["XDG_DATA_DIRS"]
         <<~EOS
           Homebrew's share was not found in your XDG_DATA_DIRS but you have
           this variable set to include other locations.
           Some programs like `vapigen` may not work correctly.
           Consider adding Homebrew's share directory to XDG_DATA_DIRS like so:
-            #{Utils::Shell.prepend_variable_in_profile("XDG_DATA_DIRS", HOMEBREW_PREFIX/"share")}
+            #{Utils::Shell.set_variable_in_profile("XDG_DATA_DIRS", xdg_data_dirs)}
         EOS
       end
 
