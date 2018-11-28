@@ -24,10 +24,10 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/i
 Follow the *Next steps* instructions to add Linuxbrew to your `PATH` and to your bash shell profile script, either `~/.profile` on Debian/Ubuntu or `~/.bash_profile` on CentOS/Fedora/RedHat.
 
 ```sh
-test -d ~/.linuxbrew && PATH="$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH"
-test -d /home/linuxbrew/.linuxbrew && PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
-test -r ~/.bash_profile && echo "export PATH='$(brew --prefix)/bin:$(brew --prefix)/sbin'":'"$PATH"' >>~/.bash_profile
-echo "export PATH='$(brew --prefix)/bin:$(brew --prefix)/sbin'":'"$PATH"' >>~/.profile
+test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
+test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
+echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
 ```
 
 You're done! Try installing a package:
@@ -36,24 +36,22 @@ You're done! Try installing a package:
 brew install hello
 ```
 
-If you're using an older distribution of Linux, installing your first package will also install a recent version of `gcc`.
+If you're using an older distribution of Linux, installing your first package will also install a recent version of `glibc` and `gcc`.
 
 Use `brew doctor` to troubleshoot common issues.
 
-Features
---------
+## Features
 
 + Can install software to a home directory and so does not require sudo
 + Install software not packaged by the native distribution
 + Install up-to-date versions of software when the native distribution is old
 + Use the same package manager to manage both your Mac and Linux machines
 
-Dependencies
-------------
+## Dependencies
 
 + **GCC** 4.4 or newer
-+ **Linux** 2.6.16 or newer
-+ **Glibc** 2.12 or newer (2.19 or newer to be able to use bottles)
++ **Linux** 2.6.32 or newer
++ **Glibc** 2.12 or newer
 + **64-bit x86** or **32-bit ARM** (Raspberry Pi)
 
 Paste at a Terminal prompt:
@@ -80,25 +78,19 @@ sudo yum groupinstall 'Development Tools' && sudo yum install curl file git
 
 Linuxbrew does not currently support 32-bit x86 platforms. It would be possible for Linuxbrew to work on 32-bit x86 platforms with some effort. Pull requests would be welcome if someone were to volunteer to maintain the 32-bit x86 support.
 
-Bottles
--------
+## Bottles
 
-Bottles are Linuxbrew's precompiled binary packages. Linuxbrew bottles work on any Linux system. They do however require `glibc` 2.19 or better. On systems with an older version of `glibc` (at least 2.12), Linuxbrew will install `glibc` the first time that you install a bottled formula. If you prefer to use the `glibc` provided by your system and build all formulas from source, add to your `.bashrc` or `.zshrc`:
-
-`export HOMEBREW_BUILD_FROM_SOURCE=1`
+Bottles are Linuxbrew's precompiled binary packages. Linuxbrew bottles work on any Linux system. If you're using an older distribution of Linux, installing your first package will also install a recent version of `glibc` and `gcc`.
 
 ## Alternative Installation
 
-Extract (or `git clone`) Linuxbrew wherever you want. Use `/home/linuxbrew/.linuxbrew` if possible.
+Extract or `git clone` Linuxbrew wherever you want. Use `/home/linuxbrew/.linuxbrew` if possible.
 
 ```sh
-git clone https://github.com/Linuxbrew/brew.git ~/.linuxbrew
-```
-
-```sh
-PATH="$HOME/.linuxbrew/bin:$PATH"
-export MANPATH="$(brew --prefix)/share/man:$MANPATH"
-export INFOPATH="$(brew --prefix)/share/info:$INFOPATH"
+git clone https://github.com/Linuxbrew/brew ~/.linuxbrew/Homebrew
+mkdir ~/.linuxbrew/bin
+ln -s ../Homebrew/bin/brew ~/.linuxbrew/bin
+eval $(~/.linuxbrew/bin/brew shellenv)
 ```
 
 ## What Packages Are Available?
