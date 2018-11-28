@@ -77,11 +77,11 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
         cask 'foo' do
           version :latest
           sha256 :no_check
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
 
           name 'Foo'
 
-          homepage 'https://foo.example.com'
+          homepage 'https://foo.brew.sh'
 
           app 'Foo.app'
           uninstall :quit => 'com.example.foo',
@@ -95,9 +95,9 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
           version :latest
           sha256 :no_check
 
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
-          homepage 'https://foo.example.com'
+          homepage 'https://foo.brew.sh'
 
           app 'Foo.app'
 
@@ -112,7 +112,7 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
         severity: :convention,
         line:     4,
         column:   0,
-        source:   "  url 'https://foo.example.com/foo.zip'",
+        source:   "  url 'https://foo.brew.sh/foo.zip'",
       }, {
         message:  extra_line_msg,
         severity: :convention,
@@ -145,7 +145,7 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
         cask 'foo' do
           version :latest
           sha256 :no_check
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
           app 'Foo.app'
           %{caveats}
@@ -158,7 +158,7 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
           version :latest
           sha256 :no_check
 
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
 
           app 'Foo.app'
@@ -209,7 +209,7 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
         cask 'foo' do
           version :latest
           sha256 :no_check
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
           app 'Foo.app'
           postflight do
@@ -224,7 +224,7 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
           version :latest
           sha256 :no_check
 
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
 
           app 'Foo.app'
@@ -251,7 +251,7 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
           postflight do
             puts 'We have liftoff!'
           end
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
           app 'Foo.app'
         end
@@ -270,7 +270,7 @@ describe RuboCop::Cop::Cask::StanzaGrouping do
             puts 'We have liftoff!'
           end
 
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
 
           app 'Foo.app'

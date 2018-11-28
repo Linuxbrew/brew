@@ -244,7 +244,7 @@ describe Version do
 
   describe "::parse" do
     it "returns a NULL version when the URL cannot be parsed" do
-      expect(described_class.parse("https://example.com/blah.tar")).to be_null
+      expect(described_class.parse("https://brew.sh/blah.tar")).to be_null
       expect(described_class.parse("foo")).to be_null
     end
   end
@@ -267,17 +267,17 @@ describe Version do
 
     specify "version all dots" do
       expect(described_class.create("1.14"))
-        .to be_detected_from("https://example.com/foo.bar.la.1.14.zip")
+        .to be_detected_from("https://brew.sh/foo.bar.la.1.14.zip")
     end
 
     specify "version underscore separator" do
       expect(described_class.create("1.1"))
-        .to be_detected_from("https://example.com/grc_1.1.tar.gz")
+        .to be_detected_from("https://brew.sh/grc_1.1.tar.gz")
     end
 
     specify "boost version style" do
       expect(described_class.create("1.39.0"))
-        .to be_detected_from("https://example.com/boost_1_39_0.tar.bz2")
+        .to be_detected_from("https://brew.sh/boost_1_39_0.tar.bz2")
     end
 
     specify "erlang version style" do
@@ -340,27 +340,27 @@ describe Version do
 
     specify "version internal dash" do
       expect(described_class.create("1.1-2"))
-        .to be_detected_from("https://example.com/foo-arse-1.1-2.tar.gz")
+        .to be_detected_from("https://brew.sh/foo-arse-1.1-2.tar.gz")
     end
 
     specify "version single digit" do
       expect(described_class.create("45"))
-        .to be_detected_from("https://example.com/foo_bar.45.tar.gz")
+        .to be_detected_from("https://brew.sh/foo_bar.45.tar.gz")
     end
 
     specify "noseparator single digit" do
       expect(described_class.create("45"))
-        .to be_detected_from("https://example.com/foo_bar45.tar.gz")
+        .to be_detected_from("https://brew.sh/foo_bar45.tar.gz")
     end
 
     specify "version developer that hates us format" do
       expect(described_class.create("1.2.3"))
-        .to be_detected_from("https://example.com/foo-bar-la.1.2.3.tar.gz")
+        .to be_detected_from("https://brew.sh/foo-bar-la.1.2.3.tar.gz")
     end
 
     specify "version regular" do
       expect(described_class.create("1.21"))
-        .to be_detected_from("https://example.com/foo_bar-1.21.tar.gz")
+        .to be_detected_from("https://brew.sh/foo_bar-1.21.tar.gz")
     end
 
     specify "version sourceforge download" do
@@ -382,7 +382,7 @@ describe Version do
 
     specify "yet another version" do
       expect(described_class.create("0.15.1b"))
-        .to be_detected_from("https://example.com/mad-0.15.1b.tar.gz")
+        .to be_detected_from("https://brew.sh/mad-0.15.1b.tar.gz")
     end
 
     specify "lame version style" do
@@ -472,7 +472,7 @@ describe Version do
 
     specify "date-based version style" do
       expect(described_class.create("2017-04-17"))
-        .to be_detected_from("https://example.com/dada-v2017-04-17.tar.gz")
+        .to be_detected_from("https://brew.sh/dada-v2017-04-17.tar.gz")
     end
 
     specify "devel spec version style" do

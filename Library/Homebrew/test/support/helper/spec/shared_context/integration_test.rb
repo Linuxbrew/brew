@@ -130,7 +130,7 @@ RSpec.shared_context "integration test" do
       end
       content = <<~RUBY
         desc "Some test"
-        homepage "https://example.com/#{name}"
+        homepage "https://brew.sh/#{name}"
         url "file://#{tarball}"
         sha256 "#{tarball.sha256}"
 
@@ -151,16 +151,16 @@ RSpec.shared_context "integration test" do
       RUBY
     when "foo"
       content = <<~RUBY
-        url "https://example.com/#{name}-1.0"
+        url "https://brew.sh/#{name}-1.0"
       RUBY
     when "bar"
       content = <<~RUBY
-        url "https://example.com/#{name}-1.0"
+        url "https://brew.sh/#{name}-1.0"
         depends_on "foo"
       RUBY
     when "patchelf"
       content = <<~RUBY
-        url "https://example.com/#{name}-1.0"
+        url "https://brew.sh/#{name}-1.0"
       RUBY
     end
 

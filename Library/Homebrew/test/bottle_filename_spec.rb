@@ -45,7 +45,7 @@ describe Bottle::Filename do
 
     let(:f) {
       formula do
-        url "https://example.com/foo.tar.gz"
+        url "https://brew.sh/foo.tar.gz"
         version "1.0"
       end
     }

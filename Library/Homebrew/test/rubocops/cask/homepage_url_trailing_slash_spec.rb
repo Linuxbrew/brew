@@ -10,7 +10,7 @@ describe RuboCop::Cop::Cask::HomepageUrlTrailingSlash do
     let(:source) do
       <<-CASK.undent
         cask 'foo' do
-          homepage 'https://foo.example.com/'
+          homepage 'https://foo.brew.sh/'
         end
       CASK
     end
@@ -22,7 +22,7 @@ describe RuboCop::Cop::Cask::HomepageUrlTrailingSlash do
     let(:source) do
       <<-CASK.undent
         cask 'foo' do
-          homepage 'https://foo.example.com/path'
+          homepage 'https://foo.brew.sh/path'
         end
       CASK
     end
@@ -34,25 +34,25 @@ describe RuboCop::Cop::Cask::HomepageUrlTrailingSlash do
     let(:source) do
       <<-CASK.undent
         cask 'foo' do
-          homepage 'https://foo.example.com'
+          homepage 'https://foo.brew.sh'
         end
       CASK
     end
     let(:correct_source) do
       <<-CASK.undent
         cask 'foo' do
-          homepage 'https://foo.example.com/'
+          homepage 'https://foo.brew.sh/'
         end
       CASK
     end
     let(:expected_offenses) do
       [{
-        message:  "'https://foo.example.com' must have a slash "\
+        message:  "'https://foo.brew.sh' must have a slash "\
                  "after the domain.",
         severity: :convention,
         line:     2,
         column:   11,
-        source:   "'https://foo.example.com'",
+        source:   "'https://foo.brew.sh'",
       }]
     end
 

@@ -17,7 +17,7 @@ describe Formula do
   describe "::new" do
     let(:klass) do
       Class.new(described_class) do
-        url "https://example.com/foo-1.0.tar.gz"
+        url "https://brew.sh/foo-1.0.tar.gz"
       end
     end
 
@@ -510,22 +510,22 @@ describe Formula do
 
   specify "spec integration" do
     f = formula do
-      homepage "https://example.com"
+      homepage "https://brew.sh"
 
-      url "https://example.com/test-0.1.tbz"
+      url "https://brew.sh/test-0.1.tbz"
       mirror "https://example.org/test-0.1.tbz"
       sha256 TEST_SHA256
 
-      head "https://example.com/test.git", tag: "foo"
+      head "https://brew.sh/test.git", tag: "foo"
 
       devel do
-        url "https://example.com/test-0.2.tbz"
+        url "https://brew.sh/test-0.2.tbz"
         mirror "https://example.org/test-0.2.tbz"
         sha256 TEST_SHA256
       end
     end
 
-    expect(f.homepage).to eq("https://example.com")
+    expect(f.homepage).to eq("https://brew.sh")
     expect(f.version).to eq(Version.create("0.1"))
     expect(f).to be_stable
     expect(f.stable.version).to eq(Version.create("0.1"))

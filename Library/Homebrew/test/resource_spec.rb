@@ -57,7 +57,7 @@ describe Resource do
     end
 
     it "can detect the version from a URL" do
-      subject.url("https://example.com/foo-1.0.tar.gz")
+      subject.url("https://brew.sh/foo-1.0.tar.gz")
       expect(subject.version).to eq(Version.parse("1.0"))
       expect(subject.version).to be_detected_from_url
     end
@@ -70,7 +70,7 @@ describe Resource do
     end
 
     it "can set the version from a tag" do
-      subject.url("https://example.com/foo-1.0.tar.gz", tag: "v1.0.2")
+      subject.url("https://brew.sh/foo-1.0.tar.gz", tag: "v1.0.2")
       expect(subject.version).to eq(Version.parse("1.0.2"))
       expect(subject.version).to be_detected_from_url
     end
