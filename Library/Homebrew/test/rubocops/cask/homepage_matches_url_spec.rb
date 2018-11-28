@@ -10,8 +10,8 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
     let(:source) do
       <<-CASK.undent
         cask 'foo' do
-          url 'https://foo.example.com/foo.zip'
-          homepage 'https://foo.example.com'
+          url 'https://foo.brew.sh/foo.zip'
+          homepage 'https://foo.brew.sh'
         end
       CASK
     end
@@ -24,9 +24,9 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
     let(:source) do
       <<-CASK.undent
         cask 'foo' do
-          url 'https://foo.example.com/foo.zip',
-              referrer: 'https://example.com/foo/'
-          homepage 'https://foo.example.com'
+          url 'https://foo.brew.sh/foo.zip',
+              referrer: 'https://brew.sh/foo/'
+          homepage 'https://foo.brew.sh'
         end
       CASK
     end
@@ -40,9 +40,9 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
       <<-CASK.undent
         cask 'foo' do
           version '1.8.0_72,8.13.0.5'
-          url "https://foo.example.com/foo-\#{version.after_comma}-\#{version.minor}.\#{version.patch}.\#{version.before_comma.sub(\%r{.*_}, '')}.zip",
-              referrer: 'https://example.com/foo/'
-          homepage 'https://foo.example.com'
+          url "https://foo.brew.sh/foo-\#{version.after_comma}-\#{version.minor}.\#{version.patch}.\#{version.before_comma.sub(\%r{.*_}, '')}.zip",
+              referrer: 'https://brew.sh/foo/'
+          homepage 'https://foo.brew.sh'
         end
       CASK
     end
@@ -56,8 +56,8 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
       <<-CASK.undent
         cask 'foo' do
           # this is just a comment with information
-          url 'https://example.com/foo.zip'
-          homepage 'https://example.com'
+          url 'https://brew.sh/foo.zip'
+          homepage 'https://brew.sh'
         end
       CASK
     end
@@ -70,21 +70,21 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
     let(:source) do
       <<-CASK.undent
         cask 'foo' do
-          # foo.example.com was verified as official when first introduced to the cask
-          url 'https://foo.example.com/foo.zip'
-          homepage 'https://foo.example.com'
+          # foo.brew.sh was verified as official when first introduced to the cask
+          url 'https://foo.brew.sh/foo.zip'
+          homepage 'https://foo.brew.sh'
         end
       CASK
     end
     let(:expected_offenses) do
       [{
-        message:  "The URL's domain `foo.example.com` matches the homepage " \
-                 "`foo.example.com`, the comment above the `url` stanza is " \
+        message:  "The URL's domain `foo.brew.sh` matches the homepage " \
+                 "`foo.brew.sh`, the comment above the `url` stanza is " \
                  "unnecessary",
         severity: :convention,
         line:     2,
         column:   2,
-        source:   "# foo.example.com was verified as official when " \
+        source:   "# foo.brew.sh was verified as official when " \
                 "first introduced to the cask",
       }]
     end
@@ -98,22 +98,22 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
       let(:source) do
         <<-CASK.undent
           cask 'foo' do
-            # example.com was verified as official
-            url 'https://example.com/foo.zip'
+            # brew.sh was verified as official
+            url 'https://brew.sh/foo.zip'
             homepage 'https://foo.example.org'
           end
         CASK
       end
       let(:expected_offenses) do
         [{
-          message:  "`# example.com was verified as official` does not " \
+          message:  "`# brew.sh was verified as official` does not " \
                    "match the expected comment format. For details, see " \
                   "https://github.com/Homebrew/homebrew-cask/blob/master/doc/" \
                   "cask_language_reference/stanzas/url.md#when-url-and-homepage-hostnames-differ-add-a-comment",
           severity: :convention,
           line:     2,
           column:   2,
-          source:   "# example.com was verified as official",
+          source:   "# brew.sh was verified as official",
         }]
       end
 
@@ -125,8 +125,8 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
       let(:source) do
         <<-CASK.undent
           cask 'foo' do
-            # example.com was verified as official when first introduced to the cask
-            url 'https://example.com/foo.zip'
+            # brew.sh was verified as official when first introduced to the cask
+            url 'https://brew.sh/foo.zip'
             homepage 'https://foo.example.org'
           end
         CASK
@@ -139,8 +139,8 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
       let(:source) do
         <<-CASK.undent
           cask 'foo' do
-            # example.com/vendor/app was verified as official when first introduced to the cask
-            url 'https://downloads.example.com/vendor/app/foo.zip'
+            # brew.sh/vendor/app was verified as official when first introduced to the cask
+            url 'https://downloads.brew.sh/vendor/app/foo.zip'
             homepage 'https://vendor.example.org/app/'
           end
         CASK
@@ -153,19 +153,19 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
       let(:source) do
         <<-CASK.undent
           cask 'foo' do
-            # example.com was verified as official when first introduced to the cask
+            # brew.sh was verified as official when first introduced to the cask
             url 'https://example.org/foo.zip'
-            homepage 'https://foo.example.com'
+            homepage 'https://foo.brew.sh'
           end
         CASK
       end
       let(:expected_offenses) do
         [{
-          message:  "`example.com` does not match `example.org/foo.zip`",
+          message:  "`brew.sh` does not match `example.org/foo.zip`",
           severity: :convention,
           line:     2,
           column:   2,
-          source:   "# example.com was verified as official when " \
+          source:   "# brew.sh was verified as official when " \
                   "first introduced to the cask",
         }]
       end
@@ -177,21 +177,21 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
       let(:source) do
         <<-CASK.undent
           cask 'foo' do
-            url 'https://example.com/foo.zip'
+            url 'https://brew.sh/foo.zip'
             homepage 'https://example.org'
           end
         CASK
       end
       let(:expected_offenses) do
         [{
-          message:  "`example.com` does not match `example.org`, a comment " \
+          message:  "`brew.sh` does not match `example.org`, a comment " \
                    "has to be added above the `url` stanza. For details, see " \
                    "https://github.com/Homebrew/homebrew-cask/blob/master/doc/" \
                    "cask_language_reference/stanzas/url.md#when-url-and-homepage-hostnames-differ-add-a-comment",
           severity: :convention,
           line:     2,
           column:   2,
-          source:   "url 'https://example.com/foo.zip'",
+          source:   "url 'https://brew.sh/foo.zip'",
         }]
       end
 
@@ -203,7 +203,7 @@ describe RuboCop::Cop::Cask::HomepageMatchesUrl do
     let(:source) do
       <<-CASK.undent
         cask 'foo' do
-          url 'https://example.com/foo.zip'
+          url 'https://brew.sh/foo.zip'
         end
       CASK
     end

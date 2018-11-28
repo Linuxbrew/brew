@@ -75,43 +75,43 @@ describe DependencyCollector do
 
     it "creates a resource dependency from a CVS URL" do
       resource = Resource.new
-      resource.url(":pserver:anonymous:@example.com:/cvsroot/foo/bar", using: :cvs)
+      resource.url(":pserver:anonymous:@brew.sh:/cvsroot/foo/bar", using: :cvs)
       expect(subject.add(resource)).to eq(Dependency.new("cvs", [:build]))
     end
 
     it "creates a resource dependency from a '.7z' URL" do
       resource = Resource.new
-      resource.url("https://example.com/foo.7z")
+      resource.url("https://brew.sh/foo.7z")
       expect(subject.add(resource)).to eq(Dependency.new("p7zip", [:build]))
     end
 
     it "creates a resource dependency from a '.gz' URL" do
       resource = Resource.new
-      resource.url("https://example.com/foo.tar.gz")
+      resource.url("https://brew.sh/foo.tar.gz")
       expect(subject.add(resource)).to be nil
     end
 
     it "creates a resource dependency from a '.lz' URL" do
       resource = Resource.new
-      resource.url("https://example.com/foo.lz")
+      resource.url("https://brew.sh/foo.lz")
       expect(subject.add(resource)).to eq(Dependency.new("lzip", [:build]))
     end
 
     it "creates a resource dependency from a '.lha' URL" do
       resource = Resource.new
-      resource.url("https://example.com/foo.lha")
+      resource.url("https://brew.sh/foo.lha")
       expect(subject.add(resource)).to eq(Dependency.new("lha", [:build]))
     end
 
     it "creates a resource dependency from a '.lzh' URL" do
       resource = Resource.new
-      resource.url("https://example.com/foo.lzh")
+      resource.url("https://brew.sh/foo.lzh")
       expect(subject.add(resource)).to eq(Dependency.new("lha", [:build]))
     end
 
     it "creates a resource dependency from a '.rar' URL" do
       resource = Resource.new
-      resource.url("https://example.com/foo.rar")
+      resource.url("https://brew.sh/foo.rar")
       expect(subject.add(resource)).to eq(Dependency.new("unrar", [:build]))
     end
 

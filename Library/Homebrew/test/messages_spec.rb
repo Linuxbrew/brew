@@ -3,7 +3,7 @@ require "spec_helper"
 
 describe Messages do
   let(:messages) { described_class.new }
-  let(:test_formula) { formula("foo") { url("https://example.com/foo-0.1.tgz") } }
+  let(:test_formula) { formula("foo") { url("https://brew.sh/foo-0.1.tgz") } }
   let(:elapsed_time) { 1.1 }
 
   describe "#record_caveats" do
@@ -51,7 +51,7 @@ describe Messages do
     end
 
     context "when formula_count is greater than one and caveats are present" do
-      let(:test_formula2) { formula("bar") { url("https://example.com/bar-0.1.tgz") } }
+      let(:test_formula2) { formula("bar") { url("https://brew.sh/bar-0.1.tgz") } }
 
       before do
         messages.record_caveats(test_formula, "Zsh completions were installed")

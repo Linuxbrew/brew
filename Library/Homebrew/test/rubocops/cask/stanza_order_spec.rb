@@ -73,7 +73,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
     let(:source) do
       <<-CASK.undent
         cask 'foo' do
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           uninstall :quit => 'com.example.foo',
                     :kext => 'com.example.foo.kext'
           version :latest
@@ -87,7 +87,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
         cask 'foo' do
           version :latest
           sha256 :no_check
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           app 'Foo.app'
           uninstall :quit => 'com.example.foo',
                     :kext => 'com.example.foo.kext'
@@ -100,7 +100,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
         severity: :convention,
         line:     2,
         column:   2,
-        source:   "url 'https://foo.example.com/foo.zip'",
+        source:   "url 'https://foo.brew.sh/foo.zip'",
       }, {
         message:  "`uninstall` stanza out of order",
         severity: :convention,
@@ -133,7 +133,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
       <<-CASK.undent
         cask 'foo' do
           name 'Foo'
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'FancyFoo'
           version :latest
           app 'Foo.app'
@@ -147,7 +147,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
         cask 'foo' do
           version :latest
           sha256 :no_check
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
           name 'FancyFoo'
           name 'FunkyFoo'
@@ -199,7 +199,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
       format(<<-CASK.undent, caveats: caveats.strip)
         cask 'foo' do
           name 'Foo'
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           %{caveats}
           version :latest
           app 'Foo.app'
@@ -212,7 +212,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
         cask 'foo' do
           version :latest
           sha256 :no_check
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
           app 'Foo.app'
           %{caveats}
@@ -260,7 +260,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
       <<-CASK.undent
         cask 'foo' do
           name 'Foo'
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           postflight do
             puts 'We have liftoff!'
           end
@@ -275,7 +275,7 @@ describe RuboCop::Cop::Cask::StanzaOrder do
         cask 'foo' do
           version :latest
           sha256 :no_check
-          url 'https://foo.example.com/foo.zip'
+          url 'https://foo.brew.sh/foo.zip'
           name 'Foo'
           app 'Foo.app'
           postflight do

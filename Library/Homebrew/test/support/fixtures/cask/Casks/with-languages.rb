@@ -12,7 +12,7 @@ cask 'with-languages' do
   end
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
-  homepage 'https://example.com'
+  homepage 'https://brew.sh'
 
   app 'Caffeine.app'
 end

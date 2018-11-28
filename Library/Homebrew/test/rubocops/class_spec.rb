@@ -7,7 +7,7 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
     expect_offense(<<~RUBY)
       class Foo < ScriptFileFormula
                   ^^^^^^^^^^^^^^^^^ ScriptFileFormula is deprecated, use Formula instead
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
       end
     RUBY
   end
@@ -16,7 +16,7 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
     expect_offense(<<~RUBY)
       class Foo < GithubGistFormula
                   ^^^^^^^^^^^^^^^^^ GithubGistFormula is deprecated, use Formula instead
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
       end
     RUBY
   end
@@ -25,7 +25,7 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
     expect_offense(<<~RUBY)
       class Foo < AmazonWebServicesFormula
                   ^^^^^^^^^^^^^^^^^^^^^^^^ AmazonWebServicesFormula is deprecated, use Formula instead
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
       end
     RUBY
   end
@@ -33,13 +33,13 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
   it "supports auto-correcting deprecated parent classes" do
     source = <<~RUBY
       class Foo < AmazonWebServicesFormula
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
       end
     RUBY
 
     corrected_source = <<~RUBY
       class Foo < Formula
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
       end
     RUBY
 
@@ -54,7 +54,7 @@ describe RuboCop::Cop::FormulaAudit::TestCalls do
   it "reports an offense when /usr/local/bin is found in test calls" do
     expect_offense(<<~RUBY)
       class Foo < Formula
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
 
         test do
           system "/usr/local/bin/test"
@@ -67,7 +67,7 @@ describe RuboCop::Cop::FormulaAudit::TestCalls do
   it "reports an offense when passing 0 as the second parameter to shell_output" do
     expect_offense(<<~RUBY)
       class Foo < Formula
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
 
         test do
           shell_output("\#{bin}/test", 0)
@@ -80,7 +80,7 @@ describe RuboCop::Cop::FormulaAudit::TestCalls do
   it "supports auto-correcting test calls" do
     source = <<~RUBY
       class Foo < Formula
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
 
         test do
           shell_output("/usr/local/sbin/test", 0)
@@ -90,7 +90,7 @@ describe RuboCop::Cop::FormulaAudit::TestCalls do
 
     corrected_source = <<~RUBY
       class Foo < Formula
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
 
         test do
           shell_output("\#{sbin}/test")
@@ -110,7 +110,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Test do
     expect_offense(<<~RUBY)
       class Foo < Formula
       ^^^^^^^^^^^^^^^^^^^ A `test do` test block should be added
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
       end
     RUBY
   end
@@ -118,7 +118,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Test do
   it "reports an offense when there is an empty test block" do
     expect_offense(<<~RUBY)
       class Foo < Formula
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
 
         test do
         ^^^^^^^ `test do` should not be empty
@@ -130,7 +130,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Test do
   it "reports an offense when test is falsely true" do
     expect_offense(<<~RUBY)
       class Foo < Formula
-        url 'https://example.com/foo-1.0.tgz'
+        url 'https://brew.sh/foo-1.0.tgz'
 
         test do
         ^^^^^^^ `test do` should contain a real test

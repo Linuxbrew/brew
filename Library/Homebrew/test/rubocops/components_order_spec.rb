@@ -7,9 +7,9 @@ describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
     it "When url precedes homepage" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "https://example.com/foo-1.0.tgz"
-          homepage "https://example.com"
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `homepage` (line 3) should be put before `url` (line 2)
+          url "https://brew.sh/foo-1.0.tgz"
+          homepage "https://brew.sh"
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^ `homepage` (line 3) should be put before `url` (line 2)
         end
       RUBY
     end
@@ -17,10 +17,10 @@ describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
     it "When `resource` precedes `depends_on`" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "https://example.com/foo-1.0.tgz"
+          url "https://brew.sh/foo-1.0.tgz"
 
           resource "foo2" do
-            url "https://example.com/foo-2.0.tgz"
+            url "https://brew.sh/foo-2.0.tgz"
           end
 
           depends_on "openssl"
@@ -32,7 +32,7 @@ describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
     it "When `test` precedes `plist`" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "https://example.com/foo-1.0.tgz"
+          url "https://brew.sh/foo-1.0.tgz"
 
           test do
             expect(shell_output("./dogs")).to match("Dogs are terrific")
@@ -64,15 +64,15 @@ describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
     it "When url precedes homepage" do
       source = <<~RUBY
         class Foo < Formula
-          url "https://example.com/foo-1.0.tgz"
-          homepage "https://example.com"
+          url "https://brew.sh/foo-1.0.tgz"
+          homepage "https://brew.sh"
         end
       RUBY
 
       correct_source = <<~RUBY
         class Foo < Formula
-          homepage "https://example.com"
-          url "https://example.com/foo-1.0.tgz"
+          homepage "https://brew.sh"
+          url "https://brew.sh/foo-1.0.tgz"
         end
       RUBY
 
@@ -83,10 +83,10 @@ describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
     it "When `resource` precedes `depends_on`" do
       source = <<~RUBY
         class Foo < Formula
-          url "https://example.com/foo-1.0.tgz"
+          url "https://brew.sh/foo-1.0.tgz"
 
           resource "foo2" do
-            url "https://example.com/foo-2.0.tgz"
+            url "https://brew.sh/foo-2.0.tgz"
           end
 
           depends_on "openssl"
@@ -95,12 +95,12 @@ describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
 
       correct_source = <<~RUBY
         class Foo < Formula
-          url "https://example.com/foo-1.0.tgz"
+          url "https://brew.sh/foo-1.0.tgz"
 
           depends_on "openssl"
 
           resource "foo2" do
-            url "https://example.com/foo-2.0.tgz"
+            url "https://brew.sh/foo-2.0.tgz"
           end
         end
       RUBY

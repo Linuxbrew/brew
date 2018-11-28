@@ -20,7 +20,7 @@ describe Tap do
   def setup_tap_files
     formula_file.write <<~RUBY
       class Foo < Formula
-        url "https://example.com/foo-1.0.tar.gz"
+        url "https://brew.sh/foo-1.0.tar.gz"
       end
     RUBY
 
@@ -368,7 +368,7 @@ describe CoreTap do
     formula_file = subject.formula_dir/"foo.rb"
     formula_file.write <<~RUBY
       class Foo < Formula
-        url "https://example.com/foo-1.0.tar.gz"
+        url "https://brew.sh/foo-1.0.tar.gz"
       end
     RUBY
 

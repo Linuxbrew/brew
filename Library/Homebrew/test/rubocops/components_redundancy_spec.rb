@@ -7,8 +7,8 @@ describe RuboCop::Cop::FormulaAudit::ComponentsRedundancy do
     it "When url outside stable block" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "https://example.com/foo-1.0.tgz"
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `url` should be put inside `stable` block
+          url "https://brew.sh/foo-1.0.tgz"
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `url` should be put inside `stable` block
           stable do
             # stuff
           end
@@ -23,7 +23,7 @@ describe RuboCop::Cop::FormulaAudit::ComponentsRedundancy do
     it "When both `head` and `head do` are present" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          head "https://example.com/foo.git"
+          head "https://brew.sh/foo.git"
           head do
           ^^^^^^^ `head` and `head do` should not be simultaneously present
             # stuff
@@ -35,7 +35,7 @@ describe RuboCop::Cop::FormulaAudit::ComponentsRedundancy do
     it "When both `bottle :modifier` and `bottle do` are present" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "https://example.com/foo-1.0.tgz"
+          url "https://brew.sh/foo-1.0.tgz"
           bottle do
           ^^^^^^^^^ `bottle :modifier` and `bottle do` should not be simultaneously present
             # bottles go here
@@ -48,7 +48,7 @@ describe RuboCop::Cop::FormulaAudit::ComponentsRedundancy do
     it "When `stable do` is present with a `head` method" do
       expect_no_offenses(<<~RUBY)
         class Foo < Formula
-          head "https://example.com/foo.git"
+          head "https://brew.sh/foo.git"
 
           stable do
             # stuff

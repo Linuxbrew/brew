@@ -5,7 +5,7 @@ cask 'hockeyapp-without-appcast' do
   # rink.hockeyapp.net/api/2/apps/67503a7926431872c4b6c1549f5bd6b1 was verified as official when first introduced to the cask
   url "https://rink.hockeyapp.net/api/2/apps/67503a7926431872c4b6c1549f5bd6b1/app_versions/#{version.after_comma}?format=zip"
   name 'HockeyApp'
-  homepage 'https://www.example.com/'
+  homepage 'https://www.brew.sh/'
 
   app 'HockeyApp.app'
 end

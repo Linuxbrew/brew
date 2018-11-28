@@ -3,17 +3,17 @@ describe Cask::CaskLoader::FromURILoader do
 
   describe "::can_load?" do
     it "returns true when given an URI" do
-      expect(described_class).to be_able_to_load(URI("https://example.com/"))
+      expect(described_class).to be_able_to_load(URI("https://brew.sh/"))
     end
 
     it "returns true when given a String which can be parsed to a URI" do
-      expect(described_class).to be_able_to_load("https://example.com/")
+      expect(described_class).to be_able_to_load("https://brew.sh/")
     end
 
     it "returns false when given a String with Cask contents containing a URL" do
       expect(described_class).not_to be_able_to_load <<~RUBY
         cask 'token' do
-          url 'https://example.com/'
+          url 'https://brew.sh/'
         end
       RUBY
     end

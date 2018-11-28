@@ -7,7 +7,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
     it "When there is no legacy patch" do
       expect_no_offenses(<<~RUBY)
         class Foo < Formula
-          url 'https://example.com/foo-1.0.tgz'
+          url 'https://brew.sh/foo-1.0.tgz'
         end
       RUBY
     end
@@ -15,8 +15,8 @@ describe RuboCop::Cop::FormulaAudit::Patches do
     it "Formula with `def patches`" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          homepage "ftp://example.com/foo"
-          url "https://example.com/foo-1.0.tgz"
+          homepage "ftp://brew.sh/foo"
+          url "https://brew.sh/foo-1.0.tgz"
           def patches
           ^^^^^^^^^^^ Use the patch DSL instead of defining a 'patches' method
             DATA
@@ -37,8 +37,8 @@ describe RuboCop::Cop::FormulaAudit::Patches do
       patch_urls.each do |patch_url|
         source = <<~EOS
           class Foo < Formula
-            homepage "ftp://example.com/foo"
-            url "https://example.com/foo-1.0.tgz"
+            homepage "ftp://brew.sh/foo"
+            url "https://brew.sh/foo-1.0.tgz"
             def patches
               "#{patch_url}"
             end
@@ -121,8 +121,8 @@ describe RuboCop::Cop::FormulaAudit::Patches do
     it "Formula with nested `def patches`" do
       source = <<~RUBY
         class Foo < Formula
-          homepage "ftp://example.com/foo"
-          url "https://example.com/foo-1.0.tgz"
+          homepage "ftp://brew.sh/foo"
+          url "https://brew.sh/foo-1.0.tgz"
           def patches
             files = %w[patch-domain_resolver.c patch-colormask.c patch-trafshow.c patch-trafshow.1 patch-configure]
             {
@@ -171,8 +171,8 @@ describe RuboCop::Cop::FormulaAudit::Patches do
       patch_urls.each do |patch_url|
         source = <<~RUBY
           class Foo < Formula
-            homepage "ftp://example.com/foo"
-            url "https://example.com/foo-1.0.tgz"
+            homepage "ftp://brew.sh/foo"
+            url "https://brew.sh/foo-1.0.tgz"
             patch do
               url "#{patch_url}"
               sha256 "63376b8fdd6613a91976106d9376069274191860cd58f039b29ff16de1925621"
