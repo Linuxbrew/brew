@@ -1160,16 +1160,6 @@ Note that environment variables must have a value set to be detected. For exampl
   * `HOMEBREW_DEBUG`:
     If set, any commands that can emit debugging information will do so.
 
-  * `HOMEBREW_DEBUG_INSTALL`:
-    When `brew install -d` or `brew install -i` drops into a shell,
-    `HOMEBREW_DEBUG_INSTALL` will be set to the name of the formula being
-    brewed.
-
-  * `HOMEBREW_DEBUG_PREFIX`:
-    When `brew install -d` or `brew install -i` drops into a shell,
-    `HOMEBREW_DEBUG_PREFIX` will be set to the target prefix in the Cellar
-    of the formula being brewed.
-
   * `HOMEBREW_DEVELOPER`:
     If set, Homebrew will tweak behaviour to be more relevant for Homebrew
     developers (active or budding) e.g. turning warnings into errors.
