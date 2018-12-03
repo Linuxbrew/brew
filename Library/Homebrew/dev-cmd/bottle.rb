@@ -342,7 +342,9 @@ module Homebrew
           prefix_check = prefix
         end
 
-        ignores = []
+        # Ignore matches to source code, which is not required at run time.
+        # These matches may be caused by debugging symbols.
+        ignores = [%r{/include/|\.(c|cc|cpp|h|hpp)$}]
         any_go_deps = f.deps.any? do |dep|
           dep.name =~ Version.formula_optionally_versioned_regex(:go)
         end
