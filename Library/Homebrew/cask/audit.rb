@@ -24,7 +24,6 @@ module Cask
 
     def run!
       check_required_stanzas
-      check_version_and_checksum
       check_version
       check_sha256
       check_url
@@ -134,31 +133,6 @@ module Cask
       # TODO: specific DSL knowledge should not be spread around in various files like this
       installable_artifacts = cask.artifacts.reject { |k| [:uninstall, :zap].include?(k) }
       add_error "at least one activatable artifact stanza is required" if installable_artifacts.empty?
-    end
-
-    def check_version_and_checksum
-      return if cask.sha256 == :no_check
-
-      return if @cask.sourcefile_path.nil?
-
-      tap = @cask.tap
-      return if tap.nil?
-
-      return if commit_range.nil?
-
-      previous_cask_contents = Git.last_revision_of_file(tap.path, @cask.sourcefile_path, before_commit: commit_range)
-      return if previous_cask_contents.empty?
-
-      begin
-        previous_cask = CaskLoader.load(previous_cask_contents)
-
-        return unless previous_cask.version == cask.version
-        return if previous_cask.sha256 == cask.sha256
-
-        add_error "only sha256 changed (see: https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
-      rescue CaskError => e
-        add_warning "Skipped version and checksum comparison. Reading previous version failed: #{e}"
-      end
     end
 
     def check_version
