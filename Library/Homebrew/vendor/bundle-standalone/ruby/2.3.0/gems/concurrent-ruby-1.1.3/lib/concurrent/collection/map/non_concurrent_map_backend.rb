@@ -10,7 +10,7 @@ module Concurrent
 
       # WARNING: all public methods of the class must operate on the @backend
       # directly without calling each other. This is important because of the
-      # SynchronizedMapBackend which uses a non-reentrant mutex for perfomance
+      # SynchronizedMapBackend which uses a non-reentrant mutex for performance
       # reasons.
       def initialize(options = nil)
         @backend = {}
@@ -95,7 +95,6 @@ module Concurrent
       end
 
       def each_pair
-        return enum_for :each_pair unless block_given?
         dupped_backend.each_pair do |k, v|
           yield k, v
         end
