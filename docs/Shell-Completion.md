@@ -7,13 +7,14 @@ Homebrew comes with completion definitions for the `brew` command. Some packages
 You must configure your shell to enable the completion support. This is because the Homebrew-managed completions are stored under `HOMEBREW_PREFIX`, which your system shell may not be aware of, and because it is difficult to automatically configure `bash` and `zsh` completions in a robust manner, so the Homebrew installer cannot do it for you.
 
 ## Configuring Completions in `bash`
+
 To make Homebrew's completions available in `bash`, you must source the definitions as part of your shell startup. Add the following to your `~/.bashrc` file:
 
 ```sh
 if type brew 2&>/dev/null; then
-  for completion_file in $(brew --prefix)/etc/bash_completion.d/*; do
-    source "$completion_file"
-  done
+  source "$(brew --prefix)/etc/bash_completion"
+else
+  echo "run: brew install git bash-completion"
 fi
 ```
 
