@@ -78,24 +78,10 @@ module Homebrew
       if keg_only
         if Homebrew.default_prefix?
           f = keg.to_formula
-          caveats = Caveats.new(f)
-
-          if f.keg_only_reason.reason == :provided_by_macos &&
-             (MacOS.version >= :mojave ||
-              MacOS::Xcode.version >= "10.0" ||
-              MacOS::CLT.version >= "10.0")
+          if f.keg_only_reason.reason == :provided_by_macos
+            caveats = Caveats.new(f)
             opoo <<~EOS
               Refusing to link macOS-provided software: #{keg.name}
-              #{caveats.keg_only_text(skip_reason: true).strip}
-            EOS
-            next
-          end
-
-          if keg.name.start_with?("openssl", "libressl")
-            opoo <<~EOS
-              Refusing to link: #{keg.name}
-              Linking keg-only #{keg.name} means you may end up linking against the insecure,
-              deprecated system OpenSSL while using the headers from Homebrew's #{keg.name}.
               #{caveats.keg_only_text(skip_reason: true).strip}
             EOS
             next
