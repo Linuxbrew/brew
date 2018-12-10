@@ -39,9 +39,28 @@ __brew_formulae_or_ruby_files() {
     'files:files:{_files -g *.rb}'
 }
 
+# formulae completions are cached as long as homebrew does have new commits
+__brew_formulae_caching_policy() {
+  # rebuild cache if no cache file exists (anyway we cannot proceed further down)
+  ! [[ -f "$1" ]] && return 0
+  # cache file modification date (seconds since epoch)
+  local -i cache_mtime=$(date -r "$1" +%s)
+  # latest homebrew commit on HEAD (branch 'stable' by default)
+  local brew_repo=${HOMEBREW_PREFIX:-/usr/local}/Homebrew/.git
+  local latest_commit=$(git --git-dir=${brew_repo} rev-parse HEAD) # --branches=refs/stable
+  # latest homebrew commit date (seconds since epoch)
+  local -i commit_mtime=$(git --git-dir=${brew_repo} rev-list -1 --format=format:'%at' $latest_commit | tail +2)
+  (( $cache_mtime < $commit_mtime ))
+}
+
 __brew_formulae() {
+  zstyle ":completion:${curcontext}:" cache-policy __brew_formulae_caching_policy
   local -a formulae
-  formulae=($(brew search))
+  local comp_cachename=brew_formulae
+  if _cache_invalid $comp_cachename || ! _retrieve_cache $comp_cachename; then
+    formulae=($(brew search))
+    _store_cache $comp_cachename formulae
+  fi
   _describe -t formulae 'all formulae' formulae
 }
 
