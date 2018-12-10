@@ -9,7 +9,7 @@
 #:  * `search` [`--desc`] (<text>|`/`<text>`/`):
 #:    Perform a substring search of cask tokens and formula names for <text>. If <text>
 #:    is surrounded with slashes, then it is interpreted as a regular expression.
-#:    The search for <text> is extended online to official taps.
+#:    The search for <text> is extended online to `homebrew/core` and `homebrew/cask`.
 #:
 #:    If `--desc` is passed, search formulae with a description matching <text> and
 #:    casks with a name matching <text>.

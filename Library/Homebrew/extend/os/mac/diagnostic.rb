@@ -111,9 +111,11 @@ module Homebrew
 
       def check_xcode_minimum_version
         return unless MacOS::Xcode.below_minimum_version?
+        xcode = MacOS::Xcode.version.to_s
+        xcode += " => #{MacOS::Xcode.prefix}" unless MacOS::Xcode.default_prefix?
 
         <<~EOS
-          Your Xcode (#{MacOS::Xcode.version}) is too outdated.
+          Your Xcode (#{xcode}) is too outdated.
           Please update to Xcode #{MacOS::Xcode.latest_version} (or delete it).
           #{MacOS::Xcode.update_instructions}
         EOS

@@ -531,7 +531,13 @@ module Homebrew
       return unless @versioned_formula
       return unless @core_tap
 
-      return if formula.keg_only? && formula.keg_only_reason.reason == :versioned_formula
+      if formula.keg_only?
+        return if formula.keg_only_reason.reason == :versioned_formula
+        if formula.name.start_with?("openssl", "libressl") &&
+           formula.keg_only_reason.reason == :provided_by_macos
+          return
+        end
+      end
 
       keg_only_whitelist = %w[
         autoconf@2.13

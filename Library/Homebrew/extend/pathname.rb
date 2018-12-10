@@ -162,18 +162,8 @@ class Pathname
 
   # NOTE: This always overwrites.
   def atomic_write(content)
-    # The enclosing `mktmpdir` and the `chmod` are a workaround
-    # for https://github.com/rails/rails/pull/34037.
-    Dir.mktmpdir(".d", dirname) do |tmpdir|
-      should_fix_sticky_bit = dirname.world_writable? && !dirname.sticky?
-      FileUtils.chmod "+t", dirname if should_fix_sticky_bit
-      begin
-        File.atomic_write(self, tmpdir) do |file|
-          file.write(content)
-        end
-      ensure
-        FileUtils.chmod "-t", dirname if should_fix_sticky_bit
-      end
+    File.atomic_write(self) do |file|
+      file.write(content)
     end
   end
 
@@ -356,7 +346,7 @@ class Pathname
   def write_jar_script(target_jar, script_name, java_opts = "", java_version: nil)
     mkpath
     java_home = if java_version
-      "JAVA_HOME=\"$(#{Language::Java.java_home_cmd(java_version)})\" "
+      "JAVA_HOME=\"#{Language::Java.java_home_shell(java_version)}\" "
     end
     join(script_name).write <<~SH
       #!/bin/bash

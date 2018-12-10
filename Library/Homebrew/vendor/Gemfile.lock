@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (5.2.1)
+    activesupport (5.2.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
@@ -19,7 +19,7 @@ GEM
     plist (3.4.0)
     powerpack (0.1.2)
     rainbow (3.0.0)
-    rubocop (0.60.0)
+    rubocop (0.61.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)
@@ -49,4 +49,4 @@ DEPENDENCIES
   ruby-macho
 
 BUNDLED WITH
-   1.16.6
+   1.17.1

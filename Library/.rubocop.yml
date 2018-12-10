@@ -77,8 +77,8 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 Metrics/MethodLength:
   Enabled: false
-# Metrics/ModuleLength:
-#   Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
 Metrics/PerceivedComplexity:
   Enabled: false
 
@@ -109,6 +109,8 @@ Style/GuardClause:
 # depends_on a: :b looks weird in formulae.
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
+  Exclude:
+  - '**/cmd/*.rb'
 
 # ruby style guide favorite
 Style/StringLiterals:

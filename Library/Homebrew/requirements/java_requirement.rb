@@ -1,6 +1,8 @@
 require "language/java"
 
 class JavaRequirement < Requirement
+  attr_reader :java_home
+
   fatal true
   download "https://www.oracle.com/technetwork/java/javase/downloads/index.html"
 

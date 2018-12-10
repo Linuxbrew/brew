@@ -134,7 +134,7 @@ module Homebrew
     end
   end
 
-  def keg_contain?(string, keg, ignores)
+  def keg_contain?(string, keg, ignores, formula_and_runtime_deps_names = nil)
     @put_string_exists_header, @put_filenames = nil
 
     print_filename = lambda do |str, filename|
@@ -177,6 +177,19 @@ module Homebrew
 
           offset, match = str.split(" ", 2)
           next if linked_libraries.include? match # Don't bother reporting a string if it was found by otool
+
+          # Do not report matches to files that do not exist.
+          next unless File.exist? match
+
+          # Do not report matches to build dependencies.
+          if formula_and_runtime_deps_names.present?
+            begin
+              keg_name = Keg.for(Pathname.new(match)).name
+              next unless formula_and_runtime_deps_names.include? keg_name
+            rescue NotAKegError
+              nil
+            end
+          end
 
           result = true
           text_matches << [match, offset]
@@ -272,6 +285,7 @@ module Homebrew
 
     ohai "Bottling #{filename}..."
 
+    formula_and_runtime_deps_names = [f.name] + f.runtime_dependencies.map(&:name)
     keg = Keg.new(f.prefix)
     relocatable = false
     skip_relocation = false
@@ -328,7 +342,9 @@ module Homebrew
           prefix_check = prefix
         end
 
-        ignores = []
+        # Ignore matches to source code, which is not required at run time.
+        # These matches may be caused by debugging symbols.
+        ignores = [%r{/include/|\.(c|cc|cpp|h|hpp)$}]
         any_go_deps = f.deps.any? do |dep|
           dep.name =~ Version.formula_optionally_versioned_regex(:go)
         end
@@ -342,9 +358,9 @@ module Homebrew
         if args.skip_relocation?
           skip_relocation = true
         else
-          relocatable = false if keg_contain?(prefix_check, keg, ignores)
+          relocatable = false if keg_contain?(prefix_check, keg, ignores, formula_and_runtime_deps_names)
           relocatable = false if keg_contain?(repository, keg, ignores)
-          relocatable = false if keg_contain?(cellar, keg, ignores)
+          relocatable = false if keg_contain?(cellar, keg, ignores, formula_and_runtime_deps_names)
           if prefix != prefix_check
             relocatable = false if keg_contain_absolute_symlink_starting_with?(prefix, keg)
             relocatable = false if keg_contain?("#{prefix}/etc", keg, ignores)
@@ -390,8 +406,10 @@ module Homebrew
       mismatches = [:root_url, :prefix, :cellar, :rebuild].reject do |key|
         old_spec.send(key) == bottle.send(key)
       end
-      mismatches.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
-      bottle.cellar :any if OS.linux? && old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
+      if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
+        mismatches.delete(:cellar)
+        bottle.cellar :any
+      end
       unless mismatches.empty?
         if bottle.prefix == "/home/linuxbrew/.linuxbrew"
           bottle.cellar old_spec.cellar

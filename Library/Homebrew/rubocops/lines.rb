@@ -180,8 +180,7 @@ module RuboCop
           end
 
           [:mac?, :linux?].each do |method_name|
-            next if @file_path.include? "/.linuxbrew/"
-            next unless formula_tap == "homebrew-core"
+            next if formula_tap != "homebrew-core" || file_path&.match(/linuxbrew/)
 
             find_instance_method_call(body_node, "OS", method_name) do |check|
               problem "Don't use #{check.source}; Homebrew/core only supports macOS"
