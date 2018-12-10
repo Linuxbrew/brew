@@ -26,7 +26,7 @@ def linux?
 end
 
 class Cmd
-  attr_reader :config, :prefix, :cellar, :opt, :tmpdir, :sysroot, :deps
+  attr_reader :config, :prefix, :cellar, :opt, :cachedir, :tmpdir, :sysroot, :deps
   attr_reader :archflags, :optflags, :keg_regex, :formula_prefix
 
   def initialize(arg0, args)
@@ -35,6 +35,7 @@ class Cmd
     @config = ENV.fetch("HOMEBREW_CCCFG") { "" }
     @prefix = ENV["HOMEBREW_PREFIX"]
     @cellar = ENV["HOMEBREW_CELLAR"]
+    @cachedir = ENV["HOMEBREW_CACHE"]
     @opt = ENV["HOMEBREW_OPT"]
     @tmpdir = ENV["HOMEBREW_TEMP"]
     @sysroot = ENV["HOMEBREW_SDKROOT"]
@@ -242,7 +243,7 @@ class Cmd
     elsif path.start_with?(cellar) || path.start_with?(opt)
       dep = path[keg_regex, 2]
       dep && @deps.include?(dep)
-    elsif path.start_with?(prefix, tmpdir)
+    elsif path.start_with?(prefix, cachedir, tmpdir)
       true
     elsif path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
       # ignore MacPorts, Boxen's Homebrew, X11, fink
