@@ -129,9 +129,26 @@ __brew_common_commands() {
   _describe -t common-commands 'common commands' commands
 }
 
+# completions are cached for 24 hour
+__brew_commands_caching_policy() {
+  local -a oldp
+  oldp=( "$1"(Nmh+24) )
+  (( $#oldp ))
+}
+
 __brew_all_commands() {
+  local cache_policy
+  zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
+  if [[ -z "$cache_policy" ]]; then
+    zstyle ":completion:${curcontext}:" cache-policy __brew_commands_caching_policy
+  fi
   local -a commands
-  commands=($(_call_program brew brew commands --quiet --include-aliases))
+  local comp_cachename=brew_all_commands
+
+  if  _cache_invalid $comp_cachename  || ! _retrieve_cache $comp_cachename; then
+    commands=($(_call_program brew brew commands --quiet --include-aliases))
+    _store_cache $comp_cachename commands
+  fi
   _describe -t all-commands 'all commands' commands
 }
 
