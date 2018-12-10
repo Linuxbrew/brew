@@ -137,15 +137,10 @@ __brew_commands_caching_policy() {
 }
 
 __brew_all_commands() {
-  local cache_policy
-  zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
-  if [[ -z "$cache_policy" ]]; then
-    zstyle ":completion:${curcontext}:" cache-policy __brew_commands_caching_policy
-  fi
+  zstyle ":completion:${curcontext}:" cache-policy __brew_commands_caching_policy
   local -a commands
   local comp_cachename=brew_all_commands
-
-  if  _cache_invalid $comp_cachename  || ! _retrieve_cache $comp_cachename; then
+  if _cache_invalid $comp_cachename || ! _retrieve_cache $comp_cachename; then
     commands=($(_call_program brew brew commands --quiet --include-aliases))
     _store_cache $comp_cachename commands
   fi
