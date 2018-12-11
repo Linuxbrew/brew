@@ -18,12 +18,32 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def cleanup
-    CLI::Parser.parse do
-      switch "-n", "--dry-run"
-      switch "-s"
-      flag   "--prune="
+  def cleanup_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `cleanup` [<options>] [<formulae>|<casks>]
+
+
+        Remove stale lock files and outdated downloads for formulae and casks,
+        and remove old versions of installed formulae. If arguments are specified,
+        only do this for the specified formulae and casks.
+      EOS
+
+      flag   "--prune=",
+        description: "Remove all cache files older than specified <days>."
+      switch "-n", "--dry-run",
+        description: "Show what would be removed, but do not actually remove anything."
+      switch "-s",
+        description: "Scrub the cache, including downloads for even the latest versions. "\
+                     "Note downloads for any installed formula or cask will still not be deleted. "\
+                     "If you want to delete those too: `rm -rf \"$(brew --cache)\"`"
+      switch :verbose
+      switch :debug
     end
+  end
+
+  def cleanup
+    cleanup_args.parse
 
     cleanup = Cleanup.new(*args.remaining, dry_run: args.dry_run?, scrub: args.s?, days: args.prune&.to_i)
 
