@@ -11,14 +11,33 @@ require "keg"
 require "formula"
 require "diagnostic"
 require "migrator"
+require "cli_parser"
 
 module Homebrew
   module_function
 
-  def uninstall
-    raise KegUnspecifiedError if ARGV.named.empty?
+  def uninstall_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `uninstall`, `rm`, `remove` [<options>] <formula>
 
-    kegs_by_rack = if ARGV.force?
+        Uninstall <formula>.
+      EOS
+      switch :force,
+        description: "Delete all installed versions of the <formula>"
+      switch "--ignore-dependencies",
+        description: "Dont fail uninstall, even if <formula> is a dependency of any installed "\
+                     "formulae."
+      switch :debug
+    end
+  end
+
+  def uninstall
+    uninstall_args.parse
+
+    raise KegUnspecifiedError if args.remaining.empty?
+
+    kegs_by_rack = if args.force?
       Hash[ARGV.named.map do |name|
         rack = Formulary.to_rack(name)
         next unless rack.directory?
@@ -33,7 +52,7 @@ module Homebrew
     return if Homebrew.failed?
 
     kegs_by_rack.each do |rack, kegs|
-      if ARGV.force?
+      if args.force?
         name = rack.basename
 
         if rack.directory?
@@ -87,7 +106,7 @@ module Homebrew
   end
 
   def handle_unsatisfied_dependents(kegs_by_rack)
-    return if ARGV.include?("--ignore-dependencies")
+    return if args.ignore_dependencies?
 
     all_kegs = kegs_by_rack.values.flatten(1)
     check_for_dependents all_kegs

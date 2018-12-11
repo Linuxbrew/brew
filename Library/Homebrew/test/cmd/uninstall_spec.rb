@@ -60,7 +60,7 @@ describe Homebrew do
     end
 
     specify "when not developer and --ignore-dependencies is specified" do
-      ARGV << "--ignore-dependencies"
+      expect(described_class.args).to receive(:ignore_dependencies?).and_return(true)
 
       expect {
         described_class.handle_unsatisfied_dependents(opts)
