@@ -45,11 +45,9 @@ __brew_formulae_caching_policy() {
   ! [[ -f "$1" ]] && return 0
   # cache file modification date (seconds since epoch)
   local -i cache_mtime=$(date -r "$1" +%s)
-  # latest homebrew commit on HEAD (branch 'stable' by default)
-  local brew_repo=${HOMEBREW_PREFIX:-/usr/local}/Homebrew/.git
-  local latest_commit=$(git --git-dir=${brew_repo} rev-parse HEAD) # --branches=refs/stable
-  # latest homebrew commit date (seconds since epoch)
-  local -i commit_mtime=$(git --git-dir=${brew_repo} rev-list -1 --format=format:'%at' $latest_commit | tail +2)
+  # latest modified homebrew tap index file
+  local latest_modified_git_index=(${HOMEBREW_REPOSITORY:-/usr/local/Homebrew}/Library/Taps/*/*/.git/index(om[1]))
+  local -i commit_mtime=$(date -r "$latest_modified_git_index" +%s)
   (( $cache_mtime < $commit_mtime ))
 }
 
