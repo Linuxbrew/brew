@@ -60,7 +60,9 @@ describe Homebrew do
     end
 
     specify "when not developer and --ignore-dependencies is specified" do
+      described_class.args = described_class.args.dup if described_class.args.frozen?
       expect(described_class.args).to receive(:ignore_dependencies?).and_return(true)
+      described_class.args.freeze
 
       expect {
         described_class.handle_unsatisfied_dependents(opts)
