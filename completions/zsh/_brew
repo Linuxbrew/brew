@@ -39,8 +39,8 @@ __brew_formulae_or_ruby_files() {
     'files:files:{_files -g *.rb}'
 }
 
-# formulae completions are cached as long as homebrew does have new commits
-__brew_formulae_caching_policy() {
+# completions are cached as long as homebrew does have new commits
+__brew_completion_caching_policy() {
   # rebuild cache if no cache file exists (anyway we cannot proceed further down)
   ! [[ -f "$1" ]] && return 0
   # cache file modification date (seconds since epoch)
@@ -52,7 +52,7 @@ __brew_formulae_caching_policy() {
 }
 
 __brew_formulae() {
-  zstyle ":completion:${curcontext}:" cache-policy __brew_formulae_caching_policy
+  zstyle ":completion:${curcontext}:" cache-policy __brew_completion_caching_policy
   local -a formulae
   local comp_cachename=brew_formulae
   if _cache_invalid $comp_cachename || ! _retrieve_cache $comp_cachename; then
@@ -146,15 +146,8 @@ __brew_common_commands() {
   _describe -t common-commands 'common commands' commands
 }
 
-# completions are cached for 24 hour
-__brew_commands_caching_policy() {
-  local -a oldp
-  oldp=( "$1"(Nmh+24) )
-  (( $#oldp ))
-}
-
 __brew_all_commands() {
-  zstyle ":completion:${curcontext}:" cache-policy __brew_commands_caching_policy
+  zstyle ":completion:${curcontext}:" cache-policy __brew_completion_caching_policy
   local -a commands
   local comp_cachename=brew_all_commands
   if _cache_invalid $comp_cachename || ! _retrieve_cache $comp_cachename; then
