@@ -320,7 +320,7 @@ module SharedEnvExtension
     return if compiler_any_clang?(cc)
 
     version = if cc == :gcc
-      non_apple_gcc_version "gcc"
+      DevelopmentTools.non_apple_gcc_version "gcc"
     else
       cc[/^gcc-(\d+(?:\.\d+)?)$/, 1]
     end
