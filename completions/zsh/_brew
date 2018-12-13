@@ -39,7 +39,7 @@ __brew_formulae_or_ruby_files() {
     'files:files:{_files -g *.rb}'
 }
 
-# completions are cached as long as homebrew does have new commits
+# completions remain in cache until any tap has new commits
 __brew_completion_caching_policy() {
   # rebuild cache if no cache file exists (anyway we cannot proceed further down)
   ! [[ -f "$1" ]] && return 0
