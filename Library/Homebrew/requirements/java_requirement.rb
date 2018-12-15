@@ -129,7 +129,7 @@ class JavaRequirement < Requirement
   end
 
   def satisfies_version(java)
-    java_version_s = system_command(java, args: ["-version"], print_stderr: false).stderr[/\d+.\d/]
+    java_version_s = system_command(java, args: ["-version"], print_stderr: false).stderr[/\d+\.\d/]
     return false unless java_version_s
 
     java_version = Version.create(java_version_s)
