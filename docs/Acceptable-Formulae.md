@@ -21,9 +21,9 @@ We don't like install scripts that are pulling from the `master` branch of Git r
 ### We don’t like binary formulae
 Our policy is that formulae in the core tap
 ([homebrew/core](https://github.com/Homebrew/homebrew-core)) must be open-source
-and either built from source or produce cross-platform binaries (e.g. Java, Mono).
-Binary-only formulae should go to
-[homebrew/cask](https://github.com/Homebrew/homebrew-cask).
+with an [OSI-approved license](https://opensource.org/licenses) and either built
+from source or produce cross-platform binaries (e.g. Java, Mono). Binary-only
+formulae should go to [homebrew/cask](https://github.com/Homebrew/homebrew-cask).
 
 ### Stable versions
 Formulae in the core repository must have a stable version tagged by
