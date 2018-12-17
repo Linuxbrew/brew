@@ -2,3 +2,4 @@
 BUNDLE_PATH: "bundle-standalone"
 BUNDLE_DISABLE_SHARED_GEMS: "true"
 BUNDLE_BIN: "false"
+BUNDLE_CLEAN: "true"
