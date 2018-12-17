@@ -683,6 +683,9 @@ class GitDownloadStrategy < VCSDownloadStrategy
     system_command! "git",
                     args:  ["config", "remote.origin.fetch", refspec],
                     chdir: cached_location
+    system_command! "git",
+                    args:  ["config", "remote.origin.tagOpt", "--no-tags"],
+                    chdir: cached_location
   end
 
   def update_repo

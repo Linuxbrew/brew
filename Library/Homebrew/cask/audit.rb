@@ -300,7 +300,7 @@ module Cask
         check_url_for_https_availability(cask.url, user_agents: [cask.url.user_agent])
       end
       check_url_for_https_availability(cask.appcast) unless cask.appcast.blank?
-      check_url_for_https_availability(cask.homepage) unless cask.homepage.blank?
+      check_url_for_https_availability(cask.homepage, user_agents: [:browser]) unless cask.homepage.blank?
     end
 
     def check_url_for_https_availability(url_to_check, user_agents: [:default])

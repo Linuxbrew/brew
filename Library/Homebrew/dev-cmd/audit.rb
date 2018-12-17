@@ -527,6 +527,23 @@ module Homebrew
       problem "keg_only reason should not end with a period."
     end
 
+    def audit_postgresql
+      return unless formula.name == "postgresql"
+      major_version = formula.version
+                             .to_s
+                             .split(".")
+                             .first
+                             .to_i
+      previous_major_version = major_version - 1
+      previous_formula_name = "postgresql@#{previous_major_version}"
+      begin
+        Formula[previous_formula_name]
+      rescue FormulaUnavailableError
+        problem "Versioned #{previous_formula_name} must be created for " \
+                "`brew-postgresql-upgrade-database` and `pg_upgrade` to work."
+      end
+    end
+
     def audit_versioned_keg_only
       return unless @versioned_formula
       return unless @core_tap
