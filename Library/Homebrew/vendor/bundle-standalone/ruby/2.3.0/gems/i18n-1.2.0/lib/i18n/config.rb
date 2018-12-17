@@ -145,5 +145,21 @@ module I18n
     def enforce_available_locales=(enforce_available_locales)
       @@enforce_available_locales = enforce_available_locales
     end
+
+    # Returns the current interpolation patterns. Defaults to
+    # I18n::DEFAULT_INTERPOLATION_PATTERNS.
+    def interpolation_patterns
+      @@interpolation_patterns ||= I18n::DEFAULT_INTERPOLATION_PATTERNS.dup
+    end
+
+    # Sets the current interpolation patterns. Used to set a interpolation
+    # patterns.
+    #
+    # E.g. using {{}} as a placeholder like "{{hello}}, world!":
+    #
+    #   I18n.config.interpolation_patterns << /\{\{(\w+)\}\}/
+    def interpolation_patterns=(interpolation_patterns)
+      @@interpolation_patterns = interpolation_patterns
+    end
   end
 end

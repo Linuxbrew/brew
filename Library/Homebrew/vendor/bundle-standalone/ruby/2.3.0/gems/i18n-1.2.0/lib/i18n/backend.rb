@@ -5,6 +5,7 @@ module I18n
     autoload :Base,                  'i18n/backend/base'
     autoload :InterpolationCompiler, 'i18n/backend/interpolation_compiler'
     autoload :Cache,                 'i18n/backend/cache'
+    autoload :CacheFile,             'i18n/backend/cache_file'
     autoload :Cascade,               'i18n/backend/cascade'
     autoload :Chain,                 'i18n/backend/chain'
     autoload :Fallbacks,             'i18n/backend/fallbacks'

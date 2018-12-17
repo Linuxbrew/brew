@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'yaml'
+require 'json'
 require 'i18n/core_ext/hash'
 
 module I18n
@@ -9,7 +10,7 @@ module I18n
       include I18n::Backend::Transliterator
 
       # Accepts a list of paths to translation files. Loads translations from
-      # plain Ruby (*.rb) or YAML files (*.yml). See #load_rb and #load_yml
+      # plain Ruby (*.rb), YAML files (*.yml), or JSON files (*.json). See #load_rb, #load_yml, and #load_json
       # for details.
       def load_translations(*filenames)
         filenames = I18n.load_path if filenames.empty?
@@ -234,6 +235,16 @@ module I18n
           end
         end
         alias_method :load_yaml, :load_yml
+
+        # Loads a JSON translations file. The data must have locales as
+        # toplevel keys.
+        def load_json(filename)
+          begin
+            ::JSON.parse(File.read(filename))
+          rescue TypeError, StandardError => e
+            raise InvalidLocaleData.new(filename, e.inspect)
+          end
+        end
 
         def translate_localization_format(locale, object, format, options)
           format.to_s.gsub(/%[aAbBpP]/) do |match|

@@ -38,6 +38,7 @@
 **/vendor/bundle-standalone/ruby/*/gems/backports-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/minitest-*/lib
 **/vendor/bundle-standalone/ruby/*/gems/thread_safe-*/lib
+**/vendor/bundle-standalone/ruby/*/gems/i18n-*/lib/i18n/tests*
 
 # Ignore rubocop dependencies we don't wish to vendor
 **/vendor/bundle-standalone/ruby/*/gems/ast-*/

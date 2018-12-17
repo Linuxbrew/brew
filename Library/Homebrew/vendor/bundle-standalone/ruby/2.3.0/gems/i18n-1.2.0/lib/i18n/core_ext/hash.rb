@@ -17,6 +17,14 @@ class Hash
     }
   end unless Hash.method_defined?(:deep_symbolize_keys)
 
+  def deep_stringify_keys
+    inject({}) { |result, (key, value)|
+      value = value.deep_stringify_keys if value.is_a?(Hash)
+      result[key.to_s] = value
+      result
+    }
+  end unless Hash.method_defined?(:deep_stringify_keys)
+
   # deep_merge_hash! by Stefan Rusterholz, see http://www.ruby-forum.com/topic/142809
   MERGER = proc do |key, v1, v2|
     Hash === v1 && Hash === v2 ? v1.merge(v2, &MERGER) : v2

@@ -76,6 +76,10 @@ module I18n
           @store, @subtrees = store, subtrees
         end
 
+        def initialized?
+          !@store.nil?
+        end
+
         def store_translations(locale, data, options = EMPTY_HASH)
           escape = options.fetch(:escape, true)
           flatten_translations(locale, data, escape, @subtrees).each do |key, value|
@@ -104,6 +108,26 @@ module I18n
         end
 
       protected
+
+        # Queries the translations from the key-value store and converts
+        # them into a hash such as the one returned from loading the
+        # haml files
+        def translations
+          @translations = @store.keys.clone.map do |main_key|
+            main_value = JSON.decode(@store[main_key])
+            main_key.to_s.split(".").reverse.inject(main_value) do |value, key|
+              {key.to_sym => value}
+            end
+          end.inject{|hash, elem| hash.deep_merge!(elem)}.deep_symbolize_keys
+        end
+
+        def init_translations
+          # NO OP
+          # This call made also inside Simple Backend and accessed by
+          # other plugins like I18n-js and babilu and
+          # to use it along with the Chain backend we need to
+          # provide a uniform API even for protected methods :S
+        end
 
         def subtrees?
           @subtrees

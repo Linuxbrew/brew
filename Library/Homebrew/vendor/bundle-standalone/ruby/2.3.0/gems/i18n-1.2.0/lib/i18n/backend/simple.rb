@@ -39,7 +39,7 @@ module I18n
           end
           locale = locale.to_sym
           translations[locale] ||= {}
-          data = data.deep_symbolize_keys
+          data = data.deep_stringify_keys.deep_symbolize_keys
           translations[locale].deep_merge!(data)
         end
 

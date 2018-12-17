@@ -2,11 +2,13 @@
 # http://github.com/mutoh/gettext/blob/f6566738b981fe0952548c421042ad1e0cdfb31e/lib/gettext/core_ext/string.rb
 
 module I18n
-  INTERPOLATION_PATTERN = Regexp.union(
+  DEFAULT_INTERPOLATION_PATTERNS = [
     /%%/,
     /%\{(\w+)\}/,                               # matches placeholders like "%{foo}"
     /%<(\w+)>(.*?\d*\.?\d*[bBdiouxXeEfgGcps])/  # matches placeholders like "%<foo>.d"
-  )
+  ].freeze
+  INTERPOLATION_PATTERN = Regexp.union(DEFAULT_INTERPOLATION_PATTERNS)
+  deprecate_constant :INTERPOLATION_PATTERN if method_defined? :INTERPOLATION_PATTERN
 
   class << self
     # Return String or raises MissingInterpolationArgument exception.
@@ -18,7 +20,7 @@ module I18n
     end
 
     def interpolate_hash(string, values)
-      string.gsub(INTERPOLATION_PATTERN) do |match|
+      string.gsub(Regexp.union(config.interpolation_patterns)) do |match|
         if match == '%%'
           '%'
         else
