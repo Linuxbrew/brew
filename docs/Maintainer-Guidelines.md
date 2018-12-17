@@ -85,6 +85,14 @@ If the formula uses a repository, then the `url` parameter should have a
 tag or revision. `url`s have versions and are stable (not yet
 implemented!).
 
+Don't merge any formula updates with failing `brew test`s. If a `test do` block
+is failing it needs to be fixed. This may involve replacing more involved tests
+with those that are more reliable. This is fine: false positives are better than
+false negatives as we don't want to teach maintainers to merge red PRs. If the
+test failure is believed to be due to a bug in Homebrew/brew or the CI system,
+that bug must be fixed, or worked around in the formula to yield a passing test,
+before the PR can be merged.
+
 ## Common “gotchas”
 1.  [Ensure you have set your username and email address
     properly](https://help.github.com/articles/setting-your-email-in-git/)
