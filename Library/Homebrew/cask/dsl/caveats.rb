@@ -141,21 +141,6 @@ module Cask
             #{web_page}
         EOS
       end
-
-      caveat :malware do |radar_number|
-        <<~EOS
-          #{@cask} has been reported to bundle malware. Like with any app, use at your own risk.
-
-          A report has been made to Apple about this app. Their certificate will hopefully be revoked.
-          See the public report at
-            #{Formatter.url("https://openradar.appspot.com/#{radar_number}")}
-
-          If this report is accurate, please duplicate it at
-            #{Formatter.url("https://bugreport.apple.com/")}
-          If this report is a mistake, please let us know by opening an issue at
-            #{Formatter.url("https://github.com/Homebrew/homebrew-cask/issues/new")}
-        EOS
-      end
     end
   end
 end
