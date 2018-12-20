@@ -233,6 +233,9 @@ module Superenv
     if ARGV.build_bottle?
       arch = ARGV.bottle_arch || Hardware.oldest_cpu
       Hardware::CPU.optimization_flags.fetch(arch)
+    # If the CPU doesn't support SSE4, we cannot trust -march=native or
+    # -march=<cpu family> to do the right thing because we might be running
+    # in a VM or on a Hackintosh.
     elsif Hardware::CPU.intel? && !Hardware::CPU.sse4?
       Hardware::CPU.optimization_flags.fetch(Hardware.oldest_cpu)
     elsif ![:gcc_4_0, :gcc_4_2].include?(compiler)
