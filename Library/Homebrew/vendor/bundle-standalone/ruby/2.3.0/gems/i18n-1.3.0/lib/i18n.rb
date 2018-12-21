@@ -362,7 +362,18 @@ module I18n
         else
           keys = key.to_s.split(separator)
           keys.delete('')
-          keys.map! { |k| k.to_sym }
+          keys.map! do |k|
+            case k
+            when /\A[-+]?\d+\z/ # integer
+              k.to_i
+            when 'true'
+              true
+            when 'false'
+              false
+            else
+              k.to_sym
+            end
+          end
           keys
         end
     end

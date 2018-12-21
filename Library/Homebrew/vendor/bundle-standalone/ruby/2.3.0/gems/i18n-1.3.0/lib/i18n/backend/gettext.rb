@@ -31,6 +31,8 @@ module I18n
     # Without it strings containing periods (".") will not be translated.
 
     module Gettext
+      using I18n::HashRefinements
+
       class PoData < Hash
         def set_comment(msgid_or_sym, comment)
           # ignore

@@ -7,6 +7,7 @@ require 'i18n/core_ext/hash'
 module I18n
   module Backend
     module Base
+      using I18n::HashRefinements
       include I18n::Backend::Transliterator
 
       # Accepts a list of paths to translation files. Loads translations from
