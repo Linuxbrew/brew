@@ -984,6 +984,9 @@ If no arguments are passed, use `origin/master` as the start commit.
 * `--before`:
   Use the commit at provided *`date`* as the start commit.
 
+  * `vendor-gems`:
+    Install and commit Homebrew's vendored gems.
+
 ## GLOBAL OPTIONS
 
 These options are applicable across all sub-commands.
