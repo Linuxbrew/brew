@@ -7,10 +7,11 @@ module Hardware
 
     class << self
       OPTIMIZATION_FLAGS = {
-        core2: "-march=core2",
-        core:  "-march=prescott",
-        armv6: "-march=armv6",
-        armv8: "-march=armv8-a",
+        nehalem: "-march=nehalem -msse4.2",
+        core2:   "-march=core2",
+        core:    "-march=prescott",
+        armv6:   "-march=armv6",
+        armv8:   "-march=armv8-a",
       }.freeze
 
       def optimization_flags
@@ -130,35 +131,38 @@ module Hardware
     end
   end
 
-  def self.cores_as_words
-    case Hardware::CPU.cores
-    when 1 then "single"
-    when 2 then "dual"
-    when 4 then "quad"
-    when 6 then "hexa"
-    when 8 then "octa"
-    when 12 then "dodeca"
-    else
-      Hardware::CPU.cores
+  class << self
+    def cores_as_words
+      case Hardware::CPU.cores
+      when 1 then "single"
+      when 2 then "dual"
+      when 4 then "quad"
+      when 6 then "hexa"
+      when 8 then "octa"
+      when 12 then "dodeca"
+      else
+        Hardware::CPU.cores
+      end
     end
-  end
 
-  def self.oldest_cpu
-    if Hardware::CPU.intel?
-      if Hardware::CPU.is_64_bit?
-        :core2
+    def oldest_cpu
+      if Hardware::CPU.intel?
+        if Hardware::CPU.is_64_bit?
+          :core2
+        else
+          :core
+        end
+      elsif Hardware::CPU.arm?
+        if Hardware::CPU.is_64_bit?
+          :armv8
+        else
+          :armv6
+        end
       else
-        :core
+        Hardware::CPU.family
       end
-    elsif Hardware::CPU.arm?
-      if Hardware::CPU.is_64_bit?
-        :armv8
-      else
-        :armv6
-      end
-    else
-      Hardware::CPU.family
     end
+    alias generic_oldest_cpu oldest_cpu
   end
 end
 
