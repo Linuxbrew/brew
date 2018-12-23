@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'i18n/backend/base'
+
 module I18n
   module Backend
     # A simple backend that reads translations from YAML files and stores them in
@@ -17,6 +19,8 @@ module I18n
     #
     # I18n::Backend::Simple.include(I18n::Backend::Pluralization)
     class Simple
+      using I18n::HashRefinements
+
       (class << self; self; end).class_eval { public :include }
 
       module Implementation
@@ -39,7 +43,7 @@ module I18n
           end
           locale = locale.to_sym
           translations[locale] ||= {}
-          data = data.deep_stringify_keys.deep_symbolize_keys
+          data = data.deep_symbolize_keys
           translations[locale].deep_merge!(data)
         end
 
@@ -84,8 +88,11 @@ module I18n
           keys = I18n.normalize_keys(locale, key, scope, options[:separator])
 
           keys.inject(translations) do |result, _key|
-            _key = _key.to_sym
-            return nil unless result.is_a?(Hash) && result.has_key?(_key)
+            return nil unless result.is_a?(Hash)
+            unless result.has_key?(_key)
+              _key = _key.to_s.to_sym
+              return nil unless result.has_key?(_key)
+            end
             result = result[_key]
             result = resolve(locale, _key, result, options.merge(:scope => nil)) if result.is_a?(Symbol)
             result

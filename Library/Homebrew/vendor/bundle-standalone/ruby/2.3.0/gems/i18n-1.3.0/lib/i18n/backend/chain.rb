@@ -17,6 +17,8 @@ module I18n
     # The implementation assumes that all backends added to the Chain implement
     # a lookup method with the same API as Simple backend does.
     class Chain
+      using I18n::HashRefinements
+
       module Implementation
         include Base
 
@@ -34,7 +36,7 @@ module I18n
           end
           true
         end
-          
+
         def reload!
           backends.each { |backend| backend.reload! }
         end
@@ -94,7 +96,7 @@ module I18n
               init_translations unless initialized?
               translations
             end
-          end  
+          end
 
           def namespace_lookup?(result, options)
             result.is_a?(Hash) && !options.has_key?(:count)

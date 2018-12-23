@@ -67,6 +67,8 @@ module I18n
     #
     # This is useful if you are using a KeyValue backend chained to a Simple backend.
     class KeyValue
+      using I18n::HashRefinements
+
       module Implementation
         attr_accessor :store
 
