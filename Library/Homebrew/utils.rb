@@ -300,7 +300,7 @@ end
 def safe_system(cmd, *args, **options)
   return if Homebrew.system(cmd, *args, **options)
 
-  raise(ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS))
+  raise ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS)
 end
 
 # Prints no output
