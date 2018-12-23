@@ -52,7 +52,7 @@ def curl_download(*args, to: nil, **options)
   destination.dirname.mkpath
 
   continue_at = if destination.exist? &&
-                   curl_output("--location", "--head", "--range", "0-1",
+                   curl_output("--location", "--range", "0-1",
                                "--write-out", "%{http_code}",
                                "--output", "/dev/null", *args, **options).stdout.to_i == 206 # Partial Content
     "-"
