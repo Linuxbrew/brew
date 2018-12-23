@@ -21,7 +21,7 @@ Homebrew uses Git for downloading updates and contributing to the project.
 
 Homebrew installs to the `Cellar` and then symlinks some of the installation into `/usr/local` so that other programs can see what's going on. We suggest you `brew ls` a few of the kegs in your Cellar to see how it is all arranged.
 
-Packages are installed according to their formulae, which live in `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula`. Check one out a simple one, e.g. `brew edit etl` (or [`etl`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/etl.rb)) or a more advanced one, e.g. `brew edit git` (or [`git`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/git.rb)).
+Packages are installed according to their formulae, which live in `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula`. Check out a simple one, e.g. `brew edit etl` (or [`etl`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/etl.rb)) or a more advanced one, e.g. `brew edit git` (or [`git`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/git.rb)).
 
 ## Basic instructions
 
