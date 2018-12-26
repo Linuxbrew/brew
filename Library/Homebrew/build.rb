@@ -202,7 +202,7 @@ rescue Exception => e # rubocop:disable Lint/RescueException
     error_hash["cmd"] = e.cmd
     error_hash["args"] = e.args
     error_hash["env"] = e.env
-  elsif error_hash["json_class"] = "ErrorDuringExecution"
+  elsif error_hash["json_class"] == "ErrorDuringExecution"
     error_hash["cmd"] = e.cmd
     error_hash["status"] = e.status.exitstatus
     error_hash["output"] = e.output
