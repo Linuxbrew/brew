@@ -88,7 +88,8 @@ module Homebrew
     puts "Start commit: #{start_commit}"
     puts "End   commit: #{end_commit}"
 
-    mkdir "update-test" do
+    mkdir "update-test"
+    chdir "update-test" do
       curdir = Pathname.new(Dir.pwd)
 
       oh1 "Setup test environment..."
