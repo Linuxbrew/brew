@@ -113,6 +113,7 @@ then
   fi
 
   HOMEBREW_CACHE="${HOMEBREW_CACHE:-${HOME}/Library/Caches/Homebrew}"
+  HOMEBREW_LOGS="${HOMEBREW_LOGS:-${HOME}/Library/Logs/Homebrew}"
   HOMEBREW_SYSTEM_TEMP="/private/tmp"
 else
   HOMEBREW_PROCESSOR="$(uname -m)"
@@ -142,6 +143,7 @@ else
 
   CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
   HOMEBREW_CACHE="${HOMEBREW_CACHE:-${CACHE_HOME}/Homebrew}"
+  HOMEBREW_LOGS="${HOMEBREW_LOGS:-${CACHE_HOME}/Homebrew/Logs}"
   HOMEBREW_SYSTEM_TEMP="/tmp"
 fi
 
@@ -194,6 +196,7 @@ export HOMEBREW_TEMP
 # Declared in brew.sh
 export HOMEBREW_VERSION
 export HOMEBREW_CACHE
+export HOMEBREW_LOGS
 export HOMEBREW_CELLAR
 export HOMEBREW_SYSTEM
 export HOMEBREW_CURL
