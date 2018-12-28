@@ -16,7 +16,7 @@ $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/extensions/universal-darwi
 $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/jaro_winkler-1.5.1/lib"
 $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/parallel-1.12.1/lib"
 $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/parser-2.5.3.0/lib"
-$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/plist-3.4.0/lib"
+$:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/plist-3.5.0/lib"
 $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/powerpack-0.1.2/lib"
 $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/rainbow-3.0.0/lib"
 $:.unshift "#{path}/../#{ruby_engine}/#{ruby_version}/gems/ruby-progressbar-1.10.0/lib"
