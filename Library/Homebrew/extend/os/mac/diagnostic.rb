@@ -284,6 +284,17 @@ module Homebrew
         EOS
       end
 
+      def check_homebrew_prefix
+        return if HOMEBREW_PREFIX.to_s == "/usr/local"
+
+        <<~EOS
+          Your Homebrew's prefix is not /usr/local.
+          You can install Homebrew anywhere you want but some bottles (binary packages)
+          can only be used with a /usr/local prefix and some formulae (packages)
+          may not build correctly with a non-/usr/local prefix.
+        EOS
+      end
+
       def check_for_gettext
         find_relative_paths("lib/libgettextlib.dylib",
                             "lib/libintl.dylib",

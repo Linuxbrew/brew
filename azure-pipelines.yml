@@ -35,11 +35,7 @@ jobs:
     vmImage: ubuntu-16.04
   steps:
     - bash: |
-        HOMEBREW_REPOSITORY=/home/linuxbrew/.linuxbrew
-        sudo mkdir -p /home/linuxbrew
-        sudo mv "$PWD" "$HOMEBREW_REPOSITORY"
-        sudo ln -s "$HOMEBREW_REPOSITORY" "$PWD"
-        "$HOMEBREW_REPOSITORY/bin/brew" test-bot
+        "$PWD/bin/brew" test-bot
       displayName: Run brew test-bot
       env:
         HOMEBREW_GITHUB_API_TOKEN: $(github.publicApiToken)

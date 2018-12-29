@@ -32,6 +32,12 @@ describe Homebrew::Diagnostic::Checks do
       .to match("Xcode alone is not sufficient on El Capitan")
   end
 
+  specify "#check_homebrew_prefix" do
+    # the integration tests are run in a special prefix
+    expect(subject.check_homebrew_prefix)
+      .to match("Your Homebrew's prefix is not /usr/local.")
+  end
+
   specify "#check_ruby_version" do
     allow(MacOS).to receive(:version).and_return(OS::Mac::Version.new("10.12"))
     stub_const("RUBY_VERSION", "1.8.6")
