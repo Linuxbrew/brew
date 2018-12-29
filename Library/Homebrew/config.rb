@@ -36,13 +36,11 @@ HOMEBREW_CACHE = Pathname.new(ENV["HOMEBREW_CACHE"])
 HOMEBREW_CACHE_FORMULA = HOMEBREW_CACHE/"Formula"
 
 # Where build, postinstall, and test logs of formulae are written to
-HOMEBREW_LOGS = Pathname.new(ENV["HOMEBREW_LOGS"] || "~/Library/Logs/Homebrew/").expand_path
+HOMEBREW_LOGS = Pathname.new(ENV["HOMEBREW_LOGS"]).expand_path
 
 # Must use `/tmp` instead of `TMPDIR` because long paths break Unix domain sockets
 HOMEBREW_TEMP = begin
-  # /tmp fallback is here for people auto-updating from a version where
-  # HOMEBREW_TEMP isn't set.
-  tmp = Pathname.new(ENV["HOMEBREW_TEMP"] || "/tmp")
+  tmp = Pathname.new(ENV["HOMEBREW_TEMP"])
   tmp.mkpath unless tmp.exist?
   tmp.realpath
 end

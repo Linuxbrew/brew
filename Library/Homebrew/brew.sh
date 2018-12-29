@@ -395,12 +395,15 @@ update-preinstall-timer() {
 update-preinstall() {
   [[ -z "$HOMEBREW_HELP" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
+  [[ -z "$HOMEBREW_AUTO_UPDATING" ]] || return
   [[ -z "$HOMEBREW_AUTO_UPDATE_CHECKED" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ||
         "$HOMEBREW_CASK_COMMAND" = "install" || "$HOMEBREW_CASK_COMMAND" = "upgrade" ]]
   then
+    export HOMEBREW_AUTO_UPDATING="1"
+
     if [[ -z "$HOMEBREW_VERBOSE" ]]
     then
       update-preinstall-timer &
@@ -417,17 +420,14 @@ update-preinstall() {
       kill "$timer_pid" 2>/dev/null
       wait "$timer_pid" 2>/dev/null
     fi
-  fi
 
-  # If brew update --preinstall did a migration then export the new locations.
-  if [[ "$HOMEBREW_REPOSITORY" = "/usr/local" &&
-        ! -d "$HOMEBREW_REPOSITORY/.git" &&
-        -d "/usr/local/Homebrew/.git" ]]
-  then
-    HOMEBREW_REPOSITORY="/usr/local/Homebrew"
-    HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
-    export HOMEBREW_REPOSITORY
-    export HOMEBREW_LIBRARY
+    unset HOMEBREW_AUTO_UPDATING
+
+    # If we've checked for updates, we don't need to check again.
+    export HOMEBREW_AUTO_UPDATE_CHECKED="1"
+
+    # exec a new process to set any new environment variables.
+    exec "$HOMEBREW_BREW_FILE" "$@"
   fi
 
   # If we've checked for updates, we don't need to check again.
@@ -444,7 +444,7 @@ then
   # Don't need shellcheck to follow this `source`.
   # shellcheck disable=SC1090
   source "$HOMEBREW_BASH_COMMAND"
-  { update-preinstall; "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
+  { update-preinstall "$@"; "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
 else
   # Don't need shellcheck to follow this `source`.
   # shellcheck disable=SC1090
@@ -453,5 +453,5 @@ else
 
   # Unshift command back into argument list (unless argument list was empty).
   [[ "$HOMEBREW_ARG_COUNT" -gt 0 ]] && set -- "$HOMEBREW_COMMAND" "$@"
-  { update-preinstall; exec "$HOMEBREW_RUBY_PATH" $HOMEBREW_RUBY_WARNINGS "$HOMEBREW_LIBRARY/Homebrew/brew.rb" "$@"; }
+  { update-preinstall "$@"; exec "$HOMEBREW_RUBY_PATH" $HOMEBREW_RUBY_WARNINGS "$HOMEBREW_LIBRARY/Homebrew/brew.rb" "$@"; }
 fi
