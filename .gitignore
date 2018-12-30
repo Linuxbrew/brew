@@ -119,9 +119,8 @@
 /docs/.jekyll-metadata
 
 # Unignore our root-level metadata files.
+!/.editorconfig
 !/.gitignore
-!/.travis.yml
-!/.codecov.yml
 !/.yardopts
 !/CHANGELOG.md
 !/CODE_OF_CONDUCT.md

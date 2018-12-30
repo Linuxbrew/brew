@@ -61,6 +61,7 @@ module Homebrew
       ENV.delete("HOMEBREW_NO_GITHUB_API")
       ENV.delete("HOMEBREW_NO_EMOJI")
       ENV.delete("HOMEBREW_DEVELOPER")
+      ENV.delete("HOMEBREW_INSTALL_CLEANUP")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_NO_COMPAT"] = "1" if args.no_compat?
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if args.generic?
