@@ -741,10 +741,6 @@ class FormulaInstaller
     ].concat(build_argv)
 
     Utils.safe_fork do
-      # Invalidate the current sudo timestamp in case a build script calls sudo.
-      # Travis CI's Linux sudoless workers have a weird sudo that fails here.
-      system "/usr/bin/sudo", "-k" if ENV["HOMEBREW_TRAVIS_SUDO"] != "false"
-
       if Sandbox.formula?(formula)
         sandbox = Sandbox.new
         formula.logs.mkpath

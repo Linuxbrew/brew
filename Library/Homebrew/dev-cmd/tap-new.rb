@@ -51,30 +51,23 @@ module Homebrew
     MARKDOWN
     write_path(tap, "README.md", readme)
 
-    travis = <<~YAML
-      language: c
-      os: osx
-      compiler: clang
-      osx_image: xcode9.2
-      cache:
-        directories:
-          - #{Homebrew::DEFAULT_PREFIX}/Homebrew/Library/Homebrew/vendor/bundle
-      branches:
-        only:
-          - master
-
-      before_install:
-        - sudo chown -R "$USER" "$(brew --repo)"
-        - travis_retry brew update
-        - HOMEBREW_TAP_DIR="$(brew --repo "$TRAVIS_REPO_SLUG")"
-        - mkdir -p "$HOMEBREW_TAP_DIR"
-        - rm -rf "$HOMEBREW_TAP_DIR"
-        - ln -s "$PWD" "$HOMEBREW_TAP_DIR"
-
-      script:
-        - brew test-bot
+    azure = <<~YAML
+      jobs:
+      - job: macOS
+        pool:
+          vmImage: xcode9-macos10.13
+        steps:
+          - bash: |
+              sudo xcode-select --switch /Applications/Xcode_10.app/Contents/Developer
+              brew update
+              HOMEBREW_TAP_DIR="/usr/local/Homebrew/Library/Taps/#{tap}"
+              mkdir -p "$HOMEBREW_TAP_DIR"
+              rm -rf "$HOMEBREW_TAP_DIR"
+              ln -s "$PWD" "$HOMEBREW_TAP_DIR"
+              brew test-bot
+            displayName: Run brew test-bot
     YAML
-    write_path(tap, ".travis.yml", travis)
+    write_path(tap, "azure-pipelines.yml", azure)
   end
 
   def write_path(tap, filename, content)
