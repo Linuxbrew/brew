@@ -2,7 +2,7 @@ if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
 
   formatters = [SimpleCov::Formatter::HTMLFormatter]
-  if ENV["HOMEBREW_COVERALLS_REPO_TOKEN"] || ENV["HOMEBREW_TRAVIS_CI"]
+  if ENV["HOMEBREW_COVERALLS_REPO_TOKEN"]
     require "coveralls"
 
     if !ENV["HOMEBREW_COLOR"] && (ENV["HOMEBREW_NO_COLOR"] || !$stdout.tty?)

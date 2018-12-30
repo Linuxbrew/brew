@@ -32,7 +32,7 @@ def curl_args(*extra_args, show_output: false, user_agent: :default)
     args << "--fail"
     args << "--progress-bar" unless ARGV.verbose?
     args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
-    args << "--silent" if !$stdout.tty? || ENV["HOMEBREW_TRAVIS_CI"]
+    args << "--silent" unless $stdout.tty?
   end
 
   args + extra_args
