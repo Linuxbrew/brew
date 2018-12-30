@@ -10,10 +10,11 @@ jobs:
         sudo rm -rf "$HOMEBREW_REPOSITORY"
         sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY"
         brew update-reset Library/Taps/homebrew/homebrew-core
-        brew test-bot --coverage
+        brew test-bot
       displayName: Run brew test-bot
       env:
         HOMEBREW_GITHUB_API_TOKEN: $(github.publicApiToken)
+        HOMEBREW_COVERALLS_REPO_TOKEN: $(coveralls.homebrewBrewApiToken)
 
     - task: PublishTestResults@2
       displayName: Publish test-bot test results
