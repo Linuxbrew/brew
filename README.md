@@ -20,7 +20,6 @@ Second, read the [Troubleshooting Checklist](https://docs.brew.sh/Troubleshootin
 
 ## Contributing
 [![Azure Pipelines](https://img.shields.io/vso/build/Homebrew/56a87eb4-3180-495a-9117-5ed6c79da737/1.svg)](https://dev.azure.com/Homebrew/Homebrew/_build/latest?definitionId=1)
-[![Codecov](https://img.shields.io/codecov/c/github/Homebrew/brew.svg)](https://codecov.io/gh/Homebrew/brew)
 
 We'd love you to contribute to Homebrew. First, please read our [Contribution Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md#code-of-conduct).
 
