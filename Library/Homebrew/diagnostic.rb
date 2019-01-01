@@ -95,6 +95,16 @@ module Homebrew
         ]).freeze
       end
 
+      def please_create_pull_requests(what = "unsupported configuration")
+        <<~EOS
+          You may encounter build failures and other breakages.
+          Please create pull requests instead of asking for help on
+          Homebrew's GitHub, Discourse, Twitter or IRC. You are
+          responsible for resolving any issues you experience, as
+          you are running this #{what}.
+        EOS
+      end
+
       def check_for_installed_developer_tools
         return if DevelopmentTools.installed?
 
