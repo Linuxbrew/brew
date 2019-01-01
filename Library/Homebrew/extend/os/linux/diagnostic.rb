@@ -1,6 +1,8 @@
 require "tempfile"
 require "utils/shell"
 require "os/linux/diagnostic"
+require "os/linux/glibc"
+require "os/linux/kernel"
 
 module Homebrew
   module Diagnostic
@@ -57,6 +59,33 @@ module Homebrew
           be world-writable. This issue can be resolved by adding umask 002 to
           your #{shell_profile}
             echo 'umask 002' >> #{shell_profile}
+        EOS
+      end
+
+      def check_glibc_minimum_version
+        return unless OS::Linux::Glibc.below_minimum_version?
+
+        <<~EOS
+          Your system glibc #{OS::Linux::Glibc.system_version} is too old.
+          We only support glibc #{OS::Linux::Glibc.minimum_version} or later.
+          #{please_create_pull_requests}
+          We recommend updating to a newer version via your distribution's
+          package manager, upgrading your distribution to the latest version,
+          or changing distributions.
+        EOS
+      end
+
+      def check_kernel_minimum_version
+        return unless OS::Linux::Kernel.below_minimum_version?
+
+        <<~EOS
+          Your Linux kernel #{OS::Linux::Kernel.version} is too old.
+          We only support kernel #{OS::Linux::Kernel.minimum_version} or later.
+          You will be unable to use binary packages (bottles).
+          #{please_create_pull_requests}
+          We recommend updating to a newer version via your distribution's
+          package manager, upgrading your distribution to the latest version,
+          or changing distributions.
         EOS
       end
     end
