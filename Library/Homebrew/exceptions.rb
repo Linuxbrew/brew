@@ -539,7 +539,8 @@ class ErrorDuringExecution < RuntimeError
     s = "Failure while executing; `#{cmd.shelljoin.gsub(/\\=/, "=")}` exited with #{exitstatus}."
 
     unless [*output].empty?
-      format_output_line = lambda do |type, line|
+      format_output_line = lambda do |type_line|
+        type, line = *type_line
         if type == :stderr
           Formatter.error(line)
         else
