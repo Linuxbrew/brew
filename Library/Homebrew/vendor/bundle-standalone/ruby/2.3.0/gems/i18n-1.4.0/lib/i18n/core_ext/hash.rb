@@ -1,20 +1,19 @@
 module I18n
   module HashRefinements
     refine Hash do
-      def slice(*keep_keys)
-        h = {}
-        keep_keys.each { |key| h[key] = fetch(key) if has_key?(key) }
-        h
+      using I18n::HashRefinements
+      def except(*keys)
+        dup.except!(*keys)
       end
 
-      def except(*less_keys)
-        slice(*keys - less_keys)
+      def except!(*keys)
+        keys.each { |key| delete(key) }
+        self
       end
 
       def deep_symbolize_keys
         each_with_object({}) do |(key, value), result|
-          value = value.deep_symbolize_keys if value.is_a?(Hash)
-          result[symbolize_key(key)] = value
+          result[symbolize_key(key)] = deep_symbolize_keys_in_object(value)
           result
         end
       end
@@ -27,10 +26,21 @@ module I18n
         merge!(data, &merger)
       end
 
-      private
-
       def symbolize_key(key)
         key.respond_to?(:to_sym) ? key.to_sym : key
+      end
+
+      private
+
+      def deep_symbolize_keys_in_object(value)
+        case value
+        when Hash
+          value.deep_symbolize_keys
+        when Array
+          value.map { |e| deep_symbolize_keys_in_object(e) }
+        else
+          value
+        end
       end
     end
   end
