@@ -19,10 +19,5 @@ describe "brew prune", :integration_test do
     expect(share/"pruneable").not_to be_a_directory
     expect(share/"notpruneable").to be_a_directory
     expect(share/"pruneable_symlink").not_to be_a_symlink
-
-    expect { brew "prune", "--verbose" }
-      .to output(/Nothing pruned/).to_stdout
-      .and not_to_output.to_stderr
-      .and be_a_success
   end
 end
