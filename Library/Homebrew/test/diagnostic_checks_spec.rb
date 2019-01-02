@@ -162,4 +162,10 @@ describe Homebrew::Diagnostic::Checks do
       end
     end
   end
+
+  specify "#check_homebrew_prefix" do
+    # the integration tests are run in a special prefix
+    expect(subject.check_homebrew_prefix)
+      .to match("Your Homebrew's prefix is not #{Homebrew::DEFAULT_PREFIX}")
+  end
 end
