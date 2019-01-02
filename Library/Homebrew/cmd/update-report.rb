@@ -342,8 +342,8 @@ class Reporter
           ohai "#{name} has been moved to Homebrew Cask."
           ohai "brew unlink #{name}"
           system HOMEBREW_BREW_FILE, "unlink", name
-          ohai "brew prune"
-          system HOMEBREW_BREW_FILE, "prune"
+          ohai "brew cleanup"
+          system HOMEBREW_BREW_FILE, "cleanup"
           ohai "brew cask install #{new_name}"
           system HOMEBREW_BREW_FILE, "cask", "install", new_name
           ohai <<~EOS

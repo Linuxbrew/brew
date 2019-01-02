@@ -409,11 +409,7 @@ these flags should only appear after a command.
     Rerun the post-install steps for *`formula`*.
 
   * `prune` [`--dry-run`]:
-    Remove dead symlinks from the Homebrew prefix. This is generally not
-    needed, but can be useful when doing DIY installations.
-
-    If `--dry-run` or `-n` is passed, show what would be removed, but do not
-    actually remove anything.
+    Deprecated. Use `brew cleanup` instead.
 
   * `readall` [`--aliases`] [`--syntax`] [*`taps`*]:
     Import all formulae from specified *`taps`* (defaults to all installed taps).

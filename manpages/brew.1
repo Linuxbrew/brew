@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "December 2018" "Homebrew" "brew"
+.TH "BREW" "1" "January 2019" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -416,10 +416,7 @@ Rerun the post\-install steps for \fIformula\fR\.
 .
 .TP
 \fBprune\fR [\fB\-\-dry\-run\fR]
-Remove dead symlinks from the Homebrew prefix\. This is generally not needed, but can be useful when doing DIY installations\.
-.
-.IP
-If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do not actually remove anything\.
+Deprecated\. Use \fBbrew cleanup\fR instead\.
 .
 .TP
 \fBreadall\fR [\fB\-\-aliases\fR] [\fB\-\-syntax\fR] [\fItaps\fR]

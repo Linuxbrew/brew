@@ -288,7 +288,7 @@ module Homebrew
         return if broken_symlinks.empty?
 
         inject_file_list broken_symlinks, <<~EOS
-          Broken symlinks were found. Remove them with `brew prune`:
+          Broken symlinks were found. Remove them with `brew cleanup`:
         EOS
       end
 

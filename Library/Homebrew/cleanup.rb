@@ -163,6 +163,7 @@ module Homebrew
 
         cleanup_old_cache_db
         rm_ds_store
+        prune_prefix_symlinks_and_directories
       else
         args.each do |arg|
           formula = begin
@@ -357,6 +358,52 @@ module Homebrew
           args:         [dir, "-name", ".DS_Store", "-delete"],
           print_stderr: false
       end
+    end
+
+    def prune_prefix_symlinks_and_directories
+      ObserverPathnameExtension.reset_counts!
+
+      dirs = []
+
+      Keg::MUST_EXIST_SUBDIRECTORIES.each do |dir|
+        next unless dir.directory?
+
+        dir.find do |path|
+          path.extend(ObserverPathnameExtension)
+          if path.symlink?
+            unless path.resolved_path_exists?
+              if path.to_s =~ Keg::INFOFILE_RX
+                path.uninstall_info unless dry_run?
+              end
+
+              if dry_run?
+                puts "Would remove (broken link): #{path}"
+              else
+                path.unlink
+              end
+            end
+          elsif path.directory? && !Keg::MUST_EXIST_SUBDIRECTORIES.include?(path)
+            dirs << path
+          end
+        end
+      end
+
+      dirs.reverse_each do |d|
+        if dry_run? && d.children.empty?
+          puts "Would remove (empty directory): #{d}"
+        else
+          d.rmdir_if_possible
+        end
+      end
+
+      return if dry_run?
+
+      return if ObserverPathnameExtension.total.zero?
+
+      n, d = ObserverPathnameExtension.counts
+      print "Pruned #{n} symbolic links "
+      print "and #{d} directories " if d.positive?
+      puts "from #{HOMEBREW_PREFIX}"
     end
   end
 end
