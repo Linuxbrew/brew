@@ -791,6 +791,17 @@ module Homebrew
         end.join("\n")
       end
 
+      def check_homebrew_prefix
+        return if HOMEBREW_PREFIX.to_s == Homebrew::DEFAULT_PREFIX
+
+        <<~EOS
+          Your Homebrew's prefix is not #{Homebrew::DEFAULT_PREFIX}.
+          You can install Homebrew anywhere you want but some bottles (binary packages)
+          can only be used with a standard prefix and some formulae (packages)
+          may not build correctly with a non-standard prefix.
+        EOS
+      end
+
       def all
         methods.map(&:to_s).grep(/^check_/)
       end
