@@ -11,6 +11,14 @@ module OS
 
         @system_version = Version.new version
       end
+
+      def minimum_version
+        Version.new "2.12"
+      end
+
+      def below_minimum_version?
+        system_version < minimum_version
+      end
     end
   end
 end
