@@ -312,9 +312,6 @@ these flags should only appear after a command.
     If `--git` (or `-g`) is passed, Homebrew will create a Git repository, useful for
     creating patches to the software.
 
-    If `HOMEBREW_INSTALL_CLEANUP` is set then remove previously installed versions
-    of upgraded *`formulae`* as well as the HOMEBREW_CACHE for that formula.
-
   * `leaves`:
     Show installed formulae that are not dependencies of another installed formula.
 
@@ -599,13 +596,10 @@ these flags should only appear after a command.
     `repositories`) using `git`(1) to their latest `origin/master`. Note this
     will destroy all your uncommitted or committed changes.
 
-  * `upgrade` [*`install-options`*] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`--display-times`] [*`formulae`*]:
+  * `upgrade` [*`install-options`*] [`--fetch-HEAD`] [`--ignore-pinned`] [`--display-times`] [*`formulae`*]:
     Upgrade outdated, unpinned brews (with existing install options).
 
     Options for the `install` command are also valid here.
-
-    If `--cleanup` is specified or `HOMEBREW_INSTALL_CLEANUP` is set then remove
-    previously installed version(s) of upgraded *`formulae`*.
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
     the HEAD installation of the formula is outdated. Otherwise, the
@@ -1198,6 +1192,16 @@ Note that environment variables must have a value set to be detected. For exampl
 
     *Default:* the beer emoji.
 
+  * `HOMEBREW_INSTALL_CLEANUP`:
+    If set, `brew install`, `brew upgrade` and `brew reinstall` will remove
+    previously installed version(s) of the installed/upgraded formulae.
+
+    If `brew cleanup` has not been run in 30 days then it will be run at this
+    time.
+
+    This will become the default in a later version of Homebrew. To opt-out see
+    `HOMEBREW_NO_INSTALL_CLEANUP`.
+
   * `HOMEBREW_LOGS`:
     If set, Homebrew will use the specified directory to store log files.
 
@@ -1235,6 +1239,11 @@ Note that environment variables must have a value set to be detected. For exampl
     If set, Homebrew will not use the GitHub API, e.g. for searches or
     fetching relevant issues on a failed install.
 
+  * `HOMEBREW_NO_INSTALL_CLEANUP`:
+    If set, `brew install`, `brew upgrade` and `brew reinstall` will never
+    automatically remove the previously installed version(s) of the
+    installed/upgraded formulae.
+
   * `HOMEBREW_PRY`:
     If set, Homebrew will use Pry for the `brew irb` command.
 
@@ -1255,9 +1264,6 @@ Note that environment variables must have a value set to be detected. For exampl
   * `HOMEBREW_UPDATE_TO_TAG`:
     If set, instructs Homebrew to always use the latest stable tag (even if
     developer commands have been run).
-
-  * `HOMEBREW_UPGRADE_CLEANUP`:
-    If set, `brew upgrade` always assumes `--cleanup` has been passed.
 
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.

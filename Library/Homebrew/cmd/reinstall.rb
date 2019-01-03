@@ -12,6 +12,7 @@ require "development_tools"
 require "messages"
 require "reinstall"
 require "cli_parser"
+require "cleanup"
 
 module Homebrew
   module_function
@@ -49,7 +50,7 @@ module Homebrew
       end
       Migrator.migrate_if_needed(f)
       reinstall_formula(f)
-      Cleanup.new.cleanup_formula(f) if ENV["HOMEBREW_INSTALL_CLEANUP"]
+      Cleanup.install_formula_clean!(f)
     end
     Homebrew.messages.display_messages
   end

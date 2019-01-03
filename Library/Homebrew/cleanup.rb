@@ -3,9 +3,10 @@ require "formula"
 require "cask/cask_loader"
 require "set"
 
-module CleanupRefinement
-  LATEST_CASK_OUTDATED = 7.days.ago
+CLEANUP_DEFAULT_DAYS = 30
+CLEANUP_MAX_AGE_DAYS = 120
 
+module CleanupRefinement
   refine Enumerator do
     def parallel
       queue = Queue.new
@@ -123,7 +124,7 @@ module CleanupRefinement
 
       return true if scrub && !cask.versions.include?(cask.version)
 
-      return mtime < LATEST_CASK_OUTDATED if cask.version.latest?
+      return mtime < CLEANUP_DEFAULT_DAYS.days.ago if cask.version.latest?
 
       false
     end
@@ -136,6 +137,8 @@ module Homebrew
   class Cleanup
     extend Predicable
 
+    PERIODIC_CLEAN_FILE = HOMEBREW_CACHE/".cleaned"
+
     attr_predicate :dry_run?, :scrub?
     attr_reader :args, :days, :cache
     attr_reader :disk_cleanup_size
@@ -145,9 +148,36 @@ module Homebrew
       @args = args
       @dry_run = dry_run
       @scrub = scrub
-      @days = days
+      @days = days || CLEANUP_MAX_AGE_DAYS
       @cache = cache
       @cleaned_up_paths = Set.new
+    end
+
+    def self.install_formula_clean!(f)
+      return if ENV["HOMEBREW_NO_INSTALL_CLEANUP"]
+      return unless ENV["HOMEBREW_INSTALL_CLEANUP"]
+
+      cleanup = Cleanup.new
+      if cleanup.periodic_clean_due?
+        cleanup.periodic_clean!
+      elsif f.installed?
+        cleanup.cleanup_formula(f)
+      end
+    end
+
+    def periodic_clean_due?
+      return false if ENV["HOMEBREW_NO_INSTALL_CLEANUP"]
+      return unless ENV["HOMEBREW_INSTALL_CLEANUP"]
+      return true unless PERIODIC_CLEAN_FILE.exist?
+
+      PERIODIC_CLEAN_FILE.mtime < CLEANUP_DEFAULT_DAYS.days.ago
+    end
+
+    def periodic_clean!
+      return false unless periodic_clean_due?
+
+      ohai "`brew cleanup` has not been run in #{CLEANUP_DEFAULT_DAYS} days, running now..."
+      clean!
     end
 
     def clean!
@@ -164,6 +194,7 @@ module Homebrew
         cleanup_old_cache_db
         rm_ds_store
         prune_prefix_symlinks_and_directories
+        FileUtils.touch PERIODIC_CLEAN_FILE
       else
         args.each do |arg|
           formula = begin
@@ -208,13 +239,16 @@ module Homebrew
       unremovable_kegs << keg
     end
 
-    DEFAULT_LOG_DAYS = 14
-
     def cleanup_logs
       return unless HOMEBREW_LOGS.directory?
+      logs_days = if days > CLEANUP_DEFAULT_DAYS
+        CLEANUP_DEFAULT_DAYS
+      else
+        days
+      end
 
       HOMEBREW_LOGS.subdirs.each do |dir|
-        cleanup_path(dir) { dir.rmtree } if dir.prune?(days || DEFAULT_LOG_DAYS)
+        cleanup_path(dir) { dir.rmtree } if dir.prune?(logs_days)
       end
     end
 
