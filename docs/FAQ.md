@@ -121,8 +121,8 @@ Or:
     fix this for Homebrew formulae (although we don’t always test for
     it), but you’ll find that many RubyGems and Python setup scripts
     break which is something outside our control.
-3.  **It’s safe**<br>Apple has assigned this directory for non-system utilities. Which means
-    there is no files in `/usr/local` by default, so there
+3.  **It’s safe**<br>Apple has assigned this directory for non-system utilities. This means
+    there are no files in `/usr/local` by default, so there
     is no need to worry about messing up existing or system tools.
 
 **If you plan to install gems that depend on
