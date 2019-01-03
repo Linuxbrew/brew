@@ -315,9 +315,6 @@ If \fB\-\-interactive\fR (or \fB\-i\fR) is passed, download and patch \fIformula
 .IP
 If \fB\-\-git\fR (or \fB\-g\fR) is passed, Homebrew will create a Git repository, useful for creating patches to the software\.
 .
-.IP
-If \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed versions of upgraded \fIformulae\fR as well as the HOMEBREW_CACHE for that formula\.
-.
 .TP
 \fBleaves\fR
 Show installed formulae that are not dependencies of another installed formula\.
@@ -610,14 +607,11 @@ If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full upd
 Fetches and resets Homebrew and all tap repositories (or the specified \fBrepositories\fR) using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
 .
 .TP
-\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fB\-\-display\-times\fR] [\fIformulae\fR]
+\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fB\-\-display\-times\fR] [\fIformulae\fR]
 Upgrade outdated, unpinned brews (with existing install options)\.
 .
 .IP
 Options for the \fBinstall\fR command are also valid here\.
-.
-.IP
-If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed version(s) of upgraded \fIformulae\fR\.
 .
 .IP
 If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if the HEAD installation of the formula is outdated\. Otherwise, the repository\'s HEAD will be checked for updates when a new stable or devel version has been released\.
@@ -1322,6 +1316,16 @@ Text printed before the installation summary of each successful build\.
 \fIDefault:\fR the beer emoji\.
 .
 .TP
+\fBHOMEBREW_INSTALL_CLEANUP\fR
+If set, \fBbrew install\fR, \fBbrew upgrade\fR and \fBbrew reinstall\fR will remove previously installed version(s) of the installed/upgraded formulae\.
+.
+.IP
+If \fBbrew cleanup\fR has not been run in 30 days then it will be run at this time\.
+.
+.IP
+This will become the default in a later version of Homebrew\. To opt\-out see \fBHOMEBREW_NO_INSTALL_CLEANUP\fR\.
+.
+.TP
 \fBHOMEBREW_LOGS\fR
 If set, Homebrew will use the specified directory to store log files\.
 .
@@ -1363,6 +1367,10 @@ While ensuring your downloads are fully secure, this is likely to cause from\-so
 If set, Homebrew will not use the GitHub API, e\.g\. for searches or fetching relevant issues on a failed install\.
 .
 .TP
+\fBHOMEBREW_NO_INSTALL_CLEANUP\fR
+If set, \fBbrew install\fR, \fBbrew upgrade\fR and \fBbrew reinstall\fR will never automatically remove the previously installed version(s) of the installed/upgraded formulae\.
+.
+.TP
 \fBHOMEBREW_PRY\fR
 If set, Homebrew will use Pry for the \fBbrew irb\fR command\.
 .
@@ -1383,10 +1391,6 @@ This issue typically occurs when using FileVault or custom SSD configurations\.
 .TP
 \fBHOMEBREW_UPDATE_TO_TAG\fR
 If set, instructs Homebrew to always use the latest stable tag (even if developer commands have been run)\.
-.
-.TP
-\fBHOMEBREW_UPGRADE_CLEANUP\fR
-If set, \fBbrew upgrade\fR always assumes \fB\-\-cleanup\fR has been passed\.
 .
 .TP
 \fBHOMEBREW_VERBOSE\fR

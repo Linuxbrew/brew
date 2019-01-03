@@ -1,10 +1,7 @@
-#:  * `upgrade` [<install-options>] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`--display-times`] [<formulae>]:
+#:  * `upgrade` [<install-options>] [`--fetch-HEAD`] [`--ignore-pinned`] [`--display-times`] [<formulae>]:
 #:    Upgrade outdated, unpinned brews (with existing install options).
 #:
 #:    Options for the `install` command are also valid here.
-#:
-#:    If `--cleanup` is specified or `HOMEBREW_INSTALL_CLEANUP` is set then remove
-#:    previously installed version(s) of upgraded <formulae>.
 #:
 #:    If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
 #:    the HEAD installation of the formula is outdated. Otherwise, the
@@ -23,14 +20,23 @@
 require "install"
 require "reinstall"
 require "formula_installer"
-require "cleanup"
 require "development_tools"
 require "messages"
+require "cleanup"
 
 module Homebrew
   module_function
 
   def upgrade
+    # TODO: deprecate for next minor release.
+    if ARGV.include?("--cleanup")
+      ENV["HOMEBREW_INSTALL_CLEANUP"] = "1"
+      # odeprecated("'brew upgrade --cleanup'", "'HOMEBREW_INSTALL_CLEANUP'")
+    elsif ENV["HOMEBREW_UPGRADE_CLEANUP"]
+      ENV["HOMEBREW_INSTALL_CLEANUP"] = "1"
+      # odeprecated("'HOMEBREW_UPGRADE_CLEANUP'", "'HOMEBREW_INSTALL_CLEANUP'")
+    end
+
     FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
     Install.perform_preinstall_checks
@@ -107,10 +113,7 @@ module Homebrew
       Migrator.migrate_if_needed(f)
       begin
         upgrade_formula(f)
-        next if !ARGV.include?("--cleanup") && !ENV["HOMEBREW_UPGRADE_CLEANUP"] && !ENV["HOMEBREW_INSTALL_CLEANUP"]
-        next unless f.installed?
-
-        Cleanup.new.cleanup_formula(f)
+        Cleanup.install_formula_clean!(f)
       rescue UnsatisfiedRequirements => e
         Homebrew.failed = true
         onoe "#{f}: #{e}"
