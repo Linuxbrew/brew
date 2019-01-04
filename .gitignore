@@ -31,6 +31,7 @@
 
 # Unignore vendored gems
 !**/vendor/bundle-standalone/ruby/*/gems/*/lib
+!**/vendor/bundle-standalone/ruby/*/gems/rubocop-rspec-*/config
 
 # Ignore partially included gems where we don't need all files
 **/vendor/bundle-standalone/ruby/2.3.0/gems/activesupport-*/lib/active_support.rb
