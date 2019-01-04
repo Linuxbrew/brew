@@ -226,9 +226,9 @@ these flags should only appear after a command.
 
     To view formula history locally: `brew log -p` *`formula`*
 
-  * `info` `--json=`*`version`* (`--all`|`--installed`|*`formulae`*):
-    Print a JSON representation of *`formulae`*. Currently the only accepted value
-    for *`version`* is `v1`.
+  * `info` `--json[=`*`version`*] (`--all`|`--installed`|*`formulae`*):
+    Print a JSON representation of *`formulae`*. Currently the default and
+    only accepted value for *`version`* is `v1`.
 
     Pass `--all` to get information on all formulae, or `--installed` to get
     information on all installed formulae.

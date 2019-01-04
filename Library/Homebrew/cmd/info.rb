@@ -24,9 +24,9 @@
 #:
 #:    To view formula history locally: `brew log -p` <formula>
 #:
-#:  * `info` `--json=`<version> (`--all`|`--installed`|<formulae>):
-#:    Print a JSON representation of <formulae>. Currently the only accepted value
-#:    for <version> is `v1`.
+#:  * `info` `--json[=`<version>] (`--all`|`--installed`|<formulae>):
+#:    Print a JSON representation of <formulae>. Currently the default and
+#:    only accepted value for <version> is `v1`.
 #:
 #:    Pass `--all` to get information on all formulae, or `--installed` to get
 #:    information on all installed formulae.
@@ -66,8 +66,8 @@ module Homebrew
       switch "--github",
         description: "Open a browser to the GitHub History page for provided <formula>. "\
                      "To view formula history locally: `brew log -p` <formula>"
-      flag "--json=",
-        description: "Print a JSON representation of <formulae>. Currently the only accepted "\
+      flag "--json",
+        description: "Print a JSON representation of <formulae>. Currently the default and only accepted "\
                      "value for <version> is `v1`. See the docs for examples of using the JSON "\
                      "output: <https://docs.brew.sh/Querying-Brew>"
       switch "--all",
@@ -84,10 +84,12 @@ module Homebrew
 
   def info
     info_args.parse
-    # eventually we'll solidify an API, but we'll keep old versions
-    # awhile around for compatibility
-    if args.json == "v1"
-      print_json
+    if args.json
+      if args.json == "v1" || args.json == true
+        print_json
+      else
+        raise UsageError, "invalid JSON version: #{args.json}"
+      end
     elsif args.github?
       exec_browser(*ARGV.formulae.map { |f| github_info(f) })
     else
