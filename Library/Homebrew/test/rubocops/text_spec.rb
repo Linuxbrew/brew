@@ -86,20 +86,6 @@ describe RuboCop::Cop::FormulaAudit::Text do
       RUBY
     end
 
-    it "When scons is executed" do
-      expect_offense(<<~RUBY)
-        class Foo < Formula
-          url "https://brew.sh/foo-1.0.tgz"
-          homepage "https://brew.sh"
-
-          def install
-            system "scons", "foo", "bar"
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ use \"scons *args\" instead of \"system 'scons', *args\"
-          end
-        end
-      RUBY
-    end
-
     it "When plist_options are not defined when using a formula-defined plist", :ruby23 do
       expect_offense(<<~RUBY)
         class Foo < Formula

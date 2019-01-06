@@ -42,10 +42,6 @@ module RuboCop
             problem %q(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
           end
 
-          find_method_with_args(body_node, :system, "scons") do
-            problem "use \"scons *args\" instead of \"system 'scons', *args\""
-          end
-
           find_method_with_args(body_node, :system, "go", "get") do
             problem "Do not use `go get`. Please ask upstream to implement Go vendoring"
           end
