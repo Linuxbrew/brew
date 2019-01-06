@@ -7,7 +7,6 @@ module Stdenv
 
   # @private
   SAFE_CFLAGS_FLAGS = "-w -pipe".freeze
-  DEFAULT_FLAGS = "-march=native".freeze
 
   # @private
   def setup_build_environment(formula = nil)
@@ -103,12 +102,12 @@ module Stdenv
 
   def gcc_4_0
     super
-    set_cpu_cflags "-march=nocona -mssse3"
+    set_cpu_cflags
   end
 
   def gcc_4_2
     super
-    set_cpu_cflags "-march=core2 -msse4"
+    set_cpu_cflags
   end
 
   GNU_GCC_VERSIONS.each do |n|
@@ -123,8 +122,8 @@ module Stdenv
     replace_in_cflags(/-Xarch_#{Hardware::CPU.arch_32_bit} (-march=\S*)/, '\1')
     # Clang mistakenly enables AES-NI on plain Nehalem
     map = Hardware::CPU.optimization_flags
-    map = map.merge(nehalem: "-march=native -Xclang -target-feature -Xclang -aes")
-    set_cpu_cflags DEFAULT_FLAGS, map
+                       .merge(nehalem: "-march=nehalem -Xclang -target-feature -Xclang -aes")
+    set_cpu_cflags map
   end
 
   def minimal_optimization
@@ -199,7 +198,7 @@ module Stdenv
   # Sets architecture-specific flags for every environment variable
   # given in the list `flags`.
   # @private
-  def set_cpu_flags(flags, default = DEFAULT_FLAGS, map = Hardware::CPU.optimization_flags)
+  def set_cpu_flags(flags, map = Hardware::CPU.optimization_flags)
     cflags =~ /(-Xarch_#{Hardware::CPU.arch_32_bit} )-march=/
     xarch = Regexp.last_match(1).to_s
     remove flags, /(-Xarch_#{Hardware::CPU.arch_32_bit} )?-march=\S*/
@@ -207,29 +206,15 @@ module Stdenv
     remove flags, /-mssse3/
     remove flags, /-msse4(\.\d)?/
     append flags, xarch unless xarch.empty?
-    append flags, map.fetch(effective_arch, default)
+    append flags, map.fetch(effective_arch)
   end
   alias generic_set_cpu_flags set_cpu_flags
 
   def x11; end
 
   # @private
-  def effective_arch
-    if ARGV.build_bottle?
-      ARGV.bottle_arch || Hardware.oldest_cpu
-    elsif Hardware::CPU.intel? && !Hardware::CPU.sse4?
-      # If the CPU doesn't support SSE4, we cannot trust -march=native or
-      # -march=<cpu family> to do the right thing because we might be running
-      # in a VM or on a Hackintosh.
-      Hardware.oldest_cpu
-    else
-      Hardware::CPU.family
-    end
-  end
-
-  # @private
-  def set_cpu_cflags(default = DEFAULT_FLAGS, map = Hardware::CPU.optimization_flags)
-    set_cpu_flags CC_FLAG_VARS, default, map
+  def set_cpu_cflags(map = Hardware::CPU.optimization_flags)
+    set_cpu_flags CC_FLAG_VARS, map
   end
 
   def make_jobs
