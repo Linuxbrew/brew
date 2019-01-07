@@ -136,7 +136,10 @@ Homebrew/homebrew-core's other current maintainers are [Claudia](https://github.
 Former maintainers with significant contributions include [JCount](https://github.com/jcount), [commitay](https://github.com/commitay), [Dominyk Tiller](https://github.com/DomT4), [Tim Smith](https://github.com/tdsmith), [Baptiste Fontaine](https://github.com/bfontaine), [Xu Cheng](https://github.com/xu-cheng), [Martin Afanasjew](https://github.com/UniqMartin), [Brett Koonce](https://github.com/asparagui), [Charlie Sharpsteen](https://github.com/Sharpie), [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv), [Andrew Janke](https://github.com/apjanke), [Alex Dunn](https://github.com/dunn), [neutric](https://github.com/neutric), [Tomasz Pajor](https://github.com/nijikon), [Uladzislau Shablinski](https://github.com/vladshablinsky), [Alyssa Ross](https://github.com/alyssais), [ilovezfs](https://github.com/ilovezfs) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
 
 ## Linuxbrew Community
-- [@Linuxbrew (Twitter)](https://twitter.com/Linuxbrew)
+
+- [@Linuxbrew on Twitter](https://twitter.com/Linuxbrew)
+- [Linuxbrew/core on GitHub](https://github.com/Linuxbrew/homebrew-core)
+- [Linuxbrew category](https://discourse.brew.sh/c/linuxbrew) of [Homebrew's Discourse](https://discourse.brew.sh)
 
 ## License
 Code is under the [BSD 2-clause "Simplified" License](LICENSE.txt).
