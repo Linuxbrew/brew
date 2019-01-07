@@ -275,6 +275,15 @@ module SharedEnvExtension
   end
 
   # @private
+  def effective_arch
+    if ARGV.build_bottle? && ARGV.bottle_arch
+      ARGV.bottle_arch
+    else
+      Hardware.oldest_cpu
+    end
+  end
+
+  # @private
   def gcc_version_formula(name)
     version = name[GNU_GCC_REGEXP, 1]
     gcc_version_name = "gcc@#{version}"

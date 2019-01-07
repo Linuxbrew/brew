@@ -67,8 +67,8 @@ module Stdenv
   # Sets architecture-specific flags for every environment variable
   # given in the list `flags`.
   # @private
-  def set_cpu_flags(flags, default = DEFAULT_FLAGS, map = Hardware::CPU.optimization_flags)
-    generic_set_cpu_flags(flags, default, map)
+  def set_cpu_flags(flags, map = Hardware::CPU.optimization_flags)
+    generic_set_cpu_flags(flags, map)
 
     # Works around a buggy system header on Tiger
     append flags, "-faltivec" if MacOS.version == :tiger
