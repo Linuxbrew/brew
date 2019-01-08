@@ -9,7 +9,6 @@ module Hardware
       OPTIMIZATION_FLAGS = {
         native:  "-march=native",
         nehalem: "-march=nehalem",
-        penryn:  "-march=penryn",
         core2:   "-march=core2",
         core:    "-march=prescott",
         armv6:   "-march=armv6",
