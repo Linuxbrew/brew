@@ -46,7 +46,7 @@ GEM
     rspec-support (3.8.0)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
-    rubocop (0.62.0)
+    rubocop (0.61.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)

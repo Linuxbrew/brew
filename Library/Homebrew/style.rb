@@ -17,8 +17,7 @@ module Homebrew
     def check_style_impl(files, output_type, options = {})
       fix = options[:fix]
 
-      Homebrew.install_gem_setup_path! "rubocop"
-      Homebrew.install_gem! "rubocop-rspec"
+      Homebrew.install_bundler_gems!
       require "rubocop"
       require "rubocops"
 
