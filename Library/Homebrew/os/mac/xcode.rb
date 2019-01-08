@@ -44,7 +44,7 @@ module OS
       end
 
       def latest_sdk_version?
-        OS::Mac.version == OS::Mac.latest_sdk_version
+        OS::Mac.version >= OS::Mac.latest_sdk_version
       end
 
       def needs_clt_installed?
