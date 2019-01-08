@@ -240,19 +240,19 @@ module Homebrew
     odie "Failed to install/update the '#{name}' gem." if exit_code.nonzero?
   end
 
-  def install_gem_setup_path!(name)
+  def install_gem_setup_path!(name, executable: name)
     install_gem!(name)
 
-    return if which(name)
+    return if which(executable)
 
     odie <<~EOS
-      The '#{name}' gem is installed but couldn't find '#{name}' in the PATH:
+      The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
       #{ENV["PATH"]}
     EOS
   end
 
   def install_bundler!
-    install_gem_setup_path! "bundler"
+    install_gem_setup_path! "bundler", executable: "bundle"
   end
 
   def install_bundler_gems!
