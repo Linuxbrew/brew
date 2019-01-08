@@ -194,6 +194,7 @@ module Homebrew
         cleanup_old_cache_db
         rm_ds_store
         prune_prefix_symlinks_and_directories
+        HOMEBREW_CACHE.mkpath
         FileUtils.touch PERIODIC_CLEAN_FILE
       else
         args.each do |arg|
