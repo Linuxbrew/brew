@@ -198,7 +198,7 @@ module Stdenv
   # Sets architecture-specific flags for every environment variable
   # given in the list `flags`.
   # @private
-  def set_cpu_flags(flags, map = Hardware::CPU.optimization_flags)
+  def set_cpu_flags(flags, map = Hardware::CPU.optimization_flags) # rubocop:disable Naming/AccessorMethodName
     cflags =~ /(-Xarch_#{Hardware::CPU.arch_32_bit} )-march=/
     xarch = Regexp.last_match(1).to_s
     remove flags, /(-Xarch_#{Hardware::CPU.arch_32_bit} )?-march=\S*/
@@ -213,7 +213,7 @@ module Stdenv
   def x11; end
 
   # @private
-  def set_cpu_cflags(map = Hardware::CPU.optimization_flags)
+  def set_cpu_cflags(map = Hardware::CPU.optimization_flags) # rubocop:disable Naming/AccessorMethodName
     set_cpu_flags CC_FLAG_VARS, map
   end
 
