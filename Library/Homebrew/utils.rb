@@ -225,13 +225,12 @@ module Homebrew
     return unless Gem::Specification.find_all_by_name(name).empty?
 
     ohai "Installing or updating '#{name}' gem"
-    install_args = %W[--no-ri --no-rdoc #{name}]
 
     # Do `gem install [...]` without having to spawn a separate process or
     # having to find the right `gem` binary for the running Ruby interpreter.
     require "rubygems/commands/install_command"
     install_cmd = Gem::Commands::InstallCommand.new
-    install_cmd.handle_options(install_args)
+    install_cmd.handle_options(["--no-document", name])
     exit_code = 1 # Should not matter as `install_cmd.execute` always throws.
     begin
       install_cmd.execute
