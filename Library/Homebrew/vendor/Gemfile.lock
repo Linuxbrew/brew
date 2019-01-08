@@ -19,7 +19,7 @@ GEM
     plist (3.5.0)
     powerpack (0.1.2)
     rainbow (3.0.0)
-    rubocop (0.62.0)
+    rubocop (0.61.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)

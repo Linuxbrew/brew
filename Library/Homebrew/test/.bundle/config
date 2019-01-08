@@ -1,4 +1,6 @@
 ---
+BUNDLE_BIN: "../bin"
 BUNDLE_PATH: "../vendor/bundle"
 BUNDLE_DISABLE_SHARED_GEMS: "true"
-BUNDLE_BIN: "../bin"
+BUNDLE_JOBS: "4"
+BUNDLE_RETRY: "3"
