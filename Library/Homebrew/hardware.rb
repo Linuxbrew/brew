@@ -7,6 +7,7 @@ module Hardware
 
     class << self
       OPTIMIZATION_FLAGS = {
+        native:  "-march=native",
         nehalem: "-march=nehalem",
         penryn:  "-march=penryn",
         core2:   "-march=core2",
