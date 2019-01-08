@@ -17,7 +17,7 @@ module Homebrew
       switch :debug
     end.parse
 
-    Homebrew.install_gem_setup_path! "bundler", "<2"
+    Homebrew.install_bundler!
 
     ohai "cd #{HOMEBREW_LIBRARY_PATH}/vendor"
     (HOMEBREW_LIBRARY_PATH/"vendor").cd do
