@@ -230,7 +230,7 @@ module Homebrew
     # having to find the right `gem` binary for the running Ruby interpreter.
     require "rubygems/commands/install_command"
     install_cmd = Gem::Commands::InstallCommand.new
-    install_cmd.handle_options("--no-document", name)
+    install_cmd.handle_options(["--no-document", name])
     exit_code = 1 # Should not matter as `install_cmd.execute` always throws.
     begin
       install_cmd.execute
