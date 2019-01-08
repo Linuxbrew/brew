@@ -54,36 +54,9 @@ module Stdenv
 
     # Leopard's ld needs some convincing that it's building 64-bit
     # See: https://github.com/mistydemeo/tigerbrew/issues/59
-    return unless MacOS.version == :leopard && MacOS.prefer_64_bit?
+    return unless MacOS.version == :leopard
 
     append "LDFLAGS", "-arch #{Hardware::CPU.arch_64_bit}"
-
-    # Many, many builds are broken thanks to Leopard's buggy ld.
-    # Our ld64 fixes many of those builds, though of course we can't
-    # depend on it already being installed to build itself.
-    ld64 if Formula["ld64"].installed?
-  end
-
-  # Sets architecture-specific flags for every environment variable
-  # given in the list `flags`.
-  # @private
-  def set_cpu_flags(flags, map = Hardware::CPU.optimization_flags)
-    generic_set_cpu_flags(flags, map)
-
-    # Works around a buggy system header on Tiger
-    append flags, "-faltivec" if MacOS.version == :tiger
-  end
-
-  def minimal_optimization
-    generic_minimal_optimization
-
-    macosxsdk unless MacOS::CLT.installed?
-  end
-
-  def no_optimization
-    generic_no_optimization
-
-    macosxsdk unless MacOS::CLT.installed?
   end
 
   def remove_macosxsdk(version = MacOS.version)

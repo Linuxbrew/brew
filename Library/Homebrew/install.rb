@@ -7,7 +7,7 @@ module Homebrew
   module Install
     module_function
 
-    def check_ppc
+    def check_cpu
       case Hardware::CPU.type
       when :ppc
         abort <<~EOS
@@ -32,7 +32,7 @@ module Homebrew
     end
 
     def perform_preinstall_checks
-      check_ppc
+      check_cpu
       attempt_directory_creation
       fatal_checks(:fatal_install_checks)
     end

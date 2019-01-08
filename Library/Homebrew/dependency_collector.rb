@@ -83,8 +83,6 @@ class DependencyCollector
     JavaRequirement.new(tags)
   end
 
-  def ld64_dep_if_needed(*); end
-
   def self.tar_needs_xz_dependency?
     !new.xz_dep_if_needed([]).nil?
   end
@@ -130,7 +128,6 @@ class DependencyCollector
     when :tuntap        then TuntapRequirement.new(tags)
     when :x11           then X11Requirement.new(tags)
     when :xcode         then XcodeRequirement.new(tags)
-    when :ld64          then ld64_dep_if_needed(tags)
     else
       raise ArgumentError, "Unsupported special dependency #{spec.inspect}"
     end

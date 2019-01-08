@@ -20,9 +20,9 @@ dependencies that you built on 10.8 or earlier. If you're reading this page beca
 you were directed here by a build error, you can most likely fix the issue if
 you reinstall all the dependencies of the package you're trying to build.
 
-Example install using GCC 4.8:
+Example install using GCC 7:
 
 ```sh
-brew install gcc48
-brew install --cc=gcc-4.8 <formula>
+brew install gcc@7
+brew install --cc=gcc-7 <formula>
 ```

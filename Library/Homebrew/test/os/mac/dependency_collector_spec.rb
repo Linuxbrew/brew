@@ -12,16 +12,6 @@ describe DependencyCollector do
     expect(described_class).not_to need_tar_xz_dependency
   end
 
-  specify "LD64 pre-Leopard dependency" do
-    allow(MacOS).to receive(:version).and_return(MacOS::Version.new("10.4"))
-    expect(subject.build(:ld64)).to eq(LD64Dependency.new)
-  end
-
-  specify "LD64 Leopard or newer dependency" do
-    allow(MacOS).to receive(:version).and_return(MacOS::Version.new("10.5"))
-    expect(subject.build(:ld64)).to be nil
-  end
-
   specify "Resource xz pre-Mavericks dependency" do
     allow(MacOS).to receive(:version).and_return(MacOS::Version.new("10.8"))
     resource = Resource.new

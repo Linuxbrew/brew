@@ -7,7 +7,6 @@ require "migrator"
 require "formulary"
 require "descriptions"
 require "cleanup"
-require "update_migrator"
 require "description_cache_store"
 
 module Homebrew
@@ -83,13 +82,6 @@ module Homebrew
       updated = true
     end
 
-    out, _, status = system_command("git",
-                                    args:         ["describe", "--tags", "--abbrev=0", initial_revision],
-                                    chdir:        HOMEBREW_REPOSITORY,
-                                    print_stderr: false)
-
-    initial_version = Version.new(out) if status.success?
-
     updated_taps = []
     Tap.each do |tap|
       next unless tap.git?
@@ -111,11 +103,6 @@ module Homebrew
       puts "Updated #{updated_taps.count} #{"tap".pluralize(updated_taps.count)} (#{updated_taps.to_sentence})."
       updated = true
     end
-
-    UpdateMigrator.migrate_legacy_cache_if_necessary
-    UpdateMigrator.migrate_cache_entries_to_double_dashes(initial_version)
-    UpdateMigrator.migrate_cache_entries_to_symlinks(initial_version)
-    UpdateMigrator.migrate_legacy_keg_symlinks_if_necessary
 
     if !updated
       if !ARGV.include?("--preinstall") && !ENV["HOMEBREW_UPDATE_FAILED"]
@@ -140,12 +127,6 @@ module Homebrew
     Tap.each(&:link_completions_and_manpages)
 
     Homebrew.failed = true if ENV["HOMEBREW_UPDATE_FAILED"]
-
-    # This should always be the last thing to run (but skip on auto-update).
-    if !ARGV.include?("--preinstall") ||
-       ENV["HOMEBREW_ENABLE_AUTO_UPDATE_MIGRATION"]
-      UpdateMigrator.migrate_legacy_repository_if_necessary
-    end
   end
 
   def shorten_revision(revision)

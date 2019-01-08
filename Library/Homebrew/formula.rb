@@ -1983,38 +1983,6 @@ class Formula
     end
   end
 
-  # Run `scons` using a Homebrew-installed version rather than whatever is
-  # in the `PATH`.
-  def scons(*args)
-    system Formulary.factory("scons").opt_bin/"scons", *args
-  end
-
-  # Run `make` 3.81 or newer.
-  # Uses the system make on Leopard and newer, and the
-  # path to the actually-installed make on Tiger or older.
-  def make(*args)
-    if Utils.popen_read("/usr/bin/make", "--version")
-            .match(/Make (\d\.\d+)/)[1] > "3.80"
-      make_path = "/usr/bin/make"
-    else
-      make = Formula["make"].opt_bin/"make"
-      make_path = if make.exist?
-        make.to_s
-      else
-        (Formula["make"].opt_bin/"gmake").to_s
-      end
-    end
-
-    if superenv?
-      make_name = File.basename(make_path)
-      with_env(HOMEBREW_MAKE: make_name) do
-        system "make", *args
-      end
-    else
-      system make_path, *args
-    end
-  end
-
   # Run `xcodebuild` without Homebrew's compiler environment variables set.
   def xcodebuild(*args)
     removed = ENV.remove_cc_etc
@@ -2388,7 +2356,6 @@ class Formula
     # depends_on :arch => :intel # If this formula only builds on Intel architecture.
     # depends_on :arch => :x86_64 # If this formula only builds on Intel x86 64-bit.
     # depends_on :arch => :ppc # Only builds on PowerPC?
-    # depends_on :ld64 # Sometimes ld fails on `MacOS.version < :leopard`. Then use this.
     # depends_on :x11 => :optional # X11/XQuartz components.
     # depends_on :osxfuse # Permits the use of the upstream signed binary or our source package.
     # depends_on :tuntap # Does the same thing as above. This is vital for Yosemite and above.</pre>
@@ -2532,17 +2499,18 @@ class Formula
     # if so, then the compiler will be blacklisted for *all* versions.
     #
     # `major_version` should be the major release number only, for instance
-    # '4.8' for the GCC 4.8 series (4.8.0, 4.8.1, etc.).
+    # '7' for the GCC 7 series (7.0, 7.1, etc.).
     # If `version` or the block is omitted, then the compiler will be
     # blacklisted for all compilers in that series.
     #
-    # For example, if a bug is only triggered on GCC 4.8.1 but is not
-    # encountered on 4.8.2:
+    # For example, if a bug is only triggered on GCC 7.1 but is not
+    # encountered on 7.2:
     #
-    # <pre>fails_with :gcc => '4.8' do
-    #   version '4.8.1'
+    # <pre>fails_with :gcc => '7' do
+    #   version '7.1'
     # end</pre>
     def fails_with(compiler, &block)
+      odeprecated "fails_with :gcc_4_0" if compiler == :gcc_4_0
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
 

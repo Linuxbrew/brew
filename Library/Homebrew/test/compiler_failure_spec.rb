@@ -21,17 +21,17 @@ describe CompilerFailure do
     end
 
     it "creates a failure when given a hash" do
-      failure = described_class.create(gcc: "4.8")
-      expect(failure).to fail_with(double("Compiler", name: "gcc-4.8", version: "4.8"))
-      expect(failure).to fail_with(double("Compiler", name: "gcc-4.8", version: "4.8.1"))
-      expect(failure).not_to fail_with(double("Compiler", name: "gcc-4.7", version: "4.7"))
+      failure = described_class.create(gcc: "7")
+      expect(failure).to fail_with(double("Compiler", name: "gcc-7", version: "7"))
+      expect(failure).to fail_with(double("Compiler", name: "gcc-7", version: "7.1"))
+      expect(failure).not_to fail_with(double("Compiler", name: "gcc-6", version: "6.0"))
     end
 
     it "creates a failure when given a hash and a block with aversion" do
-      failure = described_class.create(gcc: "4.8") { version "4.8.1" }
-      expect(failure).to fail_with(double("Compiler", name: "gcc-4.8", version: "4.8"))
-      expect(failure).to fail_with(double("Compiler", name: "gcc-4.8", version: "4.8.1"))
-      expect(failure).not_to fail_with(double("Compiler", name: "gcc-4.8", version: "4.8.2"))
+      failure = described_class.create(gcc: "7") { version "7.1" }
+      expect(failure).to fail_with(double("Compiler", name: "gcc-7", version: "7"))
+      expect(failure).to fail_with(double("Compiler", name: "gcc-7", version: "7.1"))
+      expect(failure).not_to fail_with(double("Compiler", name: "gcc-7", version: "7.2"))
     end
   end
 end

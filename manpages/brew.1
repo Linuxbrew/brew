@@ -270,7 +270,7 @@ If \fB\-\-ignore\-dependencies\fR is passed, skip installing any dependencies of
 If \fB\-\-only\-dependencies\fR is passed, install the dependencies with specified options but do not install the specified formula\.
 .
 .IP
-If \fB\-\-cc=\fR\fIcompiler\fR is passed, attempt to compile using \fIcompiler\fR\. \fIcompiler\fR should be the name of the compiler\'s executable, for instance \fBgcc\-8\fR for gcc 8, \fBgcc\-4\.2\fR for Apple\'s GCC 4\.2, or \fBgcc\-4\.9\fR for a Homebrew\-provided GCC 4\.9\. In order to use LLVM\'s clang, use \fBllvm_clang\fR\. To specify the Apple\-provided clang, use \fBclang\fR\. This parameter will only accept compilers that are provided by Homebrew or bundled with macOS\. Please do not file issues if you encounter errors while using this flag\.
+If \fB\-\-cc=\fR\fIcompiler\fR is passed, attempt to compile using \fIcompiler\fR\. \fIcompiler\fR should be the name of the compiler\'s executable, for instance \fBgcc\-7\fR for GCC 7\. In order to use LLVM\'s clang, use \fBllvm_clang\fR\. To specify the Apple\-provided clang, use \fBclang\fR\. This parameter will only accept compilers that are provided by Homebrew or bundled with macOS\. Please do not file issues if you encounter errors while using this flag\.
 .
 .IP
 If \fB\-\-build\-from\-source\fR (or \fB\-s\fR) is passed, compile the specified \fIformula\fR from source even if a bottle is provided\. Dependencies will still be installed from bottles if they are available\.
@@ -1254,10 +1254,6 @@ By default, Homebrew uses \fBhttps://homebrew\.bintray\.com/\fR as its download 
 .TP
 \fBHOMEBREW_BROWSER\fR
 If set, Homebrew uses this setting as the browser when opening project homepages, instead of the OS default browser\.
-.
-.TP
-\fBHOMEBREW_BUILD_FROM_SOURCE\fR
-If set, instructs Homebrew to compile from source even when a formula provides a bottle\. This environment variable is intended for use by Homebrew developers\. Please do not file issues if you encounter errors when using this environment variable\.
 .
 .TP
 \fBHOMEBREW_CACHE\fR

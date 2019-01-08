@@ -92,7 +92,6 @@ module OS
       # educated guess as to what version is installed.
       def guess_system_version
         case MacOS.version
-        when "10.4" then "1.1.3"
         when "10.5" then "2.1.6"
         when "10.6" then "2.3.6"
         when "10.7" then "2.6.3"

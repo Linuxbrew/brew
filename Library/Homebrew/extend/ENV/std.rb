@@ -100,11 +100,6 @@ module Stdenv
     dir/base.to_s.sub("gcc", "g++").sub("clang", "clang++")
   end
 
-  def gcc_4_0
-    super
-    set_cpu_cflags
-  end
-
   def gcc_4_2
     super
     set_cpu_cflags
@@ -124,21 +119,6 @@ module Stdenv
     map = Hardware::CPU.optimization_flags
                        .merge(nehalem: "-march=nehalem -Xclang -target-feature -Xclang -aes")
     set_cpu_cflags map
-  end
-
-  def minimal_optimization
-    define_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
-  end
-  alias generic_minimal_optimization minimal_optimization
-
-  def no_optimization
-    define_cflags SAFE_CFLAGS_FLAGS
-  end
-  alias generic_no_optimization no_optimization
-
-  # we've seen some packages fail to build when warnings are disabled!
-  def enable_warnings
-    remove_from_cflags "-w"
   end
 
   def m64
@@ -208,7 +188,6 @@ module Stdenv
     append flags, xarch unless xarch.empty?
     append flags, map.fetch(effective_arch)
   end
-  alias generic_set_cpu_flags set_cpu_flags
 
   def x11; end
 
