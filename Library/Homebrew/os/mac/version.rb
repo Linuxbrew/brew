@@ -15,7 +15,6 @@ module OS
         snow_leopard:  "10.6",
         leopard_64:    "10.5",
         leopard:       "10.5",
-        tiger:         "10.4",
       }.freeze
 
       def self.from_symbol(sym)

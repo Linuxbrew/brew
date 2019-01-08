@@ -9,13 +9,7 @@ module Utils
         elsif MacOS.version == :snow_leopard
           Hardware::CPU.is_64_bit? ? :snow_leopard : :snow_leopard_32
         else
-          # Return, e.g., :tiger_g3, :leopard_g5_64, :leopard_64 (which is Intel)
-          if Hardware::CPU.type == :ppc
-            tag = "#{MacOS.cat}_#{Hardware::CPU.family}".to_sym
-          else
-            tag = MacOS.cat
-          end
-          MacOS.prefer_64_bit? ? "#{tag}_64".to_sym : tag
+          "#{MacOS.cat}_64".to_sym
         end
       end
     end
@@ -27,19 +21,7 @@ module Utils
 
       def find_matching_tag(tag)
         generic_find_matching_tag(tag) ||
-          find_altivec_tag(tag) ||
           find_older_compatible_tag(tag)
-      end
-
-      # This allows generic Altivec PPC bottles to be supported in some
-      # formulae, while also allowing specific bottles in others; e.g.,
-      # sometimes a formula has just :tiger_altivec, other times it has
-      # :tiger_g4, :tiger_g5, etc.
-      def find_altivec_tag(tag)
-        return unless tag.to_s =~ /(\w+)_(g4|g4e|g5)$/
-
-        altivec_tag = "#{Regexp.last_match(1)}_altivec".to_sym
-        altivec_tag if key?(altivec_tag)
       end
 
       def tag_without_or_later(tag)

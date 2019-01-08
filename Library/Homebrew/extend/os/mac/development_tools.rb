@@ -11,7 +11,7 @@ class DevelopmentTools
       (@locate ||= {}).fetch(tool) do |key|
         @locate[key] = if (located_tool = generic_locate(tool))
           located_tool
-        elsif MacOS.version > :tiger
+        else
           path = Utils.popen_read("/usr/bin/xcrun", "-no-cache", "-find", tool, err: :close).chomp
           Pathname.new(path) if File.executable?(path)
         end
@@ -27,9 +27,6 @@ class DevelopmentTools
 
     def default_compiler
       case default_cc
-      # if GCC 4.2 is installed, e.g. via Tigerbrew, prefer it
-      # over the system's GCC 4.0
-      when /^gcc-4\.0/ then gcc_4_2_build_version ? :gcc_4_2 : :gcc_4_0
       when /^gcc/ then :gcc_4_2
       when "clang" then :clang
       else
@@ -75,26 +72,10 @@ class DevelopmentTools
     end
 
     def custom_installation_instructions
-      if MacOS.version > :leopard
-        <<~EOS
-          Install GNU's GCC
-            brew install gcc
-        EOS
-      elsif MacOS.version > :tiger
-        <<~EOS
-          Install GNU's GCC
-            brew install gcc@4.6
-        EOS
-      else
-        # Tiger doesn't ship with apple-gcc42, and this is required to build
-        # some software that doesn't build properly with FSF GCC.
-        <<~EOS
-          Install Apple's GCC
-            brew install apple-gcc42
-          or GNU's GCC
-            brew install gcc@4.6
-        EOS
-      end
+      <<~EOS
+        Install GNU's GCC
+          brew install gcc
+      EOS
     end
   end
 end

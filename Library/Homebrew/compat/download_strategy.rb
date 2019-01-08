@@ -9,7 +9,7 @@ require "download_strategy"
 # distribution.  (It will work for public buckets as well.)
 class S3DownloadStrategy < CurlDownloadStrategy
   def initialize(url, name, version, **meta)
-    odeprecated("S3DownloadStrategy",
+    odisabled("S3DownloadStrategy",
       "a vendored S3DownloadStrategy in your own formula or tap (using require_relative)")
     super
   end
@@ -58,7 +58,7 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   require "utils/github"
 
   def initialize(url, name, version, **meta)
-    odeprecated("GitHubPrivateRepositoryDownloadStrategy",
+    odisabled("GitHubPrivateRepositoryDownloadStrategy",
       "a vendored GitHubPrivateRepositoryDownloadStrategy in your own formula or tap (using require_relative)")
     super
     parse_url_pattern
@@ -112,7 +112,7 @@ end
 # environment variables HOMEBREW_GITHUB_API_TOKEN) to sign the request.
 class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDownloadStrategy
   def initialize(url, name, version, **meta)
-    odeprecated("GitHubPrivateRepositoryReleaseDownloadStrategy",
+    odisabled("GitHubPrivateRepositoryReleaseDownloadStrategy",
       "a vendored GitHubPrivateRepositoryReleaseDownloadStrategy in your own formula or tap (using require_relative)")
     super
   end
@@ -168,7 +168,7 @@ end
 #     ...
 class ScpDownloadStrategy < AbstractFileDownloadStrategy
   def initialize(url, name, version, **meta)
-    odeprecated("ScpDownloadStrategy",
+    odisabled("ScpDownloadStrategy",
       "a vendored ScpDownloadStrategy in your own formula or tap (using require_relative)")
     super
     parse_url_pattern
@@ -214,11 +214,11 @@ class DownloadStrategyDetector
       def detect_from_url(url)
         case url
         when %r{^s3://}
-          odeprecated("s3://",
+          odisabled("s3://",
             "a vendored S3DownloadStrategy in your own formula or tap (using require_relative)")
           S3DownloadStrategy
         when %r{^scp://}
-          odeprecated("scp://",
+          odisabled("scp://",
             "a vendored ScpDownloadStrategy in your own formula or tap (using require_relative)")
           ScpDownloadStrategy
         else
@@ -229,20 +229,20 @@ class DownloadStrategyDetector
       def detect_from_symbol(symbol)
         case symbol
         when :github_private_repo
-          odeprecated(":github_private_repo",
+          odisabled(":github_private_repo",
             "a vendored GitHubPrivateRepositoryDownloadStrategy in your own formula or tap (using require_relative)")
           GitHubPrivateRepositoryDownloadStrategy
         when :github_private_release
-          odeprecated(":github_private_repo",
+          odisabled(":github_private_repo",
             "a vendored GitHubPrivateRepositoryReleaseDownloadStrategy in your own formula or tap "\
             "(using require_relative)")
           GitHubPrivateRepositoryReleaseDownloadStrategy
         when :s3
-          odeprecated(":s3",
+          odisabled(":s3",
             "a vendored S3DownloadStrategy in your own formula or tap (using require_relative)")
           S3DownloadStrategy
         when :scp
-          odeprecated(":scp",
+          odisabled(":scp",
             "a vendored ScpDownloadStrategy in your own formula or tap (using require_relative)")
           ScpDownloadStrategy
         else

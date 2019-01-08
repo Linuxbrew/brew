@@ -266,14 +266,6 @@ module SharedEnvExtension
     set_cpu_flags(flags)
   end
 
-  # ld64 is a newer linker provided for Xcode 2.5
-  # @private
-  def ld64
-    ld64 = Formulary.factory("ld64")
-    self["LD"] = ld64.bin/"ld"
-    append "LDFLAGS", "-B#{ld64.bin}/"
-  end
-
   # @private
   def effective_arch
     if ARGV.build_bottle? && ARGV.bottle_arch

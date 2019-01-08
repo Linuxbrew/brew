@@ -8,7 +8,7 @@ class XcodeRequirement < Requirement
       else
         tags.find do |tag|
           next unless tag.to_s.match?(/(\d\.)+\d/)
-          odeprecated('depends_on :xcode => [..., "X.Y.Z"]')
+          odisabled('depends_on :xcode => [..., "X.Y.Z"]')
           tags.delete(tag)
         end
       end

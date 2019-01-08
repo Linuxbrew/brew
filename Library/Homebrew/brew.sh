@@ -105,6 +105,18 @@ then
     HOMEBREW_FORCE_BREWED_CURL="1"
   fi
 
+  # Announce pre-Mavericks deprecation now
+  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" ]]
+  then
+    printf "WARNING: Your version of macOS (%s) will not be able to run Homebrew when\n" "$HOMEBREW_MACOS_VERSION" >&2
+    printf "         version 2.0.0 is released (Q1 2019)!\n" >&2
+    if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100700" ]]
+    then
+      printf "         For 10.4 - 10.6 support see: https://github.com/mistydemeo/tigerbrew\n" >&2
+    fi
+    printf "\n" >&2
+  fi
+
   # The system Git on macOS versions before Sierra is too old for some Homebrew functionality we rely on.
   HOMEBREW_MINIMUM_GIT_VERSION="2.14.3"
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "101200" ]]

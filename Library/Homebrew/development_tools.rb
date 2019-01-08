@@ -37,21 +37,10 @@ class DevelopmentTools
       :clang
     end
 
-    def gcc_4_0_build_version
-      @gcc_4_0_build_version ||= begin
-        if (path = locate("gcc-4.0")) &&
-           build_version = `#{path} --version 2>/dev/null`[/build (\d{4,})/, 1]
-          Version.new build_version
-        else
-          Version::NULL
-        end
-      end
-    end
-
     def gcc_4_2_build_version
       @gcc_4_2_build_version ||= begin
-        gcc = locate("gcc-4.2") || HOMEBREW_PREFIX/"opt/apple-gcc42/bin/gcc-4.2"
-        if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm") &&
+        if (gcc = locate("gcc-4.2")) &&
+           !gcc.realpath.basename.to_s.start_with?("llvm") &&
            build_version = `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1]
           Version.new build_version
         else
@@ -109,7 +98,7 @@ class DevelopmentTools
     end
 
     def clear_version_cache
-      @gcc_4_0_build_version = @gcc_4_2_build_version = nil
+      @gcc_4_2_build_version = nil
       @clang_version = @clang_build_version = nil
       @non_apple_gcc_version = {}
     end

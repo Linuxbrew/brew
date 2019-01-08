@@ -9,7 +9,6 @@ module OS
 
       def latest_version
         case MacOS.version
-        when "10.4"  then "2.5"
         when "10.5"  then "3.1.4"
         when "10.6"  then "3.2.6"
         when "10.7"  then "4.6.3"

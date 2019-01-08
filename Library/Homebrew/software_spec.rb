@@ -131,10 +131,6 @@ class SoftwareSpec
 
   def option(name, description = "")
     opt = PREDEFINED_OPTIONS.fetch(name) do
-      if name.is_a?(Symbol)
-        odisabled "passing arbitrary symbols (i.e. #{name.inspect}) to `option`"
-      end
-
       unless name.is_a?(String)
         raise ArgumentError, "option name must be string or symbol; got a #{name.class}: #{name}"
       end
@@ -212,6 +208,7 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
+    odeprecated "fails_with :gcc_4_0" if compiler == :gcc_4_0
     compiler_failures << CompilerFailure.create(compiler, &block)
   end
 

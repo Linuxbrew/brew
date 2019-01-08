@@ -25,8 +25,7 @@ module Homebrew
   def prune
     prune_args.parse
 
-    # TODO: deprecate and hide from manpage for next minor release.
-    # odeprecated("'brew prune'", "'brew cleanup'")
+    odeprecated("'brew prune'", "'brew cleanup'")
     Cleanup.new(dry_run: args.dry_run?).prune_prefix_symlinks_and_directories
   end
 end

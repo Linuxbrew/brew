@@ -264,15 +264,6 @@ module Superenv
     check_for_compiler_universal_support
 
     self["HOMEBREW_ARCHFLAGS"] = Hardware::CPU.universal_archs.as_arch_flags
-
-    # GCC doesn't accept "-march" for a 32-bit CPU with "-arch x86_64"
-    return if compiler_any_clang?
-    return unless Hardware::CPU.is_32_bit?
-
-    self["HOMEBREW_OPTFLAGS"] = self["HOMEBREW_OPTFLAGS"].sub(
-      /-march=\S*/,
-      "-Xarch_#{Hardware::CPU.arch_32_bit} \\0",
-    )
   end
 
   def permit_arch_flags

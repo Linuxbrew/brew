@@ -1,8 +1,5 @@
-require "compat/cask/cask_loader"
-require "compat/cask/cmd/--version"
-require "compat/cask/cmd/cleanup"
-require "compat/cask/cmd/search"
 require "compat/cask/cache"
+require "compat/cask/cask_loader"
 require "compat/cask/caskroom"
 require "compat/cask/dsl"
 

@@ -158,16 +158,8 @@ module OS
       paths.uniq
     end
 
-    def prefer_64_bit?
-      if ENV["HOMEBREW_PREFER_64_BIT"] && version == :leopard
-        Hardware::CPU.is_64_bit?
-      else
-        Hardware::CPU.is_64_bit? && version > :leopard
-      end
-    end
-
     def preferred_arch
-      if prefer_64_bit?
+      if Hardware::CPU.is_64_bit?
         Hardware::CPU.arch_64_bit
       else
         Hardware::CPU.arch_32_bit
@@ -175,13 +167,11 @@ module OS
     end
 
     STANDARD_COMPILERS = {
-      "2.0"   => { gcc_4_0_build: 4061 },
-      "2.5"   => { gcc_4_0_build: 5370 },
-      "3.1.4" => { gcc_4_0_build: 5493, gcc_4_2_build: 5577 },
-      "3.2.6" => { gcc_4_0_build: 5494, gcc_4_2_build: 5666, clang: "1.7", clang_build: 77 },
-      "4.0"   => { gcc_4_0_build: 5494, gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
-      "4.0.1" => { gcc_4_0_build: 5494, gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
-      "4.0.2" => { gcc_4_0_build: 5494, gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
+      "3.1.4" => { gcc_4_2_build: 5577 },
+      "3.2.6" => { gcc_4_2_build: 5666, clang: "1.7", clang_build: 77 },
+      "4.0"   => { gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
+      "4.0.1" => { gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
+      "4.0.2" => { gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
       "4.2"   => { clang: "3.0", clang_build: 211 },
       "4.3"   => { clang: "3.1", clang_build: 318 },
       "4.3.1" => { clang: "3.1", clang_build: 318 },

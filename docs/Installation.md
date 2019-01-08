@@ -10,7 +10,7 @@ installed to `/usr/local` already. It tells you exactly what it will do before
 it does it too. And you have to confirm everything it will do before it starts.
 
 ## Requirements
-* An Intel CPU <sup>[1](#1)</sup>
+* An 64-bit Intel CPU <sup>[1](#1)</sup>
 * macOS 10.12 or higher <sup>[2](#2)</sup>
 * Command Line Tools (CLT) for Xcode: `xcode-select --install`,
   [developer.apple.com/downloads](https://developer.apple.com/downloads) or
@@ -20,9 +20,7 @@ it does it too. And you have to confirm everything it will do before it starts.
 ## Alternative Installs
 
 ### OS X Mountain Lion (10.8) and below
-Because GitHub now only allows clients that support TLS 1.2 to access repositories over HTTPS, the Homebrew installer will use the GIT protocol when run on systems older than OS X Mavericks (10.9). This requires the availability of a `git` binary, which can be provided by pre-installing the [Command Line Tools or Xcode](https://developer.apple.com/download/more/) on Lion or Mountain Lion, or a [prepackaged installer](https://code.google.com/archive/p/git-osx-installer/downloads) on Leopard or Snow Leopard. Homebrew will also require the Command Line Tools or Xcode in order to automatically compile and install a newer `curl` and `git` with support for TLS 1.2.
-
-Also note that when installing on OS X Leopard (10.5), you need to bypass its outdated built-in certificates by adding `--insecure` to the [installation command](https://brew.sh/#install)'s list of `curl` flags.
+Because GitHub now only allows clients that support TLS 1.2 to access repositories over HTTPS, the Homebrew installer will use the Git protocol when run on systems older than OS X Mavericks (10.9). This requires the availability of a `git` binary, which can be provided by pre-installing the [Command Line Tools for Xcode](https://developer.apple.com/download/more/). Homebrew will also require the Command Line Tools or Xcode in order to automatically compile and install a newer `curl` and `git` with support for TLS 1.2.
 
 ### Untar anywhere
 Just extract (or `git clone`) Homebrew wherever you want. Just avoid:
@@ -31,7 +29,7 @@ Just extract (or `git clone`) Homebrew wherever you want. Just avoid:
 * `/tmp` subdirectories because Homebrew gets upset.
 * `/sw` and `/opt/local` because build scripts get confused when Homebrew is there instead of Fink or MacPorts, respectively.
 
-However do yourself a favor and install to `/usr/local`. Some things may
+However do yourself a favour and install to `/usr/local`. Some things may
 not build when installed elsewhere. One of the reasons Homebrew just
 works relative to the competition is **because** we recommend installing
 to `/usr/local`. *Pick another prefix at your peril!*
@@ -46,13 +44,11 @@ Create a Homebrew installation wherever you extract the tarball. Whichever `brew
 ## Uninstallation
 Uninstallation is documented in the [FAQ](FAQ.md).
 
-<a name="1"><sup>1</sup></a> Not all formulae have CPU or OS requirements, but
-you can assume you will have trouble if you don’t conform. Also, you can find
-PowerPC and Tiger branches from other users in the fork network. See
-[Interesting Taps and Forks](Interesting-Taps-and-Forks.md).
+<a name="1"><sup>1</sup></a> For 32-bit or PPC support see
+[Tigerbrew](https://github.com/mistydemeo/tigerbrew).
 
-<a name="2"><sup>2</sup></a> 10.12 or higher is recommended. 10.5–10.11 are
-supported on a best-effort basis. For 10.4 see
+<a name="2"><sup>2</sup></a> 10.12 or higher is recommended. 10.9–10.11 are
+supported on a best-effort basis. For 10.4-10.6 see
 [Tigerbrew](https://github.com/mistydemeo/tigerbrew).
 
 <a name="3"><sup>3</sup></a> Most formulae require a compiler. A handful

@@ -259,10 +259,9 @@ these flags should only appear after a command.
 
     If `--cc=`*`compiler`* is passed, attempt to compile using *`compiler`*.
     *`compiler`* should be the name of the compiler's executable, for instance
-    `gcc-8` for gcc 8, `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a
-    Homebrew-provided GCC 4.9. In order to use LLVM's clang, use
-    `llvm_clang`. To specify the Apple-provided clang, use `clang`. This
-    parameter will only accept compilers that are provided by Homebrew or
+    `gcc-7` for GCC 7. In order to use LLVM's clang, use `llvm_clang`.
+    To specify the Apple-provided clang, use `clang`.
+    This parameter will only accept compilers that are provided by Homebrew or
     bundled with macOS. Please do not file issues if you encounter errors
     while using this flag.
 
@@ -1133,12 +1132,6 @@ Note that environment variables must have a value set to be detected. For exampl
   * `HOMEBREW_BROWSER`:
     If set, Homebrew uses this setting as the browser when opening project
     homepages, instead of the OS default browser.
-
-  * `HOMEBREW_BUILD_FROM_SOURCE`:
-    If set, instructs Homebrew to compile from source even when a formula
-    provides a bottle. This environment variable is intended for use by
-    Homebrew developers. Please do not file issues if you encounter errors when
-    using this environment variable.
 
   * `HOMEBREW_CACHE`:
     If set, instructs Homebrew to use the specified directory as the download cache.
