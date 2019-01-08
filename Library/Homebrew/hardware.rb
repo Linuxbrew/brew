@@ -8,7 +8,6 @@ module Hardware
     class << self
       OPTIMIZATION_FLAGS = {
         nehalem: "-march=nehalem",
-        penryn:  "-march=penryn",
         core2:   "-march=core2",
         core:    "-march=prescott",
         armv6:   "-march=armv6",
