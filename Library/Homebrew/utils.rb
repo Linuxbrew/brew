@@ -221,7 +221,7 @@ module Homebrew
     return unless Gem::Specification.find_all_by_name(name, version).empty?
 
     ohai "Installing or updating '#{name}' gem"
-    install_args = %W[--no-ri --no-rdoc #{name}]
+    install_args = %W[--no-document #{name}]
     install_args << "--version" << version if version
 
     # Do `gem install [...]` without having to spawn a separate process or
