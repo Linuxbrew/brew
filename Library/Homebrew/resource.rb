@@ -35,8 +35,8 @@ class Resource
   end
 
   def downloader
-    download_strategy.new(url, download_name, version,
-                          mirrors: mirrors.dup, **specs)
+    @downloader ||= download_strategy.new(url, download_name, version,
+                                          mirrors: mirrors.dup, **specs)
   end
 
   # Removes /s from resource names; this allows go package names

@@ -95,6 +95,16 @@ module Homebrew
         ]).freeze
       end
 
+      def please_create_pull_requests(what = "unsupported configuration")
+        <<~EOS
+          You may encounter build failures and other breakages.
+          Please create pull requests instead of asking for help on
+          Homebrew's GitHub, Discourse, Twitter or IRC. You are
+          responsible for resolving any issues you experience, as
+          you are running this #{what}.
+        EOS
+      end
+
       def check_for_installed_developer_tools
         return if DevelopmentTools.installed?
 
@@ -288,7 +298,7 @@ module Homebrew
         return if broken_symlinks.empty?
 
         inject_file_list broken_symlinks, <<~EOS
-          Broken symlinks were found. Remove them with `brew prune`:
+          Broken symlinks were found. Remove them with `brew cleanup`:
         EOS
       end
 
@@ -792,6 +802,17 @@ module Homebrew
               #{bad_tap_files[tap].join("\n  ")}
           EOS
         end.join("\n")
+      end
+
+      def check_homebrew_prefix
+        return if HOMEBREW_PREFIX.to_s == Homebrew::DEFAULT_PREFIX
+
+        <<~EOS
+          Your Homebrew's prefix is not #{Homebrew::DEFAULT_PREFIX}.
+          You can install Homebrew anywhere you want but some bottles (binary packages)
+          can only be used with a standard prefix and some formulae (packages)
+          may not build correctly with a non-standard prefix.
+        EOS
       end
 
       def all

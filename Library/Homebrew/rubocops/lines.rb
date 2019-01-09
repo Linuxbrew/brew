@@ -312,8 +312,6 @@ module RuboCop
           end
 
           find_method_with_args(body_node, :system, /^(otool|install_name_tool|lipo)/) do
-            next if @formula_name == "cctools"
-
             problem "Use ruby-macho instead of calling #{@offensive_node.source}"
           end
 

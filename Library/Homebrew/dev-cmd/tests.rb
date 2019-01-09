@@ -61,6 +61,7 @@ module Homebrew
       ENV.delete("HOMEBREW_NO_GITHUB_API")
       ENV.delete("HOMEBREW_NO_EMOJI")
       ENV.delete("HOMEBREW_DEVELOPER")
+      ENV.delete("HOMEBREW_INSTALL_CLEANUP")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_NO_COMPAT"] = "1" if args.no_compat?
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if args.generic?
@@ -75,8 +76,6 @@ module Homebrew
         FileUtils.rm_f "test/coverage/.resultset.json"
       end
 
-      ENV["BUNDLE_GEMFILE"] = "#{HOMEBREW_LIBRARY_PATH}/test/Gemfile"
-
       # Override author/committer as global settings might be invalid and thus
       # will cause silent failure during the setup of dummy Git repositories.
       %w[AUTHOR COMMITTER].each do |role|
@@ -85,8 +84,7 @@ module Homebrew
         ENV["GIT_#{role}_DATE"]  = "Sun Jan 22 19:59:13 2017 +0000"
       end
 
-      Homebrew.install_gem_setup_path! "bundler"
-      system "bundle", "install" unless quiet_system("bundle", "check")
+      Homebrew.install_bundler_gems!
 
       parallel = true
 

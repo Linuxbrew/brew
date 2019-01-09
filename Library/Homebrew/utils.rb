@@ -203,7 +203,7 @@ module Homebrew
     _system(cmd, *args, **options)
   end
 
-  def install_gem!(name, version = nil)
+  def setup_gem_environment!
     # Match where our bundler gems are.
     ENV["GEM_HOME"] = "#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/vendor/bundle/ruby/#{RbConfig::CONFIG["ruby_version"]}"
     ENV["GEM_PATH"] = ENV["GEM_HOME"]
@@ -217,18 +217,20 @@ module Homebrew
     path.prepend(RUBY_BIN) if which("ruby") != RUBY_PATH
     path.prepend(Gem.bindir)
     ENV["PATH"] = path
+  end
 
-    return unless Gem::Specification.find_all_by_name(name, version).empty?
+  def install_gem!(name)
+    setup_gem_environment!
+
+    return unless Gem::Specification.find_all_by_name(name).empty?
 
     ohai "Installing or updating '#{name}' gem"
-    install_args = %W[--no-ri --no-rdoc #{name}]
-    install_args << "--version" << version if version
 
     # Do `gem install [...]` without having to spawn a separate process or
     # having to find the right `gem` binary for the running Ruby interpreter.
     require "rubygems/commands/install_command"
     install_cmd = Gem::Commands::InstallCommand.new
-    install_cmd.handle_options(install_args)
+    install_cmd.handle_options(["--no-document", name])
     exit_code = 1 # Should not matter as `install_cmd.execute` always throws.
     begin
       install_cmd.execute
@@ -238,8 +240,8 @@ module Homebrew
     odie "Failed to install/update the '#{name}' gem." if exit_code.nonzero?
   end
 
-  def install_gem_setup_path!(name, version = nil, executable = name)
-    install_gem!(name, version)
+  def install_gem_setup_path!(name, executable: name)
+    install_gem!(name)
 
     return if which(executable)
 
@@ -247,6 +249,17 @@ module Homebrew
       The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
       #{ENV["PATH"]}
     EOS
+  end
+
+  def install_bundler!
+    install_gem_setup_path! "bundler", executable: "bundle"
+  end
+
+  def install_bundler_gems!
+    install_bundler!
+    ENV["BUNDLE_GEMFILE"] = "#{HOMEBREW_LIBRARY_PATH}/test/Gemfile"
+    system "bundle", "install" unless quiet_system("bundle", "check")
+    setup_gem_environment!
   end
 
   # rubocop:disable Style/GlobalVars
@@ -300,7 +313,7 @@ end
 def safe_system(cmd, *args, **options)
   return if Homebrew.system(cmd, *args, **options)
 
-  raise(ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS))
+  raise ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS)
 end
 
 # Prints no output

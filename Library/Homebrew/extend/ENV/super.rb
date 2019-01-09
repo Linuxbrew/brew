@@ -230,17 +230,7 @@ module Superenv
   end
 
   def determine_optflags
-    if ARGV.build_bottle?
-      arch = ARGV.bottle_arch || Hardware.oldest_cpu
-      Hardware::CPU.optimization_flags.fetch(arch)
-    elsif Hardware::CPU.intel? && !Hardware::CPU.sse4?
-      Hardware::CPU.optimization_flags.fetch(Hardware.oldest_cpu)
-    elsif ![:gcc_4_0, :gcc_4_2].include?(compiler)
-      "-march=native"
-    # This is mutated elsewhere, so return an empty string in this case
-    else
-      ""
-    end
+    Hardware::CPU.optimization_flags.fetch(effective_arch)
   end
 
   def determine_cccfg
@@ -275,15 +265,6 @@ module Superenv
     check_for_compiler_universal_support
 
     self["HOMEBREW_ARCHFLAGS"] = Hardware::CPU.universal_archs.as_arch_flags
-
-    # GCC doesn't accept "-march" for a 32-bit CPU with "-arch x86_64"
-    return if compiler_any_clang?
-    return unless Hardware::CPU.is_32_bit?
-
-    self["HOMEBREW_OPTFLAGS"] = self["HOMEBREW_OPTFLAGS"].sub(
-      /-march=\S*/,
-      "-Xarch_#{Hardware::CPU.arch_32_bit} \\0",
-    )
   end
 
   def permit_arch_flags

@@ -105,6 +105,18 @@ then
     HOMEBREW_FORCE_BREWED_CURL="1"
   fi
 
+  # Announce pre-Mavericks deprecation now
+  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" ]]
+  then
+    printf "WARNING: Your version of macOS (%s) will not be able to run Homebrew when\n" "$HOMEBREW_MACOS_VERSION" >&2
+    printf "         version 2.0.0 is released (Q1 2019)!\n" >&2
+    if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100700" ]]
+    then
+      printf "         For 10.4 - 10.6 support see: https://github.com/mistydemeo/tigerbrew\n" >&2
+    fi
+    printf "\n" >&2
+  fi
+
   # The system Git on macOS versions before Sierra is too old for some Homebrew functionality we rely on.
   HOMEBREW_MINIMUM_GIT_VERSION="2.14.3"
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "101200" ]]
@@ -113,6 +125,7 @@ then
   fi
 
   HOMEBREW_CACHE="${HOMEBREW_CACHE:-${HOME}/Library/Caches/Homebrew}"
+  HOMEBREW_LOGS="${HOMEBREW_LOGS:-${HOME}/Library/Logs/Homebrew}"
   HOMEBREW_SYSTEM_TEMP="/private/tmp"
 else
   HOMEBREW_PROCESSOR="$(uname -m)"
@@ -142,6 +155,7 @@ else
 
   CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
   HOMEBREW_CACHE="${HOMEBREW_CACHE:-${CACHE_HOME}/Homebrew}"
+  HOMEBREW_LOGS="${HOMEBREW_LOGS:-${CACHE_HOME}/Homebrew/Logs}"
   HOMEBREW_SYSTEM_TEMP="/tmp"
 fi
 
@@ -194,6 +208,7 @@ export HOMEBREW_TEMP
 # Declared in brew.sh
 export HOMEBREW_VERSION
 export HOMEBREW_CACHE
+export HOMEBREW_LOGS
 export HOMEBREW_CELLAR
 export HOMEBREW_SYSTEM
 export HOMEBREW_CURL
@@ -392,12 +407,15 @@ update-preinstall-timer() {
 update-preinstall() {
   [[ -z "$HOMEBREW_HELP" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
+  [[ -z "$HOMEBREW_AUTO_UPDATING" ]] || return
   [[ -z "$HOMEBREW_AUTO_UPDATE_CHECKED" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ||
         "$HOMEBREW_CASK_COMMAND" = "install" || "$HOMEBREW_CASK_COMMAND" = "upgrade" ]]
   then
+    export HOMEBREW_AUTO_UPDATING="1"
+
     if [[ -z "$HOMEBREW_VERBOSE" ]]
     then
       update-preinstall-timer &
@@ -414,17 +432,14 @@ update-preinstall() {
       kill "$timer_pid" 2>/dev/null
       wait "$timer_pid" 2>/dev/null
     fi
-  fi
 
-  # If brew update --preinstall did a migration then export the new locations.
-  if [[ "$HOMEBREW_REPOSITORY" = "/usr/local" &&
-        ! -d "$HOMEBREW_REPOSITORY/.git" &&
-        -d "/usr/local/Homebrew/.git" ]]
-  then
-    HOMEBREW_REPOSITORY="/usr/local/Homebrew"
-    HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
-    export HOMEBREW_REPOSITORY
-    export HOMEBREW_LIBRARY
+    unset HOMEBREW_AUTO_UPDATING
+
+    # If we've checked for updates, we don't need to check again.
+    export HOMEBREW_AUTO_UPDATE_CHECKED="1"
+
+    # exec a new process to set any new environment variables.
+    exec "$HOMEBREW_BREW_FILE" "$@"
   fi
 
   # If we've checked for updates, we don't need to check again.
@@ -441,7 +456,7 @@ then
   # Don't need shellcheck to follow this `source`.
   # shellcheck disable=SC1090
   source "$HOMEBREW_BASH_COMMAND"
-  { update-preinstall; "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
+  { update-preinstall "$@"; "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
 else
   # Don't need shellcheck to follow this `source`.
   # shellcheck disable=SC1090
@@ -450,5 +465,5 @@ else
 
   # Unshift command back into argument list (unless argument list was empty).
   [[ "$HOMEBREW_ARG_COUNT" -gt 0 ]] && set -- "$HOMEBREW_COMMAND" "$@"
-  { update-preinstall; exec "$HOMEBREW_RUBY_PATH" $HOMEBREW_RUBY_WARNINGS "$HOMEBREW_LIBRARY/Homebrew/brew.rb" "$@"; }
+  { update-preinstall "$@"; exec "$HOMEBREW_RUBY_PATH" $HOMEBREW_RUBY_WARNINGS "$HOMEBREW_LIBRARY/Homebrew/brew.rb" "$@"; }
 fi

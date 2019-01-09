@@ -140,12 +140,6 @@ Note that environment variables must have a value set to be detected. For exampl
     If set, Homebrew uses this setting as the browser when opening project
     homepages, instead of the OS default browser.
 
-  * `HOMEBREW_BUILD_FROM_SOURCE`:
-    If set, instructs Homebrew to compile from source even when a formula
-    provides a bottle. This environment variable is intended for use by
-    Homebrew developers. Please do not file issues if you encounter errors when
-    using this environment variable.
-
   * `HOMEBREW_CACHE`:
     If set, instructs Homebrew to use the specified directory as the download cache.
 
@@ -198,6 +192,16 @@ Note that environment variables must have a value set to be detected. For exampl
 
     *Default:* the beer emoji.
 
+  * `HOMEBREW_INSTALL_CLEANUP`:
+    If set, `brew install`, `brew upgrade` and `brew reinstall` will remove
+    previously installed version(s) of the installed/upgraded formulae.
+
+    If `brew cleanup` has not been run in 30 days then it will be run at this
+    time.
+
+    This will become the default in a later version of Homebrew. To opt-out see
+    `HOMEBREW_NO_INSTALL_CLEANUP`.
+
   * `HOMEBREW_LOGS`:
     If set, Homebrew will use the specified directory to store log files.
 
@@ -235,6 +239,11 @@ Note that environment variables must have a value set to be detected. For exampl
     If set, Homebrew will not use the GitHub API, e.g. for searches or
     fetching relevant issues on a failed install.
 
+  * `HOMEBREW_NO_INSTALL_CLEANUP`:
+    If set, `brew install`, `brew upgrade` and `brew reinstall` will never
+    automatically remove the previously installed version(s) of the
+    installed/upgraded formulae.
+
   * `HOMEBREW_PRY`:
     If set, Homebrew will use Pry for the `brew irb` command.
 
@@ -255,9 +264,6 @@ Note that environment variables must have a value set to be detected. For exampl
   * `HOMEBREW_UPDATE_TO_TAG`:
     If set, instructs Homebrew to always use the latest stable tag (even if
     developer commands have been run).
-
-  * `HOMEBREW_UPGRADE_CLEANUP`:
-    If set, `brew upgrade` always assumes `--cleanup` has been passed.
 
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.

@@ -451,16 +451,6 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       RUBY
     end
 
-    it "ruby-macho alternatives audit exempted formula" do
-      expect_no_offenses(<<~RUBY, "/homebrew-core/Formula/cctools.rb")
-        class Cctools < Formula
-          desc "foo"
-          url 'https://brew.sh/foo-1.0.tgz'
-          system "install_name_tool", "-id"
-        end
-      RUBY
-    end
-
     it "npm install without language::Node args" do
       expect_offense(<<~RUBY)
         class Foo < Formula

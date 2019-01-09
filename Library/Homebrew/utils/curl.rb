@@ -32,7 +32,7 @@ def curl_args(*extra_args, show_output: false, user_agent: :default)
     args << "--fail"
     args << "--progress-bar" unless ARGV.verbose?
     args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
-    args << "--silent" if !$stdout.tty? || ENV["HOMEBREW_TRAVIS_CI"]
+    args << "--silent" unless $stdout.tty?
   end
 
   args + extra_args
@@ -52,7 +52,7 @@ def curl_download(*args, to: nil, **options)
   destination.dirname.mkpath
 
   continue_at = if destination.exist? &&
-                   curl_output("--location", "--head", "--range", "0-1",
+                   curl_output("--location", "--range", "0-1",
                                "--write-out", "%{http_code}",
                                "--output", "/dev/null", *args, **options).stdout.to_i == 206 # Partial Content
     "-"

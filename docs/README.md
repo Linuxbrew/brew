@@ -7,6 +7,7 @@
 - [Frequently Asked Questions](FAQ.md)
 - [Common Issues](Common-Issues.md)
 - [`brew` Shell Completion](Shell-Completion.md)
+- [Linuxbrew: Homebrew on Linux and Windows 10](Linuxbrew.md)
 
 - [Tips and Tricks](Tips-N'-Tricks.md)
 - [Bottles (binary packages)](Bottles.md)

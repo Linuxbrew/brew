@@ -126,7 +126,7 @@ shared_examples EnvActivation do
 
   describe "#compiler" do
     it "allows switching compilers" do
-      [:clang, :gcc_4_2, :gcc_4_0].each do |compiler|
+      [:clang, :gcc_4_2].each do |compiler|
         subject.public_send(compiler)
         expect(subject.compiler).to eq(compiler)
       end

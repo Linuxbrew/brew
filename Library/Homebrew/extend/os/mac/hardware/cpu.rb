@@ -66,9 +66,7 @@ module Hardware
           when 11
             :g4e # PowerPC 7450
           when 100
-            # This is the only 64-bit PPC CPU type, so it's useful
-            # to distinguish in `brew config` output and in bottle tags
-            MacOS.prefer_64_bit? ? :g5_64 : :g5 # PowerPC 970
+            :g5_64 # PowerPC 970
           else
             :dunno
           end
@@ -78,17 +76,11 @@ module Hardware
       # Returns an array that's been extended with ArchitectureListExtension,
       # which provides helpers like #as_arch_flags and #as_cmake_arch_flags.
       def universal_archs
-        # Building 64-bit is a no-go on Tiger, and pretty hit or miss on Leopard.
-        # Don't even try unless Tigerbrew's experimental 64-bit Leopard support is enabled.
-        if MacOS.version <= :leopard && !MacOS.prefer_64_bit?
-          [arch_32_bit].extend ArchitectureListExtension
-        else
-          # Amazingly, this order (64, then 32) matters. It shouldn't, but it
-          # does. GCC (some versions? some systems?) can blow up if the other
-          # order is used.
-          # https://superuser.com/questions/740563/gcc-4-8-on-macos-fails-depending-on-arch-order
-          [arch_64_bit, arch_32_bit].extend ArchitectureListExtension
-        end
+        # Amazingly, this order (64, then 32) matters. It shouldn't, but it
+        # does. GCC (some versions? some systems?) can blow up if the other
+        # order is used.
+        # https://superuser.com/questions/740563/gcc-4-8-on-macos-fails-depending-on-arch-order
+        [arch_64_bit, arch_32_bit].extend ArchitectureListExtension
       end
 
       # Determines whether the current CPU and macOS combination

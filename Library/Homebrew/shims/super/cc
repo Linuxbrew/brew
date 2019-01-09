@@ -187,6 +187,9 @@ class Cmd
       "-fuse-linker-plugin", "-frounding-math"
       # clang doesn't support these flags
       args << arg unless tool =~ /^clang/
+    when "-Xpreprocessor"
+      # used for -Xpreprocessor -fopenmp
+      args << arg << enum.next
     when /-mmacosx-version-min=10\.(\d)/
       arg = "-mmacosx-version-min=10.9" if high_sierra_or_later? && $1.to_i < 9
       args << arg

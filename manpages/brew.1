@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "December 2018" "Homebrew" "brew"
+.TH "BREW" "1" "January 2019" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -242,8 +242,8 @@ Open a browser to the GitHub History page for \fIformula\fR\.
 To view formula history locally: \fBbrew log \-p\fR \fIformula\fR
 .
 .TP
-\fBinfo\fR \fB\-\-json=\fR\fIversion\fR (\fB\-\-all\fR|\fB\-\-installed\fR|\fIformulae\fR)
-Print a JSON representation of \fIformulae\fR\. Currently the only accepted value for \fIversion\fR is \fBv1\fR\.
+\fBinfo\fR \fB\-\-json[=\fR\fIversion\fR] (\fB\-\-all\fR|\fB\-\-installed\fR|\fIformulae\fR)
+Print a JSON representation of \fIformulae\fR\. Currently the default and only accepted value for \fIversion\fR is \fBv1\fR\.
 .
 .IP
 Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to get information on all installed formulae\.
@@ -274,7 +274,7 @@ If \fB\-\-ignore\-dependencies\fR is passed, skip installing any dependencies of
 If \fB\-\-only\-dependencies\fR is passed, install the dependencies with specified options but do not install the specified formula\.
 .
 .IP
-If \fB\-\-cc=\fR\fIcompiler\fR is passed, attempt to compile using \fIcompiler\fR\. \fIcompiler\fR should be the name of the compiler\'s executable, for instance \fBgcc\-8\fR for gcc 8, \fBgcc\-4\.2\fR for Apple\'s GCC 4\.2, or \fBgcc\-4\.9\fR for a Homebrew\-provided GCC 4\.9\. In order to use LLVM\'s clang, use \fBllvm_clang\fR\. To specify the Apple\-provided clang, use \fBclang\fR\. This parameter will only accept compilers that are provided by Homebrew or bundled with macOS\. Please do not file issues if you encounter errors while using this flag\.
+If \fB\-\-cc=\fR\fIcompiler\fR is passed, attempt to compile using \fIcompiler\fR\. \fIcompiler\fR should be the name of the compiler\'s executable, for instance \fBgcc\-7\fR for GCC 7\. In order to use LLVM\'s clang, use \fBllvm_clang\fR\. To specify the Apple\-provided clang, use \fBclang\fR\. This parameter will only accept compilers that are provided by Homebrew or bundled with macOS\. Please do not file issues if you encounter errors while using this flag\.
 .
 .IP
 If \fB\-\-build\-from\-source\fR (or \fB\-s\fR) is passed, compile the specified \fIformula\fR from source even if a bottle is provided\. Dependencies will still be installed from bottles if they are available\.
@@ -318,9 +318,6 @@ If \fB\-\-interactive\fR (or \fB\-i\fR) is passed, download and patch \fIformula
 .
 .IP
 If \fB\-\-git\fR (or \fB\-g\fR) is passed, Homebrew will create a Git repository, useful for creating patches to the software\.
-.
-.IP
-If \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed versions of upgraded \fIformulae\fR as well as the HOMEBREW_CACHE for that formula\.
 .
 .TP
 \fBleaves\fR
@@ -420,10 +417,7 @@ Rerun the post\-install steps for \fIformula\fR\.
 .
 .TP
 \fBprune\fR [\fB\-\-dry\-run\fR]
-Remove dead symlinks from the Homebrew prefix\. This is generally not needed, but can be useful when doing DIY installations\.
-.
-.IP
-If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do not actually remove anything\.
+Deprecated\. Use \fBbrew cleanup\fR instead\.
 .
 .TP
 \fBreadall\fR [\fB\-\-aliases\fR] [\fB\-\-syntax\fR] [\fItaps\fR]
@@ -617,14 +611,11 @@ If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full upd
 Fetches and resets Homebrew and all tap repositories (or the specified \fBrepositories\fR) using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
 .
 .TP
-\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fB\-\-display\-times\fR] [\fIformulae\fR]
+\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fB\-\-display\-times\fR] [\fIformulae\fR]
 Upgrade outdated, unpinned brews (with existing install options)\.
 .
 .IP
 Options for the \fBinstall\fR command are also valid here\.
-.
-.IP
-If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_INSTALL_CLEANUP\fR is set then remove previously installed version(s) of upgraded \fIformulae\fR\.
 .
 .IP
 If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if the HEAD installation of the formula is outdated\. Otherwise, the repository\'s HEAD will be checked for updates when a new stable or devel version has been released\.
@@ -1100,6 +1091,11 @@ Use provided \fIcommit\fR as the start commit\.
 \fB\-\-before\fR
 Use the commit at provided \fIdate\fR as the start commit\.
 .
+.TP
+\fBvendor\-gems\fR
+Install and commit Homebrew\'s vendored gems\.
+
+.
 .SH "GLOBAL OPTIONS"
 These options are applicable across all sub\-commands\.
 .
@@ -1268,10 +1264,6 @@ By default, Homebrew uses \fBhttps://homebrew\.bintray\.com/\fR as its download 
 If set, Homebrew uses this setting as the browser when opening project homepages, instead of the OS default browser\.
 .
 .TP
-\fBHOMEBREW_BUILD_FROM_SOURCE\fR
-If set, instructs Homebrew to compile from source even when a formula provides a bottle\. This environment variable is intended for use by Homebrew developers\. Please do not file issues if you encounter errors when using this environment variable\.
-.
-.TP
 \fBHOMEBREW_CACHE\fR
 If set, instructs Homebrew to use the specified directory as the download cache\.
 .
@@ -1328,6 +1320,16 @@ Text printed before the installation summary of each successful build\.
 \fIDefault:\fR the beer emoji\.
 .
 .TP
+\fBHOMEBREW_INSTALL_CLEANUP\fR
+If set, \fBbrew install\fR, \fBbrew upgrade\fR and \fBbrew reinstall\fR will remove previously installed version(s) of the installed/upgraded formulae\.
+.
+.IP
+If \fBbrew cleanup\fR has not been run in 30 days then it will be run at this time\.
+.
+.IP
+This will become the default in a later version of Homebrew\. To opt\-out see \fBHOMEBREW_NO_INSTALL_CLEANUP\fR\.
+.
+.TP
 \fBHOMEBREW_LOGS\fR
 If set, Homebrew will use the specified directory to store log files\.
 .
@@ -1369,6 +1371,10 @@ While ensuring your downloads are fully secure, this is likely to cause from\-so
 If set, Homebrew will not use the GitHub API, e\.g\. for searches or fetching relevant issues on a failed install\.
 .
 .TP
+\fBHOMEBREW_NO_INSTALL_CLEANUP\fR
+If set, \fBbrew install\fR, \fBbrew upgrade\fR and \fBbrew reinstall\fR will never automatically remove the previously installed version(s) of the installed/upgraded formulae\.
+.
+.TP
 \fBHOMEBREW_PRY\fR
 If set, Homebrew will use Pry for the \fBbrew irb\fR command\.
 .
@@ -1389,10 +1395,6 @@ This issue typically occurs when using FileVault or custom SSD configurations\.
 .TP
 \fBHOMEBREW_UPDATE_TO_TAG\fR
 If set, instructs Homebrew to always use the latest stable tag (even if developer commands have been run)\.
-.
-.TP
-\fBHOMEBREW_UPGRADE_CLEANUP\fR
-If set, \fBbrew upgrade\fR always assumes \fB\-\-cleanup\fR has been passed\.
 .
 .TP
 \fBHOMEBREW_VERBOSE\fR
@@ -1474,13 +1476,13 @@ Homebrew\'s lead maintainer is Mike McQuaid\.
 Homebrew\'s project leadership committee is Mike McQuaid, Misty De Meo and Markus Reiter\.
 .
 .P
-Homebrew/brew\'s other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, Vitor Galvao, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff\.
+Homebrew/brew\'s other current maintainers are Claudia Pellegrino, Michka Popoff, Shaun Jackman, Chongyu Zhu, Vitor Galvao, Misty De Meo, Gautham Goli, Markus Reiter, Steven Peters, Jonathan Chang and William Woodruff\.
 .
 .P
 Homebrew/brew\'s Linux support (and Linuxbrew) maintainers are Michka Popoff and Shaun Jackman\.
 .
 .P
-Homebrew/homebrew\-core\'s other current maintainers are Claudia, Michka Popoff, Shaun Jackman, Chongyu Zhu, Izaak Beekman, Sean Molenaar, Jan Viljanen, Jason Tedor, Viktor Szakats, FX Coudert, Thierry Moisan, Steven Peters, Misty De Meo and Tom Schoonjans\.
+Homebrew/homebrew\-core\'s other current maintainers are Claudia Pellegrino, Igor Kapkov, Michka Popoff, Shaun Jackman, Chongyu Zhu, Izaak Beekman, Sean Molenaar, Jan Viljanen, Jason Tedor, Viktor Szakats, FX Coudert, Thierry Moisan, Steven Peters, Misty De Meo and Tom Schoonjans\.
 .
 .P
 Former maintainers with significant contributions include JCount, commitay, Dominyk Tiller, Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross, ilovezfs and Homebrew\'s creator: Max Howell\.

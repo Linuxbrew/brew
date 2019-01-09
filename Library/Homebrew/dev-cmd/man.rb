@@ -73,7 +73,7 @@ module Homebrew
   end
 
   def regenerate_man_pages
-    Homebrew.install_gem_setup_path! "ronn"
+    Homebrew.install_bundler_gems!
 
     markup = build_man_page
     convert_man_page(markup, TARGET_DOC_PATH/"Manpage.md")

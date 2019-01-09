@@ -178,10 +178,10 @@ describe Homebrew::Cleanup do
         expect(download).to exist
       end
 
-      it "removes the download for the latest version after a week" do
+      it "removes the download for the latest version after 30 days" do
         download = Cask::Cache.path/"#{cask.token}--#{cask.version}"
 
-        FileUtils.touch download, mtime: 7.days.ago - 1.hour
+        FileUtils.touch download, mtime: 30.days.ago - 1.hour
 
         subject.cleanup_cask(cask)
 
@@ -202,14 +202,14 @@ describe Homebrew::Cleanup do
       expect(path).not_to exist
     end
 
-    it "cleans up logs if older than 14 days" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(15.days.ago)
+    it "cleans up logs if older than 30 days" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(31.days.ago)
       subject.cleanup_logs
       expect(path).not_to exist
     end
 
-    it "does not clean up logs less than 14 days old" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(2.days.ago)
+    it "does not clean up logs less than 30 days old" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(15.days.ago)
       subject.cleanup_logs
       expect(path).to exist
     end
