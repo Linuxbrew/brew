@@ -11,6 +11,13 @@ if ENV["HOMEBREW_TESTS_COVERAGE"]
 
     formatters << Coveralls::SimpleCov::Formatter
 
+    if ENV["TEST_ENV_NUMBER"]
+      SimpleCov.at_exit do
+        result = SimpleCov.result
+        result.format! if ParallelTests.number_of_running_processes <= 1
+      end
+    end
+
     ENV["CI_NAME"] = ENV["HOMEBREW_CI_NAME"]
     ENV["CI_JOB_ID"] = ENV["TEST_ENV_NUMBER"] || "1"
     ENV["CI_BUILD_NUMBER"] = ENV["HOMEBREW_CI_BUILD_NUMBER"]
@@ -65,7 +72,7 @@ RSpec.configure do |config|
 
   config.filter_run_when_matching :focus
 
-  config.silence_filter_announcements = true
+  config.silence_filter_announcements = true if ENV["TEST_ENV_NUMBER"]
 
   # TODO: when https://github.com/rspec/rspec-expectations/pull/1056
   #       makes it into a stable release:
