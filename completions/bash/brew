@@ -13,7 +13,7 @@ __brewcomp_words_include() {
     then
       return 0
     fi
-    i="$((++i))"
+    (( i++ ))
   done
   return 1
 }
@@ -24,7 +24,7 @@ __brewcomp_prev() {
   local prv="${COMP_WORDS[idx]}"
   while [[ "$prv" = -* ]]
   do
-    idx="$((--idx))"
+    (( idx-- ))
     prv="${COMP_WORDS[idx]}"
   done
   echo "$prv"
@@ -33,7 +33,7 @@ __brewcomp_prev() {
 __brewcomp() {
   # break $1 on space, tab, and newline characters,
   # and turn it into a newline separated list of words
-  local list s sep=$'\n' IFS=$' '$'\t'$'\n'
+  local list s sep=$'\n' IFS=$' \t\n'
   local cur="${COMP_WORDS[COMP_CWORD]}"
 
   for s in $1
@@ -379,7 +379,7 @@ _brew_readall() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   case "$cur" in
     --*)
-      __brewcomp "--syntax"
+      __brewcomp " --aliases --syntax"
       return
       ;;
   esac
@@ -532,7 +532,7 @@ __brew_caskcomp_words_include ()
         if [[ "${COMP_WORDS[i]}" = "$1" ]]; then
             return 0
         fi
-        i=$((++i))
+        (( i++ ))
     done
     return 1
 }
@@ -543,7 +543,7 @@ __brew_caskcomp_prev ()
     local idx=$((COMP_CWORD - 1))
     local prv="${COMP_WORDS[idx]}"
     while [[ $prv == -* ]]; do
-        idx=$((--idx))
+        (( idx-- ))
         prv="${COMP_WORDS[idx]}"
     done
     echo "$prv"
@@ -553,7 +553,7 @@ __brew_caskcomp ()
 {
     # break $1 on space, tab, and newline characters,
     # and turn it into a newline separated list of words
-    local list s sep=$'\n' IFS=$' '$'\t'$'\n'
+    local list s sep=$'\n' IFS=$' \t\n'
     local cur="${COMP_WORDS[COMP_CWORD]}"
 
     for s in $1; do
@@ -561,7 +561,7 @@ __brew_caskcomp ()
         list="$list$s$sep"
     done
 
-    IFS=$sep
+    IFS="$sep"
     COMPREPLY=($(compgen -W "$list" -- "$cur"))
 }
 
@@ -708,7 +708,7 @@ _brew_cask ()
             break
             ;;
         esac
-        i=$((++i))
+        (( i++ ))
     done
 
     if [[ $i -eq $COMP_CWORD ]]; then
@@ -759,7 +759,7 @@ _brew() {
         break
         ;;
     esac
-    i="$((++i))"
+    (( i++ ))
   done
 
   if [[ "$i" -eq "$COMP_CWORD" ]]
@@ -767,7 +767,7 @@ _brew() {
     # Do not auto-complete "*instal" or "*uninstal" aliases for "*install" commands.
     # Prefix newline to prevent not checking the first command.
     local cmds=$'\n'"$(brew commands --quiet --include-aliases | \grep -v instal$)"
-    __brewcomp "${cmds}"
+    __brewcomp "$cmds"
     return
   fi
 
