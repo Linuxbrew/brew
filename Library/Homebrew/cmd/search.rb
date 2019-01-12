@@ -125,7 +125,7 @@ module Homebrew
       end
     end
 
-    ohai <<~EOS
+    opoo <<~EOS
       Did you mean to perform a regular expression search?
       Surround your query with /slashes/ to search locally by regex.
     EOS
