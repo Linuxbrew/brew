@@ -42,6 +42,10 @@ describe Homebrew::CLI::Parser do
       expect { parser.parse(["--random"]) }.to raise_error(OptionParser::InvalidOption, /--random/)
     end
 
+    it "outputs help text on failure" do
+      expect { parser.parse(["--random"]) }.to raise_error(OptionParser::InvalidOption, /Usage: brew/)
+    end
+
     it "maps environment var to an option" do
       parser.parse([])
       expect(Homebrew.args.pry?).to be true

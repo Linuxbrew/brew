@@ -123,7 +123,12 @@ module Homebrew
       end
 
       def parse(cmdline_args = ARGV)
-        remaining_args = @parser.parse(cmdline_args)
+        begin
+          remaining_args = @parser.parse(cmdline_args)
+        rescue OptionParser::InvalidOption => e
+          puts generate_help_text
+          raise e
+        end
         check_constraint_violations
         Homebrew.args[:remaining] = remaining_args
         Homebrew.args.freeze
