@@ -1,18 +1,18 @@
-def get_env_or_raise(env, message = nil)
-  message ||= <<~EOS
-    don't worry, you likely hit a bug auto-updating from an old version.
-    Rerun your command, everything is up-to-date and fine now
-  EOS
-  unless ENV[env]
-    abort <<~EOS
-      Error: #{env} was not exported!\nPlease #{message.chomp}.
-    EOS
-  end
-  ENV[env]
+unless ENV["HOMEBREW_BREW_FILE"]
+  raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
 end
 
 # Path to `bin/brew` main executable in `HOMEBREW_PREFIX`
-HOMEBREW_BREW_FILE = Pathname.new(get_env_or_raise("HOMEBREW_BREW_FILE", "call bin/brew directly"))
+HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
+
+class MissingEnvironmentVariables < RuntimeError; end
+
+def get_env_or_raise(env)
+  unless ENV[env]
+    raise MissingEnvironmentVariables, "#{env} was not exported!"
+  end
+  ENV[env]
+end
 
 # Where we link under
 HOMEBREW_PREFIX = Pathname.new(get_env_or_raise("HOMEBREW_PREFIX"))
