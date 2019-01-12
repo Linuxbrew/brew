@@ -296,7 +296,9 @@ class FormulaInstaller
           formula.prefix.rmtree if formula.prefix.directory?
           formula.rack.rmdir_if_possible
         end
-        raise if ARGV.homebrew_developer? || e.is_a?(Interrupt)
+        raise if ARGV.homebrew_developer? ||
+                 e.is_a?(Interrupt) ||
+                 ENV["HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK"]
 
         @pour_failed = true
         onoe e.message
