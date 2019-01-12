@@ -126,7 +126,7 @@ module Homebrew
         begin
           remaining_args = @parser.parse(cmdline_args)
         rescue OptionParser::InvalidOption => e
-          puts generate_help_text
+          $stderr.puts generate_help_text
           raise e
         end
         check_constraint_violations
