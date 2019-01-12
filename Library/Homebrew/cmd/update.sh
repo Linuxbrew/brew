@@ -250,7 +250,13 @@ EOS
 
   if [[ -z "$HOMEBREW_MERGE" ]]
   then
-    git rebase "${QUIET_ARGS[@]}" "$REMOTE_REF"
+    # Work around bug where git rebase --quiet is not quiet
+    if [[ -z "$HOMEBREW_VERBOSE" ]]
+    then
+      git rebase "$REMOTE_REF" >/dev/null
+    else
+      git rebase "${QUIET_ARGS[@]}" "$REMOTE_REF"
+    fi
   else
     git merge --no-edit --ff "${QUIET_ARGS[@]}" "$REMOTE_REF" \
       --strategy=recursive \
