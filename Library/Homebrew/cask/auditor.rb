@@ -1,3 +1,4 @@
+require "cleanup"
 require "cask/download"
 
 module Cask
