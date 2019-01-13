@@ -51,9 +51,6 @@ module Cask
       ohai "Auditing language: #{languages.map { |lang| "'#{lang}'" }.to_sentence}"
       MacOS.instance_variable_set(:@languages, languages)
       audit_cask_instance(CaskLoader.load(cask.sourcefile_path))
-    ensure
-      # TODO: Check if this is still needed once cache deduplication is active.
-      Homebrew::Cleanup.new(days: 0).cleanup_cask(cask) if audit_download?
     end
 
     def audit_cask_instance(cask)
