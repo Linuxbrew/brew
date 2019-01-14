@@ -174,9 +174,7 @@ module Homebrew
     end
 
     if devel = f.devel
-      s = "devel #{devel.version}"
-      s += " (bottled)" if devel.bottled?
-      specs << s
+      specs << "devel #{devel.version}"
     end
 
     specs << "HEAD" if f.head
