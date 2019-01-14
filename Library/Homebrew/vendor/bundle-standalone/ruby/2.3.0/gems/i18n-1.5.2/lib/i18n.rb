@@ -364,7 +364,7 @@ module I18n
           keys.delete('')
           keys.map! do |k|
             case k
-            when /\A[-+]?\d+\z/ # integer
+            when /\A[-+]?[1-9]\d*\z/ # integer
               k.to_i
             when 'true'
               true
