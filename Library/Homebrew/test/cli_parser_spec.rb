@@ -11,8 +11,8 @@ describe Homebrew::CLI::Parser do
     }
 
     before do
+      allow(ENV).to receive(:[])
       allow(ENV).to receive(:[]).with("HOMEBREW_PRY").and_return("1")
-      allow(ENV).to receive(:[]).with("HOMEBREW_VERBOSE")
     end
 
     it "parses short option" do
@@ -38,8 +38,9 @@ describe Homebrew::CLI::Parser do
       expect(Homebrew.args.more_verbose?).to be nil
     end
 
-    it "raises an exception when an invalid option is passed" do
+    it "raises an exception and outputs help text when an invalid option is passed" do
       expect { parser.parse(["--random"]) }.to raise_error(OptionParser::InvalidOption, /--random/)
+                                           .and output(/Usage: brew/).to_stderr
     end
 
     it "maps environment var to an option" do
