@@ -1212,7 +1212,7 @@ Note that environment variables must have a value set to be detected. For exampl
     `brew upgrade` or `brew tap`.
 
   * `HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK`:
-    If set, Homebrew will fail if on the failure of installation from a bottle
+    If set, Homebrew will fail on the failure of installation from a bottle
     rather than falling back to building from source.
 
   * `HOMEBREW_NO_COLOR`:
