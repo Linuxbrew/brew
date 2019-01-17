@@ -219,18 +219,21 @@ module Homebrew
     ENV["PATH"] = path
   end
 
-  def install_gem!(name)
+  # TODO: version can be removed when compat/download_strategy is deleted in 2.0
+  def install_gem!(name, version = nil)
     setup_gem_environment!
 
-    return unless Gem::Specification.find_all_by_name(name).empty?
+    return unless Gem::Specification.find_all_by_name(name, version).empty?
 
     ohai "Installing or updating '#{name}' gem"
+    install_args = %W[--no-document #{name}]
+    install_args << "--version" << version if version
 
     # Do `gem install [...]` without having to spawn a separate process or
     # having to find the right `gem` binary for the running Ruby interpreter.
     require "rubygems/commands/install_command"
     install_cmd = Gem::Commands::InstallCommand.new
-    install_cmd.handle_options(["--no-document", name])
+    install_cmd.handle_options(install_args)
     exit_code = 1 # Should not matter as `install_cmd.execute` always throws.
     begin
       install_cmd.execute
