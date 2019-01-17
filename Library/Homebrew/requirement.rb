@@ -12,8 +12,8 @@ class Requirement
   attr_reader :tags, :name, :cask, :download
 
   def initialize(tags = [])
-    @cask ||= self.class.cask
-    @download ||= self.class.download
+    @cask = self.class.cask
+    @download = self.class.download
     tags.each do |tag|
       next unless tag.is_a? Hash
 
