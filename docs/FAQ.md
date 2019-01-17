@@ -141,7 +141,7 @@ You should only ever sudo a tool you trust. Of course, you can trust Homebrew
 😉 But do you trust the multi-megabyte Makefile that Homebrew runs? Developers
 often understand C++ far better than they understand make syntax. It’s too high
 a risk to sudo such stuff. It could modify (or upload) any files on your
-system.And indeed, we’ve seen some build scripts try to modify `/usr` even when
+system. And indeed, we’ve seen some build scripts try to modify `/usr` even when
 the prefix was specified as something else entirely.
 
 We use the macOS sandbox to stop this but this doesn't work when run as the `root` user (which also has read and write access to almost everything on the system).
