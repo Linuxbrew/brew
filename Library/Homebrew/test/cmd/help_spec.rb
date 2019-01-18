@@ -14,7 +14,7 @@ describe "brew", :integration_test do
 
     it "prints help for a documented Ruby command" do
       expect { brew "help", "cat" }
-        .to output(/^brew cat/).to_stdout
+        .to output(/^Usage: brew cat/).to_stdout
         .and be_a_success
     end
 
@@ -40,7 +40,7 @@ describe "brew", :integration_test do
   describe "cat" do
     it "prints help when no argument is given" do
       expect { brew "cat" }
-        .to output(/^brew cat/).to_stderr
+        .to output(/^Usage: brew cat/).to_stderr
         .and be_a_failure
     end
   end
