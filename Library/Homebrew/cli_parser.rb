@@ -59,6 +59,7 @@ module Homebrew
 
         enable_switch(*names) if !env.nil? && !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
       end
+      alias switch_option switch
 
       def usage_banner(text)
         @parser.banner = "#{text}\n"
