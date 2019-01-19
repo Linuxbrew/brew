@@ -279,7 +279,7 @@ module GitHub
       open_prs
     else
       puts "Closed pull requests:" unless open_or_closed_prs.empty?
-      open_or_closed_prs
+      open_or_closed_prs.take(20)
     end
 
     prs.each { |i| puts "#{i["title"]} (#{i["html_url"]})" }
