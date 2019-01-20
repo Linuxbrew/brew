@@ -2,14 +2,28 @@
 #:    Display the path to the file which is used when invoking `brew` <cmd>.
 
 require "commands"
+require "cli_parser"
 
 module Homebrew
   module_function
 
-  def command
-    abort "This command requires a command argument" if ARGV.empty?
+  def command_args
+    Homebrew::CLI::Parser.new do
+      usage_banner <<~EOS
+        `command` <cmd>
 
-    cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(ARGV.first, ARGV.first)
+        Display the path to the file which is used when invoking `brew` <cmd>.
+      EOS
+      switch :verbose
+      switch :debug
+    end
+  end
+
+  def command
+    command_args.parse
+    abort "This command requires a command argument" if args.remaining.empty?
+
+    cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(args.remaining.first, args.remaining.first)
 
     path = Commands.path(cmd)
 
