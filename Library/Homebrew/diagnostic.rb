@@ -73,9 +73,15 @@ module Homebrew
       end
       ############# END HELPERS
 
-      def fatal_install_checks
+      def fatal_preinstall_checks
         %w[
           check_access_directories
+        ].freeze
+      end
+
+      def fatal_build_from_source_checks
+        %w[
+          check_for_installed_developer_tools
         ].freeze
       end
 
@@ -83,20 +89,12 @@ module Homebrew
         [].freeze
       end
 
-      def development_tools_checks
-        %w[
-          check_for_installed_developer_tools
-        ].freeze
-      end
-
-      def fatal_development_tools_checks
-        %w[
-        ].freeze
+      def build_from_source_checks
+        [].freeze
       end
 
       def build_error_checks
-        (development_tools_checks + %w[
-        ]).freeze
+        supported_configuration_checks + build_from_source_checks
       end
 
       def please_create_pull_requests(what = "unsupported configuration")

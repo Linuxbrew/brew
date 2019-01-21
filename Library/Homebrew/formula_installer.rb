@@ -209,7 +209,7 @@ class FormulaInstaller
   def install
     start_time = Time.now
     if !formula.bottle_unneeded? && !pour_bottle? && DevelopmentTools.installed?
-      Homebrew::Install.perform_development_tools_checks
+      Homebrew::Install.perform_build_from_source_checks
     end
 
     # not in initialize so upgrade can unlink the active keg before calling this

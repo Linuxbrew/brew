@@ -135,6 +135,7 @@ module Homebrew
     raise FormulaUnspecifiedError if ARGV.resolved_formulae.length != 1
 
     Install.perform_preinstall_checks(all_fatal: true)
+    Install.perform_build_from_source_checks(all_fatal: true)
     gistify_logs(ARGV.resolved_formulae.first)
   end
 end
