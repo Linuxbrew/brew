@@ -15,12 +15,13 @@ describe CleanupRefinement do
       path.mkpath
     end
 
-    it "returns true when path_modified_time < days_default" do
+    it "returns true when ctime and mtime < days_default" do
+      allow_any_instance_of(Pathname).to receive(:ctime).and_return(2.days.ago)
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(2.days.ago)
       expect(path.prune?(1)).to be true
     end
 
-    it "returns false when path_modified_time >= days_default" do
+    it "returns false when ctime and mtime >= days_default" do
       expect(path.prune?(2)).to be false
     end
   end
@@ -181,7 +182,8 @@ describe Homebrew::Cleanup do
       it "removes the download for the latest version after 30 days" do
         download = Cask::Cache.path/"#{cask.token}--#{cask.version}"
 
-        FileUtils.touch download, mtime: 30.days.ago - 1.hour
+        allow(download).to receive(:ctime).and_return(30.days.ago - 1.hour)
+        allow(download).to receive(:mtime).and_return(30.days.ago - 1.hour)
 
         subject.cleanup_cask(cask)
 
@@ -203,12 +205,14 @@ describe Homebrew::Cleanup do
     end
 
     it "cleans up logs if older than 30 days" do
+      allow_any_instance_of(Pathname).to receive(:ctime).and_return(31.days.ago)
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(31.days.ago)
       subject.cleanup_logs
       expect(path).not_to exist
     end
 
     it "does not clean up logs less than 30 days old" do
+      allow_any_instance_of(Pathname).to receive(:ctime).and_return(15.days.ago)
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(15.days.ago)
       subject.cleanup_logs
       expect(path).to exist
@@ -307,6 +311,7 @@ describe Homebrew::Cleanup do
     it "cleans up VCS checkout directories with modified time < prune time" do
       foo = (HOMEBREW_CACHE/"--foo")
       foo.mkpath
+      allow_any_instance_of(Pathname).to receive(:ctime).and_return(Time.now - 2 * 60 * 60 * 24)
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 2 * 60 * 60 * 24)
       described_class.new(days: 1).cleanup_cache
       expect(foo).not_to exist
