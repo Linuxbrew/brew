@@ -1,12 +1,19 @@
 module Homebrew
   module Diagnostic
     class Checks
-      undef development_tools_checks, fatal_development_tools_checks,
-            build_error_checks
+      undef supported_configuration_checks, development_tools_checks,
+            fatal_development_tools_checks, build_error_checks
+
+      def supported_configuration_checks
+        %w[
+          check_build_from_source
+          check_homebrew_prefix
+          check_for_unsupported_macos
+        ].freeze
+      end
 
       def development_tools_checks
         %w[
-          check_for_unsupported_macos
           check_for_installed_developer_tools
           check_xcode_license_approved
           check_xcode_up_to_date
