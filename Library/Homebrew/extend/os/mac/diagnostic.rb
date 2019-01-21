@@ -1,38 +1,31 @@
 module Homebrew
   module Diagnostic
     class Checks
-      undef supported_configuration_checks, development_tools_checks,
-            fatal_development_tools_checks, build_error_checks
+      undef fatal_build_from_source_checks, supported_configuration_checks,
+            build_from_source_checks
 
-      def supported_configuration_checks
+      def fatal_build_from_source_checks
         %w[
-          check_build_from_source
-          check_homebrew_prefix
-          check_for_unsupported_macos
-        ].freeze
-      end
-
-      def development_tools_checks
-        %w[
-          check_for_installed_developer_tools
           check_xcode_license_approved
-          check_xcode_up_to_date
-          check_clt_up_to_date
-        ].freeze
-      end
-
-      def fatal_development_tools_checks
-        %w[
           check_xcode_minimum_version
           check_clt_minimum_version
           check_if_xcode_needs_clt_installed
         ].freeze
       end
 
-      def build_error_checks
-        (development_tools_checks + %w[
+      def supported_configuration_checks
+        %w[
+          check_build_from_source
           check_for_unsupported_macos
-        ]).freeze
+        ].freeze
+      end
+
+      def build_from_source_checks
+        %w[
+          check_for_installed_developer_tools
+          check_xcode_up_to_date
+          check_clt_up_to_date
+        ].freeze
       end
 
       def check_for_non_prefixed_findutils
@@ -198,7 +191,7 @@ module Homebrew
 
         <<~EOS
           You have not agreed to the Xcode license.
-          Builds will fail! Agree to the license by opening Xcode.app or running:
+          Agree to the license by opening Xcode.app or running:
             sudo xcodebuild -license
         EOS
       end

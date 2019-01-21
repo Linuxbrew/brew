@@ -17,16 +17,6 @@ module Homebrew
       end
     end
 
-    def check_cc_argv
-      return unless ARGV.cc
-
-      @checks ||= Diagnostic::Checks.new
-      opoo <<~EOS
-        You passed `--cc=#{ARGV.cc}`.
-        #{@checks.please_create_pull_requests}
-      EOS
-    end
-
     def attempt_directory_creation
       Keg::MUST_EXIST_DIRECTORIES.each do |dir|
         begin
@@ -37,8 +27,14 @@ module Homebrew
       end
     end
 
-    def perform_development_tools_checks
-      diagnostic_checks(:fatal_development_tools_checks)
+    def check_cc_argv
+      return unless ARGV.cc
+
+      @checks ||= Diagnostic::Checks.new
+      opoo <<~EOS
+        You passed `--cc=#{ARGV.cc}`.
+        #{@checks.please_create_pull_requests}
+      EOS
     end
 
     def perform_preinstall_checks(all_fatal: false)
@@ -46,10 +42,15 @@ module Homebrew
       attempt_directory_creation
       check_cc_argv
       diagnostic_checks(:supported_configuration_checks, fatal: all_fatal)
-      diagnostic_checks(:fatal_install_checks)
+      diagnostic_checks(:fatal_preinstall_checks)
     end
     alias generic_perform_preinstall_checks perform_preinstall_checks
     module_function :generic_perform_preinstall_checks
+
+    def perform_build_from_source_checks(all_fatal: false)
+      diagnostic_checks(:fatal_build_from_source_checks)
+      diagnostic_checks(:build_from_source_checks, fatal: all_fatal)
+    end
 
     def diagnostic_checks(type, fatal: true)
       @checks ||= Diagnostic::Checks.new
