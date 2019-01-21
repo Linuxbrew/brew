@@ -134,6 +134,7 @@ module Homebrew
   def gist_logs
     raise FormulaUnspecifiedError if ARGV.resolved_formulae.length != 1
 
+    Install.perform_preinstall_checks(all_fatal: true)
     gistify_logs(ARGV.resolved_formulae.first)
   end
 end
