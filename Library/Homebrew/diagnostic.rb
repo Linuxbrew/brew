@@ -802,7 +802,7 @@ module Homebrew
       end
 
       def check_homebrew_prefix
-        return if HOMEBREW_PREFIX.to_s == Homebrew::DEFAULT_PREFIX
+        return if Homebrew.default_prefix?
 
         <<~EOS
           Your Homebrew's prefix is not #{Homebrew::DEFAULT_PREFIX}.
