@@ -1,0 +1,22 @@
+inherit_from: ./.rubocop.yml
+
+NewFormulaAudit:
+  Enabled: true
+
+# TODO: try to enable these
+RSpec/AnyInstance:
+  Enabled: false
+RSpec/ContextWording:
+  Enabled: false
+RSpec/DescribeClass:
+  Enabled: false
+RSpec/ExampleLength:
+  Enabled: false
+RSpec/MessageSpies:
+  Enabled: false
+
+# TODO: try to reduce these
+RSpec/MultipleExpectations:
+  Max: 26
+RSpec/NestedGroups:
+  Max: 5
