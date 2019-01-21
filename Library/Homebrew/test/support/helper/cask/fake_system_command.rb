@@ -63,7 +63,7 @@ class FakeSystemCommand
 end
 
 RSpec.configure do |config|
-  config.after(:each) do
+  config.after do
     begin
       FakeSystemCommand.verify_expectations!
     ensure

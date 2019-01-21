@@ -137,7 +137,7 @@ RSpec.configure do |config|
     skip "unzip not installed." unless which("unzip")
   end
 
-  config.around(:each) do |example|
+  config.around do |example|
     def find_files
       Find.find(TEST_TMPDIR)
           .reject { |f| File.basename(f) == ".DS_Store" }
