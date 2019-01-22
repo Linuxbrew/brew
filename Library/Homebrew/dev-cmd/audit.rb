@@ -202,7 +202,7 @@ module Homebrew
   end
 
   def format_problem_lines(problems)
-    problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
+    problems.uniq.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
   end
 
   class FormulaText
@@ -405,7 +405,6 @@ module Homebrew
       @specs.each do |spec|
         # Check for things we don't like to depend on.
         # We allow non-Homebrew installs whenever possible.
-        options_message = "Formulae should not have optional or recommended dependencies"
         spec.deps.each do |dep|
           begin
             dep_f = dep.to_formula
@@ -434,7 +433,7 @@ module Homebrew
 
           if @new_formula && dep_f.keg_only_reason &&
              !["openssl", "apr", "apr-util"].include?(dep.name) &&
-             (!["openblas"].include?(dep.name) || @core_tap) &&
+             !["openblas"].include?(dep.name) &&
              dep_f.keg_only_reason.reason == :provided_by_macos
             new_formula_problem(
               "Dependency '#{dep.name}' may be unnecessary as it is provided " \
@@ -443,6 +442,7 @@ module Homebrew
           end
 
           dep.options.each do |opt|
+            next if @core_tap
             next if dep_f.option_defined?(opt)
             next if dep_f.requirements.find do |r|
               if r.recommended?
@@ -463,19 +463,17 @@ module Homebrew
             problem "Dependency '#{dep.name}' is marked as :run. Remove :run; it is a no-op."
           end
 
-          next unless @new_formula
           next unless @core_tap
 
           if dep.tags.include?(:recommended) || dep.tags.include?(:optional)
-            new_formula_problem options_message
+            problem "Formulae should not have optional or recommended dependencies"
           end
         end
 
-        next unless @new_formula
         next unless @core_tap
 
         if spec.requirements.map(&:recommended?).any? || spec.requirements.map(&:optional?).any?
-          new_formula_problem options_message
+          problem "Formulae should not have optional or recommended requirements"
         end
       end
     end
@@ -529,6 +527,8 @@ module Homebrew
 
     def audit_postgresql
       return unless formula.name == "postgresql"
+      return unless @core_tap
+
       major_version = formula.version
                              .to_s
                              .split(".")
@@ -602,20 +602,16 @@ module Homebrew
       return unless formula.bottle_disabled?
       return if formula.bottle_unneeded?
 
-      if !formula.bottle_disable_reason.valid?
+      unless formula.bottle_disable_reason.valid?
         problem "Unrecognized bottle modifier"
-      else
-        bottle_disabled_whitelist = %w[
-          cryptopp
-          leafnode
-        ]
-        return if bottle_disabled_whitelist.include?(formula.name)
-
-        problem "Formulae should not use `bottle :disabled`" if @core_tap
       end
+
+      return unless @core_tap
+      problem "Formulae should not use `bottle :disabled`"
     end
 
     def audit_github_repository
+      return unless @core_tap
       return unless @online
       return unless @new_formula
 
@@ -635,8 +631,7 @@ module Homebrew
       return if metadata.nil?
 
       new_formula_problem "GitHub fork (not canonical repository)" if metadata["fork"]
-      if @core_tap &&
-         (metadata["forks_count"] < 30) && (metadata["subscribers_count"] < 30) &&
+      if (metadata["forks_count"] < 30) && (metadata["subscribers_count"] < 30) &&
          (metadata["stargazers_count"] < 75)
         new_formula_problem "GitHub repository not notable enough (<30 forks, <30 watchers and <75 stars)"
       end
@@ -647,13 +642,8 @@ module Homebrew
     end
 
     def audit_specs
-      if head_only?(formula) && formula.tap.to_s.downcase !~ %r{[-/]head-only$}
-        problem "Head-only (no stable download)"
-      end
-
-      if devel_only?(formula) && formula.tap.to_s.downcase !~ %r{[-/]devel-only$}
-        problem "Devel-only (no stable download)"
-      end
+      problem "Head-only (no stable download)" if head_only?(formula)
+      problem "Devel-only (no stable download)" if devel_only?(formula)
 
       %w[Stable Devel HEAD].each do |name|
         spec_name = name.downcase.to_sym
@@ -698,11 +688,11 @@ module Homebrew
         end
       end
 
-      if @core_tap && formula.devel
-        problem "Formulae should not have a `devel` spec"
-      end
+      return unless @core_tap
 
-      if @core_tap && formula.head
+      problem "Formulae should not have a `devel` spec" if formula.devel
+
+      if formula.head
         head_spec_message = "Formulae should not have a `HEAD` spec"
         if @new_formula
           new_formula_problem head_spec_message
@@ -922,10 +912,6 @@ module Homebrew
 
       return unless @strict
 
-      if @core_tap && line.include?("env :std")
-        problem "`env :std` in `core` formulae is deprecated"
-      end
-
       if line.include?("env :userpaths")
         problem "`env :userpaths` in formulae is deprecated"
       end
@@ -944,13 +930,18 @@ module Homebrew
         problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
       end
 
-      if line =~ /depends_on .+ if build\.with(out)?\?\(?["']\w+["']\)?/
+      if !@core_tap && line =~ /depends_on .+ if build\.with(out)?\?\(?["']\w+["']\)?/
         problem "`Use :optional` or `:recommended` instead of `#{Regexp.last_match(0)}`"
       end
 
       return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
 
       problem "Use pkgshare instead of (share#{Regexp.last_match(1)}\"#{formula.name}\")"
+
+      return unless @core_tap
+
+      return unless line.include?("env :std")
+      problem "`env :std` in `core` formulae is deprecated"
     end
 
     def audit_reverse_migration

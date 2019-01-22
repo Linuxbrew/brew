@@ -8,6 +8,9 @@ module RuboCop
         DEPRECATION_MSG = "macOS has been 64-bit only since 10.6 so 32-bit options are deprecated.".freeze
         UNI_DEPRECATION_MSG = "macOS has been 64-bit only since 10.6 so universal options are deprecated.".freeze
 
+        DEP_OPTION = "Formulae should not use `deprecated_option`".freeze
+        OPTION = "Formulae should not have an `option`".freeze
+
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
           option_call_nodes = find_every_method_call_by_name(body_node, :option)
           option_call_nodes.each do |option_call|
@@ -33,21 +36,19 @@ module RuboCop
             problem "Use '--with#{Regexp.last_match(1)}-test' instead of '--#{option}'."\
                     " Migrate '--#{option}' with `deprecated_option`."
           end
+
+          return unless formula_tap == "homebrew-core"
+
+          problem DEP_OPTION if method_called_ever?(body_node, :deprecated_option)
+          problem OPTION if method_called_ever?(body_node, :option)
         end
       end
     end
 
+    # Keep this (empty) module and class around in case we need it later to
+    # avoid deleting all the NewFormulaAudit referencing logic.
     module NewFormulaAudit
       class Options < FormulaCop
-        DEP_OPTION = "New formulae should not use `deprecated_option`".freeze
-        OPTION = "Formulae should not have an `option`".freeze
-
-        def audit_formula(_node, _class_node, _parent_class_node, body_node)
-          problem DEP_OPTION if method_called_ever?(body_node, :deprecated_option)
-          return unless formula_tap == "homebrew-core"
-
-          problem OPTION if method_called_ever?(body_node, :option)
-        end
       end
     end
   end
