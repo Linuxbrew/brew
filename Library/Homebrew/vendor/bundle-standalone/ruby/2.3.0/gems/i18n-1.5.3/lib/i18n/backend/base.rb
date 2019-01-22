@@ -250,14 +250,16 @@ module I18n
         def translate_localization_format(locale, object, format, options)
           format.to_s.gsub(/%[aAbBpP]/) do |match|
             case match
-            when '%a' then I18n.t(:"date.abbr_day_names",                  :locale => locale, :format => format)[object.wday]
-            when '%A' then I18n.t(:"date.day_names",                       :locale => locale, :format => format)[object.wday]
-            when '%b' then I18n.t(:"date.abbr_month_names",                :locale => locale, :format => format)[object.mon]
-            when '%B' then I18n.t(:"date.month_names",                     :locale => locale, :format => format)[object.mon]
-            when '%p' then I18n.t(:"time.#{object.hour < 12 ? :am : :pm}", :locale => locale, :format => format).upcase if object.respond_to? :hour
-            when '%P' then I18n.t(:"time.#{object.hour < 12 ? :am : :pm}", :locale => locale, :format => format).downcase if object.respond_to? :hour
+            when '%a' then I18n.t!(:"date.abbr_day_names",                  :locale => locale, :format => format)[object.wday]
+            when '%A' then I18n.t!(:"date.day_names",                       :locale => locale, :format => format)[object.wday]
+            when '%b' then I18n.t!(:"date.abbr_month_names",                :locale => locale, :format => format)[object.mon]
+            when '%B' then I18n.t!(:"date.month_names",                     :locale => locale, :format => format)[object.mon]
+            when '%p' then I18n.t!(:"time.#{object.hour < 12 ? :am : :pm}", :locale => locale, :format => format).upcase if object.respond_to? :hour
+            when '%P' then I18n.t!(:"time.#{object.hour < 12 ? :am : :pm}", :locale => locale, :format => format).downcase if object.respond_to? :hour
             end
           end
+        rescue MissingTranslationData => e
+          e.message
         end
 
         def pluralization_key(entry, count)
