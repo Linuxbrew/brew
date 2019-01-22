@@ -12,7 +12,9 @@ module Utils
   def self.svn_remote_exists?(url)
     return true unless svn_available?
 
-    ssl_args = ["--non-interactive", "--trust-server-cert"] if ENV["HOMEBREW_TEST_ONLINE"]
-    quiet_system "svn", "ls", url, "--depth", "empty", *ssl_args
+    # OK to unconditionally trust here because we're just checking if
+    # a URL exists.
+    quiet_system "svn", "ls", url, "--depth", "empty",
+                 "--non-interactive", "--trust-server-cert"
   end
 end
