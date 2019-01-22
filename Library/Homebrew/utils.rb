@@ -291,7 +291,7 @@ module Homebrew
 
     $times = {}
     at_exit do
-      col_width = [$times.keys.map(&:size).max + 2, 15].max
+      col_width = [$times.keys.map(&:size).max.to_i + 2, 15].max
       $times.sort_by { |_k, v| v }.each do |method, time|
         puts format("%-*s %0.4f sec", col_width, "#{method}:", time)
       end
