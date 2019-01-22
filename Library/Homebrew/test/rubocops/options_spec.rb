@@ -24,7 +24,7 @@ describe RuboCop::Cop::FormulaAudit::Options do
       RUBY
     end
 
-    it "with deprecated options" do
+    it "with bad option names" do
       expect_offense(<<~RUBY)
         class Foo < Formula
           url 'https://brew.sh/foo-1.0.tgz'
@@ -35,7 +35,7 @@ describe RuboCop::Cop::FormulaAudit::Options do
       RUBY
     end
 
-    it "with misc deprecated options" do
+    it "with without-check option name" do
       expect_offense(<<~RUBY)
         class Foo < Formula
           url 'https://brew.sh/foo-1.0.tgz'
@@ -44,19 +44,13 @@ describe RuboCop::Cop::FormulaAudit::Options do
         end
       RUBY
     end
-  end
-end
 
-describe RuboCop::Cop::NewFormulaAudit::Options do
-  subject(:cop) { described_class.new }
-
-  context "When auditing options for a new formula" do
-    it "with deprecated options" do
-      expect_offense(<<~RUBY)
+    it "with deprecated_optionss" do
+      expect_offense(<<~RUBY, "/homebrew-core/")
         class Foo < Formula
           url 'https://brew.sh/foo-1.0.tgz'
           deprecated_option "examples" => "with-examples"
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ New formulae should not use `deprecated_option`
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Formulae should not use `deprecated_option`
         end
       RUBY
     end
