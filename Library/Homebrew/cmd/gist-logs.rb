@@ -15,6 +15,7 @@
 #:    If no logs are found, an error message is presented.
 
 require "formula"
+require "install"
 require "system_config"
 require "stringio"
 require "socket"
