@@ -61,7 +61,7 @@ module Homebrew
       end
 
       if files && !has_non_formula
-        config = if (files.first/"spec").exist?
+        config = if files.first && File.exist?("#{files.first}/spec")
           HOMEBREW_LIBRARY/".rubocop_rspec.yml"
         else
           HOMEBREW_LIBRARY/".rubocop_audit.yml"
