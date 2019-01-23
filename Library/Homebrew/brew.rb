@@ -10,6 +10,9 @@ if RUBY_X < 2 || (RUBY_X == 2 && RUBY_Y < 3)
   raise "Homebrew must be run under Ruby 2.3! You're running #{RUBY_VERSION}."
 end
 
+# Also define here so we can rescue regardless of location.
+class MissingEnvironmentVariables < RuntimeError; end
+
 begin
   require_relative "global"
 rescue MissingEnvironmentVariables => e
