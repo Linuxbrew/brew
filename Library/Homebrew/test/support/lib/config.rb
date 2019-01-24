@@ -41,3 +41,8 @@ PATCH_B_SHA256 = "57958271bb802a59452d0816e0670d16c8b70bdf6530bcf6f78726489ad89b
 
 TEST_SHA1   = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
 TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
+
+# For testing's sake always assume the default prefix
+module Homebrew
+  DEFAULT_PREFIX = HOMEBREW_PREFIX.to_s.freeze
+end

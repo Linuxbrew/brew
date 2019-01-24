@@ -52,7 +52,7 @@ module CleanupRefinement
 
       return true if symlink? && !exist?
 
-      mtime < days.days.ago
+      mtime < days.days.ago && ctime < days.days.ago
     end
 
     def stale?(scrub = false)
@@ -124,7 +124,10 @@ module CleanupRefinement
 
       return true if scrub && !cask.versions.include?(cask.version)
 
-      return mtime < CLEANUP_DEFAULT_DAYS.days.ago if cask.version.latest?
+      if cask.version.latest?
+        return mtime < CLEANUP_DEFAULT_DAYS.days.ago &&
+               ctime < CLEANUP_DEFAULT_DAYS.days.ago
+      end
 
       false
     end

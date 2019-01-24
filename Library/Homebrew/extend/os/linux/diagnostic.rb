@@ -7,6 +7,13 @@ require "os/linux/kernel"
 module Homebrew
   module Diagnostic
     class Checks
+      def supported_configuration_checks
+        %w[
+          check_glibc_minimum_version
+          check_kernel_minimum_version
+        ].freeze
+      end
+
       def check_tmpdir_sticky_bit
         message = generic_check_tmpdir_sticky_bit
         return if message.nil?

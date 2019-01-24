@@ -27,14 +27,22 @@ module Homebrew
       end
     end
 
-    def perform_development_tools_checks
-      fatal_checks(:fatal_development_tools_checks)
+    def check_cc_argv
+      return unless ARGV.cc
+
+      @checks ||= Diagnostic::Checks.new
+      opoo <<~EOS
+        You passed `--cc=#{ARGV.cc}`.
+        #{@checks.please_create_pull_requests}
+      EOS
     end
 
-    def perform_preinstall_checks
+    def perform_preinstall_checks(all_fatal: false)
       check_cpu
       attempt_directory_creation
-      fatal_checks(:fatal_install_checks)
+      check_cc_argv
+      diagnostic_checks(:supported_configuration_checks, fatal: all_fatal)
+      diagnostic_checks(:fatal_preinstall_checks)
       return if OS.mac?
       symlink_ld_so
       symlink_host_gcc
@@ -42,17 +50,26 @@ module Homebrew
     alias generic_perform_preinstall_checks perform_preinstall_checks
     module_function :generic_perform_preinstall_checks
 
-    def fatal_checks(type)
+    def perform_build_from_source_checks(all_fatal: false)
+      diagnostic_checks(:fatal_build_from_source_checks)
+      diagnostic_checks(:build_from_source_checks, fatal: all_fatal)
+    end
+
+    def diagnostic_checks(type, fatal: true)
       @checks ||= Diagnostic::Checks.new
       failed = false
       @checks.public_send(type).each do |check|
         out = @checks.public_send(check)
         next if out.nil?
 
-        failed ||= true
-        ofail out
+        if fatal
+          failed ||= true
+          ofail out
+        else
+          opoo out
+        end
       end
-      exit 1 if failed
+      exit 1 if failed && fatal
     end
 
     # Symlink the dynamic linker, ld.so

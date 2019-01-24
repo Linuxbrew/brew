@@ -73,35 +73,36 @@ module Homebrew
       end
       ############# END HELPERS
 
-      def fatal_install_checks
+      def fatal_preinstall_checks
         %w[
           check_access_directories
         ].freeze
       end
 
-      def development_tools_checks
+      def fatal_build_from_source_checks
         %w[
           check_for_installed_developer_tools
         ].freeze
       end
 
-      def fatal_development_tools_checks
-        %w[
-        ].freeze
+      def supported_configuration_checks
+        [].freeze
+      end
+
+      def build_from_source_checks
+        [].freeze
       end
 
       def build_error_checks
-        (development_tools_checks + %w[
-        ]).freeze
+        supported_configuration_checks + build_from_source_checks
       end
 
       def please_create_pull_requests(what = "unsupported configuration")
         <<~EOS
-          You may encounter build failures and other breakages.
-          Please create pull requests instead of asking for help on
-          Homebrew's GitHub, Discourse, Twitter or IRC. You are
-          responsible for resolving any issues you experience, as
-          you are running this #{what}.
+          You will encounter build failures with some formulae.
+          Please create pull requests instead of asking for help on Homebrew's GitHub,
+          Discourse, Twitter or IRC. You are responsible for resolving any issues you
+          experience, as you are running this #{what}.
         EOS
       end
 
@@ -118,10 +119,8 @@ module Homebrew
         return unless ENV["HOMEBREW_BUILD_FROM_SOURCE"]
 
         <<~EOS
-          You have HOMEBREW_BUILD_FROM_SOURCE set. This environment variable is
-          intended for use by Homebrew developers. If you are encountering errors,
-          please try unsetting this. Please do not file issues if you encounter
-          errors when using this environment variable.
+          You have HOMEBREW_BUILD_FROM_SOURCE set.
+          #{please_create_pull_requests}
         EOS
       end
 
@@ -805,13 +804,13 @@ module Homebrew
       end
 
       def check_homebrew_prefix
-        return if HOMEBREW_PREFIX.to_s == Homebrew::DEFAULT_PREFIX
+        return if Homebrew.default_prefix?
 
         <<~EOS
           Your Homebrew's prefix is not #{Homebrew::DEFAULT_PREFIX}.
-          You can install Homebrew anywhere you want but some bottles (binary packages)
-          can only be used with a standard prefix and some formulae (packages)
-          may not build correctly with a non-standard prefix.
+          Some of Homebrew's bottles (binary packages) can only be used with the default
+          prefix (#{Homebrew::DEFAULT_PREFIX}).
+          #{please_create_pull_requests}
         EOS
       end
 

@@ -197,7 +197,6 @@ shared_examples "#uninstall_phase or #zap_phase" do
       end
 
       before do
-        # rubocop:disable RSpec/AnyInstance
         allow_any_instance_of(Cask::Artifact::AbstractUninstall).to receive(:trash_paths)
           .and_wrap_original do |method, *args|
             method.call(*args).tap do |result|

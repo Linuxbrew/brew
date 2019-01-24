@@ -65,6 +65,12 @@ do
   export "$VAR_NEW"="${!VAR}"
 done
 
+# Set CI variable for Azure Pipelines, Jenkins.
+if [[ -n "$TF_BUILD" || -n "$JENKINS_HOME" ]]
+then
+  export CI="1"
+fi
+
 # test-bot does environment filtering itself
 if [[ -z "$HOMEBREW_NO_ENV_FILTERING" && "$1" != "test-bot" ]]
 then

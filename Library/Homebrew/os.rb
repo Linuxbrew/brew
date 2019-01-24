@@ -16,8 +16,12 @@ module OS
   if OS.mac?
     require "os/mac"
     GITHUB_USER = "Homebrew".freeze
-    # Don't tell people to report issues on unsupported versions of macOS.
-    if !OS::Mac.prerelease? && !OS::Mac.outdated_release?
+    # Don't tell people to report issues on unsupported configurations.
+    if !OS::Mac.prerelease? &&
+       !OS::Mac.outdated_release? &&
+       !ENV["HOMEBREW_BUILD_FROM_SOURCE"] &&
+       ARGV.none? { |v| v.start_with?("--cc=") } &&
+       ENV["HOMEBREW_PREFIX"] == "/usr/local"
       ISSUES_URL = "https://docs.brew.sh/Troubleshooting".freeze
     end
     PATH_OPEN = "/usr/bin/open".freeze

@@ -17,6 +17,7 @@
 /Library/Homebrew/test/fs_leak_log
 /Library/Homebrew/vendor/portable-ruby
 /Library/Taps
+/Library/PinnedTaps
 
 # Ignore Bundler files
 **/.bundle/bin

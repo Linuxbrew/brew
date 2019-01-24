@@ -16,7 +16,7 @@ module Utils
       def os_prefix_ci
         @os_prefix_ci ||= begin
           os = OS_VERSION
-          prefix = ", #{custom_prefix_label}" if HOMEBREW_PREFIX.to_s != Homebrew::DEFAULT_PREFIX
+          prefix = ", #{custom_prefix_label}" unless Homebrew.default_prefix?
           ci = ", CI" if ENV["CI"]
           "#{os}#{prefix}#{ci}"
         end
