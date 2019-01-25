@@ -555,6 +555,21 @@ module Homebrew
             properly. You can solve this by adding the Homebrew remote:
               git -C "#{HOMEBREW_REPOSITORY}" remote add origin #{Formatter.url(remote)}
           EOS
+        elsif origin =~ %r{Linuxbrew/brew(\.git)?$}
+          return if ENV["CI"]
+
+          <<~EOS
+            git origin remote is Linuxbrew/brew.
+
+            Linuxbrew/brew has been merged into Homebrew/brew!
+            Linuxbrew/brew will no longer be updated.
+            The current git origin is:
+              #{origin}
+
+            Please set the origin remote to point at the Homebrew/brew by running:
+
+              git -C "#{HOMEBREW_REPOSITORY}" remote set-url origin #{Formatter.url(remote)}
+          EOS
         elsif origin !~ %r{Homebrew/brew(\.git)?$}
           <<~EOS
             Suspicious Homebrew/brew git origin remote found.
