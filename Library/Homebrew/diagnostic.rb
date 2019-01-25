@@ -545,7 +545,7 @@ module Homebrew
         return if !Utils.git_available? || !(HOMEBREW_REPOSITORY/".git").exist?
 
         origin = HOMEBREW_REPOSITORY.git_origin
-        remote = "https://github.com/#{OS::GITHUB_USER}/brew.git"
+        remote = "https://github.com/Homebrew/brew"
 
         if origin.nil?
           <<~EOS
@@ -555,7 +555,7 @@ module Homebrew
             properly. You can solve this by adding the Homebrew remote:
               git -C "#{HOMEBREW_REPOSITORY}" remote add origin #{Formatter.url(remote)}
           EOS
-        elsif origin !~ %r{(Homebrew|Linuxbrew)/brew(\.git)?$}
+        elsif origin !~ %r{Homebrew/brew(\.git)?$}
           <<~EOS
             Suspicious Homebrew/brew git origin remote found.
 
@@ -576,7 +576,7 @@ module Homebrew
         return if !Utils.git_available? || !(coretap_path/".git").exist?
 
         origin = coretap_path.git_origin
-        remote = "https://github.com/#{OS::GITHUB_USER}/homebrew-core.git"
+        remote = "https://github.com/Homebrew/homebrew-core.git"
 
         if origin.nil?
           <<~EOS
