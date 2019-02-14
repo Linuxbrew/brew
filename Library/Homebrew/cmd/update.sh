@@ -23,12 +23,11 @@ git() {
 }
 
 git_init_if_necessary() {
+  BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
   if [[ -n "$HOMEBREW_MACOS" ]] || [[ -n "$HOMEBREW_FORCE_HOMEBREW_ON_LINUX" ]]
   then
-    BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
   else
-    BREW_OFFICIAL_REMOTE="https://github.com/Linuxbrew/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Linuxbrew/homebrew-core"
   fi
 
@@ -249,7 +248,10 @@ EOS
   # ensure we don't munge line endings on checkout
   git config core.autocrlf false
 
-  if [[ -z "$HOMEBREW_MERGE" ]]
+  if [[ "$DIR" = "$HOMEBREW_REPOSITORY" ]]
+  then
+    git checkout --force -B "$UPSTREAM_BRANCH" "$REMOTE_REF" "${QUIET_ARGS[@]}"
+  elif [[ -z "$HOMEBREW_MERGE" ]]
   then
     # Work around bug where git rebase --quiet is not quiet
     if [[ -z "$HOMEBREW_VERBOSE" ]]
@@ -403,6 +405,22 @@ EOS
   git_init_if_necessary
 
   safe_cd "$HOMEBREW_REPOSITORY"
+
+  # If the remote is not the default, change it to the default.
+  if [[ "$(git config remote.origin.url)" != "$BREW_OFFICIAL_REMOTE" ]]
+  then
+    esc=$(printf "\033")
+    cat <<EOS
+${esc}[32m==>${esc}[0m ${esc}[1mMigrating from Linuxbrew/brew to Homebrew/brew${esc}[0m
+  Linuxbrew/brew has been merged into Homebrew/brew!
+  Linuxbrew/brew will no longer be updated.
+  Your git remote has been changed from
+     $(git config remote.origin.url)
+  to $BREW_OFFICIAL_REMOTE
+  See the blog post at https://brew.sh/2019/02/02/homebrew-2.0.0/
+EOS
+    git config remote.origin.url "$BREW_OFFICIAL_REMOTE"
+  fi
 
   # if an older system had a newer curl installed, change each repo's remote URL from GIT to HTTPS
   if [[ -n "$HOMEBREW_SYSTEM_CURL_TOO_OLD" &&
