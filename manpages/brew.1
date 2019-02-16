@@ -1117,61 +1117,120 @@ Override warnings and enable potentially unsafe operations\.
 .
 .SH "OFFICIAL EXTERNAL COMMANDS"
 .
-.TP
-\fBbundle\fR \fIcommand\fR
-Bundler for non\-Ruby dependencies from Homebrew\.
+.IP "\(bu" 4
+\fBbundle\fR \fIsubcommand\fR
 .
-.IP
+.IP "" 0
+.
+.P
+Bundler for non\-Ruby dependencies from Homebrew, Homebrew Cask and the Mac App Store\.
+.
+.IP "" 4
+.
+.nf
+
+   \-\-file=                        read the `Brewfile` from this file\. Use `\-\-file=\-` to output to stdin/stdout\.
+   \-\-global                       read the `Brewfile` from `~/\.Brewfile`\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
 \fBbrew bundle\fR [\fBinstall\fR] [\fB\-v\fR|\fB\-\-verbose\fR] [\fB\-\-no\-upgrade\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR]
-    Install or upgrade all dependencies in a Brewfile\.
 .
-.IP
+.P
+Install or upgrade all dependencies in a Brewfile\.
+.
+.IP "" 4
+.
+.nf
+
+   \-v, \-\-verbose                  print the output from commands as they are run\.
+   \-\-no\-upgrade                   don\'t run `brew upgrade` on outdated dependencies\. Note they may still be upgraded by `brew install` if needed\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
 \fBbrew bundle dump\fR [\fB\-\-force\fR] [\fB\-\-describe\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR]
-    Write all installed casks/formulae/taps into a Brewfile\.
 .
-.IP
+.P
+Write all installed casks/formulae/taps into a Brewfile\.
+.
+.IP "" 4
+.
+.nf
+
+   \-\-force                        overwrite an existing `Brewfile`\.
+   \-\-describe                     output a description comment above each line\. This comment will not be output if the dependency does not have a description\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
 \fBbrew bundle cleanup\fR [\fB\-\-force\fR] [\fB\-\-zap\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR]
-    Uninstall all dependencies not listed in a Brewfile\.
 .
-.IP
+.P
+Uninstall all dependencies not listed in a Brewfile\.
+.
+.IP "" 4
+.
+.nf
+
+   \-\-force                        actually perform the cleanup operations\.
+   \-\-zap                          casks will be removed using the `zap` command instead of `uninstall`\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
 \fBbrew bundle check\fR [\fB\-\-no\-upgrade\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR] [\fB\-\-verbose\fR]
-    Check if all dependencies are installed in a Brewfile\. Missing dependencies are listed in verbose mode\. \fBcheck\fR will exit on the first category missing a dependency unless in verbose mode\.
 .
-.IP
+.P
+Check if all dependencies are installed in a Brewfile\.
+.
+.IP "" 4
+.
+.nf
+
+   \-\-no\-upgrade                   ignore outdated dependencies\.
+   \-v, \-\-verbose                  output and check for all missing dependencies\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
 \fBbrew bundle exec\fR \fIcommand\fR
-    Run an external command in an isolated build environment\.
 .
-.IP
+.P
+Run an external command in an isolated build environment\.
+.
+.P
 \fBbrew bundle list\fR [\fB\-\-all\fR|\fB\-\-brews\fR|\fB\-\-casks\fR|\fB\-\-taps\fR|\fB\-\-mas\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR]
-    List all dependencies present in a Brewfile, optionally limiting by types\. By default, only brew dependencies are output\.
 .
-.IP
-If \fB\-v\fR or \fB\-\-verbose\fR are passed, print verbose output\.
+.P
+List all dependencies present in a Brewfile\. By default, only brew dependencies are output\.
 .
-.IP
-If \fB\-\-no\-upgrade\fR is passed, don\'t run \fBbrew upgrade\fR on outdated dependencies\. Note they may still be upgraded by \fBbrew install\fR if needed\.
+.IP "" 4
 .
-.IP
-If \fB\-\-force\fR is passed, uninstall dependencies or overwrite an existing Brewfile\.
+.nf
+
+   \-\-all                          output all dependencies\.
+   \-\-brews                        output Homebrew dependencies\.
+   \-\-casks                        output Homebrew Cask dependencies\.
+   \-\-taps                         output tap dependencies\.
+   \-\-mas                          output Mac App Store dependencies\.
+
+**Homebrew/homebrew\-bundle**: <https://github\.com/Homebrew/homebrew\-bundle>
 .
-.IP
-If \fB\-\-zap\fR is passed, casks will be removed using the \fBzap\fR command instead of \fBuninstall\fR\.
+.fi
 .
-.IP
-If \fB\-\-file=\fR\fIpath\fR is passed, the Brewfile path is set accordingly\. Use \fB\-\-file=\-\fR to output to console\.
-.
-.IP
-If \fB\-\-global\fR is passed, set the Brewfile path to \fB~/\.Brewfile\fR\.
-.
-.IP
-If \fB\-\-describe\fR is passed, output a description comment above each line\. This comment will not be output if the dependency does not have a description\.
-.
-.IP
-If \fB\-h\fR or \fB\-\-help\fR are passed, print this help message and exit\.
-.
-.IP
-\fBHomebrew/homebrew\-bundle\fR
-    \fIhttps://github\.com/Homebrew/homebrew\-bundle\fR
+.IP "" 0
 .
 .TP
 \fBcask\fR [\fB\-\-version\fR | \fBaudit\fR | \fBcat\fR | \fBcleanup\fR | \fBcreate\fR | \fBdoctor\fR | \fBedit\fR | \fBfetch\fR | \fBhome\fR | \fBinfo\fR]
@@ -1182,39 +1241,70 @@ Install macOS applications distributed as binaries\.
     \fIhttps://github\.com/Homebrew/homebrew\-cask\fR
 .
 .TP
-\fBservices\fR \fIcommand\fR
-Integrates Homebrew formulae with macOS\' \fBlaunchctl\fR manager\.
+\fBservices\fR \fIsubcommand\fR:
+
 .
-.IP
+.P
+Manage background services with macOS\' \fBlaunchctl\fR(1) daemon manager
+.
+.IP "" 4
+.
+.nf
+
+   \-\-all                           run <subcommand> on all services\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
 [\fBsudo\fR] \fBbrew services list\fR
-    List all running services for the current user (or root)\.
 .
-.IP
+.P
+List all running services for the current user (or root)\.
+.
+.P
 [\fBsudo\fR] \fBbrew services run\fR (\fIformula\fR|\fB\-\-all\fR)
-    Run the service \fIformula\fR without registering to launch at login (or boot)\.
 .
-.IP
+.P
+Run the service \fIformula\fR without registering to launch at login (or boot)\.
+.
+.P
 [\fBsudo\fR] \fBbrew services start\fR (\fIformula\fR|\fB\-\-all\fR)
-    Start the service \fIformula\fR immediately and register it to launch at login (or boot)\.
 .
-.IP
+.P
+Start the service \fIformula\fR immediately and register it to launch at login (or boot)\.
+.
+.P
 [\fBsudo\fR] \fBbrew services stop\fR (\fIformula\fR|\fB\-\-all\fR)
-    Stop the service \fIformula\fR immediately and unregister it from launching at login (or boot)\.
 .
-.IP
+.P
+Stop the service \fIformula\fR immediately and unregister it from launching at login (or boot)\.
+.
+.P
 [\fBsudo\fR] \fBbrew services restart\fR (\fIformula\fR|\fB\-\-all\fR)
-    Stop (if necessary) and start the service \fIformula\fR immediately and register it to launch at login (or boot)\.
 .
-.IP
+.P
+Stop (if necessary) and start the service \fIformula\fR immediately and register it to launch at login (or boot)\.
+.
+.P
 [\fBsudo\fR] \fBbrew services cleanup\fR
-    Remove all unused services\.
 .
-.IP
+.P
+Remove all unused services\.
+.
+.P
 If \fBsudo\fR is passed, operate on \fB/Library/LaunchDaemons\fR (started at boot)\. Otherwise, operate on \fB~/Library/LaunchAgents\fR (started at login)\.
 .
-.IP
-\fBHomebrew/homebrew\-services\fR
-    \fIhttps://github\.com/Homebrew/homebrew\-services\fR
+.IP "" 4
+.
+.nf
+
+**Homebrew/homebrew\-services**: <https://github\.com/Homebrew/homebrew\-services>
+.
+.fi
+.
+.IP "" 0
 .
 .SH "CUSTOM EXTERNAL COMMANDS"
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.

@@ -1001,47 +1001,54 @@ These options are applicable across all sub-commands.
 
 ## OFFICIAL EXTERNAL COMMANDS
 
-  * `bundle` *`command`*:
-    Bundler for non-Ruby dependencies from Homebrew.
+  * `bundle` *`subcommand`*
 
-    `brew bundle` [`install`] [`-v`|`--verbose`] [`--no-upgrade`] [`--file=`*`path`*|`--global`]:
-    Install or upgrade all dependencies in a Brewfile.
+  Bundler for non-Ruby dependencies from Homebrew, Homebrew Cask and the Mac App Store.
 
-    `brew bundle dump` [`--force`] [`--describe`] [`--file=`*`path`*|`--global`]:
-    Write all installed casks/formulae/taps into a Brewfile.
+       --file=                        read the `Brewfile` from this file. Use `--file=-` to output to stdin/stdout.
+       --global                       read the `Brewfile` from `~/.Brewfile`.
 
-    `brew bundle cleanup` [`--force`] [`--zap`] [`--file=`*`path`*|`--global`]:
-    Uninstall all dependencies not listed in a Brewfile.
+  `brew bundle` [`install`] [`-v`|`--verbose`] [`--no-upgrade`] [`--file=`*`path`*|`--global`]
 
-    `brew bundle check` [`--no-upgrade`] [`--file=`*`path`*|`--global`] [`--verbose`]:
-    Check if all dependencies are installed in a Brewfile. Missing dependencies are listed in verbose mode.
-    `check` will exit on the first category missing a dependency unless in verbose mode.
+  Install or upgrade all dependencies in a Brewfile.
 
-    `brew bundle exec` *`command`*:
-    Run an external command in an isolated build environment.
+       -v, --verbose                  print the output from commands as they are run.
+       --no-upgrade                   don't run `brew upgrade` on outdated dependencies. Note they may still be upgraded by `brew install` if needed.
 
-    `brew bundle list` [`--all`|`--brews`|`--casks`|`--taps`|`--mas`] [`--file=`*`path`*|`--global`]:
-    List all dependencies present in a Brewfile, optionally limiting by types.
-    By default, only brew dependencies are output.
+  `brew bundle dump` [`--force`] [`--describe`] [`--file=`*`path`*|`--global`]
 
-    If `-v` or `--verbose` are passed, print verbose output.
+  Write all installed casks/formulae/taps into a Brewfile.
 
-    If `--no-upgrade` is passed, don't run `brew upgrade` on outdated dependencies.
-    Note they may still be upgraded by `brew install` if needed.
+       --force                        overwrite an existing `Brewfile`.
+       --describe                     output a description comment above each line. This comment will not be output if the dependency does not have a description.
 
-    If `--force` is passed, uninstall dependencies or overwrite an existing Brewfile.
+  `brew bundle cleanup` [`--force`] [`--zap`] [`--file=`*`path`*|`--global`]
 
-    If `--zap` is passed, casks will be removed using the `zap` command instead of `uninstall`.
+  Uninstall all dependencies not listed in a Brewfile.
 
-    If `--file=`*`path`* is passed, the Brewfile path is set accordingly.
-    Use `--file=-` to output to console.
+       --force                        actually perform the cleanup operations.
+       --zap                          casks will be removed using the `zap` command instead of `uninstall`.
 
-    If `--global` is passed, set the Brewfile path to `~/.Brewfile`.
+  `brew bundle check` [`--no-upgrade`] [`--file=`*`path`*|`--global`] [`--verbose`]
 
-    If `--describe` is passed, output a description comment above each line.
-    This comment will not be output if the dependency does not have a description.
+  Check if all dependencies are installed in a Brewfile.
 
-    If `-h` or `--help` are passed, print this help message and exit.
+       --no-upgrade                   ignore outdated dependencies.
+       -v, --verbose                  output and check for all missing dependencies.
+
+  `brew bundle exec` *`command`*
+
+  Run an external command in an isolated build environment.
+
+  `brew bundle list` [`--all`|`--brews`|`--casks`|`--taps`|`--mas`] [`--file=`*`path`*|`--global`]
+
+  List all dependencies present in a Brewfile. By default, only brew dependencies are output.
+
+       --all                          output all dependencies.
+       --brews                        output Homebrew dependencies.
+       --casks                        output Homebrew Cask dependencies.
+       --taps                         output tap dependencies.
+       --mas                          output Mac App Store dependencies.
 
     **Homebrew/homebrew-bundle**: <https://github.com/Homebrew/homebrew-bundle>
 
@@ -1050,29 +1057,38 @@ These options are applicable across all sub-commands.
 
     **Homebrew/homebrew-cask**: <https://github.com/Homebrew/homebrew-cask>
 
-  * `services` *`command`*:
-    Integrates Homebrew formulae with macOS' `launchctl` manager.
+  * `services` *`subcommand`*:
 
-    [`sudo`] `brew services list`:
-    List all running services for the current user (or root).
+  Manage background services with macOS' `launchctl`(1) daemon manager
 
-    [`sudo`] `brew services run` (*`formula`*|`--all`):
-    Run the service *`formula`* without registering to launch at login (or boot).
+       --all                           run *`subcommand`* on all services.
 
-    [`sudo`] `brew services start` (*`formula`*|`--all`):
-    Start the service *`formula`* immediately and register it to launch at login (or boot).
+  [`sudo`] `brew services list`
 
-    [`sudo`] `brew services stop` (*`formula`*|`--all`):
-    Stop the service *`formula`* immediately and unregister it from launching at login (or boot).
+  List all running services for the current user (or root).
 
-    [`sudo`] `brew services restart` (*`formula`*|`--all`):
-    Stop (if necessary) and start the service *`formula`* immediately and register it to launch at login (or boot).
+  [`sudo`] `brew services run` (*`formula`*|`--all`)
 
-    [`sudo`] `brew services cleanup`:
-    Remove all unused services.
+  Run the service *`formula`* without registering to launch at login (or boot).
 
-    If `sudo` is passed, operate on `/Library/LaunchDaemons` (started at boot).
-    Otherwise, operate on `~/Library/LaunchAgents` (started at login).
+  [`sudo`] `brew services start` (*`formula`*|`--all`)
+
+  Start the service *`formula`* immediately and register it to launch at login (or boot).
+
+  [`sudo`] `brew services stop` (*`formula`*|`--all`)
+
+  Stop the service *`formula`* immediately and unregister it from launching at login (or boot).
+
+  [`sudo`] `brew services restart` (*`formula`*|`--all`)
+
+  Stop (if necessary) and start the service *`formula`* immediately and register it to launch at login (or boot).
+
+  [`sudo`] `brew services cleanup`
+
+  Remove all unused services.
+
+  If `sudo` is passed, operate on `/Library/LaunchDaemons` (started at boot).
+  Otherwise, operate on `~/Library/LaunchAgents` (started at login).
 
     **Homebrew/homebrew-services**: <https://github.com/Homebrew/homebrew-services>
 
