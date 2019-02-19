@@ -38,6 +38,7 @@ homebrew-update-reset() {
     echo "==> Fetching $DIR..."
 
     if [[ "$DIR" = "$HOMEBREW_REPOSITORY" ]]; then
+      git config remote.origin.url "https://github.com/Homebrew/brew"
       latest_tag="$(git ls-remote --tags --refs -q origin | tail -n1 | cut -f2)"
       git fetch --force origin --shallow-since="$latest_tag"
     else
