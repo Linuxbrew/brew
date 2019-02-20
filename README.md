@@ -1,5 +1,11 @@
 ![Linuxbrew logo](https://linuxbrew.sh/images/linuxbrew-256x256.png)
 
+# Linuxbrew has been merged into Homebrew
+
+Linuxbrew/brew has been merged into [Homebrew/brew](https://github.com/Homebrew/brew)! Existing installations of Linuxbrew will be automatically migrated to Homebrew. Linuxbrew/brew will no longer be updated. See the [Homebrew documentation of Linuxbrew](https://docs.brew.sh/Linuxbrew) and the Homebrew 2.0.0 [blog post](https://brew.sh/2019/02/02/homebrew-2.0.0/).
+
+> Homebrew officially supports Linux and Windows 10 with Windows Subsystem for Linux (WSL). “Homebrew on Linux” is called “Linuxbrew”. You can install it in your home directory, so it does not require sudo, and use it to install software that your host distribution’s package manager does not provide. Linuxbrew uses its own repository for formulae: [Linuxbrew/homebrew-core](https://github.com/Linuxbrew/homebrew-core).
+
 # Linuxbrew
 
 [![GitHub release](https://img.shields.io/github/tag/Linuxbrew/brew.svg)](https://github.com/Linuxbrew/brew/releases)
